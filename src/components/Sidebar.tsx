@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 import { useRouter } from "next/navigation"; // ✅ 수정된 부분
 import { FC } from "react";
 
@@ -47,6 +48,18 @@ const Sidebar: FC = () => {
             })}
           </ul>
         </nav>
+        <h2 className="text-2xl font-bold mt-8 mb-4">Admin Menu</h2>
+        <ul className="space-y-2">
+          <li><Link href="/admin/dashboard">Dashboard</Link></li>
+          <li><Link href="/admin/customers">Customers</Link></li>
+          <li><Link href="/admin/sellers">Sellers</Link></li>
+          <li><Link href="/admin/products">Products</Link></li>
+          <li><Link href="/admin/auctions">Auctions</Link></li>
+          <li><Link href="/admin/reviews">Reviews</Link></li>
+          <li><Link href="/admin/reports">Reports</Link></li>
+          <li><Link href="/admin/faq">FAQ</Link></li>
+          <li><Link href="/admin/settlements">Settlements</Link></li>
+        </ul>
       </div>
     </aside>
   );

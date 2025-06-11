@@ -34,7 +34,14 @@ export default function ProductEditPage() {
                     fetchCategories()
                 ]);
 
-                setForm(productData);
+                setForm({
+                ...productData,
+                deliveryPolicy: productData.deliveryPolicy ?? {
+                    type: '무료배송',
+                    cost: 0,
+                    regionLimit: ''
+                }
+            });
                 setCategories(categoryData);
 
                 // parentCategoryId 초기 설정

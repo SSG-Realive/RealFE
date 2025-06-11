@@ -6,7 +6,7 @@ const reviews = [
   { id: 3, date: '2024-06-08', author: 'Kim Young-hee', product: '소파', rating: 3, status: '비노출', action: 'View' },
 ];
 
-export default function ReviewManagePage() {
+export default function SellerReviewPage() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f4f4' }}>
       {/* 사이드바 */}
@@ -18,7 +18,8 @@ export default function ReviewManagePage() {
             <li style={{ margin: '16px 0' }}>주문</li>
             <li style={{ margin: '16px 0' }}>상품</li>
             <li style={{ margin: '16px 0' }}>경매</li>
-            <li style={{ margin: '16px 0', fontWeight: 'bold' }}>리뷰</li>
+            <li style={{ margin: '16px 0' }}>리뷰</li>
+            <li style={{ margin: '16px 0', fontWeight: 'bold' }}>판매자리뷰</li>
             <li style={{ margin: '16px 0' }}>FAQ</li>
           </ul>
         </nav>
@@ -26,7 +27,7 @@ export default function ReviewManagePage() {
       {/* 메인 */}
       <main style={{ flex: 1, background: '#fff', padding: 32 }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontWeight: 'bold', fontSize: 24 }}>리뷰 관리</h2>
+          <h2 style={{ fontWeight: 'bold', fontSize: 24 }}>판매자 리뷰</h2>
           <span style={{ fontWeight: 'bold' }}>admin</span>
         </header>
         {/* 검색/필터 */}

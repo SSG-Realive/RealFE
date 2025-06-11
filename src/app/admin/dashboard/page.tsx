@@ -1,10 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import DashboardChart from '@/components/DashboardChart';
 
 const AdminDashboardPage = () => {
   return (
     <div>
       <h1>Admin Dashboard</h1>
+      <DashboardChart />
       <div>
         <h2>Statistics</h2>
         <p>Total Customers: 100</p>

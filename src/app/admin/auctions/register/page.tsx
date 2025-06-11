@@ -1,52 +1,63 @@
 import React from 'react';
 
-const AuctionRegisterPage = () => {
+export default function AuctionRegisterPage() {
   return (
-    <div>
-      <h2>경매 등록</h2>
-      <form style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div>
-          <label>상품명 입력</label>
-          <input type="text" style={{ width: 300 }} />
-        </div>
-        <div>
-          <label>카테고리 지정</label>
-          <div>
-            <label><input type="radio" name="category" /> 의자</label>
-            <label><input type="radio" name="category" /> 책상</label>
-            <label><input type="radio" name="category" /> 소파</label>
-            <label><input type="radio" name="category" /> 침대</label>
-            <label><input type="radio" name="category" /> 수납장</label>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f4f4f4' }}>
+      {/* 사이드바 */}
+      <aside style={{ width: 120, background: '#e0e0e0', padding: 16 }}>
+        <nav>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            <li style={{ margin: '16px 0' }}>고객</li>
+            <li style={{ margin: '16px 0' }}>판매자</li>
+            <li style={{ margin: '16px 0' }}>주문</li>
+            <li style={{ margin: '16px 0' }}>상품</li>
+            <li style={{ margin: '16px 0', fontWeight: 'bold' }}>경매</li>
+            <li style={{ margin: '16px 0' }}>FAQ</li>
+          </ul>
+        </nav>
+      </aside>
+      {/* 메인 */}
+      <main style={{ flex: 1, background: '#fff', padding: 32 }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h2 style={{ fontWeight: 'bold', fontSize: 24 }}>경매등록</h2>
+          <span style={{ fontWeight: 'bold' }}>admin</span>
+        </header>
+        <form style={{ maxWidth: 600, margin: '0 auto', background: '#fafafa', padding: 32, borderRadius: 8, boxShadow: '0 2px 8px #eee' }}>
+          <div style={{ marginBottom: 16 }}>
+            <label>상품명</label>
+            <input type="text" style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
           </div>
-        </div>
-        <div>
-          <label>사용감 지정</label>
-          <div>
-            <label><input type="radio" name="condition" /> 상</label>
-            <label><input type="radio" name="condition" /> 중</label>
-            <label><input type="radio" name="condition" /> 하</label>
+          <div style={{ marginBottom: 16 }}>
+            <label>이미지</label>
+            <input type="file" />
           </div>
-        </div>
-        <div>
-          <label>금액 입력</label>
-          <input type="number" style={{ width: 200 }} />
-        </div>
-        <div>
-          <label>상품 설명</label>
-          <textarea style={{ width: 400, height: 80 }} />
-        </div>
-        <div>
-          <label>이미지 첨부</label>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div style={{ width: 80, height: 80, background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>이미지</div>
-            <div style={{ width: 80, height: 80, background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>이미지</div>
-            <div style={{ width: 80, height: 80, background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>이미지</div>
+          <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label>시작가</label>
+              <input type="number" style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label>즉시구매가</label>
+              <input type="number" style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
+            </div>
           </div>
-        </div>
-        <button type="submit">경매등록</button>
-      </form>
+          <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <label>시작일</label>
+              <input type="date" style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label>마감일</label>
+              <input type="date" style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} />
+            </div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label>설명</label>
+            <textarea style={{ width: '100%', padding: 8, border: '1px solid #ccc', borderRadius: 4 }} rows={3} />
+          </div>
+          <button type="submit" style={{ background: '#222', color: '#fff', border: 'none', borderRadius: 4, padding: '8px 32px', fontWeight: 'bold' }}>등록</button>
+        </form>
+      </main>
     </div>
   );
-};
-
-export default AuctionRegisterPage; 
+} 

@@ -63,6 +63,7 @@ export default function SellerSettlementPage() {
                     <input
                         type="date"
                         value={filterDate}
+                        
                         onChange={(e) => setFilterDate(e.target.value)}
                         className="border px-2 py-1 rounded"
                     />

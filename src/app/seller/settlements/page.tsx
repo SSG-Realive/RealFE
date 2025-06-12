@@ -49,6 +49,7 @@ export default function SellerSettlementPage() {
     };
 
     useEffect(() => {
+        
         fetchAll(); // 초기 전체 조회
     }, []);
 
@@ -63,7 +64,7 @@ export default function SellerSettlementPage() {
                     <input
                         type="date"
                         value={filterDate}
-                        
+
                         onChange={(e) => setFilterDate(e.target.value)}
                         className="border px-2 py-1 rounded"
                     />

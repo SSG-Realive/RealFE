@@ -4,34 +4,53 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import Header from '@/components/Header';
-import { getSellerSettlementList } from '@/service/sellerSettlementService';
+import {
+    getSellerSettlementList,
+    getSellerSettlementListByDate,
+} from '@/service/sellerSettlementService';
 import { SellerSettlementResponse } from '@/types/sellerSettlement';
+import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 export default function SellerSettlementPage() {
+    useSellerAuthGuard();
+
     const router = useRouter();
     const [payouts, setPayouts] = useState<SellerSettlementResponse[]>([]);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [filterDate, setFilterDate] = useState(''); // ✅ 날짜 필터 상태
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchAll = async () => {
+        try {
+            setLoading(true);
+            const res = await getSellerSettlementList();
+            setPayouts(res || []);
+            setError(null);
+        } catch (err) {
+            console.error('정산 목록 조회 실패:', err);
+            setError('정산 데이터를 불러오는 데 실패했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchFiltered = async (date: string) => {
+        try {
+            setLoading(true);
+            const res = await getSellerSettlementListByDate(date);
+            setPayouts(res || []);
+            setError(null);
+        } catch (err) {
+            console.error('날짜 필터 조회 실패:', err);
+            setError('해당 날짜의 정산 데이터를 불러오지 못했습니다.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const res = await getSellerSettlementList({ page, size: 10 });
-                setPayouts(res.content || []);
-                setTotalPages(res.totalPages || 1);
-                setError(null);
-            } catch (err) {
-                console.error('정산 목록 조회 실패:', err);
-                setError('정산 데이터를 불러오는 데 실패했습니다.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [page]);
+        fetchAll(); // 초기 전체 조회
+    }, []);
 
     return (
         <SellerLayout>
@@ -39,6 +58,33 @@ export default function SellerSettlementPage() {
             <div className="max-w-4xl mx-auto p-6">
                 <h1 className="text-2xl font-bold mb-6">판매자 정산 내역</h1>
 
+                {/* ✅ 날짜 필터 */}
+                <div className="mb-4 flex items-center gap-2">
+                    <input
+                        type="date"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                        className="border px-2 py-1 rounded"
+                    />
+                    <button
+                        onClick={() => fetchFiltered(filterDate)}
+                        disabled={!filterDate}
+                        className="px-3 py-1 border rounded bg-blue-100 hover:bg-blue-200"
+                    >
+                        날짜 필터 조회
+                    </button>
+                    <button
+                        onClick={() => {
+                            setFilterDate('');
+                            fetchAll();
+                        }}
+                        className="px-3 py-1 border rounded bg-gray-100 hover:bg-gray-200"
+                    >
+                        전체 보기
+                    </button>
+                </div>
+
+                {/* ✅ 테이블 */}
                 {loading ? (
                     <p className="text-gray-500">로딩 중...</p>
                 ) : error ? (
@@ -81,26 +127,6 @@ export default function SellerSettlementPage() {
                         </table>
                     </div>
                 )}
-
-                <div className="mt-6 flex justify-center items-center gap-2">
-                    <button
-                        onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={page === 1}
-                        className="px-3 py-1 border rounded disabled:opacity-50"
-                    >
-                        이전
-                    </button>
-                    <span className="text-sm">
-                        {page} / {totalPages}
-                    </span>
-                    <button
-                        onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={page === totalPages}
-                        className="px-3 py-1 border rounded disabled:opacity-50"
-                    >
-                        다음
-                    </button>
-                </div>
             </div>
         </SellerLayout>
     );

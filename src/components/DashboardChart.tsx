@@ -75,7 +75,7 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
       align: 'left',
     },
     xaxis: {
-      categories: ['총 경매', '총 입찰', '평균 입찰', '성공률', '실패률'],
+      categories: ['총 경매', '총 입찰', '평균 입찰'],
     },
   };
 
@@ -85,8 +85,6 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
       data.auctionSummaryStats.totalAuctionsInPeriod,
       data.auctionSummaryStats.totalBidsInPeriod,
       data.auctionSummaryStats.averageBidsPerAuctionInPeriod,
-      data.auctionSummaryStats.successRate * 100,
-      data.auctionSummaryStats.failureRate * 100,
     ],
   }];
 

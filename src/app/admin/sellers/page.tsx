@@ -1,25 +1,60 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 
 const dummySellers = [
-  { id: 1, name: '이상훈', email: 'sang@test.com', status: 'Active' },
-  { id: 2, name: '박지민', email: 'park@test.com', status: 'Request' },
+  { id: 1, name: '이상훈', email: 'sang@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
+  { id: 2, name: '박지민', email: 'park@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
+  { id: 3, name: '김영희', email: 'kim@test.com', status: 'Blocked', image: 'https://randomuser.me/api/portraits/men/3.jpg' },
+  { id: 4, name: '최민수', email: 'choi@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/women/4.jpg' },
+  { id: 5, name: '정가영', email: 'jung@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/men/5.jpg' },
+  { id: 6, name: '한지민', email: 'han@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/women/6.jpg' },
+  { id: 7, name: '오세훈', email: 'oh@test.com', status: 'Blocked', image: 'https://randomuser.me/api/portraits/men/7.jpg' },
+  { id: 8, name: '유재석', email: 'yoo@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/8.jpg' },
+  { id: 9, name: '강호동', email: 'kang@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/men/9.jpg' },
+  { id: 10, name: '신동엽', email: 'shin@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/10.jpg' },
 ];
 
 export default function AdminSellersPage() {
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const filtered = dummySellers.filter(s =>
+    (s.name.includes(search) || s.email.includes(search)) &&
+    (!status || s.status === status)
+  );
   return (
     <div>
       <h2>판매자 관리</h2>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+        <input
+          type="text"
+          placeholder="이름/이메일 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 200, padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+        />
+        <select
+          value={status}
+          onChange={e => setStatus(e.target.value)}
+          style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+        >
+          <option value="Active">Active</option>
+          <option value="Request">Request</option>
+          <option value="Blocked">Blocked</option>
+        </select>
+      </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
         <thead>
           <tr style={{ background: '#f7f7f7' }}>
+            <th style={{ padding: 8, border: '1px solid #eee' }}>사진</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>상태</th>
           </tr>
         </thead>
         <tbody>
-          {dummySellers.map((s) => (
+          {filtered.map((s) => (
             <tr key={s.id}>
+              <td style={{ padding: 8, border: '1px solid #eee' }}><img src={s.image} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.name}</td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.email}</td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.status}</td>

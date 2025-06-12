@@ -78,8 +78,6 @@ export interface AuctionSummaryStatsDTO {
   totalAuctionsInPeriod: number;
   totalBidsInPeriod: number;
   averageBidsPerAuctionInPeriod: number;
-  successRate: number;
-  failureRate: number;
 }
 
 export interface ReviewSummaryStatsDTO {

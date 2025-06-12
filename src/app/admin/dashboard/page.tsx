@@ -134,6 +134,15 @@ const AdminDashboardPage = () => {
             </table>
           </div>
         </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Auction Statistics</h3>
+          <div className="space-y-2">
+            <p>Total Auctions: {dashboardData.auctionSummaryStats.totalAuctionsInPeriod}</p>
+            <p>Total Bids: {dashboardData.auctionSummaryStats.totalBidsInPeriod}</p>
+            <p>Average Bids per Auction: {dashboardData.auctionSummaryStats.averageBidsPerAuctionInPeriod.toFixed(1)}</p>
+          </div>
+        </div>
       </div>
     </div>
   );

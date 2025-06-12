@@ -73,9 +73,7 @@ const dummyDashboardData: AdminDashboardDTO = {
   auctionSummaryStats: {
     totalAuctionsInPeriod: 30,
     totalBidsInPeriod: 150,
-    averageBidsPerAuctionInPeriod: 5,
-    successRate: 0.8,
-    failureRate: 0.2
+    averageBidsPerAuctionInPeriod: 5
   },
   reviewSummaryStats: {
     totalReviewsInPeriod: 100,

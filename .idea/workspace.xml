@@ -4,14 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="병합" />
+    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="병합">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/seller/qna/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/seller/qna/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/sellerQnaService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/sellerQnaService.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -46,7 +50,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "team2/jaehyun",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/SSG_KDT8/Realive/front",
+    "last_opened_file_path": "C:/SSG_KDT8/Realive/back",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -87,7 +91,8 @@
       <workItem from="1749015148641" duration="11125000" />
       <workItem from="1749081532612" duration="9305000" />
       <workItem from="1749546415896" duration="3277000" />
-      <workItem from="1749600037565" duration="4065000" />
+      <workItem from="1749600037565" duration="20757000" />
+      <workItem from="1749686605018" duration="9163000" />
     </task>
     <task id="LOCAL-00001" summary="change">
       <option name="closed" value="true" />
@@ -201,7 +206,63 @@
       <option name="project" value="LOCAL" />
       <updated>1749603962393</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary=".">
+      <option name="closed" value="true" />
+      <created>1749604349825</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1749604349825</updated>
+    </task>
+    <task id="LOCAL-00016" summary=".">
+      <option name="closed" value="true" />
+      <created>1749604366525</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1749604366525</updated>
+    </task>
+    <task id="LOCAL-00017" summary="예외처리, 인증가드">
+      <option name="closed" value="true" />
+      <created>1749608121580</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1749608121580</updated>
+    </task>
+    <task id="LOCAL-00018" summary="병합">
+      <option name="closed" value="true" />
+      <created>1749614600740</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1749614600740</updated>
+    </task>
+    <task id="LOCAL-00019" summary="병합">
+      <option name="closed" value="true" />
+      <created>1749615909541</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1749615909541</updated>
+    </task>
+    <task id="LOCAL-00020" summary="병합">
+      <option name="closed" value="true" />
+      <created>1749619164994</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1749619164994</updated>
+    </task>
+    <task id="LOCAL-00021" summary="병합">
+      <option name="closed" value="true" />
+      <created>1749698846986</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1749698846986</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -225,7 +286,20 @@
     <MESSAGE value="sellerorder" />
     <MESSAGE value="통합수정" />
     <MESSAGE value="인증 가드" />
+    <MESSAGE value="." />
+    <MESSAGE value="예외처리, 인증가드" />
     <MESSAGE value="병합" />
     <option name="LAST_COMMIT_MESSAGE" value="병합" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/app/seller/orders/page.tsx</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -30,7 +30,7 @@ export async function getQnaDetail(id: number): Promise<SellerQnaDetailResponse>
  * 판매자 QnA 작성
  */
 export async function createQna(data: CreateQnaRequest): Promise<void> {
-    await apiClient.post('/seller/qna', data);
+    await apiClient.post('/seller/qna/new', data);
 }
 
 /**

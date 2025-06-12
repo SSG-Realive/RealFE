@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createQna } from '@/service/sellerQnaService';
-import { CreateQnaRequest } from '@/types/sellerQna';
+
 import Header from '@/components/Header';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
+import { SellerCreateQnaRequest } from '@/types/sellerqna/sellerQnaRequest';
 
 export default function QnaCreatePage() {
-    // useSellerAuthGuard();
+    useSellerAuthGuard();
     const router = useRouter();
-    const [form, setForm] = useState<CreateQnaRequest>({
+    const [form, setForm] = useState<SellerCreateQnaRequest>({
         title: '',
         content: '',
     });
@@ -27,8 +28,10 @@ export default function QnaCreatePage() {
     };
 
     return (
+        <>
+        <Header/>
         <SellerLayout>
-            <Header />
+            
             <div className="max-w-2xl mx-auto p-6">
                 <h1 className="text-2xl font-bold mb-4">QnA 작성</h1>
 
@@ -55,5 +58,6 @@ export default function QnaCreatePage() {
                 </button>
             </div>
         </SellerLayout>
+        </>
     );
 }

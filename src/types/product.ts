@@ -20,4 +20,5 @@ export interface ProductDetail {
     categoryId: number;
     categoryName: string;
     deliveryPolicy: DeliveryPolicy;
+    imageThumbnailUrl: string;
 }

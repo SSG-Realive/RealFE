@@ -1,5 +1,5 @@
 // QnA 등록 요청 DTO
-export interface SellerQnaRequest {
+export interface SellerCreateQnaRequest {
   title: string;
   content: string;
 }

@@ -189,29 +189,29 @@ export default function ProductEditPage() {
                     {/* 상품 설명 */}
                     <div className="mb-4">
                         <label>상품 설명</label>
-                        <textarea name="description" value={form.description} onChange={handleChange} className="w-full p-2 border mt-1" rows={5} />
+                        <textarea name="description" value={form.description} onChange={handleChange} required className="w-full p-2 border mt-1" rows={5} />
                     </div>
 
                     {/* 재고 */}
                     <div className="mb-4">
                         <label>재고</label>
-                        <input type="number" name="stock" value={form.stock} onChange={handleChange} className="w-full p-2 border mt-1" />
+                        <input type="number" name="stock" value={form.stock} onChange={handleChange} required className="w-full p-2 border mt-1" />
                     </div>
 
                     {/* 크기 */}
                     <div className="mb-4">
                         <label>가로 (Width)</label>
-                        <input type="number" name="width" value={form.width} onChange={handleChange} className="w-full p-2 border mt-1" />
+                        <input type="number" name="width" value={form.width} onChange={handleChange} required className="w-full p-2 border mt-1" />
                     </div>
 
                     <div className="mb-4">
                         <label>세로 (Depth)</label>
-                        <input type="number" name="depth" value={form.depth} onChange={handleChange} className="w-full p-2 border mt-1" />
+                        <input type="number" name="depth" value={form.depth} onChange={handleChange} required className="w-full p-2 border mt-1" />
                     </div>
 
                     <div className="mb-4">
                         <label>높이 (Height)</label>
-                        <input type="number" name="height" value={form.height} onChange={handleChange} className="w-full p-2 border mt-1" />
+                        <input type="number" name="height" value={form.height} onChange={handleChange} required className="w-full p-2 border mt-1" />
                     </div>
 
                     {/* 상태 */}
@@ -239,6 +239,7 @@ export default function ProductEditPage() {
                             onChange={(e) =>
                                 setForm({ ...form, active: e.target.value === 'true' })
                             }
+                            required
                             className="w-full p-2 border mt-1"
                         >
                             <option value="true">활성</option>
@@ -249,7 +250,7 @@ export default function ProductEditPage() {
                     {/* 썸네일 및 서브 이미지 */}
                     <div className="mb-4">
                         <label>대표 이미지</label>
-                        <input type="file" accept="image/*" onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} className="w-full p-2 border mt-1" />
+                        <input type="file" accept="image/*" onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} required={form?.imageThumbnailUrl ? false : true} className="w-full p-2 border mt-1" />
                     </div>
 
                     <div className="mb-4">

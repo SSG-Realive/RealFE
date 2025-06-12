@@ -18,6 +18,7 @@ export default function SellerQnaDetailPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+
     useEffect(() => {
         const fetchData = async () => {
             try {

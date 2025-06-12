@@ -22,6 +22,13 @@ const dummyBids: Bid[] = [
   { id: 10, user: "user10", amount: "105,000원", date: "2024-06-09", userImage: "https://randomuser.me/api/portraits/women/20.jpg" },
 ];
 
+// 낙찰자/낙찰가 계산 (가장 높은 금액)
+const getWinner = () => {
+  const sorted = [...dummyBids].sort((a, b) => parseInt(b.amount.replace(/[^0-9]/g, '')) - parseInt(a.amount.replace(/[^0-9]/g, '')));
+  return { winner: sorted[0]?.user || '-', winningPrice: sorted[0]?.amount || '-' };
+};
+const { winner, winningPrice } = getWinner();
+
 export default function BidListPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Bid | null>(null);
@@ -44,6 +51,8 @@ export default function BidListPage() {
             <th className="px-2 py-1">User</th>
             <th className="px-2 py-1">Amount</th>
             <th className="px-2 py-1">Date</th>
+            <th className="px-2 py-1">낙찰자</th>
+            <th className="px-2 py-1">낙찰가</th>
             <th className="px-2 py-1">Action</th>
           </tr>
         </thead>
@@ -53,6 +62,8 @@ export default function BidListPage() {
               <td className="px-2 py-1">{bid.user}</td>
               <td className="px-2 py-1">{bid.amount}</td>
               <td className="px-2 py-1">{bid.date}</td>
+              <td className="px-2 py-1">{winner}</td>
+              <td className="px-2 py-1">{winningPrice}</td>
               <td className="px-2 py-1">
                 <button className="text-blue-600 underline" onClick={() => setSelected(bid)}>View</button>
               </td>

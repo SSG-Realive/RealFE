@@ -87,7 +87,7 @@ export default function ReviewManagementPage() {
       <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* 리뷰 목록 요약 */}
         <div className="bg-white rounded shadow p-6 mb-8 col-span-1">
-          <h2 className="text-lg font-bold mb-4">리뷰 목록</h2>
+          <h2 className="text-lg font-bold mb-4">리뷰</h2>
           <div className="mb-2">
             <input className="border px-2 py-1 flex-1" placeholder="상품명/작성자 검색" value={reviewSearch} onChange={e => setReviewSearch(e.target.value)} />
           </div>

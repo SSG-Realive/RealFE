@@ -45,13 +45,13 @@ export default function AdminSidebar() {
       <nav>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, boxSizing: 'border-box' }}>
           <li style={{ margin: '18px 0' }}><Link href="/admin/dashboard">대시보드</Link></li>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/customers">회원관리</Link></li>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/sellers">판매자관리</Link></li>
+          <li style={{ margin: '18px 0' }}><Link href="/admin/customers">회원</Link></li>
+          <li style={{ margin: '18px 0' }}><Link href="/admin/sellers">판매자</Link></li>
           <li style={{ margin: '18px 0' }}><Link href="/admin/products">상품관리</Link></li>
           <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
-            <Link href="/admin/auction-management" style={{ flex: 1 }}>경매 대시보드</Link>
+            <Link href="/admin/auction-management" style={{ flex: 1 }}>경매</Link>
             <button
-              aria-label="경매 대시보드 하위 메뉴 열기"
+              aria-label="경매 하위 메뉴 열기"
               onClick={e => { e.stopPropagation(); setAuctionOpen(v => !v); }}
               style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, marginLeft: 4 }}
             >
@@ -66,11 +66,11 @@ export default function AdminSidebar() {
               <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/auction-management/register">경매 등록</Link></li>
             </ul>
           </Accordion>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/settlement-management">정산관리</Link></li>
+          <li style={{ margin: '18px 0' }}><Link href="/admin/settlement-management">정산</Link></li>
           <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
-            <Link href="/admin/review-management" style={{ flex: 1 }}>리뷰 대시보드</Link>
+            <Link href="/admin/review-management" style={{ flex: 1 }}>리뷰</Link>
             <button
-              aria-label="리뷰 대시보드 하위 메뉴 열기"
+              aria-label="리뷰 하위 메뉴 열기"
               onClick={e => { e.stopPropagation(); setReviewOpen(v => !v); }}
               style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, marginLeft: 4 }}
             >

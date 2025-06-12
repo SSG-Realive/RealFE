@@ -31,7 +31,7 @@ export default function SellerManagementPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">판매자 관리</h1>
+      <h1 className="text-2xl font-bold mb-4">판매자</h1>
       <div className="mb-4">
         <input
           type="text"

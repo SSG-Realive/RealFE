@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
 
-const AdminFAQPage = () => {
+export default function AdminFAQPage() {
   return (
     <div>
-      <h2>Q&A/FAQ 관리</h2>
+      <h2>FAQ 관리</h2>
       <div style={{ marginBottom: 16 }}>
         <input type="text" placeholder="질문/작성자 검색" style={{ marginRight: 8 }} />
         <button>검색</button>
@@ -32,6 +32,4 @@ const AdminFAQPage = () => {
       <Link href="/admin/dashboard">Back to Dashboard</Link>
     </div>
   );
-};
-
-export default AdminFAQPage; 
+} 

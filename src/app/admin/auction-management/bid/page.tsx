@@ -35,7 +35,6 @@ export default function BidListPage() {
   const filtered = dummyBids.filter(bid => bid.user.includes(search));
   return (
     <div className="p-8">
-      <h2 className="text-lg font-bold mb-4">입찰 내역 조회</h2>
       <div className="mb-4">
         <input
           type="text"
@@ -89,4 +88,6 @@ export default function BidListPage() {
       )}
     </div>
   );
-} 
+}
+
+export default Object.assign(BidListPage, { pageTitle: '입찰 내역' }); 

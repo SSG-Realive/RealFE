@@ -30,7 +30,7 @@ function QnaManagementPage() {
 
   return (
     <div className="p-8">
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-2">
         <input
           type="text"
           placeholder="제목/작성자 검색"
@@ -38,6 +38,11 @@ function QnaManagementPage() {
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
         />
+        <select className="border rounded px-3 py-2 ml-2">
+          <option value="">전체</option>
+          <option value="answered">답변완료</option>
+          <option value="unanswered">미답변</option>
+        </select>
       </div>
       <table className="min-w-full border text-sm">
         <thead>

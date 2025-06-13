@@ -26,14 +26,32 @@ const dummyReviews: Review[] = [
 export default function ReviewListPage() {
   const [reviewSearch, setReviewSearch] = useState("");
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const filteredReviews = dummyReviews.filter(r => r.product.includes(reviewSearch) || r.user.includes(reviewSearch));
+  const [status, setStatus] = useState("");
+  const filteredReviews = dummyReviews.filter(
+    r => (r.product.includes(reviewSearch) || r.user.includes(reviewSearch)) &&
+         (!status || r.status === status)
+  );
 
   return (
     <div className="p-8">
-      <h2 className="text-lg font-bold mb-4">리뷰 목록</h2>
-      <form className="flex gap-2 mb-2">
-        <input className="border px-2 py-1 flex-1" placeholder="상품명/작성자 검색" value={reviewSearch} onChange={e => setReviewSearch(e.target.value)} />
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="button">Search</button>
+      <form className="flex items-center gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="상품명/작성자 검색"
+          value={reviewSearch}
+          onChange={e => setReviewSearch(e.target.value)}
+          className="border rounded px-3 py-2 w-64"
+        />
+        <select
+          className="border rounded px-3 py-2"
+          value={status}
+          onChange={e => setStatus(e.target.value)}
+        >
+          <option value="">전체</option>
+          <option value="정상">정상</option>
+          <option value="신고됨">신고됨</option>
+        </select>
+        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="button">검색</button>
       </form>
       <table className="min-w-full border text-sm">
         <thead>

@@ -2,98 +2,88 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import {
-    getOrderDetail,
-    updateDeliveryStatus,
-} from '@/service/sellerOrderService';
-import {
-    SellerOrderDetailResponse,
-    DeliveryStatus,
-} from '@/types/sellerOrder';
-
+import { getOrderDetail } from '@/service/sellerOrderService';
+import { SellerOrderDetailResponse } from '@/types/sellerOrder';
 import Header from '@/components/Header';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 export default function SellerOrderDetailPage() {
-    // ✅ 인증 가드 적용
-    // useSellerAuthGuard();
-
-    const params = useParams();
-    const orderId = Number(params?.id);
+    useSellerAuthGuard();
     const router = useRouter();
+    const params = useParams();
 
     const [order, setOrder] = useState<SellerOrderDetailResponse | null>(null);
-    const [newStatus, setNewStatus] = useState<DeliveryStatus>('DELIVERY_PREPARING');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const DELIVERY_STATUSES: DeliveryStatus[] = [
-        'DELIVERY_PREPARING',
-        'DELIVERY_IN_PROGRESS',
-        'DELIVERY_COMPLETED',
-    ];
+    const orderId = Number(params.id);
 
     useEffect(() => {
-        const fetchData = async () => {
+        if (isNaN(orderId)) {
+            setError('잘못된 주문 ID입니다.');
+            setLoading(false);
+            return;
+        }
+
+        const fetchOrder = async () => {
             try {
                 const data = await getOrderDetail(orderId);
                 setOrder(data);
-                setNewStatus(data.deliveryStatus);
+                setError(null);
             } catch (err) {
-                console.error('주문 상세 조회 실패:', err);
-                alert('주문 정보를 불러오지 못했습니다.');
+                console.error('주문 상세 조회 실패', err);
+                setError('주문 상세 정보를 불러오지 못했습니다.');
+            } finally {
+                setLoading(false);
             }
         };
-        fetchData();
+
+        fetchOrder();
     }, [orderId]);
-
-    const handleUpdate = async () => {
-        try {
-            await updateDeliveryStatus(orderId, {
-                deliveryStatus: newStatus,
-            });
-            alert('배송 상태가 변경되었습니다.');
-            router.refresh();
-        } catch (err) {
-            console.error('배송 상태 변경 실패:', err);
-            alert('배송 상태 변경에 실패했습니다.');
-        }
-    };
-
-    if (!order) return <div className="p-6">로딩 중...</div>;
 
     return (
         <SellerLayout>
             <Header />
-            <div className="p-6 max-w-3xl mx-auto">
-                <h1 className="text-2xl font-bold mb-4">주문 상세</h1>
-                <p><strong>수령인:</strong> {order.receiverName}</p>
-                <p><strong>전화번호:</strong> {order.phone}</p>
-                <p><strong>주소:</strong> {order.deliveryAddress}</p>
-                <p><strong>총 가격:</strong> {order.totalPrice.toLocaleString()}원</p>
-                <p><strong>결제 수단:</strong> {order.paymentType}</p>
-                <p><strong>주문 상태:</strong> {order.orderStatus}</p>
-                <p><strong>배송 상태:</strong></p>
-
-                <select
-                    className="border p-2 rounded mb-4"
-                    value={newStatus}
-                    onChange={(e) => setNewStatus(e.target.value as DeliveryStatus)}
+            <div className="p-6 max-w-4xl mx-auto">
+                <button
+                    className="mb-4 text-blue-600 hover:underline"
+                    onClick={() => router.back()}
                 >
-                    {DELIVERY_STATUSES.map((status) => (
-                        <option key={status} value={status}>
-                            {status}
-                        </option>
-                    ))}
-                </select>
+                    ← 뒤로가기
+                </button>
 
-                <div>
-                    <button
-                        onClick={handleUpdate}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-                    >
-                        배송 상태 변경
-                    </button>
-                </div>
+                <h1 className="text-2xl font-bold mb-4">주문 상세</h1>
+
+                {loading ? (
+                    <p className="text-gray-500">로딩 중...</p>
+                ) : error ? (
+                    <p className="text-red-500">{error}</p>
+                ) : order ? (
+                    <div className="space-y-3">
+                        <p><strong>주문 ID:</strong> {order.orderId}</p>
+                        <p><strong>주문일:</strong> {new Date(order.orderedAt).toLocaleString()}</p>
+                        <p><strong>배송 상태:</strong> {order.deliveryStatus}</p>
+                        <p><strong>받는 사람:</strong> {order.receiverName}</p>
+                        <p><strong>연락처:</strong> {order.phone}</p>
+                        <p><strong>주소:</strong> {order.deliveryAddress}</p>
+                        <p><strong>배송비:</strong> {order.deliveryFee.toLocaleString()}원</p>
+                        <p><strong>결제 수단:</strong> {order.paymentType ?? '미지정'}</p>
+
+                        <h2 className="text-xl font-semibold mt-6">주문 상품</h2>
+                        <ul className="mt-2 space-y-2">
+                            {order.items.map((item, idx) => (
+                                <li key={idx} className="p-3 border rounded">
+                                    <p>상품명: {item.productName}</p>
+                                    <p>수량: {item.quantity}</p>
+                                    <p>가격: {item.price.toLocaleString()}원</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <p className="text-gray-400">주문 정보를 찾을 수 없습니다.</p>
+                )}
             </div>
         </SellerLayout>
     );

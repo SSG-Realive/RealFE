@@ -4,7 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="병합" />
+    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="병합">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/seller/orders/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/seller/orders/[id]/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/seller/orders/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/seller/orders/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/apiClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/apiClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/sellerOrderService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/sellerOrderService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/sellerOrder.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/sellerOrder.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -87,19 +94,6 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\SSG_KDT8\Realive\front\src\app\customer" />
     </key>
-  </component>
-  <component name="RunManager">
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="realive" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="realive" />
-      <option name="filePath" />
-      <method v="2" />
-    </configuration>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -322,16 +316,5 @@
     <MESSAGE value="예외처리, 인증가드" />
     <MESSAGE value="병합" />
     <option name="LAST_COMMIT_MESSAGE" value="병합" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/app/seller/orders/page.tsx</url>
-          <line>8</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

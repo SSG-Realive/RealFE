@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSellerOrders } from '@/service/sellerOrderService';
 import { SellerOrderResponse } from '@/types/sellerOrder';
+import { PageResponse } from '@/types/page/pageResponse';
 import Header from '@/components/Header';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 export default function SellerOrderListPage() {
-
-     // useSellerAuthGuard();
+    useSellerAuthGuard();
 
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,11 @@ export default function SellerOrderListPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await getSellerOrders();
+                const res: PageResponse<SellerOrderResponse> = await getSellerOrders({
+                    page: 0,
+                    size: 10,
+                    sort: 'orderedAt,desc', // ✅ 백엔드 필드명에 맞게 정렬
+                });
                 setOrders(res.dtoList || []);
                 setError(null);
             } catch (err) {
@@ -31,6 +35,7 @@ export default function SellerOrderListPage() {
                 setLoading(false);
             }
         };
+
         fetchData();
     }, []);
 
@@ -51,12 +56,15 @@ export default function SellerOrderListPage() {
                         {orders.map((order) => (
                             <li
                                 key={order.orderId}
-                                className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-50"
+                                className="bg-white shadow rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
                                 onClick={() => router.push(`/seller/orders/${order.orderId}`)}
                             >
-                                <p>주문 ID: {order.orderId}</p>
-                                <p>총 가격: {order.totalPrice.toLocaleString()}원</p>
-                                <p>상태: {order.orderStatus}</p>
+                                <p className="font-semibold">주문 ID: {order.orderId}</p>
+                                <p>고객명: {order.customerName}</p>
+                                <p>상품명: {order.productName}</p>
+                                <p>수량: {order.quantity}</p>
+                                <p>배송 상태: {order.deliveryStatus}</p>
+                                <p>주문일시: {new Date(order.orderedAt).toLocaleString()}</p>
                             </li>
                         ))}
                     </ul>

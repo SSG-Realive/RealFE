@@ -29,7 +29,7 @@ const getWinner = () => {
 };
 const { winner, winningPrice } = getWinner();
 
-export default function BidListPage() {
+function BidListPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Bid | null>(null);
   const filtered = dummyBids.filter(bid => bid.user.includes(search));

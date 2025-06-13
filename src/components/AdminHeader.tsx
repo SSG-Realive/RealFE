@@ -1,7 +1,7 @@
 import React from 'react';
 import AdminNotification from './AdminNotification';
 
-export default function AdminHeader() {
+export default function AdminHeader({ title }: { title: string }) {
   return (
     <header style={{
       background: '#333',
@@ -12,7 +12,7 @@ export default function AdminHeader() {
       justifyContent: 'space-between',
       minHeight: 56
     }}>
-      <div style={{ fontWeight: 'bold', fontSize: 22, color: '#fff' }}>Admin Dashboard</div>
+      <div style={{ fontWeight: 'bold', fontSize: 22, color: '#fff' }}>{title}</div>
       <AdminNotification />
     </header>
   );

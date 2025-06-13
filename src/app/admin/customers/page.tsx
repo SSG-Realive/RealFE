@@ -1,5 +1,8 @@
 'use client';
 import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 const dummyCustomers = [
   { id: 1, name: '홍길동', email: 'hong@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/11.jpg' },
@@ -14,54 +17,88 @@ const dummyCustomers = [
   { id: 10, name: '강호동', email: 'kang@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/20.jpg' },
 ];
 
-export default function AdminCustomersPage() {
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
-  const filtered = dummyCustomers.filter(c =>
-    (c.name.includes(search) || c.email.includes(search)) &&
-    (!status || c.status === status)
-  );
+const dummyPenalties = [
+  { id: 1, user: "user1", reason: "부정입찰", date: "2024-06-01", userImage: "https://randomuser.me/api/portraits/men/21.jpg" },
+  { id: 2, user: "user2", reason: "허위정보", date: "2024-06-02", userImage: "https://randomuser.me/api/portraits/women/22.jpg" },
+  { id: 3, user: "user3", reason: "욕설", date: "2024-06-03", userImage: "https://randomuser.me/api/portraits/men/23.jpg" },
+  { id: 4, user: "user4", reason: "도배", date: "2024-06-04", userImage: "https://randomuser.me/api/portraits/women/24.jpg" },
+  { id: 5, user: "user5", reason: "광고성", date: "2024-06-05", userImage: "https://randomuser.me/api/portraits/men/25.jpg" },
+  { id: 6, user: "user6", reason: "부정입찰", date: "2024-06-06", userImage: "https://randomuser.me/api/portraits/women/26.jpg" },
+  { id: 7, user: "user7", reason: "허위정보", date: "2024-06-07", userImage: "https://randomuser.me/api/portraits/men/27.jpg" },
+  { id: 8, user: "user8", reason: "욕설", date: "2024-06-08", userImage: "https://randomuser.me/api/portraits/women/28.jpg" },
+  { id: 9, user: "user9", reason: "도배", date: "2024-06-09", userImage: "https://randomuser.me/api/portraits/men/29.jpg" },
+  { id: 10, user: "user10", reason: "광고성", date: "2024-06-10", userImage: "https://randomuser.me/api/portraits/women/30.jpg" },
+];
+
+export default function AdminCustomersDashboard() {
+  const router = useRouter();
+  // 고객 요약
+  const total = dummyCustomers.length;
+  const active = dummyCustomers.filter(c => c.status === 'Active').length;
+  const blocked = dummyCustomers.filter(c => c.status === 'Blocked').length;
   return (
-    <div>
-      <h2>고객 관리</h2>
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <input
-          type="text"
-          placeholder="이름/이메일 검색"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 200, padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
-        />
-        <select
-          value={status}
-          onChange={e => setStatus(e.target.value)}
-          style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
-        >
-          <option value="">전체</option>
-          <option value="Active">Active</option>
-          <option value="Blocked">Blocked</option>
-        </select>
+    <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+      <h2 className="text-2xl font-bold mb-4">회원 대시보드</h2>
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded shadow p-6">
+          <h3 className="text-lg font-bold mb-2">전체 회원</h3>
+          <div className="text-3xl font-bold">{total}</div>
+        </div>
+        <div className="bg-white rounded shadow p-6">
+          <h3 className="text-lg font-bold mb-2">활성 회원</h3>
+          <div className="text-3xl font-bold">{active}</div>
+        </div>
+        <div className="bg-white rounded shadow p-6">
+          <h3 className="text-lg font-bold mb-2">차단 회원</h3>
+          <div className="text-3xl font-bold">{blocked}</div>
+        </div>
       </div>
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 0 }}>
-        <thead>
-          <tr style={{ background: '#f7f7f7' }}>
-            <th style={{ padding: 8, border: '1px solid #eee' }}>사진</th>
-            <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
-            <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
-            <th style={{ padding: 8, border: '1px solid #eee' }}>상태</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((c) => (
-            <tr key={c.id}>
-              <td style={{ padding: 8, border: '1px solid #eee' }}><img src={c.image} alt="customer" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
-              <td style={{ padding: 8, border: '1px solid #eee' }}>{c.name}</td>
-              <td style={{ padding: 8, border: '1px solid #eee' }}>{c.email}</td>
-              <td style={{ padding: 8, border: '1px solid #eee' }}>{c.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+        {/* 고객 관리 요약 - 테이블형 */}
+        <div className="bg-white rounded shadow p-6 min-w-[400px]">
+          <h2 className="text-lg font-bold mb-4">고객 관리</h2>
+          <table className="min-w-full border text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-2 py-1">이름</th>
+                <th className="px-2 py-1">이메일</th>
+                <th className="px-2 py-1">상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dummyCustomers.slice(0, 5).map(c => (
+                <tr key={c.id}>
+                  <td className="px-2 py-1">{c.name}</td>
+                  <td className="px-2 py-1">{c.email}</td>
+                  <td className="px-2 py-1">{c.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {/* 사용자 패널티 요약 - 테이블형 */}
+        <div className="bg-white rounded shadow p-6 min-w-[400px]">
+          <h2 className="text-lg font-bold mb-4">사용자 패널티</h2>
+          <table className="min-w-full border text-sm">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-2 py-1">이름</th>
+                <th className="px-2 py-1">사유</th>
+                <th className="px-2 py-1">상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dummyPenalties.slice(0, 5).map((p, idx) => (
+                <tr key={idx}>
+                  <td className="px-2 py-1">{p.user}</td>
+                  <td className="px-2 py-1">{p.reason}</td>
+                  <td className="px-2 py-1">{p.date}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 } 

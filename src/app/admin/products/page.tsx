@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Product {
   id: number;
@@ -28,6 +29,7 @@ const dummyProducts: Product[] = [
 export default function ProductManagementPage() {
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
+  const router = useRouter();
 
   const filtered = dummyProducts.filter(p => p.name.includes(filter) || p.category.includes(filter));
 
@@ -67,7 +69,7 @@ export default function ProductManagementPage() {
               <td className="px-4 py-2">{p.createdAt}</td>
               <td className="px-4 py-2">{p.status}</td>
               <td className="px-4 py-2">
-                <button className="text-blue-600 underline" onClick={() => setSelected(p)}>
+                <button className="text-blue-600 underline" onClick={() => router.push(`/admin/products/${p.id}`)}>
                   상세
                 </button>
               </td>
@@ -86,6 +88,11 @@ export default function ProductManagementPage() {
             <p><b>재고:</b> {selected.stock}</p>
             <p><b>등록일:</b> {selected.createdAt}</p>
             <p><b>상태:</b> {selected.status}</p>
+            <div className="flex gap-2 mt-6">
+              <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => router.push(`/admin/products/edit/${selected.id}`)}>수정</button>
+              <button className="px-4 py-2 bg-green-500 text-white rounded" onClick={() => router.push(`/admin/products/stock/${selected.id}`)}>재고 관리</button>
+              <button className="px-4 py-2 bg-gray-700 text-white rounded" onClick={() => router.push(`/admin/products/images/${selected.id}`)}>이미지 관리</button>
+            </div>
             <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>
               닫기
             </button>

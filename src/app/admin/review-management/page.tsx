@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useRouter } from "next/navigation";
 
 // 더미 데이터 타입
 interface Review {
@@ -77,6 +80,7 @@ export default function ReviewManagementPage() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [selectedReported, setSelectedReported] = useState<ReportedReview | null>(null);
   const [selectedQna, setSelectedQna] = useState<Qna | null>(null);
+  const router = useRouter();
 
   const filteredReviews = dummyReviews.filter(r => r.product.includes(reviewSearch) || r.user.includes(reviewSearch));
   const filteredReported = dummyReported.filter(r => r.product.includes(reportedSearch) || r.user.includes(reportedSearch) || r.reason.includes(reportedSearch));
@@ -84,53 +88,45 @@ export default function ReviewManagementPage() {
 
   return (
     <div>
-      <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* 리뷰 목록 요약 */}
-        <div className="bg-white rounded shadow p-6 mb-8 col-span-1">
+      <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+        {/* 리뷰 목록 요약 - 테이블형 */}
+        <Link href="/admin/reviews/list" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">리뷰</h2>
-          <div className="mb-2">
-            <input className="border px-2 py-1 flex-1" placeholder="상품명/작성자 검색" value={reviewSearch} onChange={e => setReviewSearch(e.target.value)} />
-          </div>
-          <table className="min-w-full border text-sm mb-2">
+          <table className="min-w-full border text-sm">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-2 py-1">상품명</th>
+                <th className="px-2 py-1">상품</th>
                 <th className="px-2 py-1">작성자</th>
-                <th className="px-2 py-1">내용</th>
-                <th className="px-2 py-1">작성일</th>
+                <th className="px-2 py-1">날짜</th>
                 <th className="px-2 py-1">상태</th>
               </tr>
             </thead>
             <tbody>
-              {filteredReviews.slice(0,10).map(r => (
+              {filteredReviews.slice(0, 5).map(r => (
                 <tr key={r.id}>
                   <td className="px-2 py-1">{r.product}</td>
                   <td className="px-2 py-1">{r.user}</td>
-                  <td className="px-2 py-1">{r.content}</td>
                   <td className="px-2 py-1">{r.date}</td>
                   <td className="px-2 py-1">{r.status}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-        {/* 리뷰 신고 관리 요약 */}
-        <div className="bg-white rounded shadow p-6 mb-8 col-span-1">
+        </Link>
+        {/* 리뷰 신고 관리 요약 - 테이블형 */}
+        <Link href="/admin/review-management/reported" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">리뷰 신고 관리</h2>
-          <div className="mb-2">
-            <input className="border px-2 py-1 flex-1" placeholder="상품명/작성자/사유 검색" value={reportedSearch} onChange={e => setReportedSearch(e.target.value)} />
-          </div>
-          <table className="min-w-full border text-sm mb-2">
+          <table className="min-w-full border text-sm">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-2 py-1">상품명</th>
+                <th className="px-2 py-1">상품</th>
                 <th className="px-2 py-1">작성자</th>
                 <th className="px-2 py-1">사유</th>
                 <th className="px-2 py-1">상태</th>
               </tr>
             </thead>
             <tbody>
-              {filteredReported.slice(0,10).map((r, idx) => (
+              {filteredReported.slice(0, 5).map((r, idx) => (
                 <tr key={idx}>
                   <td className="px-2 py-1">{r.product}</td>
                   <td className="px-2 py-1">{r.user}</td>
@@ -140,36 +136,31 @@ export default function ReviewManagementPage() {
               ))}
             </tbody>
           </table>
-        </div>
-        {/* Q&A 관리 요약 */}
-        <div className="bg-white rounded shadow p-6 mb-8 col-span-1">
+        </Link>
+        {/* Q&A 관리 요약 - 테이블형 */}
+        <Link href="/admin/review-management/qna" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">Q&A 관리</h2>
-          <div className="mb-2">
-            <input className="border px-2 py-1 flex-1" placeholder="제목/작성자 검색" value={qnaSearch} onChange={e => setQnaSearch(e.target.value)} />
-          </div>
-          <table className="min-w-full border text-sm mb-2">
+          <table className="min-w-full border text-sm">
             <thead>
               <tr className="bg-gray-100">
-                <th className="px-2 py-1">번호</th>
-                <th className="px-2 py-1">작성자</th>
                 <th className="px-2 py-1">제목</th>
-                <th className="px-2 py-1">작성일</th>
-                <th className="px-2 py-1">답변여부</th>
+                <th className="px-2 py-1">작성자</th>
+                <th className="px-2 py-1">날짜</th>
+                <th className="px-2 py-1">답변상태</th>
               </tr>
             </thead>
             <tbody>
-              {filteredQna.slice(0,10).map(q => (
+              {filteredQna.slice(0, 5).map(q => (
                 <tr key={q.id}>
-                  <td className="px-2 py-1">{q.id}</td>
-                  <td className="px-2 py-1">{q.user}</td>
                   <td className="px-2 py-1">{q.title}</td>
+                  <td className="px-2 py-1">{q.user}</td>
                   <td className="px-2 py-1">{q.created}</td>
                   <td className="px-2 py-1">{q.answered ? "답변완료" : "미답변"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </Link>
       </div>
       {selectedReview && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
@@ -217,7 +208,7 @@ export default function ReviewManagementPage() {
                 <p><b>작성자:</b> {selectedQna.user}</p>
                 <p><b>제목:</b> {selectedQna.title}</p>
                 <p><b>작성일:</b> {selectedQna.created}</p>
-                <p><b>답변여부:</b> {selectedQna.answered ? "답변완료" : "미답변"}</p>
+                <p><b>답변상태:</b> {selectedQna.answered ? "답변완료" : "미답변"}</p>
               </div>
             </div>
             <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelectedQna(null)}>닫기</button>

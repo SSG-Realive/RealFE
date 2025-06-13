@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 // Auction 타입 정의
 interface Auction {
@@ -157,81 +159,46 @@ export default function AuctionManagementPage() {
   const filteredPenalties = dummyPenalties.filter(p => p.user.includes(penaltySearch) || p.reason.includes(penaltySearch));
 
   return (
-    <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-      {/* 경매 목록 요약 */}
-      <div className="bg-white rounded shadow p-6 mb-8">
+    <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+      {/* 경매 요약 - 테이블형 */}
+      <div className="bg-white rounded shadow p-6 min-w-[400px]">
         <h2 className="text-lg font-bold mb-4">경매</h2>
-        <div className="mb-2">
-          <input className="border px-2 py-1 flex-1" placeholder="경매명/상품명/판매자 검색" value={auctionSearch} onChange={e => setAuctionSearch(e.target.value)} />
-        </div>
-        <table className="min-w-full border text-sm mb-2">
+        <table className="min-w-full border text-sm">
           <thead>
             <tr className="bg-gray-100">
               <th className="px-2 py-1">경매명</th>
-              <th className="px-2 py-1">상품명</th>
               <th className="px-2 py-1">판매자</th>
-              <th className="px-2 py-1">시작일</th>
               <th className="px-2 py-1">상태</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAuctions.slice(0,10).map(a => (
+            {filteredAuctions.slice(0, 5).map(a => (
               <tr key={a.id}>
                 <td className="px-2 py-1">{a.name}</td>
-                <td className="px-2 py-1">{a.product}</td>
                 <td className="px-2 py-1">{a.seller}</td>
-                <td className="px-2 py-1">{a.start}</td>
                 <td className="px-2 py-1">{a.status}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      {/* 입찰 내역 요약 */}
-      <div className="bg-white rounded shadow p-6 mb-8">
+      {/* 입찰 내역 요약 - 테이블형 */}
+      <div className="bg-white rounded shadow p-6 min-w-[400px]">
         <h2 className="text-lg font-bold mb-4">입찰 내역</h2>
-        <div className="mb-2">
-          <input className="border px-2 py-1 flex-1" placeholder="입찰자 검색" value={bidSearch} onChange={e => setBidSearch(e.target.value)} />
-        </div>
-        <table className="min-w-full border text-sm mb-2">
+        <table className="min-w-full border text-sm">
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-2 py-1">User</th>
-              <th className="px-2 py-1">Amount</th>
-              <th className="px-2 py-1">Date</th>
+              <th className="px-2 py-1">경매명</th>
+              <th className="px-2 py-1">입찰자</th>
+              <th className="px-2 py-1">금액</th>
             </tr>
           </thead>
           <tbody>
-            {filteredBids.slice(0,10).map(bid => (
-              <tr key={bid.id}>
-                <td className="px-2 py-1">{bid.user}</td>
-                <td className="px-2 py-1">{bid.amount.toLocaleString()}원</td>
-                <td className="px-2 py-1">{bid.date}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {/* 사용자 패널티 목록 요약 */}
-      <div className="bg-white rounded shadow p-6 mb-8">
-        <h2 className="text-lg font-bold mb-4">사용자 패널티</h2>
-        <div className="mb-2">
-          <input className="border px-2 py-1 flex-1" placeholder="사용자/사유 검색" value={penaltySearch} onChange={e => setPenaltySearch(e.target.value)} />
-        </div>
-        <table className="min-w-full border text-sm mb-2">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-2 py-1">User</th>
-              <th className="px-2 py-1">사유</th>
-              <th className="px-2 py-1">일자</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPenalties.slice(0,10).map(p => (
-              <tr key={p.id}>
-                <td className="px-2 py-1">{p.user}</td>
-                <td className="px-2 py-1">{p.reason}</td>
-                <td className="px-2 py-1">{p.date}</td>
+            {filteredBids.slice(0, 5).map((b, idx) => (
+              <tr key={idx}>
+                <td className="px-2 py-1">{b.user}</td>
+                <td className="px-2 py-1">{b.amount.toLocaleString()}원</td>
+                <td className="px-2 py-1">{b.date}</td>
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,9 @@
++'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const AdminReviewListPage = () => {
+  const router = useRouter();
   return (
     <div>
       <h2>리뷰 목록</h2>
@@ -9,13 +12,15 @@ const AdminReviewListPage = () => {
         <button>검색</button>
       </div>
       <div style={{ background: '#eee', padding: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ width: 80, height: 80, background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>이미지</div>
-          <div>리뷰 내용 미리보기</div>
-          <div>작성자</div>
-          <div>작성일</div>
-          <button>상세보기</button>
-        </div>
+        {[1,2,3].map((item) => (
+          <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+            <div style={{ width: 80, height: 80, background: '#ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>이미지</div>
+            <div>리뷰 내용 미리보기</div>
+            <div>작성자</div>
+            <div>작성일</div>
+            <button onClick={() => router.push(`/admin/reviews/${item}`)}>상세보기</button>
+          </div>
+        ))}
       </div>
     </div>
   );

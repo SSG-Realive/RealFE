@@ -1,5 +1,6 @@
 // 🔹 배송 상태 enum 타입 정의
 export type DeliveryStatus =
+    | "INIT"
     | 'DELIVERY_PREPARING'
     | 'DELIVERY_IN_PROGRESS'
     | 'DELIVERY_COMPLETED';

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Review {
   id: number;
@@ -24,14 +25,13 @@ const dummyReviews: Review[] = [
   { id: 10, product: "램프", user: "user10", content: "밝아요", date: "2024-06-10", status: "신고됨", productImage: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=facearea&w=256&q=80" },
 ];
 
-export default function ReviewListPage() {
+function ReviewListPage() {
   const [search, setSearch] = useState("");
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  const router = useRouter();
   const filtered = dummyReviews.filter(r => r.product.includes(search) || r.user.includes(search));
 
   return (
     <div className="p-8">
-      <h2 className="text-lg font-bold mb-4">리뷰 목록</h2>
       <div className="mb-4">
         <input
           type="text"
@@ -61,30 +61,14 @@ export default function ReviewListPage() {
               <td className="px-2 py-1">{r.date}</td>
               <td className="px-2 py-1">{r.status}</td>
               <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelectedReview(r)}>상세</button>
+                <button className="text-blue-600 underline" onClick={() => router.push(`/admin/reviews/${r.id}`)}>상세</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selectedReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[300px]">
-            <h2 className="text-xl font-bold mb-4">리뷰 상세</h2>
-            <div className="flex flex-col items-center gap-4 mb-4">
-              <img src={selectedReview.productImage} alt={selectedReview.product} className="w-32 h-32 rounded-lg object-cover border" />
-              <div>
-                <p><b>상품명:</b> {selectedReview.product}</p>
-                <p><b>작성자:</b> {selectedReview.user}</p>
-                <p><b>내용:</b> {selectedReview.content}</p>
-                <p><b>작성일:</b> {selectedReview.date}</p>
-                <p><b>상태:</b> {selectedReview.status}</p>
-              </div>
-            </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelectedReview(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
-} 
+}
+
+export default Object.assign(ReviewListPage, { pageTitle: '리뷰 목록' }); 

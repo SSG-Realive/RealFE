@@ -23,7 +23,7 @@ const dummyPenalties: Penalty[] = [
   { id: 10, user: "user10", reason: "광고성", date: "2024-06-10", userImage: "https://randomuser.me/api/portraits/women/30.jpg" },
 ];
 
-export default function PenaltyListPage() {
+function CustomerPenaltyPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Penalty | null>(null);
@@ -80,4 +80,6 @@ export default function PenaltyListPage() {
       )}
     </div>
   );
-} 
+}
+
+export default Object.assign(CustomerPenaltyPage, { pageTitle: '사용자 패널티 목록' }); 

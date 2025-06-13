@@ -27,7 +27,7 @@ const dummyAuctions: Auction[] = [
   { id: 10, name: "램프 경매", product: "램프", seller: "손흥민", start: "2025-06-10", end: "2025-06-14", status: "종료", image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=400&q=80", winner: "user9", winningPrice: "105,000원" },
 ];
 
-export default function AuctionListPage() {
+function AuctionListPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Auction | null>(null);
   const filtered = dummyAuctions.filter(a => a.name.includes(search) || a.product.includes(search) || a.seller.includes(search));
@@ -92,4 +92,6 @@ export default function AuctionListPage() {
       )}
     </div>
   );
-} 
+}
+
+export default Object.assign(AuctionListPage, { pageTitle: '경매 목록' }); 

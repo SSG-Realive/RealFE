@@ -14,7 +14,7 @@ const dummyCustomers = [
   { id: 10, name: '강호동', email: 'kang@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/20.jpg' },
 ];
 
-export default function CustomerListPage() {
+function CustomerListPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const filtered = dummyCustomers.filter(c =>
@@ -23,7 +23,6 @@ export default function CustomerListPage() {
   );
   return (
     <div className="p-8">
-      <h2 className="text-2xl font-bold mb-4">고객 관리</h2>
       <div className="mb-4 flex gap-2">
         <input
           type="text"
@@ -64,4 +63,6 @@ export default function CustomerListPage() {
       </table>
     </div>
   );
-} 
+}
+
+export default Object.assign(CustomerListPage, { pageTitle: '고객 관리' }); 

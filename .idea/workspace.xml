@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="병합">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/seller/orders/[id]/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/seller/orders/[id]/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/seller/orders/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/seller/orders/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/apiClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/apiClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/service/sellerOrderService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/sellerOrderService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/sellerOrder.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/sellerOrder.ts" afterDir="false" />
-    </list>
+    <list default="true" id="31883063-87fe-44f2-b836-458e49ca3558" name="Changes" comment="front" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -288,7 +281,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749698846986</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="front">
+      <option name="closed" value="true" />
+      <created>1749799165953</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1749799165953</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -315,6 +316,7 @@
     <MESSAGE value="." />
     <MESSAGE value="예외처리, 인증가드" />
     <MESSAGE value="병합" />
-    <option name="LAST_COMMIT_MESSAGE" value="병합" />
+    <MESSAGE value="front" />
+    <option name="LAST_COMMIT_MESSAGE" value="front" />
   </component>
 </project>

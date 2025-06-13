@@ -64,11 +64,12 @@ function AuctionListPage() {
                 }
               </td>
               <td className="px-2 py-1 align-top">
-                <div className="flex flex-col gap-1">
-                  <span className="font-bold">{a.name}</span>
-                  <span className="text-gray-600">경매 시작 시간: {a.start}</span>
-                  <span className="text-gray-600">경매 마감 시간: {a.end}</span>
-                  <span className="text-gray-600">즉시 구입가: {/* 즉시구입가 */}</span>
+                <div className="bg-gray-200 rounded p-3">
+                  <div className="font-bold">{a.name}</div>
+                  <div className="font-bold">경매 시작 시간: {a.start}</div>
+                  <div className="font-bold">경매 시작가: {a.winningPrice || '-'}</div>
+                  <div className="font-bold">경매 마감 시간: {a.end}</div>
+                  <div className="font-bold">즉시 구매가: {/* 즉시구입가 */}</div>
                 </div>
               </td>
               <td className="px-2 py-1 align-top">

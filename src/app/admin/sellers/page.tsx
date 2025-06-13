@@ -35,6 +35,7 @@ export default function AdminSellersPage() {
           onChange={e => setStatus(e.target.value)}
           style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
         >
+          <option value="">전체</option>
           <option value="Active">Active</option>
           <option value="Request">Request</option>
         </select>

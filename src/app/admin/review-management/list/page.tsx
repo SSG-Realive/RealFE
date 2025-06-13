@@ -41,30 +41,22 @@ function ReviewListPage() {
           className="border rounded px-3 py-2"
         />
       </div>
-      <table className="min-w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-2 py-1">상품명</th>
-            <th className="px-2 py-1">작성자</th>
-            <th className="px-2 py-1">내용</th>
-            <th className="px-2 py-1">작성일</th>
-            <th className="px-2 py-1">상태</th>
-            <th className="px-2 py-1">상세</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map(r => (
-            <tr key={r.id}>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.content}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.date}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>상세</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ background: '#eee', padding: 16 }}>
+        {filtered.map(r => (
+          <div key={r.id} style={{
+            display: 'flex', alignItems: 'center', background: '#fff', borderRadius: 8, marginBottom: 16, padding: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+          }}>
+            <div style={{ width: 80, height: 80, background: '#ccc', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 24 }}>
+              {r.productImage ? <img src={r.productImage} alt="이미지" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 4 }} /> : '이미지'}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 'bold', marginBottom: 4 }}>{r.content}</div>
+              <div style={{ color: '#888', fontSize: 14 }}>{r.user} | {r.date}</div>
+            </div>
+            <button style={{ marginLeft: 16 }} onClick={() => router.push(`/admin/reviews/${r.id}`)}>View</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -90,7 +90,7 @@ export default function ReviewManagementPage() {
     <div>
       <div className="p-8 flex flex-row gap-8 overflow-x-auto">
         {/* 리뷰 목록 요약 - 테이블형 */}
-        <Link href="/admin/reviews/list" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
+        <div className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">리뷰</h2>
           <table className="min-w-full border text-sm">
             <thead>
@@ -104,17 +104,17 @@ export default function ReviewManagementPage() {
             <tbody>
               {filteredReviews.slice(0, 5).map(r => (
                 <tr key={r.id}>
-                  <td className="px-2 py-1">{r.product}</td>
-                  <td className="px-2 py-1">{r.user}</td>
-                  <td className="px-2 py-1">{r.date}</td>
-                  <td className="px-2 py-1">{r.status}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.date}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </Link>
+        </div>
         {/* 리뷰 신고 관리 요약 - 테이블형 */}
-        <Link href="/admin/review-management/reported" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
+        <div className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">리뷰 신고 관리</h2>
           <table className="min-w-full border text-sm">
             <thead>
@@ -128,17 +128,17 @@ export default function ReviewManagementPage() {
             <tbody>
               {filteredReported.slice(0, 5).map((r, idx) => (
                 <tr key={idx}>
-                  <td className="px-2 py-1">{r.product}</td>
-                  <td className="px-2 py-1">{r.user}</td>
-                  <td className="px-2 py-1">{r.reason}</td>
-                  <td className="px-2 py-1">{r.status}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.reason}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </Link>
+        </div>
         {/* Q&A 관리 요약 - 테이블형 */}
-        <Link href="/admin/review-management/qna" className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
+        <div className="block bg-white rounded shadow p-6 min-w-[400px] cursor-pointer hover:bg-gray-50 transition">
           <h2 className="text-lg font-bold mb-4">Q&A 관리</h2>
           <table className="min-w-full border text-sm">
             <thead>
@@ -152,15 +152,15 @@ export default function ReviewManagementPage() {
             <tbody>
               {filteredQna.slice(0, 5).map(q => (
                 <tr key={q.id}>
-                  <td className="px-2 py-1">{q.title}</td>
-                  <td className="px-2 py-1">{q.user}</td>
-                  <td className="px-2 py-1">{q.created}</td>
-                  <td className="px-2 py-1">{q.answered ? "답변완료" : "미답변"}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.title}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.user}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.created}</td>
+                  <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.answered ? "답변완료" : "미답변"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </Link>
+        </div>
       </div>
       {selectedReview && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">

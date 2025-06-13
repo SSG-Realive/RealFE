@@ -48,7 +48,7 @@ export default function ReviewReportedPage() {
               <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
               <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.reason}</td>
               <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>View</td>
+              <td style={{ textDecoration: 'none', fontWeight: 'normal', cursor: 'pointer', color: '#0070f3' }} onClick={() => setSelected(r)}>View</td>
             </tr>
           ))}
         </tbody>

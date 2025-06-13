@@ -1,5 +1,8 @@
 "use client";
 import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import Link from "next/link";
 
 interface Auction {
   id: number;
@@ -46,30 +49,30 @@ function AuctionListPage() {
       <table className="min-w-full border text-sm">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-2 py-1">경매명</th>
-            <th className="px-2 py-1">상품명</th>
-            <th className="px-2 py-1">판매자</th>
-            <th className="px-2 py-1">시작일</th>
-            <th className="px-2 py-1">종료일</th>
-            <th className="px-2 py-1">상태</th>
-            <th className="px-2 py-1">낙찰자</th>
-            <th className="px-2 py-1">낙찰가</th>
-            <th className="px-2 py-1"></th>
+            <th className="px-2 py-1">사진</th>
+            <th className="px-2 py-1">정보</th>
+            <th className="px-2 py-1">상세</th>
           </tr>
         </thead>
         <tbody>
           {filtered.map(a => (
             <tr key={a.id}>
-              <td className="px-2 py-1">{a.name}</td>
-              <td className="px-2 py-1">{a.product}</td>
-              <td className="px-2 py-1">{a.seller}</td>
-              <td className="px-2 py-1">{a.start}</td>
-              <td className="px-2 py-1">{a.end}</td>
-              <td className="px-2 py-1">{a.status}</td>
-              <td className="px-2 py-1">{a.status === "종료" ? a.winner || "-" : "-"}</td>
-              <td className="px-2 py-1">{a.status === "종료" ? a.winningPrice || "-" : "-"}</td>
-              <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelected(a)}>View</button>
+              <td className="px-2 py-1 align-top">
+                {a.image
+                  ? <img src={a.image} alt="auction" className="w-32 h-32 rounded-full object-cover" style={{ minWidth: 128, minHeight: 128, maxWidth: 128, maxHeight: 128 }} />
+                  : <div className="w-32 h-32 bg-gray-200 flex items-center justify-center rounded-full text-xs font-semibold" style={{ minWidth: 128, minHeight: 128, maxWidth: 128, maxHeight: 128 }}>이미지</div>
+                }
+              </td>
+              <td className="px-2 py-1 align-top">
+                <div className="flex flex-col gap-1">
+                  <span className="font-bold">{a.name}</span>
+                  <span className="text-gray-600">경매 시작 시간: {a.start}</span>
+                  <span className="text-gray-600">경매 마감 시간: {a.end}</span>
+                  <span className="text-gray-600">즉시 구입가: {/* 즉시구입가 */}</span>
+                </div>
+              </td>
+              <td className="px-2 py-1 align-top">
+                <Link href={`/admin/auction-management/list/${a.id}`} className="text-blue-600 underline">상세조회</Link>
               </td>
             </tr>
           ))}

@@ -22,7 +22,6 @@ export default function ReviewReportedPage() {
   const filtered = dummyReported.filter(r => r.product.includes(search) || r.user.includes(search) || r.reason.includes(search));
   return (
     <div className="p-8">
-      <h2 className="text-lg font-bold mb-4">리뷰 신고 관리</h2>
       <div className="mb-4">
         <input
           type="text"

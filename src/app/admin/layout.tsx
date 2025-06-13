@@ -19,7 +19,7 @@ const pathTitleMap: { path: string; title: string }[] = [
   { path: '/admin/dashboard', title: '대시보드' },
   { path: '/admin/sellers', title: '판매자' },
   { path: '/admin/products', title: '상품 관리' },
-  { path: '/admin/settlement-management', title: '정산' },
+  { path: '/admin/settlement-management', title: '정산관리' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

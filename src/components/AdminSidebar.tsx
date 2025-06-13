@@ -81,7 +81,7 @@ export default function AdminSidebar() {
               <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/auction-management/register" style={{ color: '#fff' }}>경매 등록</Link></li>
             </ul>
           </Accordion>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/settlement-management" style={{ color: '#fff' }}>정산</Link></li>
+          <li style={{ margin: '18px 0' }}><Link href="/admin/settlement-management" style={{ color: '#fff' }}>정산관리</Link></li>
           <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
             <Link href="/admin/review-management" style={{ flex: 1, color: '#fff' }}>리뷰</Link>
             <button

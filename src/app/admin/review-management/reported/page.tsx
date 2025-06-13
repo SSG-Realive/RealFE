@@ -12,17 +12,24 @@ const dummyReported = [
   { product: "프린터", user: "user8", reason: "광고성", status: "신고됨", userImage: "https://randomuser.me/api/portraits/women/58.jpg" },
   { product: "마우스패드", user: "user9", reason: "도배", status: "신고됨", userImage: "https://randomuser.me/api/portraits/men/59.jpg" },
   { product: "램프", user: "user10", reason: "욕설", status: "신고됨", userImage: "https://randomuser.me/api/portraits/women/60.jpg" },
+  { product: "노트북 파우치", user: "user11", reason: "욕설", status: "신고처리됨", userImage: "https://randomuser.me/api/portraits/men/61.jpg" },
+  { product: "USB 허브", user: "user12", reason: "광고성", status: "신고처리됨", userImage: "https://randomuser.me/api/portraits/women/62.jpg" },
+  { product: "스탠드", user: "user13", reason: "도배", status: "신고처리됨", userImage: "https://randomuser.me/api/portraits/men/63.jpg" },
 ];
 
 type Reported = typeof dummyReported[0];
 
 export default function ReviewReportedPage() {
   const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
   const [selected, setSelected] = useState<Reported | null>(null);
-  const filtered = dummyReported.filter(r => r.product.includes(search) || r.user.includes(search) || r.reason.includes(search));
+  const filtered = dummyReported.filter(r =>
+    (r.product.includes(search) || r.user.includes(search) || r.reason.includes(search)) &&
+    (!status || r.status === status)
+  );
   return (
     <div className="p-8">
-      <div className="mb-4">
+      <div className="mb-4 flex gap-2 items-center">
         <input
           type="text"
           placeholder="상품명/작성자/사유 검색"
@@ -30,6 +37,15 @@ export default function ReviewReportedPage() {
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
         />
+        <select
+          value={status}
+          onChange={e => setStatus(e.target.value)}
+          className="border rounded px-3 py-2"
+        >
+          <option value="">전체</option>
+          <option value="신고됨">신고됨</option>
+          <option value="신고처리됨">신고처리됨</option>
+        </select>
       </div>
       <table className="min-w-full border text-sm">
         <thead>

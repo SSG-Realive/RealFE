@@ -2,14 +2,14 @@
 import React, { useState } from 'react';
 
 const dummySellers = [
-  { id: 1, name: '이상훈', email: 'sang@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: 2, name: '박지민', email: 'park@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: 4, name: '최민수', email: 'choi@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/women/4.jpg' },
-  { id: 5, name: '정가영', email: 'jung@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/men/5.jpg' },
-  { id: 6, name: '한지민', email: 'han@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/women/6.jpg' },
-  { id: 8, name: '유재석', email: 'yoo@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/8.jpg' },
-  { id: 9, name: '강호동', email: 'kang@test.com', status: 'Request', image: 'https://randomuser.me/api/portraits/men/9.jpg' },
-  { id: 10, name: '신동엽', email: 'shin@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/10.jpg' },
+  { id: 1, name: '이상훈', email: 'sang@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
+  { id: 2, name: '박지민', email: 'park@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
+  { id: 4, name: '최민수', email: 'choi@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/women/4.jpg' },
+  { id: 5, name: '정가영', email: 'jung@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/men/5.jpg' },
+  { id: 6, name: '한지민', email: 'han@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/women/6.jpg' },
+  { id: 8, name: '유재석', email: 'yoo@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/8.jpg' },
+  { id: 9, name: '강호동', email: 'kang@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/men/9.jpg' },
+  { id: 10, name: '신동엽', email: 'shin@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/10.jpg' },
 ];
 
 export default function AdminSellersPage() {
@@ -36,8 +36,8 @@ export default function AdminSellersPage() {
           style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
         >
           <option value="">전체</option>
-          <option value="Active">Active</option>
-          <option value="Request">Request</option>
+          <option value="승인">승인</option>
+          <option value="승인 처리 전">승인 처리 전</option>
         </select>
       </div>
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>

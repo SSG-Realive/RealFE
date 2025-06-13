@@ -1,5 +1,6 @@
 import apiClient from '@/lib/apiClient';
 import { PageResponse } from '@/types/page/pageResponse';
+import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
 import {
     SellerOrderResponse,
     SellerOrderDetailResponse,
@@ -10,14 +11,10 @@ import {
  * 판매자 주문 목록 조회 (PageResponse 기반)
  * @param searchParams - 페이지, 정렬, 검색 필터 등
  */
-export async function getSellerOrders(
-    searchParams: Record<string, any> = {}
-): Promise<PageResponse<SellerOrderResponse>> {
-    const query = new URLSearchParams(searchParams).toString();
-    const res = await apiClient.get(`/seller/orders?${query}`);
+export async function getSellerOrders(): Promise<PageResponseForOrder<SellerOrderResponse>> {
+    const res = await apiClient.get('/seller/orders');
     return res.data;
 }
-
 /**
  * 주문 상세 조회
  */

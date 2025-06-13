@@ -8,9 +8,16 @@ export type DeliveryStatus =
 // 🔹 주문 목록 응답
 export interface SellerOrderResponse {
     orderId: number;
-    orderStatus: string;
-    totalPrice: number;
-    orderCreatedAt: string;
+    orderedAt: string;
+    customerName: string;
+    productName: string;
+    quantity: number;
+    deliveryStatus: string;
+    deleiveryStatusText: string | null;
+    trackingNumber: string | null;
+    startDate: string;
+    completeDate: string;
+    deliveryType: string | null;
 }
 
 // 🔹 주문 상세 응답

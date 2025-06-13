@@ -8,3 +8,4 @@ export interface PageResponse<T> {
   next: boolean;
   dtoList: T[];
 }
+

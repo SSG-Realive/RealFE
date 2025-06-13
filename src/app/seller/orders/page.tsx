@@ -7,10 +7,11 @@ import { SellerOrderResponse } from '@/types/sellerOrder';
 import Header from '@/components/Header';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
+import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
 
 export default function SellerOrderListPage() {
 
-     // useSellerAuthGuard();
+    // useSellerAuthGuard();
 
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,8 +22,9 @@ export default function SellerOrderListPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await getSellerOrders();
-                setOrders(res.dtoList || []);
+                const res: PageResponseForOrder<SellerOrderResponse> = await getSellerOrders();
+                console.log('주문 목록 결과:', res);
+                setOrders(res.content || []);
                 setError(null);
             } catch (err) {
                 console.error('주문 목록 조회 실패', err);
@@ -55,8 +57,12 @@ export default function SellerOrderListPage() {
                                 onClick={() => router.push(`/seller/orders/${order.orderId}`)}
                             >
                                 <p>주문 ID: {order.orderId}</p>
-                                <p>총 가격: {order.totalPrice.toLocaleString()}원</p>
-                                <p>상태: {order.orderStatus}</p>
+                                <p>주문일자: {new Date(order.orderedAt).toLocaleString()}</p>
+                                <p>고객명: {order.customerName}</p>
+                                <p>상품명: {order.productName}</p>
+                                <p>수량: {order.quantity}</p>
+                                <p>상태: {order.deliveryStatus}</p>
+                                {/* totalPrice는 현재 API에 없음 → 나중에 추가 시 사용 */}
                             </li>
                         ))}
                     </ul>

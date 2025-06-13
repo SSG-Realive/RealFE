@@ -49,6 +49,7 @@ export default function SellerSettlementPage() {
     };
 
     useEffect(() => {
+
         fetchAll(); // 초기 전체 조회
     }, []);
 
@@ -63,7 +64,7 @@ export default function SellerSettlementPage() {
                     <input
                         type="date"
                         value={filterDate}
-                        
+
                         onChange={(e) => setFilterDate(e.target.value)}
                         className="border px-2 py-1 rounded"
                     />
@@ -85,7 +86,7 @@ export default function SellerSettlementPage() {
                     </button>
                 </div>
 
-                {/* ✅ 테이블 */}
+                {/* ✅ 테이블  변경 사항이 있습니다*/}
                 {loading ? (
                     <p className="text-gray-500">로딩 중...</p>
                 ) : error ? (

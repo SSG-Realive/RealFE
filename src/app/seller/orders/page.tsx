@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSellerOrders } from '@/service/sellerOrderService';
 import { SellerOrderResponse } from '@/types/sellerOrder';
-import { PageResponse } from '@/types/page/pageResponse';
 import Header from '@/components/Header';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
+import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
 
 export default function SellerOrderListPage() {
-    useSellerAuthGuard();
+
+    // useSellerAuthGuard();
 
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,12 +22,9 @@ export default function SellerOrderListPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const res: PageResponse<SellerOrderResponse> = await getSellerOrders({
-                    page: 0,
-                    size: 10,
-                    sort: 'orderedAt,desc', // ✅ 백엔드 필드명에 맞게 정렬
-                });
-                setOrders(res.dtoList || []);
+                const res: PageResponseForOrder<SellerOrderResponse> = await getSellerOrders();
+                console.log('주문 목록 결과:', res);
+                setOrders(res.content || []);
                 setError(null);
             } catch (err) {
                 console.error('주문 목록 조회 실패', err);
@@ -35,7 +33,6 @@ export default function SellerOrderListPage() {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
@@ -56,15 +53,16 @@ export default function SellerOrderListPage() {
                         {orders.map((order) => (
                             <li
                                 key={order.orderId}
-                                className="bg-white shadow rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                                className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-50"
                                 onClick={() => router.push(`/seller/orders/${order.orderId}`)}
                             >
-                                <p className="font-semibold">주문 ID: {order.orderId}</p>
+                                <p>주문 ID: {order.orderId}</p>
+                                <p>주문일자: {new Date(order.orderedAt).toLocaleString()}</p>
                                 <p>고객명: {order.customerName}</p>
                                 <p>상품명: {order.productName}</p>
                                 <p>수량: {order.quantity}</p>
-                                <p>배송 상태: {order.deliveryStatus}</p>
-                                <p>주문일시: {new Date(order.orderedAt).toLocaleString()}</p>
+                                <p>상태: {order.deliveryStatus}</p>
+                                {/* totalPrice는 현재 API에 없음 → 나중에 추가 시 사용 */}
                             </li>
                         ))}
                     </ul>

@@ -11,7 +11,7 @@ const apiClient = axios.create({
 // 요청 인터셉터 예시: 토큰이 있다면 자동으로 헤더에 넣기
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
-  console.log('→ Interceptor: token=', token);
+   console.log('→ Interceptor: token=', token);
 
   if (token && token !== 'undefined' && token !== 'null' && token.trim() !== '' && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -25,6 +25,7 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
 
 
 export default apiClient;

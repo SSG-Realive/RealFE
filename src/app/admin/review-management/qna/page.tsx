@@ -58,14 +58,12 @@ function QnaManagementPage() {
         <tbody>
           {filtered.map(q => (
             <tr key={q.id}>
-              <td className="px-2 py-1">{q.id}</td>
-              <td className="px-2 py-1">{q.user}</td>
-              <td className="px-2 py-1">{q.title}</td>
-              <td className="px-2 py-1">{q.created}</td>
-              <td className="px-2 py-1">{q.answered ? "답변완료" : "미답변"}</td>
-              <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => router.push(`/admin/review-management/qna/${q.id}`)}>상세</button>
-              </td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.id}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.user}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.title}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.created}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.answered ? "답변완료" : "미답변"}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>상세</td>
             </tr>
           ))}
         </tbody>

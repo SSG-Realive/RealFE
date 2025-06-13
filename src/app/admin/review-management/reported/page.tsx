@@ -44,13 +44,11 @@ export default function ReviewReportedPage() {
         <tbody>
           {filtered.map((r, idx) => (
             <tr key={idx}>
-              <td className="px-2 py-1">{r.product}</td>
-              <td className="px-2 py-1">{r.user}</td>
-              <td className="px-2 py-1">{r.reason}</td>
-              <td className="px-2 py-1">{r.status}</td>
-              <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelected(r)}>View</button>
-              </td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.reason}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>View</td>
             </tr>
           ))}
         </tbody>

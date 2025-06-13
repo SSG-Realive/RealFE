@@ -55,14 +55,12 @@ function ReviewListPage() {
         <tbody>
           {filtered.map(r => (
             <tr key={r.id}>
-              <td className="px-2 py-1">{r.product}</td>
-              <td className="px-2 py-1">{r.user}</td>
-              <td className="px-2 py-1">{r.content}</td>
-              <td className="px-2 py-1">{r.date}</td>
-              <td className="px-2 py-1">{r.status}</td>
-              <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => router.push(`/admin/reviews/${r.id}`)}>상세</button>
-              </td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.content}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.date}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
+              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>상세</td>
             </tr>
           ))}
         </tbody>

@@ -55,7 +55,18 @@ export default function AdminSellersPage() {
               <td style={{ padding: 8, border: '1px solid #eee' }}><img src={s.image} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.name}</td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.email}</td>
-              <td style={{ padding: 8, border: '1px solid #eee' }}>{s.status}</td>
+              <td style={{ padding: 8, border: '1px solid #eee' }}>
+                {s.status === '승인 처리 전' ? (
+                  <button
+                    style={{ background: '#4caf50', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', fontWeight: 'bold' }}
+                    onClick={() => alert(`${s.name} 판매자 승인처리! (추후 구현)`)}
+                  >
+                    승인처리
+                  </button>
+                ) : (
+                  s.status
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

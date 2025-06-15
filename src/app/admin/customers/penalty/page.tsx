@@ -33,8 +33,16 @@ function CustomerPenaltyPage() {
 
   return (
     <div className="p-8">
-      <div className="mb-4">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-bold mb-4">사용자 패널티 목록</h2>
+        <button
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          onClick={() => router.push('/admin/customers/penalty/register')}
+        >
+          사용자 패널티 등록
+        </button>
+      </div>
+      <div className="mb-4">
         <input
           type="text"
           placeholder="사용자/사유 검색"

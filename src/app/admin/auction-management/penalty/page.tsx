@@ -26,8 +26,11 @@ const dummyPenalties: Penalty[] = [
 export default function PenaltyListPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<Penalty | null>(null);
-  const filtered = dummyPenalties.filter(p => p.user.includes(search) || p.reason.includes(search));
+  const filtered = dummyPenalties.filter(p => 
+    p.user.includes(search) || 
+    p.reason.includes(search)
+  );
+
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-4">
@@ -64,28 +67,17 @@ export default function PenaltyListPage() {
               <td className="px-2 py-1">{penalty.reason}</td>
               <td className="px-2 py-1">{penalty.date}</td>
               <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelected(penalty)}>View</button>
+                <button 
+                  className="text-blue-600 underline" 
+                  onClick={() => router.push(`/admin/auction-management/penalty/${penalty.id}`)}
+                >
+                  View
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[320px]">
-            <h2 className="text-xl font-bold mb-4">패널티 상세</h2>
-            <div className="flex items-center gap-4 mb-4">
-              <img src={selected.userImage} alt={selected.user} className="w-16 h-16 rounded-full border" />
-              <div>
-                <p><b>사용자:</b> {selected.user}</p>
-                <p><b>사유:</b> {selected.reason}</p>
-                <p><b>일자:</b> {selected.date}</p>
-              </div>
-            </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

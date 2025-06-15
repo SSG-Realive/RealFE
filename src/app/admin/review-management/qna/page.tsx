@@ -24,14 +24,17 @@ const dummyQna: Qna[] = [
 ];
 
 function QnaManagementPage() {
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<Qna | null>(null);
   const router = useRouter();
-  const filtered = dummyQna.filter(q => q.title.includes(search) || q.user.includes(search));
+  const [search, setSearch] = useState("");
+  const filtered = dummyQna.filter(q => 
+    q.title.includes(search) || 
+    q.user.includes(search)
+  );
 
   return (
     <div className="p-8">
-      <div className="mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-bold mb-4">Q&A 관리</h2>
+      <div className="mb-4">
         <input
           type="text"
           placeholder="제목/작성자 검색"
@@ -39,11 +42,6 @@ function QnaManagementPage() {
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
         />
-        <select className="border rounded px-3 py-2 ml-2">
-          <option value="">전체</option>
-          <option value="answered">답변완료</option>
-          <option value="unanswered">미답변</option>
-        </select>
       </div>
       <table className="min-w-full border text-sm">
         <thead>
@@ -59,33 +57,25 @@ function QnaManagementPage() {
         <tbody>
           {filtered.map(q => (
             <tr key={q.id}>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.id}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.user}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.title}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.created}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{q.answered ? "답변완료" : "미답변"}</td>
-              <td style={{ textDecoration: 'none', fontWeight: 'normal', cursor: 'pointer', color: '#0070f3' }} onClick={() => setSelected(q)}>View</td>
+              <td className="px-2 py-1">{q.id}</td>
+              <td className="px-2 py-1">{q.user}</td>
+              <td className="px-2 py-1">{q.title}</td>
+              <td className="px-2 py-1">{q.created}</td>
+              <td className="px-2 py-1">{q.answered ? "답변완료" : "미답변"}</td>
+              <td className="px-2 py-1">
+                <button 
+                  className="text-blue-600 underline" 
+                  onClick={() => router.push(`/admin/review-management/qna/${q.id}`)}
+                >
+                  View
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[320px]">
-            <h2 className="text-xl font-bold mb-4">Q&A 상세</h2>
-            <div className="mb-4">
-              <p><b>번호:</b> {selected.id}</p>
-              <p><b>작성자:</b> {selected.user}</p>
-              <p><b>제목:</b> {selected.title}</p>
-              <p><b>작성일:</b> {selected.created}</p>
-              <p><b>답변여부:</b> {selected.answered ? "답변완료" : "미답변"}</p>
-            </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default Object.assign(QnaManagementPage, { pageTitle: 'Q&A 관리' }); 
+export default QnaManagementPage; 

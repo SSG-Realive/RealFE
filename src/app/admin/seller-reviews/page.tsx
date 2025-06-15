@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface SellerReview {
   id: number;
@@ -18,10 +19,13 @@ const dummyReviews: SellerReview[] = [
 ];
 
 export default function SellerReviewsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<SellerReview | null>(null);
-
-  const filtered = dummyReviews.filter(r => r.product.includes(search) || r.author.includes(search));
+  const filtered = dummyReviews.filter(r => 
+    r.product.includes(search) || 
+    r.author.includes(search) || 
+    r.content.includes(search)
+  );
 
   return (
     <div className="p-8">
@@ -29,7 +33,7 @@ export default function SellerReviewsPage() {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="상품명/작성자 검색"
+          placeholder="상품명/작성자/내용 검색"
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
@@ -38,49 +42,36 @@ export default function SellerReviewsPage() {
       <table className="min-w-full border text-sm">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-2 py-2">리뷰ID</th>
-            <th className="px-2 py-2">상품</th>
-            <th className="px-2 py-2">작성자</th>
-            <th className="px-2 py-2">평점</th>
-            <th className="px-2 py-2">내용</th>
-            <th className="px-2 py-2">상태</th>
-            <th className="px-2 py-2">등록일</th>
-            <th className="px-2 py-2">액션</th>
+            <th className="px-2 py-1">상품</th>
+            <th className="px-2 py-1">작성자</th>
+            <th className="px-2 py-1">평점</th>
+            <th className="px-2 py-1">내용</th>
+            <th className="px-2 py-1">상태</th>
+            <th className="px-2 py-1">등록일</th>
+            <th className="px-2 py-1">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filtered.map(r => (
             <tr key={r.id}>
-              <td className="px-2 py-2">{r.id}</td>
-              <td className="px-2 py-2">{r.product}</td>
-              <td className="px-2 py-2">{r.author}</td>
-              <td className="px-2 py-2">{r.rating}점</td>
-              <td className="px-2 py-2">{r.content}</td>
-              <td className="px-2 py-2">{r.status}</td>
-              <td className="px-2 py-2">{r.createdAt}</td>
-              <td className="px-2 py-2">
-                <button className="text-blue-600 underline mr-2" onClick={() => setSelected(r)}>상세</button>
-                <button className="bg-yellow-400 text-white px-2 py-1 rounded mr-2">정상처리</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded">삭제</button>
+              <td className="px-2 py-1">{r.product}</td>
+              <td className="px-2 py-1">{r.author}</td>
+              <td className="px-2 py-1">{r.rating}점</td>
+              <td className="px-2 py-1">{r.content}</td>
+              <td className="px-2 py-1">{r.status}</td>
+              <td className="px-2 py-1">{r.createdAt}</td>
+              <td className="px-2 py-1">
+                <button 
+                  className="text-blue-600 underline" 
+                  onClick={() => router.push(`/admin/seller-reviews/${r.id}`)}
+                >
+                  View
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[300px]">
-            <h2 className="text-xl font-bold mb-4">리뷰 상세</h2>
-            <p><b>상품:</b> {selected.product}</p>
-            <p><b>작성자:</b> {selected.author}</p>
-            <p><b>평점:</b> {selected.rating}점</p>
-            <p><b>내용:</b> {selected.content}</p>
-            <p><b>상태:</b> {selected.status}</p>
-            <p><b>등록일:</b> {selected.createdAt}</p>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

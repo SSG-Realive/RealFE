@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface Review {
   id: number;
@@ -24,35 +25,25 @@ const dummyReviews: Review[] = [
 ];
 
 export default function ReviewListPage() {
-  const [reviewSearch, setReviewSearch] = useState("");
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [status, setStatus] = useState("");
-  const filteredReviews = dummyReviews.filter(
-    r => (r.product.includes(reviewSearch) || r.user.includes(reviewSearch)) &&
-         (!status || r.status === status)
+  const router = useRouter();
+  const [search, setSearch] = useState("");
+  const filteredReviews = dummyReviews.filter(r => 
+    r.product.includes(search) || 
+    r.user.includes(search) || 
+    r.content.includes(search)
   );
 
   return (
     <div className="p-8">
-      <form className="flex items-center gap-2 mb-4">
+      <div className="mb-4">
         <input
           type="text"
-          placeholder="상품명/작성자 검색"
-          value={reviewSearch}
-          onChange={e => setReviewSearch(e.target.value)}
-          className="border rounded px-3 py-2 w-64"
-        />
-        <select
+          placeholder="상품명/작성자/내용 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
-          value={status}
-          onChange={e => setStatus(e.target.value)}
-        >
-          <option value="">전체</option>
-          <option value="정상">정상</option>
-          <option value="신고됨">신고됨</option>
-        </select>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="button">검색</button>
-      </form>
+        />
+      </div>
       <table className="min-w-full border text-sm">
         <thead>
           <tr className="bg-gray-100">
@@ -73,25 +64,17 @@ export default function ReviewListPage() {
               <td className="px-2 py-1">{r.date}</td>
               <td className="px-2 py-1">{r.status}</td>
               <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelectedReview(r)}>상세</button>
+                <button 
+                  className="text-blue-600 underline" 
+                  onClick={() => router.push(`/admin/review-management/${r.id}`)}
+                >
+                  상세
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selectedReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[300px]">
-            <h2 className="text-xl font-bold mb-4">리뷰 상세</h2>
-            <p><b>상품명:</b> {selectedReview.product}</p>
-            <p><b>작성자:</b> {selectedReview.user}</p>
-            <p><b>내용:</b> {selectedReview.content}</p>
-            <p><b>작성일:</b> {selectedReview.date}</p>
-            <p><b>상태:</b> {selectedReview.status}</p>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelectedReview(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

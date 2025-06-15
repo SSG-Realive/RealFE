@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Settlement {
   id: string;
@@ -23,7 +24,7 @@ export default function SettlementManagementPage() {
   const [dateFilter, setDateFilter] = useState("");
   const [amountFilter, setAmountFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selected, setSelected] = useState<Settlement | null>(null);
+  const router = useRouter();
 
   const filtered = dummySettlements.filter(s =>
     (!sellerFilter || s.seller.includes(sellerFilter)) &&
@@ -95,30 +96,12 @@ export default function SettlementManagementPage() {
                 </span>
               </td>
               <td className="px-4 py-2">
-                <button className="text-blue-600 underline" onClick={() => setSelected(s)}>View</button>
+                <button className="text-blue-600 underline" onClick={() => router.push(`/admin/settlement-management/${s.id}`)}>View</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[320px]">
-            <h2 className="text-xl font-bold mb-4">정산 상세</h2>
-            <div className="flex items-center gap-4 mb-4">
-              <img src={selected.sellerImage} alt={selected.seller} className="w-16 h-16 rounded-full border" />
-              <div>
-                <p><b>정산ID:</b> {selected.id}</p>
-                <p><b>판매자:</b> {selected.seller}</p>
-                <p><b>금액:</b> {selected.amount.toLocaleString()}원</p>
-                <p><b>정산일:</b> {selected.date}</p>
-                <p><b>상태:</b> {selected.status}</p>
-              </div>
-            </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

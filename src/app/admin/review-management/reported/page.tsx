@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const dummyReported = [
   { product: "키보드", user: "user2", reason: "욕설", status: "신고됨", userImage: "https://randomuser.me/api/portraits/women/52.jpg" },
@@ -20,16 +21,17 @@ const dummyReported = [
 type Reported = typeof dummyReported[0];
 
 export default function ReviewReportedPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
-  const [selected, setSelected] = useState<Reported | null>(null);
-  const filtered = dummyReported.filter(r =>
-    (r.product.includes(search) || r.user.includes(search) || r.reason.includes(search)) &&
-    (!status || r.status === status)
+  const filtered = dummyReported.filter(r => 
+    r.product.includes(search) || 
+    r.user.includes(search) || 
+    r.reason.includes(search)
   );
+
   return (
     <div className="p-8">
-      <div className="mb-4 flex gap-2 items-center">
+      <div className="mb-4">
         <input
           type="text"
           placeholder="상품명/작성자/사유 검색"
@@ -37,15 +39,6 @@ export default function ReviewReportedPage() {
           onChange={e => setSearch(e.target.value)}
           className="border rounded px-3 py-2"
         />
-        <select
-          value={status}
-          onChange={e => setStatus(e.target.value)}
-          className="border rounded px-3 py-2"
-        >
-          <option value="">전체</option>
-          <option value="신고됨">신고됨</option>
-          <option value="신고처리됨">신고처리됨</option>
-        </select>
       </div>
       <table className="min-w-full border text-sm">
         <thead>
@@ -60,32 +53,22 @@ export default function ReviewReportedPage() {
         <tbody>
           {filtered.map((r, idx) => (
             <tr key={idx}>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.product}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.user}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.reason}</td>
-              <td style={{ color: 'inherit', textDecoration: 'none', fontWeight: 'normal' }}>{r.status}</td>
-              <td style={{ textDecoration: 'none', fontWeight: 'normal', cursor: 'pointer', color: '#0070f3' }} onClick={() => setSelected(r)}>View</td>
+              <td className="px-2 py-1">{r.product}</td>
+              <td className="px-2 py-1">{r.user}</td>
+              <td className="px-2 py-1">{r.reason}</td>
+              <td className="px-2 py-1">{r.status}</td>
+              <td className="px-2 py-1">
+                <button 
+                  className="text-blue-600 underline" 
+                  onClick={() => router.push(`/admin/review-management/reported/${r.id}`)}
+                >
+                  View
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {selected && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 min-w-[320px]">
-            <h2 className="text-xl font-bold mb-4">신고 상세</h2>
-            <div className="flex items-center gap-4 mb-4">
-              <img src={selected.userImage} alt={selected.user} className="w-16 h-16 rounded-full border" />
-              <div>
-                <p><b>상품명:</b> {selected.product}</p>
-                <p><b>작성자:</b> {selected.user}</p>
-                <p><b>사유:</b> {selected.reason}</p>
-                <p><b>상태:</b> {selected.status}</p>
-              </div>
-            </div>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelected(null)}>닫기</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

@@ -1,7 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-// 더미 데이터
 const dummyBids = [
   { id: "1", user: "user1", amount: 100000, date: "2024-06-01", winner: "user4", winAmount: 200000, userImage: "https://randomuser.me/api/portraits/men/1.jpg" },
   { id: "2", user: "user2", amount: 120000, date: "2024-06-02", winner: "user4", winAmount: 200000, userImage: "https://randomuser.me/api/portraits/men/2.jpg" },
@@ -15,38 +14,55 @@ const dummyBids = [
   { id: "10", user: "user10", amount: 105000, date: "2024-06-09", winner: "user4", winAmount: 200000, userImage: "https://randomuser.me/api/portraits/men/10.jpg" },
 ];
 
-export default function BidHistoryPage() {
+export default function BidDetailPage() {
+  const params = useParams();
   const router = useRouter();
+  const { id } = params;
+
+  const bid = dummyBids.find(b => b.id === id);
+
+  if (!bid) {
+    return <div className="p-8">입찰 정보를 찾을 수 없습니다.</div>;
+  }
 
   return (
-    <div className="p-8">
-      <input className="mb-4 border px-2 py-1" placeholder="입찰자 검색" />
-      <table>
-        <thead>
-          <tr>
-            <th>User</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>낙찰자</th>
-            <th>낙찰가</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dummyBids.map((bid) => (
-            <tr key={bid.id}>
-              <td>{bid.user}</td>
-              <td>{bid.amount.toLocaleString()}원</td>
-              <td>{bid.date}</td>
-              <td>{bid.winner}</td>
-              <td>{bid.winAmount.toLocaleString()}원</td>
-              <td>
-                <button onClick={() => router.push(`/admin/auction-management/bid/${bid.id}`)}>View</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="p-8 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">입찰 상세</h2>
+      <div className="bg-white rounded-lg p-6 shadow">
+        <div className="flex items-center gap-4 mb-6">
+          <img src={bid.userImage} alt={bid.user} className="w-16 h-16 rounded-full border" />
+          <div>
+            <p className="text-lg font-semibold">{bid.user}</p>
+            <p className="text-gray-500">입찰자</p>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <p className="font-semibold">입찰 금액</p>
+            <p>{bid.amount.toLocaleString()}원</p>
+          </div>
+          <div>
+            <p className="font-semibold">입찰 일자</p>
+            <p>{bid.date}</p>
+          </div>
+          <div>
+            <p className="font-semibold">낙찰자</p>
+            <p>{bid.winner}</p>
+          </div>
+          <div>
+            <p className="font-semibold">낙찰가</p>
+            <p>{bid.winAmount.toLocaleString()}원</p>
+          </div>
+        </div>
+        <div className="mt-6 flex gap-2">
+          <button 
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={() => router.push('/admin/auction-management/bid')}
+          >
+            목록으로
+          </button>
+        </div>
+      </div>
     </div>
   );
 } 

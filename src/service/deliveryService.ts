@@ -14,4 +14,11 @@ export async function getDeliveryDetail(orderId: number): Promise<OrderDeliveryD
  */
 export async function updateDeliveryStatus(orderId: number, dto: DeliveryStatusUpdateRequest): Promise<void> {
     await apiClient.patch(`/seller/orders/${orderId}/delivery`, dto);
+
 }
+
+//배송취소 설정
+export async function cancelOrderDelivery(orderId: number): Promise<void> {
+    await apiClient.patch(`/seller/orders/${orderId}/cancel`);
+}
+

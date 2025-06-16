@@ -1,4 +1,5 @@
 import { AdminDashboardDTO } from '@/types/admin';
+import apiClient from '@/lib/apiClient';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -93,9 +94,20 @@ async function handleResponse<T>(response: Response): Promise<T> {
 }
 
 export async function getAdminDashboard(date: string, periodType: string): Promise<AdminDashboardDTO> {
-  // 백엔드 연결이 없을 때는 더미 데이터 반환
-  console.log('Using dummy data for admin dashboard');
-  return dummyDashboardData;
+  try {
+    // 백엔드 연결이 없을 때는 더미 데이터 반환
+    console.log('Using dummy data for admin dashboard');
+    return dummyDashboardData;
+    
+    // 실제 API 호출 (백엔드 연결 시 주석 해제)
+    // const response = await apiClient.get<AdminDashboardDTO>(
+    //   `/api/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`
+    // );
+    // return response.data;
+  } catch (error) {
+    console.error('Failed to fetch admin dashboard:', error);
+    throw error;
+  }
 }
 
 export async function getSalesStatistics(
@@ -112,15 +124,10 @@ export async function getSalesStatistics(
       ...(sortBy && { sortBy }),
     });
 
-    const response = await fetch(
-      `${API_BASE_URL}/admin/stats/sales-period?${params.toString()}`,
-      {
-        method: 'GET',
-        headers: defaultHeaders,
-        credentials: 'include',
-      }
+    const response = await apiClient.get(
+      `/api/admin/stats/sales-period?${params.toString()}`
     );
-    return handleResponse(response);
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch sales statistics:', error);
     throw error;
@@ -129,15 +136,10 @@ export async function getSalesStatistics(
 
 export async function getAuctionStatistics(startDate: string, endDate: string) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/stats/auctions-period?startDate=${startDate}&endDate=${endDate}`,
-      {
-        method: 'GET',
-        headers: defaultHeaders,
-        credentials: 'include',
-      }
+    const response = await apiClient.get(
+      `/api/admin/stats/auctions-period?startDate=${startDate}&endDate=${endDate}`
     );
-    return handleResponse(response);
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch auction statistics:', error);
     throw error;
@@ -146,15 +148,10 @@ export async function getAuctionStatistics(startDate: string, endDate: string) {
 
 export async function getMemberStatistics(startDate: string, endDate: string) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/stats/members-period?startDate=${startDate}&endDate=${endDate}`,
-      {
-        method: 'GET',
-        headers: defaultHeaders,
-        credentials: 'include',
-      }
+    const response = await apiClient.get(
+      `/api/admin/stats/members-period?startDate=${startDate}&endDate=${endDate}`
     );
-    return handleResponse(response);
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch member statistics:', error);
     throw error;
@@ -163,17 +160,35 @@ export async function getMemberStatistics(startDate: string, endDate: string) {
 
 export async function getReviewStatistics(startDate: string, endDate: string) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/admin/stats/reviews-period?startDate=${startDate}&endDate=${endDate}`,
-      {
-        method: 'GET',
-        headers: defaultHeaders,
-        credentials: 'include',
-      }
+    const response = await apiClient.get(
+      `/api/admin/stats/reviews-period?startDate=${startDate}&endDate=${endDate}`
     );
-    return handleResponse(response);
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch review statistics:', error);
+    throw error;
+  }
+}
+
+interface AdminLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export async function adminLogin(email: string, password: string): Promise<AdminLoginResponse> {
+  try {
+    const response = await apiClient.post<AdminLoginResponse>('/api/admin/login', {
+      email,
+      password
+    });
+    
+    // 로그인 성공 시 토큰 저장
+    localStorage.setItem('accessToken', response.data.accessToken);
+    localStorage.setItem('refreshToken', response.data.refreshToken);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Failed to login:', error);
     throw error;
   }
 } 

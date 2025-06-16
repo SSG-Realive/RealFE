@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Settlement {
@@ -25,6 +25,11 @@ export default function SettlementManagementPage() {
   const [amountFilter, setAmountFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   const filtered = dummySettlements.filter(s =>
     (!sellerFilter || s.seller.includes(sellerFilter)) &&

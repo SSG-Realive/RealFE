@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -30,6 +30,11 @@ export default function ProductManagementPage() {
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<Product | null>(null);
   const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   const filtered = dummyProducts.filter(p => p.name.includes(filter) || p.category.includes(filter));
 

@@ -24,6 +24,10 @@ const pathTitleMap: { path: string; title: string }[] = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  // 로그인, 대문 페이지에서는 사이드바/상단바 숨김
+  if (pathname === '/admin/login' || pathname === '/admin') {
+    return <>{children}</>;
+  }
   let found = pathTitleMap.find(item => pathname === item.path);
   if (!found) found = pathTitleMap.find(item => pathname.startsWith(item.path));
   const title = found ? found.title : '';

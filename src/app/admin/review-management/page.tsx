@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -81,6 +81,11 @@ export default function ReviewManagementPage() {
   const [selectedReported, setSelectedReported] = useState<ReportedReview | null>(null);
   const [selectedQna, setSelectedQna] = useState<Qna | null>(null);
   const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   const filteredReviews = dummyReviews.filter(r => r.product.includes(reviewSearch) || r.user.includes(reviewSearch));
   const filteredReported = dummyReported.filter(r => r.product.includes(reportedSearch) || r.user.includes(reportedSearch) || r.reason.includes(reportedSearch));

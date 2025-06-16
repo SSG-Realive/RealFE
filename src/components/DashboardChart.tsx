@@ -1,14 +1,20 @@
 "use client";
 import React from 'react';
-import ReactApexChart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
+import dynamic from 'next/dynamic';
 import { AdminDashboardDTO } from '@/types/admin';
+import { ApexOptions } from 'apexcharts';
+
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 interface DashboardChartProps {
   data: AdminDashboardDTO;
 }
 
 const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
+  if (!data) {
+    return <div className="text-gray-500 text-center py-4">데이터가 없습니다.</div>;
+  }
+
   // 회원 통계 차트
   const memberOptions: ApexOptions = {
     chart: {
@@ -24,11 +30,11 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
   };
 
   const memberSeries = [
-    data.memberSummaryStats.totalMembers,
-    data.memberSummaryStats.newMembersInPeriod,
-    data.memberSummaryStats.uniqueVisitorsInPeriod,
-    data.memberSummaryStats.engagedUsersInPeriod,
-    data.memberSummaryStats.activeUsersInPeriod,
+    data.memberSummaryStats?.totalMembers || 0,
+    data.memberSummaryStats?.newMembersInPeriod || 0,
+    data.memberSummaryStats?.uniqueVisitorsInPeriod || 0,
+    data.memberSummaryStats?.engagedUsersInPeriod || 0,
+    data.memberSummaryStats?.activeUsersInPeriod || 0,
   ];
 
   // 판매 통계 차트
@@ -38,9 +44,9 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
       height: 350,
     },
     xaxis: {
-      categories: data.productLog.salesWithCommissions.map(sale => 
+      categories: data.productLog?.salesWithCommissions?.map(sale => 
         new Date(sale.salesLog.soldAt).toLocaleDateString()
-      ),
+      ) || [],
     },
     title: {
       text: '판매 추이',
@@ -55,7 +61,7 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
 
   const salesSeries = [{
     name: '판매액',
-    data: data.productLog.salesWithCommissions.map(sale => sale.salesLog.totalPrice),
+    data: data.productLog?.salesWithCommissions?.map(sale => sale.salesLog.totalPrice) || [],
   }];
 
   // 경매 통계 차트
@@ -82,9 +88,9 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
   const auctionSeries = [{
     name: '경매 통계',
     data: [
-      data.auctionSummaryStats.totalAuctionsInPeriod,
-      data.auctionSummaryStats.totalBidsInPeriod,
-      data.auctionSummaryStats.averageBidsPerAuctionInPeriod,
+      data.auctionSummaryStats?.totalAuctionsInPeriod || 0,
+      data.auctionSummaryStats?.totalBidsInPeriod || 0,
+      data.auctionSummaryStats?.averageBidsPerAuctionInPeriod || 0,
     ],
   }];
 
@@ -103,10 +109,10 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
   };
 
   const reviewSeries = [
-    data.reviewSummaryStats.totalReviewsInPeriod,
-    data.reviewSummaryStats.newReviewsInPeriod,
-    data.reviewSummaryStats.averageRatingInPeriod * 20, // 5점 만점을 100점으로 변환
-    data.reviewSummaryStats.deletionRate * 100,
+    data.reviewSummaryStats?.totalReviewsInPeriod || 0,
+    data.reviewSummaryStats?.newReviewsInPeriod || 0,
+    (data.reviewSummaryStats?.averageRatingInPeriod || 0) * 20, // 5점 만점을 100점으로 변환
+    (data.reviewSummaryStats?.deletionRate || 0) * 100,
   ];
 
   return (

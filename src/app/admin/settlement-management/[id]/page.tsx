@@ -1,5 +1,6 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from 'react';
 
 const dummySettlements = [
   { id: "SETT001", seller: "홍길동 (hong123)", amount: 100000, date: "2024-06-01", status: "Pending", sellerImage: "https://randomuser.me/api/portraits/men/31.jpg" },
@@ -15,6 +16,11 @@ export default function SettlementDetailPage() {
   const { id } = params;
 
   const settlement = dummySettlements.find(s => s.id === id);
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   if (!settlement) {
     return <div className="p-8">정산 정보를 찾을 수 없습니다.</div>;

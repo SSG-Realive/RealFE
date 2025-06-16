@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Qna {
@@ -30,6 +30,11 @@ function QnaManagementPage() {
     q.title.includes(search) || 
     q.user.includes(search)
   );
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   return (
     <div className="p-8">

@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
 
 // 더미 데이터
 const dummyBids = [
@@ -17,6 +18,11 @@ const dummyBids = [
 
 export default function BidHistoryPage() {
   const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   return (
     <div className="p-8">

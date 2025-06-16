@@ -1,5 +1,6 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect } from 'react';
 
 // 더미 데이터
 const dummySellerReviews = [
@@ -12,6 +13,11 @@ export default function SellerReviewDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { id } = params;
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
 
   const review = dummySellerReviews.find(r => r.id === id);
 

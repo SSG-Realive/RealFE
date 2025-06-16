@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const dummySellers = [
   { id: 1, name: '이상훈', email: 'sang@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
@@ -15,6 +16,13 @@ const dummySellers = [
 export default function AdminSellersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
+
   const filtered = dummySellers.filter(s =>
     (s.name.includes(search) || s.email.includes(search)) &&
     (!status || s.status === status)

@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 interface Auction {
   id: number;
@@ -34,6 +35,13 @@ function AuctionListPage() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Auction | null>(null);
   const filtered = dummyAuctions.filter(a => a.name.includes(search) || a.product.includes(search) || a.seller.includes(search));
+  const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
+
   return (
     <div className="p-8">
       <div className="mb-4">

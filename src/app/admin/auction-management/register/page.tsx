@@ -1,7 +1,15 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function AuctionRegisterPage() {
+  const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
+
   return (
     <div className="p-8 max-w-xl mx-auto">
       <h2 className="text-lg font-bold mb-4">경매 물품 등록</h2>

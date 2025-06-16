@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 const dummyCustomers = [
   { id: 1, name: '홍길동', email: 'hong@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/11.jpg' },
@@ -17,6 +18,13 @@ const dummyCustomers = [
 function CustomerListPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const router = useRouter();
+
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
+
   const filtered = dummyCustomers.filter(c =>
     (c.name.includes(search) || c.email.includes(search)) &&
     (!status || c.status === status)

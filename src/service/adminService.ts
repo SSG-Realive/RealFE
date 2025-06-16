@@ -8,81 +8,81 @@ const defaultHeaders = {
   'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('accessToken') : ''}`,
 };
 
-// 더미 데이터
-const dummyDashboardData: AdminDashboardDTO = {
-  queryDate: new Date().toISOString().split('T')[0],
-  periodType: 'DAILY',
-  pendingSellerCount: 5,
-  productLog: {
-    salesWithCommissions: [
-      {
-        salesLog: {
-          id: 1,
-          orderItemId: 101,
-          productId: 201,
-          sellerId: 301,
-          customerId: 401,
-          quantity: 2,
-          unitPrice: 50000,
-          totalPrice: 100000,
-          soldAt: '2024-03-20T10:00:00Z'
-        },
-        commissionLog: {
-          id: 1,
-          salesLogId: 1,
-          commissionRate: 0.1,
-          commissionAmount: 10000,
-          recordedAt: '2024-03-20T10:00:00Z'
-        }
-      }
-    ],
-    payoutLogs: [
-      {
-        id: 1,
-        sellerId: 301,
-        periodStart: '2024-03-01',
-        periodEnd: '2024-03-31',
-        totalSales: 1000000,
-        totalCommission: 100000,
-        payoutAmount: 900000,
-        processedAt: '2024-04-01T00:00:00Z'
-      }
-    ]
-  },
-  penaltyLogs: [
-    {
-      id: 1,
-      customerId: 401,
-      reason: '부적절한 리뷰',
-      points: -10,
-      description: '비방성 리뷰 작성',
-      createdAt: '2024-03-20T15:00:00Z'
-    }
-  ],
-  memberSummaryStats: {
-    totalMembers: 120,
-    newMembersInPeriod: 15,
-    uniqueVisitorsInPeriod: 300,
-    engagedUsersInPeriod: 200,
-    activeUsersInPeriod: 150
-  },
-  salesSummaryStats: {
-    totalOrdersInPeriod: 50,
-    totalRevenueInPeriod: 5000000,
-    totalFeesInPeriod: 500000
-  },
-  auctionSummaryStats: {
-    totalAuctionsInPeriod: 30,
-    totalBidsInPeriod: 150,
-    averageBidsPerAuctionInPeriod: 5
-  },
-  reviewSummaryStats: {
-    totalReviewsInPeriod: 100,
-    newReviewsInPeriod: 20,
-    averageRatingInPeriod: 4.5,
-    deletionRate: 0.05
-  }
-};
+// // 더미 데이터
+// const dummyDashboardData: AdminDashboardDTO = {
+//   queryDate: new Date().toISOString().split('T')[0],
+//   periodType: 'DAILY',
+//   pendingSellerCount: 5,
+//   productLog: {
+//     salesWithCommissions: [
+//       {
+//         salesLog: {
+//           id: 1,
+//           orderItemId: 101,
+//           productId: 201,
+//           sellerId: 301,
+//           customerId: 401,
+//           quantity: 2,
+//           unitPrice: 50000,
+//           totalPrice: 100000,
+//           soldAt: '2024-03-20T10:00:00Z'
+//         },
+//         commissionLog: {
+//           id: 1,
+//           salesLogId: 1,
+//           commissionRate: 0.1,
+//           commissionAmount: 10000,
+//           recordedAt: '2024-03-20T10:00:00Z'
+//         }
+//       }
+//     ],
+//     payoutLogs: [
+//       {
+//         id: 1,
+//         sellerId: 301,
+//         periodStart: '2024-03-01',
+//         periodEnd: '2024-03-31',
+//         totalSales: 1000000,
+//         totalCommission: 100000,
+//         payoutAmount: 900000,
+//         processedAt: '2024-04-01T00:00:00Z'
+//       }
+//     ]
+//   },
+//   penaltyLogs: [
+//     {
+//       id: 1,
+//       customerId: 401,
+//       reason: '부적절한 리뷰',
+//       points: -10,
+//       description: '비방성 리뷰 작성',
+//       createdAt: '2024-03-20T15:00:00Z'
+//     }
+//   ],
+//   memberSummaryStats: {
+//     totalMembers: 120,
+//     newMembersInPeriod: 15,
+//     uniqueVisitorsInPeriod: 300,
+//     engagedUsersInPeriod: 200,
+//     activeUsersInPeriod: 150
+//   },
+//   salesSummaryStats: {
+//     totalOrdersInPeriod: 50,
+//     totalRevenueInPeriod: 5000000,
+//     totalFeesInPeriod: 500000
+//   },
+//   auctionSummaryStats: {
+//     totalAuctionsInPeriod: 30,
+//     totalBidsInPeriod: 150,
+//     averageBidsPerAuctionInPeriod: 5
+//   },
+//   reviewSummaryStats: {
+//     totalReviewsInPeriod: 100,
+//     newReviewsInPeriod: 20,
+//     averageRatingInPeriod: 4.5,
+//     deletionRate: 0.05
+//   }
+// };
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -96,14 +96,14 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function getAdminDashboard(date: string, periodType: string): Promise<AdminDashboardDTO> {
   try {
     // 백엔드 연결이 없을 때는 더미 데이터 반환
-    console.log('Using dummy data for admin dashboard');
-    return dummyDashboardData;
+    // console.log('Using dummy data for admin dashboard');
+    // return dummyDashboardData;
     
     // 실제 API 호출 (백엔드 연결 시 주석 해제)
-    // const response = await apiClient.get<AdminDashboardDTO>(
-    //   `/api/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`
-    // );
-    // return response.data;
+    const response = await apiClient.get<AdminDashboardDTO>(
+      `/api/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`
+    );
+    return response.data;
   } catch (error) {
     console.error('Failed to fetch admin dashboard:', error);
     throw error;

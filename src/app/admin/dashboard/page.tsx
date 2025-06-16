@@ -41,7 +41,7 @@ const AdminDashboardPage = () => {
       const today = new Date().toISOString().split('T')[0];
       const data = await getAdminDashboard(today, periodType);
       console.log('Dashboard Data:', data);
-      setDashboardData(data);
+      setDashboardData(data.data); 
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');

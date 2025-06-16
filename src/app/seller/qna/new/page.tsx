@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createQna } from '@/service/sellerQnaService';
 
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { SellerCreateQnaRequest } from '@/types/sellerqna/sellerQnaRequest';
@@ -29,7 +29,7 @@ export default function QnaCreatePage() {
 
     return (
         <>
-        <Header/>
+        <SellerHeader/>
         <SellerLayout>
             
             <div className="max-w-2xl mx-auto p-6">

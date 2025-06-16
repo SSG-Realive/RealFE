@@ -1,9 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import CustomerHeader from '@/components/customer/CustomerHeader';
-import PopularProducts from '@/components/customer/PopularProducts';
-import ChatbotFloatingButton from '@/components/customer/ChatbotFloatingButton';
 import ProductCard from '@/components/customer/ProductCard';
 
 interface Product {
@@ -14,6 +11,7 @@ interface Product {
     category: string;
 }
 
+// 전체 mock 상품 100개 생성 (카테고리 포함)
 const mockProducts: Product[] = Array.from({ length: 100 }, (_, i) => {
     const categories = ['의자', '책상', '침대', '소파'];
     return {
@@ -27,11 +25,12 @@ const mockProducts: Product[] = Array.from({ length: 100 }, (_, i) => {
 
 const categories = ['전체', '의자', '책상', '침대', '소파'];
 
-export default function CustomerHomePage() {
+export default function InfiniteScrollWithCategory() {
     const [selectedCategory, setSelectedCategory] = useState('전체');
     const [products, setProducts] = useState<Product[]>([]);
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
+
     const ITEMS_PER_PAGE = 20;
 
     const getFilteredProducts = () => {
@@ -46,15 +45,20 @@ export default function CustomerHomePage() {
         setProducts((prev) => [...prev, ...next]);
     };
 
-    // 무한 스크롤 감지
+    useEffect(() => {
+        loadMore();
+    }, [page]);
+
     useEffect(() => {
         if (!loader.current) return;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                setPage((prev) => prev + 1);
-            }
-        }, { rootMargin: '100px' });
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setPage((prev) => prev + 1);
+                }
+            },
+            { rootMargin: '100px' }
+        );
 
         observer.observe(loader.current);
         return () => {
@@ -62,12 +66,7 @@ export default function CustomerHomePage() {
         };
     }, []);
 
-    // 페이지 변경 시 load
-    useEffect(() => {
-        loadMore();
-    }, [page]);
-
-    // 카테고리 변경 시 초기화
+    // 🔁 카테고리 변경 시 초기화
     useEffect(() => {
         setPage(1);
         const filtered = getFilteredProducts();
@@ -76,11 +75,9 @@ export default function CustomerHomePage() {
     }, [selectedCategory]);
 
     return (
-        <div>
-            <CustomerHeader />
-
-            {/* 카테고리 필터 */}
-            <div className="flex gap-3 overflow-x-auto mb-6 px-4 py-2">
+        <div className="px-4 py-6">
+            {/* 🔹 카테고리 필터 바 */}
+            <div className="flex gap-3 overflow-x-auto mb-6">
                 {categories.map((category) => (
                     <button
                         key={category}
@@ -96,16 +93,15 @@ export default function CustomerHomePage() {
                 ))}
             </div>
 
-            {/* 상품 목록 */}
-            <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* 🔹 상품 그리드 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {products.map((p) => (
                     <ProductCard key={p.id} {...p} />
                 ))}
-                <div ref={loader} className="h-10 col-span-full"></div>
             </div>
 
-            <PopularProducts />
-            <ChatbotFloatingButton />
+            {/* 🔹 Intersection 감지 요소 */}
+            <div ref={loader} className="h-10 col-span-full"></div>
         </div>
     );
 }

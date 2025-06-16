@@ -10,6 +10,7 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
+  { label: "대시보드", href: "/seller/dashboard" },
   { label: "마이페이지", href: "/seller/me" },
   { label: "상품관리", href: "/seller/products" },
   { label: "주문관리", href: "/seller/orders" },
@@ -17,7 +18,7 @@ const menuItems: MenuItem[] = [
   { label: "고객문의확인", href: "/seller/qna" },
 ];
 
-const Sidebar: FC = () => {
+const SellerSidebar: FC = () => {
   const pathname = usePathname ();
   const currentPath = pathname;
   return (
@@ -51,4 +52,4 @@ const Sidebar: FC = () => {
   );
 };
 
-export default Sidebar;
+export default SellerSidebar;

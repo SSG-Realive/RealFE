@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import { getProductDetail, updateProduct, fetchCategories } from '@/service/productService';
 import { SellerCategoryDTO } from '@/types/category/sellerCategory';
 import { ProductDetail } from '@/types/product';
@@ -149,7 +149,7 @@ export default function ProductEditPage() {
 
     return (
         <>
-            <Header />
+            <SellerHeader />
             <SellerLayout>
                 <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem' }}>
                     <h1 className="text-xl font-bold mb-4">상품 수정</h1>

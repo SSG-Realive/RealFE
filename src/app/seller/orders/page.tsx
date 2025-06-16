@@ -3,15 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSellerOrders } from '@/service/sellerOrderService';
-import { SellerOrderResponse } from '@/types/sellerOrder';
-import Header from '@/components/Header';
+import { SellerOrderResponse } from '@/types/sellerorder/sellerOrder';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
 
 export default function SellerOrderListPage() {
 
-    // useSellerAuthGuard();
+     useSellerAuthGuard();
 
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function SellerOrderListPage() {
 
     return (
         <SellerLayout>
-            <Header />
+            <SellerHeader />
             <div className="p-6 max-w-4xl mx-auto">
                 <h1 className="text-2xl font-bold mb-4">판매자 주문 목록</h1>
 

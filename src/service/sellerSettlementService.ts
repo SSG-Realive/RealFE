@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { SellerSettlementResponse } from '@/types/sellerSettlement';
+import { SellerSettlementResponse } from '@/types/sellersettlement/sellerSettlement';
 
 /**
  * 판매자 정산 내역 전체 조회

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
@@ -63,7 +63,7 @@ export default function ProductListPage() {
     if (checking) return <div className="p-8">인증 확인 중...</div>; // ✅ 인증 확인 중 UI 
   return (
     <>
-      <Header />
+      <SellerHeader />
       <SellerLayout>
         <div className="max-w-5xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-4">내 상품 목록</h1>

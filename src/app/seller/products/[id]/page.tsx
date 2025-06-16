@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getProductDetail, deleteProduct } from '@/service/productService';
 import { ProductDetail } from '@/types/product';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
@@ -70,7 +70,7 @@ export default function ProductDetailPage() {
 
     return (
         <>
-            <Header />
+            <SellerHeader />
             <SellerLayout>
                 <div className="max-w-3xl mx-auto p-6">
                     <h1 className="text-2xl font-bold mb-4">{product.name}</h1>

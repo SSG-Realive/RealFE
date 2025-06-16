@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getQnaDetail } from '@/service/sellerQnaService';
 import { SellerQnaDetailResponse } from '@/types/sellerqna/sellerQnaResponse';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
+import SellerHeader from '@/components/seller/SellerHeader';
+import SellerSidebar from '@/components/seller/SellerSidebar';
 import SellerLayout from '@/components/layouts/SellerLayout';
 
 export default function SellerQnaDetailPage() {
@@ -41,7 +41,7 @@ export default function SellerQnaDetailPage() {
 
     return (
         <>
-        <Header/>
+        <SellerHeader/>
         <SellerLayout>
         <div className="max-w-3xl mx-auto p-6">
             <button

@@ -6,7 +6,7 @@ import { getDeliveryDetail, updateDeliveryStatus } from '@/service/deliveryServi
 import { OrderDeliveryDetail } from '@/types/sellerdelivery/sellerDelivery';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
-import { DeliveryStatus } from '@/types/sellerOrder';
+import { DeliveryStatus } from '@/types/sellerorder/sellerOrder';
 
 export default function DeliveryDetailPage() {
     const checking = useSellerAuthGuard();

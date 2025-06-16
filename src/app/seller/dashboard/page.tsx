@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { getDashboard } from '@/service/sellerService';
 import { SellerDashboardResponse } from '@/types/dashboard/sellerDashboardResponse';
@@ -31,7 +31,7 @@ export default function SellerDashboardPage() {
 
   return (
     <>
-      <Header />
+      <SellerHeader />
       <SellerLayout>
         <main className="p-8 w-full">
           <h1 className="text-2xl font-bold mb-6">판매자 대시보드</h1>

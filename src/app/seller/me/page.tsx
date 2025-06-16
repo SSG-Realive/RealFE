@@ -4,7 +4,7 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';      // ↙ Header 컴포넌트를 import
+import SellerHeader from '@/components/seller/SellerHeader';      // ↙ SellerHeader 컴포넌트를 import
 import {
   getProfile,
   updateProfile,
@@ -93,7 +93,7 @@ export default function SellerMePage() {
   return (
     <>
       {/* ↙ 여기서 Header를 먼저 렌더링 */}
-      <Header />
+      <SellerHeader />
       <SellerLayout>
       {/* 기존 로그인 폼처럼 생긴 부분을 그대로 둔 예시 */}
       <div style={{ maxWidth: 500, margin: '0 auto', padding: '2rem' }}>

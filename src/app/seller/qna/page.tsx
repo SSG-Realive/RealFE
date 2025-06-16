@@ -6,7 +6,7 @@ import { getQnaList } from '@/service/sellerQnaService';
 import { SellerQnaResponse } from '@/types/sellerqna/sellerQnaResponse';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 
 export default function SellerQnaPage() {
     useSellerAuthGuard(); // ✅ 가드 적용 (일관성 유지)
@@ -39,7 +39,7 @@ export default function SellerQnaPage() {
 
     return (
         <>
-        <Header/>
+        <SellerHeader/>
         <SellerLayout> {/* ✅ 명시적 적용 */}
             <div className="max-w-xl mx-auto py-10">
                 <h1 className="text-2xl font-semibold mb-6">판매자 QnA 목록</h1>

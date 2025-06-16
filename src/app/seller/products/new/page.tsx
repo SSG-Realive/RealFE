@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import { createProduct, fetchCategories } from '@/service/productService';
 import { SellerCategoryDTO } from '@/types/category/sellerCategory';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
@@ -133,7 +133,7 @@ export default function ProductNewPage() {
 
     return (
         <>
-            <Header />
+            <SellerHeader />
             <SellerLayout>
             <div style={{ maxWidth: 700, margin: '0 auto', padding: '2rem' }}>
                 <h1 className="text-xl font-bold mb-4">상품 등록</h1>

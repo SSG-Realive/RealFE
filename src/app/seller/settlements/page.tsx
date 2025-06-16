@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SellerLayout from '@/components/layouts/SellerLayout';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import {
     getSellerSettlementList,
     getSellerSettlementListByDate,
 } from '@/service/sellerSettlementService';
-import { SellerSettlementResponse } from '@/types/sellerSettlement';
+import { SellerSettlementResponse } from '@/types/sellersettlement/sellerSettlement';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 export default function SellerSettlementPage() {
@@ -55,7 +55,7 @@ export default function SellerSettlementPage() {
 
     return (
         <SellerLayout>
-            <Header />
+            <SellerHeader />
             <div className="max-w-4xl mx-auto p-6">
                 <h1 className="text-2xl font-bold mb-6">판매자 정산 내역</h1>
 

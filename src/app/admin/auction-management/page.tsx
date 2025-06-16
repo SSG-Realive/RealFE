@@ -26,6 +26,11 @@ export default function AuctionManagementPage() {
   const [penaltyReason, setPenaltyReason] = useState("");
   const [selectedAuction, setSelectedAuction] = useState<Auction | null>(null);
 
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
+
   const dummyAuctions: Auction[] = [
     {
       id: 1,

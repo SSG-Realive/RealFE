@@ -32,6 +32,10 @@ const dummyPenalties = [
 
 export default function AdminCustomersDashboard() {
   const router = useRouter();
+  if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
+    window.location.replace('/admin/login');
+    return null;
+  }
   // 고객 요약
   const total = dummyCustomers.length;
   const active = dummyCustomers.filter(c => c.status === 'Active').length;

@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, redirect } from "next/navigation";
 import { useEffect } from 'react';
 
 const dummySettlements = [
@@ -15,12 +15,11 @@ export default function SettlementDetailPage() {
   const router = useRouter();
   const { id } = params;
 
-  const settlement = dummySettlements.find(s => s.id === id);
-
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
-    window.location.replace('/admin/login');
-    return null;
+    redirect('/admin/login');
   }
+
+  const settlement = dummySettlements.find(s => s.id === id);
 
   if (!settlement) {
     return <div className="p-8">정산 정보를 찾을 수 없습니다.</div>;

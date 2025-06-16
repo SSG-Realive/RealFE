@@ -2,7 +2,7 @@ import apiClient from '@/lib/apiClient';
 import {
     SellerCreateQnaRequest,
     SellerQnaUpdateRequest,
-    
+
 } from '@/types/sellerqna/sellerQnaRequest';
 import{
     SellerQnaDetailResponse,

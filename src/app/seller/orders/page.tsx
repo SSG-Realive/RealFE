@@ -10,8 +10,7 @@ import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
 
 export default function SellerOrderListPage() {
-
-     useSellerAuthGuard();
+    useSellerAuthGuard();
 
     const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
     const [loading, setLoading] = useState(true);
@@ -23,7 +22,6 @@ export default function SellerOrderListPage() {
             try {
                 setLoading(true);
                 const res: PageResponseForOrder<SellerOrderResponse> = await getSellerOrders();
-                console.log('주문 목록 결과:', res);
                 setOrders(res.content || []);
                 setError(null);
             } catch (err) {
@@ -53,16 +51,24 @@ export default function SellerOrderListPage() {
                         {orders.map((order) => (
                             <li
                                 key={order.orderId}
-                                className="bg-white shadow-md rounded-lg p-4 cursor-pointer hover:bg-gray-50"
-                                onClick={() => router.push(`/seller/orders/${order.orderId}`)}
+                                className="bg-white shadow-md rounded-lg p-4"
                             >
                                 <p>주문 ID: {order.orderId}</p>
                                 <p>주문일자: {new Date(order.orderedAt).toLocaleString()}</p>
                                 <p>고객명: {order.customerName}</p>
                                 <p>상품명: {order.productName}</p>
                                 <p>수량: {order.quantity}</p>
-                                <p>상태: {order.deliveryStatus}</p>
-                                {/* totalPrice는 현재 API에 없음 → 나중에 추가 시 사용 */}
+
+                                {/* ✅ 배송 상태 + 버튼 우측 정렬 */}
+                                <p className="flex justify-between items-center">
+                                    <span>배송 상태: {order.deliveryStatus}</span>
+                                    <button
+                                        onClick={() => router.push(`/seller/orders/${order.orderId}`)}
+                                        className="ml-4 bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700"
+                                    >
+                                        배송 상세 정보 보기
+                                    </button>
+                                </p>
                             </li>
                         ))}
                     </ul>

@@ -14,6 +14,7 @@ interface Product {
     category: string;
 }
 
+// 전체 mock 상품 100개 생성 (카테고리 포함)
 const mockProducts: Product[] = Array.from({ length: 100 }, (_, i) => {
     const categories = ['의자', '책상', '침대', '소파'];
     return {
@@ -79,6 +80,12 @@ export default function CustomerHomePage() {
         <div>
             <CustomerHeader />
 
+            {/* 🔥 인기 상품 */}
+            <div className="px-4 py-4">
+                <h2 className="text-xl font-semibold mb-2">🔥 인기 상품</h2>
+                <PopularProducts />
+            </div>
+
             {/* 카테고리 필터 */}
             <div className="flex gap-3 overflow-x-auto mb-6 px-4 py-2">
                 {categories.map((category) => (
@@ -96,7 +103,7 @@ export default function CustomerHomePage() {
                 ))}
             </div>
 
-            {/* 상품 목록 */}
+            {/* 전체 상품 목록 (무한스크롤) */}
             <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 {products.map((p) => (
                     <ProductCard key={p.id} {...p} />
@@ -104,7 +111,6 @@ export default function CustomerHomePage() {
                 <div ref={loader} className="h-10 col-span-full"></div>
             </div>
 
-            <PopularProducts />
             <ChatbotFloatingButton />
         </div>
     );

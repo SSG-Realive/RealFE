@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getProfile, logout } from '@/service/sellerService';
+import { getProfile, logout } from '@/service/seller/sellerService';
 import { useEffect, useState } from 'react';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
 

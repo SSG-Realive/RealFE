@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSellerOrders } from '@/service/sellerOrderService';
-import { SellerOrderResponse } from '@/types/sellerorder/sellerOrder';
+import { getSellerOrders } from '@/service/seller/sellerOrderService';
+import { SellerOrderResponse } from '@/types/seller/sellerOrder';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';

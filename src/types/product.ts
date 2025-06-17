@@ -23,3 +23,11 @@ export interface ProductDetail {
     imageThumbnailUrl: string;
     
 }
+
+export interface ProductListDTO {
+    productId: number;
+    name: string;
+    price: number;
+    thumbnailUrl: string;
+    isWished: boolean;
+}

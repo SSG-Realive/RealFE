@@ -6,7 +6,7 @@ import {
     SellerOrderResponse,
     SellerOrderDetailResponse,
     DeliveryStatusUpdateRequest, // 🔹 추가된 타입
-} from '@/types/sellerorder/sellerOrder';
+} from '@/types/seller/sellerOrder';
 
 /**
  * 판매자 주문 목록 조회 (PageResponse 기반)

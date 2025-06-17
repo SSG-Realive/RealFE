@@ -8,7 +8,7 @@ import {
   updateProfile,
   SellerProfile,
   SellerUpdateRequest,
-} from '@/service/sellerService';
+} from '@/service/seller/sellerService';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 

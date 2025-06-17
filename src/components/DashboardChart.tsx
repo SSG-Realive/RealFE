@@ -21,20 +21,28 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data }) => {
       type: 'donut',
       height: 350,
     },
-    labels: ['전체 회원', '신규 회원', '방문자', '참여자', '활동자'],
+    labels: [
+      '전체 회원',
+      '활성 회원',
+      '비활성 회원',
+      '전체 판매자',
+      '활성 판매자',
+      '비활성 판매자'
+    ],
     title: {
       text: '회원 통계',
       align: 'left',
     },
-    colors: ['#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#F44336'],
+    colors: ['#4CAF50', '#2196F3', '#FFC107', '#9C27B0', '#00BCD4', '#FF5722'],
   };
 
   const memberSeries = [
     data.memberSummaryStats?.totalMembers || 0,
-    data.memberSummaryStats?.newMembersInPeriod || 0,
-    data.memberSummaryStats?.uniqueVisitorsInPeriod || 0,
-    data.memberSummaryStats?.engagedUsersInPeriod || 0,
-    data.memberSummaryStats?.activeUsersInPeriod || 0,
+    data.memberSummaryStats?.activeMembers || 0,
+    data.memberSummaryStats?.inactiveMembers || 0,
+    data.memberSummaryStats?.totalSellers || 0,
+    data.memberSummaryStats?.activeSellers || 0,
+    data.memberSummaryStats?.inactiveSellers || 0,
   ];
 
   // 판매 통계 차트

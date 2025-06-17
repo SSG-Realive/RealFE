@@ -41,7 +41,8 @@ const AdminDashboardPage = () => {
       const today = new Date().toISOString().split('T')[0];
       const data = await getAdminDashboard(today, periodType);
       console.log('Dashboard Data:', data);
-      setDashboardData(data.data); 
+      console.log('Member Summary Stats:', data.memberSummaryStats);
+      setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
@@ -136,9 +137,9 @@ const AdminDashboardPage = () => {
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">신규 회원</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">전체 회원</h3>
             <p className="text-3xl font-bold text-purple-600">
-              {dashboardData.memberSummaryStats?.newMembersInPeriod || 0}
+              {dashboardData.memberSummaryStats?.totalMembers || 0}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
@@ -153,28 +154,13 @@ const AdminDashboardPage = () => {
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">매출 추이</h3>
             <DashboardChart
-              data={dashboardData.productLog?.salesWithCommissions || []}
-              type="sales"
+              data={dashboardData}
             />
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">회원 통계</h3>
             <DashboardChart
-              data={[
-                {
-                  name: '총 회원',
-                  value: dashboardData.memberSummaryStats?.totalMembers || 0,
-                },
-                {
-                  name: '신규 회원',
-                  value: dashboardData.memberSummaryStats?.newMembersInPeriod || 0,
-                },
-                {
-                  name: '활성 회원',
-                  value: dashboardData.memberSummaryStats?.activeUsersInPeriod || 0,
-                },
-              ]}
-              type="members"
+              data={dashboardData}
             />
           </div>
         </div>

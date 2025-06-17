@@ -1,5 +1,6 @@
 import { AdminDashboardDTO } from '@/types/admin';
 import apiClient from '@/lib/apiClient';
+import { ApiResponse } from '@/types/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -95,15 +96,17 @@ async function handleResponse<T>(response: Response): Promise<T> {
 
 export async function getAdminDashboard(date: string, periodType: string): Promise<AdminDashboardDTO> {
   try {
-    // 백엔드 연결이 없을 때는 더미 데이터 반환
-    // console.log('Using dummy data for admin dashboard');
-    // return dummyDashboardData;
-    
-    // 실제 API 호출 (백엔드 연결 시 주석 해제)
-    const response = await apiClient.get<AdminDashboardDTO>(
-      `/api/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`
+    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : '';
+    const response = await apiClient.get<ApiResponse<AdminDashboardDTO>>(
+      `/api/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      }
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Failed to fetch admin dashboard:', error);
     throw error;

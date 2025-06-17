@@ -61,11 +61,15 @@ export interface PenaltyLogDTO {
 }
 
 export interface MemberSummaryStatsDTO {
-  totalMembers: number;
-  newMembersInPeriod: number;
-  uniqueVisitorsInPeriod: number;
-  engagedUsersInPeriod: number;
-  activeUsersInPeriod: number;
+  // 회원 통계
+  totalMembers: number;      // 전체 회원 수 (고객 + 판매자)
+  activeMembers: number;     // 활성 회원 수
+  inactiveMembers: number;   // 비활성 회원 수
+  
+  // 판매자 통계
+  totalSellers: number;      // 전체 판매자 수
+  activeSellers: number;     // 활성 판매자 수
+  inactiveSellers: number;   // 비활성 판매자 수
 }
 
 export interface SalesSummaryStatsDTO {

@@ -21,15 +21,15 @@ export default function SellerHeader() {
       } catch (err){
         console.error('프로필 정보 가져오기 실패', err);
       }
-      }
-      fetchName();
+    }
+    fetchName();
   }, []);
 
   const handleLogout = async () => {
     try {
       // 1) 서비스의 logout() 호출 → refreshToken 쿠키 삭제
       await logout();
-      
+
       // 2) accessToken 삭제
       logoutStore();
 
@@ -44,39 +44,39 @@ export default function SellerHeader() {
   };
 
   return (
-    <header
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        borderBottom: '1px solid #ddd',
-        marginBottom: '2rem',
-      }}
-    >
-      <Link
-        href="/seller/dashboard"
-        style={{ fontSize: '1.25rem', fontWeight: 'bold', textDecoration: 'none', color: '#333' }}
-      >
-        Realive 
-      </Link>
-
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        {name && <span style={{ fontSize: '1rem', color: '#333' }}>{name}님</span>}
-        <button
-          onClick={handleLogout}
+      <header
           style={{
-            background: 'none',
-            border: 'none',
-            color: '#333',
-            fontSize: '1rem',
-            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '1rem 2rem',
+            borderBottom: '1px solid #ddd',
+            marginBottom: '2rem',
           }}
+      >
+        <Link
+            href="/seller/dashboard"
+            style={{ fontSize: '1.25rem', fontWeight: 'bold', textDecoration: 'none', color: '#333' }}
         >
-          로그아웃
-        </button>
-      </div>
-    </header>
+          Realive
+        </Link>
+
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {name && <span style={{ fontSize: '1rem', color: '#333' }}>{name}님</span>}
+          <button
+              onClick={handleLogout}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#333',
+                fontSize: '1rem',
+                cursor: 'pointer',
+              }}
+          >
+            로그아웃
+          </button>
+        </div>
+      </header>
   );
 }

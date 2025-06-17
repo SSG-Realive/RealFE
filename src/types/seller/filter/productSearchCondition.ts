@@ -1,4 +1,4 @@
-import { PageRequest } from "../page/pageRequest";
+import { PageRequest } from "@/types/seller/page/pageRequest";
 
 
 export interface ProductSearchCondition extends PageRequest {

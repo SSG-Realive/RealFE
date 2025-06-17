@@ -1,23 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
+import apiClient from '@/lib/apiClient';
 
-const dummyCustomers = [
-  { id: 1, name: '홍길동', email: 'hong@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/11.jpg' },
-  { id: 2, name: '김영희', email: 'kim@test.com', status: 'Blocked', image: 'https://randomuser.me/api/portraits/women/12.jpg' },
-  { id: 3, name: '이수민', email: 'soo@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/13.jpg' },
-  { id: 4, name: '박철수', email: 'park@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/14.jpg' },
-  { id: 5, name: '최지우', email: 'choi@test.com', status: 'Blocked', image: 'https://randomuser.me/api/portraits/women/15.jpg' },
-  { id: 6, name: '정수빈', email: 'jung@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/women/16.jpg' },
-  { id: 7, name: '한가람', email: 'han@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/17.jpg' },
-  { id: 8, name: '오세훈', email: 'oh@test.com', status: 'Blocked', image: 'https://randomuser.me/api/portraits/men/18.jpg' },
-  { id: 9, name: '유재석', email: 'yoo@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/19.jpg' },
-  { id: 10, name: '강호동', email: 'kang@test.com', status: 'Active', image: 'https://randomuser.me/api/portraits/men/20.jpg' },
-];
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
+  status: boolean | string;
+  image?: string;
+}
 
 function CustomerListPage() {
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -25,10 +23,30 @@ function CustomerListPage() {
     return null;
   }
 
-  const filtered = dummyCustomers.filter(c =>
-    (c.name.includes(search) || c.email.includes(search)) &&
-    (!status || c.status === status)
-  );
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams({
+      userType: 'CUSTOMER',
+      page: '0',
+      size: '100', // 필요에 따라 조정
+    });
+    if (search) params.append('searchTerm', search);
+    if (status) params.append('isActive', status === 'Active' ? 'true' : 'false');
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get(`/admin/users?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(res => {
+        setCustomers(res.data.data.content || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [search, status]);
+
   return (
     <div className="p-8">
       <div className="mb-4 flex gap-2">
@@ -49,26 +67,30 @@ function CustomerListPage() {
           <option value="Blocked">Blocked</option>
         </select>
       </div>
-      <table className="min-w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="px-2 py-1">사진</th>
-            <th className="px-2 py-1">이름</th>
-            <th className="px-2 py-1">이메일</th>
-            <th className="px-2 py-1">상태</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((c) => (
-            <tr key={c.id}>
-              <td className="px-2 py-1"><img src={c.image} alt="customer" className="w-9 h-9 rounded-full object-cover" /></td>
-              <td className="px-2 py-1">{c.name}</td>
-              <td className="px-2 py-1">{c.email}</td>
-              <td className="px-2 py-1">{c.status}</td>
+      {loading ? (
+        <div>로딩 중...</div>
+      ) : (
+        <table className="min-w-full border text-sm">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="px-2 py-1">사진</th>
+              <th className="px-2 py-1">이름</th>
+              <th className="px-2 py-1">이메일</th>
+              <th className="px-2 py-1">상태</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {customers.map((c) => (
+              <tr key={c.id}>
+                <td className="px-2 py-1"><img src={c.image || '/public/images/placeholder.png'} alt="customer" className="w-9 h-9 rounded-full object-cover" /></td>
+                <td className="px-2 py-1">{c.name}</td>
+                <td className="px-2 py-1">{c.email}</td>
+                <td className="px-2 py-1">{c.status === true || c.status === 'Active' ? 'Active' : 'Blocked'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

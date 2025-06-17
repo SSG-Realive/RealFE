@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { adminLogin } from '@/service/adminService';
+import { adminLogin } from '@/service/admin/adminService';
 import Modal from '@/components/Modal';
 
 const AdminLoginPage = () => {

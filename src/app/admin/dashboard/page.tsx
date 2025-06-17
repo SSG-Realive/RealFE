@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { AdminDashboardDTO } from '@/types/admin/admin';
-import { getAdminDashboard } from '@/service/adminService';
+import { getAdminDashboard } from '@/service/admin/adminService';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';
 
@@ -29,10 +29,14 @@ const AdminDashboardPage = () => {
   }, [router]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
-      router.replace('/admin/login');
+    if (typeof window !== 'undefined') {
+      const adminToken = localStorage.getItem('adminToken');
+      if (!adminToken) {
+        router.replace('/admin/login');
+        return;
+      }
     }
-  }, []);
+  }, [router]);
 
   const fetchDashboardData = async () => {
     try {
@@ -40,12 +44,25 @@ const AdminDashboardPage = () => {
       setError(null);
       const today = new Date().toISOString().split('T')[0];
       const data = await getAdminDashboard(today, periodType);
+      
+      if (!data) {
+        throw new Error('데이터를 불러오는데 실패했습니다.');
+      }
+
       console.log('Dashboard Data:', data);
       console.log('Member Summary Stats:', data.memberSummaryStats);
       setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
+      if (err instanceof Error) {
+        if (err.message.includes('관리자 인증이 필요합니다')) {
+          router.replace('/admin/login');
+          return;
+        }
+        setError(err.message);
+      } else {
+        setError('대시보드 데이터를 불러오는데 실패했습니다.');
+      }
     } finally {
       setLoading(false);
     }

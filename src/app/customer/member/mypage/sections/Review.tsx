@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getReviewSummary } from '@/service/reviewService';
+import { getReviewSummary } from '@/service/customer/reviewService';
 
 interface ReviewSummary {
     writable: number;

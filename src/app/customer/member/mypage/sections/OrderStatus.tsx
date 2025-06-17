@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getOrderSummary } from '@/service/orderService';
+import { getOrderSummary } from '@/service/customer/orderService';
 
 interface OrderSummary {
     totalOrders: number;

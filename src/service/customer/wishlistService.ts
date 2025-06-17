@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { WishlistToggleRequest } from '@/types/wishlist';
+import { WishlistToggleRequest } from '@/types/customer/wishlist/wishlist';
 import { ProductListDTO } from '@/types/product';
 
 // 찜 목록 조회

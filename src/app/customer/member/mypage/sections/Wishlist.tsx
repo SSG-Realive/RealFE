@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchWishlist, toggleWishlist } from '@/service/wishlistService';
+import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/product';
 import MypageCard from '../MypageCard';
 

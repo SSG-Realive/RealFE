@@ -1,6 +1,6 @@
 'use client';
 
-import { toggleWishlist } from '@/service/wishlistService';
+import { toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/product';
 import { useState } from 'react';
 

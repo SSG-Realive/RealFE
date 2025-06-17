@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCustomerProfile } from '@/service/customerService';
+import { getCustomerProfile } from '@/service/customer/customerService';
 
 interface CustomerProfile {
     name: string;

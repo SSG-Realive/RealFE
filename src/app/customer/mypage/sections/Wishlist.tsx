@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
-import { ProductListDTO } from '@/types/product';
+import { ProductListDTO } from '@/types/seller/product/product';
 import MypageCard from '../MypageCard';
 
 export default function Wishlist() {

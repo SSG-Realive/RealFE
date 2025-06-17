@@ -1,8 +1,8 @@
 
 import { sellerApi } from '@/lib/apiClient';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
-import { SellerDashboardResponse } from '@/types/dashboard/sellerDashboardResponse';
-import { LoginResponse } from '@/types/login/loginResponse';
+import { SellerDashboardResponse } from '@/types/seller/dashboard/sellerDashboardResponse';
+import { LoginResponse } from '@/types/seller/login/loginResponse';
 
 
 

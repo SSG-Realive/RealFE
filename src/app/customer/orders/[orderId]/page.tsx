@@ -11,7 +11,8 @@ interface PageProps {
 
 // --- 데이터 페칭 함수 ---
 async function fetchOrderDetail(orderId: number): Promise<OrderResponseDTO> {
-    const url = `http://localhost:8080/api/orders/${orderId}`;
+    // 이 부분을 수정합니다.
+    const url = `http://localhost:8080/api/customer/orders/${orderId}`;
     console.log("주문 상세 정보를 가져오는 중:", url);
 
     // 서버 컴포넌트에서 쿠키를 통해 토큰 가져오기

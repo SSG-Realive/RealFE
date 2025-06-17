@@ -1,14 +1,15 @@
+<<<<<<< HEAD
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ApiError, ApiResponse } from '@/types/api';
+=======
+// src/lib/apiClient.ts (기존 파일을 이 내용으로 교체)
+>>>>>>> FE/team2/ho
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // "http://localhost:8080/api"
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true, // 쿠키 기반 인증을 함께 보내려면 true
-});
+import { createApiClient } from './apiFactory';
+import { useAuthStore } from '@/store/customer/authStore';
+import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
 
+<<<<<<< HEAD
 // Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
@@ -41,3 +42,14 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+=======
+// Customer용 API 클라이언트
+export const customerApi = createApiClient(useAuthStore);
+
+// Seller용 API 클라이언트
+export const sellerApi = createApiClient(useSellerAuthStore);
+
+// 기본적으로는 customerApi를 내보내거나,
+// 혹은 사용하는 곳에서 명시적으로 customerApi, sellerApi를 import해서 사용합니다.
+export default customerApi;
+>>>>>>> FE/team2/ho

@@ -1,4 +1,4 @@
-import { AdminDashboardDTO } from '@/types/admin';
+import { AdminDashboardDTO } from '@/types/admin/admin';
 
 const API_URL = '/api/admin';
 

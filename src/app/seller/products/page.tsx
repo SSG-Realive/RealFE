@@ -7,7 +7,7 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 import { getMyProducts } from '@/service/productService';
-import { ProductListItem } from '@/types/productList';
+import { ProductListItem } from '@/types/seller/productList';
 
 export default function ProductListPage() {
   const checking = useSellerAuthGuard();

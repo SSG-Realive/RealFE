@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getQnaDetail } from '@/service/sellerQnaService';
-import { SellerQnaDetailResponse } from '@/types/sellerqna/sellerQnaResponse';
+import { SellerQnaDetailResponse } from '@/types/seller/sellerqna/sellerQnaResponse';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerSidebar from '@/components/seller/SellerSidebar';
 import SellerLayout from '@/components/layouts/SellerLayout';

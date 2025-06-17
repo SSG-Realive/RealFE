@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { AdminDashboardDTO } from '@/types/admin';
+import { AdminDashboardDTO } from '@/types/admin/admin';
 import { ApexOptions } from 'apexcharts';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });

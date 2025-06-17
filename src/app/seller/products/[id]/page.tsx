@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getProductDetail, deleteProduct } from '@/service/productService';
-import { ProductDetail } from '@/types/product';
+import { ProductDetail } from '@/types/seller/product';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';

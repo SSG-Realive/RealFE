@@ -3,10 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getDeliveryDetail, updateDeliveryStatus, cancelOrderDelivery } from '@/service/deliveryService';
-import { OrderDeliveryDetail } from '@/types/sellerdelivery/sellerDelivery';
+import { OrderDeliveryDetail } from '@/types/seller/sellerdelivery/sellerDelivery';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
-import { DeliveryStatus } from '@/types/sellerorder/sellerOrder';
+import { DeliveryStatus } from '@/types/seller/sellerorder/sellerOrder';
 
 export default function DeliveryDetailPage() {
     const checking = useSellerAuthGuard();

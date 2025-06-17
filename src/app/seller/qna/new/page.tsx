@@ -7,7 +7,7 @@ import { createQna } from '@/service/sellerQnaService';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { SellerCreateQnaRequest } from '@/types/sellerqna/sellerQnaRequest';
+import { SellerCreateQnaRequest } from '@/types/seller/sellerqna/sellerQnaRequest';
 
 export default function QnaCreatePage() {
     useSellerAuthGuard();

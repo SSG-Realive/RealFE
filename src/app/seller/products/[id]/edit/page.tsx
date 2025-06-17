@@ -4,8 +4,8 @@ import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import SellerHeader from '@/components/seller/SellerHeader';
 import { getProductDetail, updateProduct, fetchCategories } from '@/service/productService';
-import { SellerCategoryDTO } from '@/types/category/sellerCategory';
-import { ProductDetail } from '@/types/product';
+import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
+import { ProductDetail } from '@/types/seller/product';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
 

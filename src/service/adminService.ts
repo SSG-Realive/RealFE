@@ -1,6 +1,6 @@
-import { AdminDashboardDTO } from '@/types/admin';
+import { AdminDashboardDTO } from '@/types/admin/admin';
 import apiClient from '@/lib/apiClient';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse } from '@/types/admin/api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api';
 

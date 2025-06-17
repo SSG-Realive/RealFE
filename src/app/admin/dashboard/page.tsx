@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { AdminDashboardDTO } from '@/types/admin';
+import { AdminDashboardDTO } from '@/types/admin/admin';
 import { getAdminDashboard } from '@/service/adminService';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';

@@ -1,12 +1,12 @@
 
 import { sellerApi } from '@/lib/apiClient';
-import { PageResponse } from '@/types/page/pageResponse';
-import { PageResponseForOrder } from '@/types/page/pageResponseForOrder';
+import { PageResponse } from '@/types/seller/page/pageResponse';
+import { PageResponseForOrder } from '@/types/seller/page/pageResponseForOrder';
 import {
     SellerOrderResponse,
     SellerOrderDetailResponse,
     DeliveryStatusUpdateRequest, // 🔹 추가된 타입
-} from '@/types/seller/sellerOrder';
+} from '@/types/seller/sellerorder/sellerOrder';
 
 /**
  * 판매자 주문 목록 조회 (PageResponse 기반)

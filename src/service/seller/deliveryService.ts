@@ -1,5 +1,5 @@
 import { sellerApi } from '@/lib/apiClient';
-import { DeliveryStatusUpdateRequest, OrderDeliveryDetail } from '@/types/seller/sellerDelivery';
+import { DeliveryStatusUpdateRequest, OrderDeliveryDetail } from '@/types/seller/sellerdelivery/sellerDelivery';
 
 /**
  * 배송 상세 조회

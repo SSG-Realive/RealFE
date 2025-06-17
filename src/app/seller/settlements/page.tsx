@@ -8,7 +8,7 @@ import {
     getSellerSettlementList,
     getSellerSettlementListByDate,
 } from '@/service/seller/sellerSettlementService';
-import { SellerSettlementResponse } from '@/types/seller/sellerSettlement';
+import { SellerSettlementResponse } from '@/types/seller/sellersettlement/sellerSettlement';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
 export default function SellerSettlementPage() {

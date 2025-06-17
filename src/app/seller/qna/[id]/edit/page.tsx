@@ -7,8 +7,8 @@ import { getQnaDetail, updateQna, deleteQna } from '@/service/seller/sellerQnaSe
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { SellerQnaUpdateRequest } from '@/types/seller/sellerQnaRequest';
-import { SellerQnaDetailResponse } from '@/types/seller/sellerQnaResponse';
+import { SellerQnaUpdateRequest } from '@/types/seller/sellerqna/sellerQnaRequest';
+import { SellerQnaDetailResponse } from '@/types/seller/sellerqna/sellerQnaResponse';
 
 export default function QnaEditPage() {
     useSellerAuthGuard();

@@ -5,7 +5,7 @@
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { getDashboard } from '@/service/seller/sellerService';
-import { SellerDashboardResponse } from '@/types/dashboard/sellerDashboardResponse';
+import { SellerDashboardResponse } from '@/types/seller/dashboard/sellerDashboardResponse';
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 

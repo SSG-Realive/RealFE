@@ -3,13 +3,13 @@ import {
     SellerCreateQnaRequest,
     SellerQnaUpdateRequest,
 
-} from '@/types/seller/sellerQnaRequest';
+} from '@/types/seller/sellerqna/sellerQnaRequest';
 import{
     SellerQnaDetailResponse,
     SellerQnaListResponse,
     SellerQnaResponse
-} from '@/types/seller/sellerQnaResponse';
-import { PageResponse } from '@/types/page/pageResponse';
+} from '@/types/seller/sellerqna/sellerQnaResponse';
+import { PageResponse } from '@/types/seller/page/pageResponse';
 import { sellerApi } from '@/lib/apiClient';
 
 /**

@@ -2,16 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
+import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
-import { getMyProducts } from '@/service/productService';
-import { ProductListItem } from '@/types/productList';
+import { getMyProducts } from '@/service/seller/productService';
+import { ProductListItem } from '@/types/seller/product/productList';
 
 export default function ProductListPage() {
   const checking = useSellerAuthGuard();
-    if (checking) return <div className="p-8">인증 확인 중...</div>;
+   
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -24,6 +24,8 @@ export default function ProductListPage() {
   const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
+    if (checking) return;
+
     const page = parseInt(searchParams.get('page') || '1', 10);
     setCurrentPage(page);
     fetchProductList(page);
@@ -49,6 +51,7 @@ export default function ProductListPage() {
   };
 
   const handleSearch = () => {
+    if (checking) return;
     fetchProductList(1);
     router.push(`/seller/products?page=1`);
   };
@@ -57,9 +60,10 @@ export default function ProductListPage() {
     router.push('/seller/products/new');
   };
 
+    if (checking) return <div className="p-8">인증 확인 중...</div>; // ✅ 인증 확인 중 UI 
   return (
     <>
-      <Header />
+      <SellerHeader />
       <SellerLayout>
         <div className="max-w-5xl mx-auto p-6">
           <h1 className="text-2xl font-bold mb-4">내 상품 목록</h1>

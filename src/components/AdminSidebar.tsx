@@ -59,8 +59,8 @@ export default function AdminSidebar() {
           <Accordion open={customerOpen}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 16, boxSizing: 'border-box' }}>
               <li style={{ margin: 0, boxSizing: 'border-box', padding: '0 0 8px 0' }}><Link href="/admin/customers/list" style={{ color: '#fff' }}>고객 관리</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/customers/penalty" style={{ color: '#fff' }}>사용자 패널티</Link></li>
               <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/sellers" style={{ color: '#fff' }}>판매자 관리</Link></li>
+              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/customers/penalty" style={{ color: '#fff' }}>사용자 패널티</Link></li>
             </ul>
           </Accordion>
           <li style={{ margin: '18px 0' }}><Link href="/admin/products" style={{ color: '#fff' }}>상품관리</Link></li>

@@ -1,6 +1,6 @@
 "use client";
 import apiClient from '@/lib/apiClient';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function PenaltyRegisterPage() {
@@ -8,6 +8,15 @@ export default function PenaltyRegisterPage() {
   const [customerId, setCustomerId] = useState("");
   const [reason, setReason] = useState("");
   const [points, setPoints] = useState(10);
+  const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get(`/admin/users?userType=CUSTOMER&page=0&size=100&searchTerm=${search}`,
+      { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => setCustomers(res.data.data.content || []));
+  }, [search]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +47,23 @@ export default function PenaltyRegisterPage() {
       <h2 className="text-lg font-bold mb-4">패널티 등록</h2>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
-          type="number"
-          placeholder="고객 ID"
+          type="text"
+          placeholder="고객 이름/이메일 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2"
+        />
+        <select
           value={customerId}
           onChange={e => setCustomerId(e.target.value)}
           className="border rounded px-3 py-2"
           required
-        />
+        >
+          <option value="">고객 선택</option>
+          {customers.map(c => (
+            <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+          ))}
+        </select>
         <input
           type="text"
           placeholder="사유"

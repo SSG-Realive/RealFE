@@ -11,6 +11,7 @@ interface Seller {
   status: string;
   image?: string;
   is_approved: boolean;
+  is_active: boolean;
 }
 
 export default function AdminSellersPage() {
@@ -42,7 +43,8 @@ export default function AdminSellersPage() {
       .then(res => {
         const sellersWithBoolean = (res.data.data.content || []).map(s => ({
           ...s,
-          is_approved: s.is_approved === true || s.is_approved === 'true' || s.is_approved === 1 || s.isApproved === true || s.isApproved === 'true' || s.isApproved === 1
+          is_approved: s.is_approved === true || s.is_approved === 'true' || s.is_approved === 1 || s.isApproved === true || s.isApproved === 'true' || s.isApproved === 1,
+          is_active: s.is_active === true || s.is_active === 'true' || s.is_active === 1 || s.isActive === true || s.isActive === 'true' || s.isActive === 1
         }));
         setSellers(sellersWithBoolean);
         setLoading(false);
@@ -54,6 +56,29 @@ export default function AdminSellersPage() {
     (s.name?.includes(search) || s.email?.includes(search)) &&
     (!status || (s.is_approved ? '승인' : '승인처리전') === status)
   );
+
+  // 판매자 활성/비활성 토글
+  const handleToggleActive = async (seller: Seller) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    try {
+      await apiClient.put(`/admin/users/sellers/${seller.id}/status`, {
+        isActive: !seller.is_active
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      alert(`판매자 ${seller.name}의 상태가 변경되었습니다.`);
+      setSellers(prev =>
+        prev.map(s =>
+          s.id === seller.id ? { ...s, is_active: !s.is_active } : s
+        )
+      );
+    } catch (err) {
+      alert('상태 변경 실패: ' + (err?.response?.data?.message || err?.message || '알 수 없는 오류'));
+    }
+  };
 
   return (
     <div>
@@ -91,6 +116,7 @@ export default function AdminSellersPage() {
               <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>Status</th>
+              <th style={{ padding: 8, border: '1px solid #eee' }}>요청</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>Action</th>
             </tr>
           </thead>
@@ -117,6 +143,22 @@ export default function AdminSellersPage() {
                       </button>
                     </>
                   )}
+                </td>
+                <td style={{ padding: 8, border: '1px solid #eee' }}>
+                  <button
+                    style={{
+                      background: s.is_active ? '#f44336' : '#4caf50',
+                      color: '#fff',
+                      padding: '4px 12px',
+                      borderRadius: 4,
+                      border: 'none',
+                      fontWeight: 'bold',
+                      marginLeft: 8
+                    }}
+                    onClick={() => handleToggleActive(s)}
+                  >
+                    {s.is_active ? '정지' : '복구'}
+                  </button>
                 </td>
               </tr>
             ))}

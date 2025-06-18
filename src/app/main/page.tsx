@@ -19,17 +19,18 @@ const ITEMS_PER_PAGE = 20;
 
 export default function CustomerHomePage() {
     const [categoryId, setCategoryId] = useState<number | null>(null);
+    const [searchKeyword, setSearchKeyword] = useState('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
 
-    // 상품 더 불러오기
+    // 상품 불러오기
     const loadMore = async () => {
-        const newProducts = await fetchPublicProducts(categoryId, page, ITEMS_PER_PAGE);
+        const newProducts = await fetchPublicProducts(categoryId, page, ITEMS_PER_PAGE, searchKeyword);
         setProducts((prev) => [...prev, ...newProducts]);
     };
 
-    // 무한 스크롤 옵저버
+    // 무한 스크롤
     useEffect(() => {
         if (!loader.current) return;
 
@@ -45,22 +46,46 @@ export default function CustomerHomePage() {
         };
     }, []);
 
-    // 페이지 변경 시 상품 불러오기
+    // 페이지 변경 시 상품 추가 로딩
     useEffect(() => {
         loadMore();
     }, [page]);
 
-    // 카테고리 변경 시 초기화 후 다시 로드
+    // 카테고리 변경 시 초기화
     useEffect(() => {
         setPage(1);
-        fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE).then((initialProducts) => {
+        fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, searchKeyword).then((initialProducts) => {
             setProducts(initialProducts);
         });
     }, [categoryId]);
 
+    // 검색 실행
+    const handleSearch = async () => {
+        setPage(1);
+        const results = await fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, searchKeyword);
+        setProducts(results);
+    };
+
     return (
         <div>
             <Navbar />
+
+            {/* 🔍 검색창 */}
+            <div className="px-4 py-4 flex gap-2 justify-center">
+                <input
+                    type="text"
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                    placeholder="상품명을 검색하세요"
+                    className="border px-3 py-2 w-full max-w-sm rounded"
+                />
+                <button
+                    onClick={handleSearch}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                    검색
+                </button>
+            </div>
 
             {/* 🔽 카테고리 필터 */}
             <div className="flex gap-3 overflow-x-auto mb-6 px-4 py-2">
@@ -69,8 +94,8 @@ export default function CustomerHomePage() {
                         key={id ?? 'all'}
                         onClick={() => {
                             setCategoryId(id);
-                            setProducts([]); // 카테고리 바뀔 때 리스트 초기화
-                            setPage(1);      // 페이지 초기화
+                            setProducts([]);
+                            setPage(1);
                         }}
                         className={`px-4 py-1 rounded-full border text-sm whitespace-nowrap ${
                             categoryId === id

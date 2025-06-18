@@ -8,19 +8,19 @@ import { ProductDetail } from '@/types/seller/product/product';
 export async function fetchPublicProducts(
     categoryId: number | null,
     page: number,
-    size: number
+    size: number,
+    keyword?: string // ✅ 검색어 추가
 ): Promise<ProductListDTO[]> {
-    const query = new URLSearchParams({
-        page: String(page),
-        size: String(size),
-    });
+    const params: Record<string, any> = {
+        page,
+        size,
+    };
+    if (categoryId !== null) params.categoryId = categoryId;
+    if (keyword) params.keyword = keyword;
+    params.type = 'T'; // ✅ 상품명 검색만 허용
 
-    if (categoryId !== null) {
-        query.append('categoryId', String(categoryId));
-    }
-
-    const res = await apiClient.get(`/public/items?${query}`);
-    return res.data.dtoList; // ✅ PageResponseDTO 내부의 리스트 반환
+    const res = await apiClient.get('/public/items', { params });
+    return res.data.dtoList;
 }
 
 

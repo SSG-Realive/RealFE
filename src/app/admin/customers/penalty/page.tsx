@@ -55,13 +55,13 @@ export default function PenaltyListPage() {
   return (
     <div className="p-8">
       <h2 className="text-2xl font-bold mb-6">사용자 패널티 목록</h2>
-      <input
-        type="text"
-        placeholder="사용자/사유 검색"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
+        <input
+          type="text"
+          placeholder="사용자/사유 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
         className="border rounded px-3 py-2 mb-4"
-      />
+        />
       <table className="min-w-full border text-sm">
         <thead>
           <tr className="bg-gray-100">
@@ -92,4 +92,4 @@ export default function PenaltyListPage() {
       </button>
     </div>
   );
-} 
+}

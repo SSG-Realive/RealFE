@@ -15,17 +15,34 @@ interface Customer {
 
 interface Penalty {
   id: number;
+  name?: string;
+  user?: string;
+  customerName?: string;
+  reason?: string;
+  cause?: string;
+  description?: string;
+  date?: string;
+  createdAt?: string;
+}
+
+interface Seller {
+  id: number;
   name: string;
-  reason: string;
-  date: string;
+  email: string;
+  status: boolean | string;
+  image?: string;
+  businessNumber?: string;
+  joinedAt?: string;
 }
 
 export default function AdminCustomersDashboard() {
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
   const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [totalMembers, setTotalMembers] = useState(0);
+  const [tab, setTab] = useState<'CUSTOMER' | 'SELLER'>('CUSTOMER');
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -33,13 +50,9 @@ export default function AdminCustomersDashboard() {
       return;
     }
     setLoading(true);
-    const params = new URLSearchParams({
-      userType: 'CUSTOMER',
-      page: '0',
-      size: '100',
-    });
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
-    apiClient.get(`/admin/users?${params.toString()}`, {
+    // 고객 목록
+    apiClient.get(`/admin/users?userType=CUSTOMER&page=0&size=100`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -47,7 +60,6 @@ export default function AdminCustomersDashboard() {
     })
       .then(res => {
         setCustomers(res.data.data.content || []);
-        setLoading(false);
         const customerCount = res.data.data.totalElements || (res.data.data.content?.length ?? 0);
         // 판매자 목록도 불러와서 합산
         apiClient.get(`/admin/users?userType=SELLER&page=0&size=100`, {
@@ -57,16 +69,23 @@ export default function AdminCustomersDashboard() {
           }
         })
         .then(res2 => {
+          setSellers(res2.data.data.content || []);
           const sellerCount = res2.data.data.totalElements || (res2.data.data.content?.length ?? 0);
           setTotalMembers(customerCount + sellerCount);
+          setLoading(false);
         })
-        .catch(() => setTotalMembers(customerCount));
+        .catch(() => {
+          setSellers([]);
+          setTotalMembers(customerCount);
+          setLoading(false);
+        });
       })
       .catch(() => {
-        setLoading(false);
+        setCustomers([]);
+        setSellers([]);
         setTotalMembers(0);
+        setLoading(false);
       });
-
     // 패널티 목록 불러오기
     apiClient.get('/admin/penalties?userType=CUSTOMER&page=0&size=5', {
       headers: {
@@ -75,15 +94,44 @@ export default function AdminCustomersDashboard() {
       }
     })
       .then(res => {
-        setPenalties(res.data.data.content || []);
+        // 콘솔로 실제 응답 구조 확인
+        console.log('패널티 API 응답', res.data);
+        // content, data.content 등 다양한 위치 대응
+        const penaltiesArr = res.data?.data?.content || res.data?.content || [];
+        setPenalties(penaltiesArr);
       })
       .catch(() => setPenalties([]));
   }, []);
 
-  // 고객 요약
-  // const total = customers.length;
-  const active = customers.filter(c => c.status === true || c.status === 'Active').length;
-  const blocked = customers.filter(c => c.status === false || c.status === 'Blocked').length;
+  // 상태 한글화
+  const getStatusLabel = (user: any) => {
+    if (
+      user.is_active === true || user.is_active === 'true' || user.is_active === 1 ||
+      user.isActive === true || user.isActive === 'true' || user.isActive === 1 ||
+      user.status === true || user.status === 'Active' || user.status === '활성'
+    ) return '활성';
+    return '비활성';
+  };
+
+  // 고객/판매자 활성/비활성 수
+  const activeCustomers = customers.filter(c => getStatusLabel(c) === '활성').length;
+  const inactiveCustomers = customers.filter(c => getStatusLabel(c) === '비활성').length;
+  const activeSellers = sellers.filter(s => getStatusLabel(s) === '활성').length;
+  const inactiveSellers = sellers.filter(s => getStatusLabel(s) === '비활성').length;
+
+  // 전체 활성/비활성 회원 수
+  const totalActive = activeCustomers + activeSellers;
+  const totalInactive = inactiveCustomers + inactiveSellers;
+
+  // 패널티에서 customerId/userId로 이름+이메일 찾기
+  const getPenaltyUserName = (p: any) => {
+    const id = p.customerId || p.userId;
+    if (id && Array.isArray(customers)) {
+      const c = customers.find(c => c.id === id);
+      if (c) return `${c.name} (${c.email})`;
+    }
+    return p.name || p.user || p.customerName || '-';
+  };
 
   return (
     <div className="p-8">
@@ -95,61 +143,90 @@ export default function AdminCustomersDashboard() {
         </div>
         <div className="bg-white rounded shadow p-6">
           <h3 className="text-lg font-bold mb-2">활성 회원</h3>
-          <div className="text-3xl font-bold">{active}</div>
+          <div className="text-3xl font-bold">{totalActive}</div>
         </div>
         <div className="bg-white rounded shadow p-6">
-          <h3 className="text-lg font-bold mb-2">차단 회원</h3>
-          <div className="text-3xl font-bold">{blocked}</div>
+          <h3 className="text-lg font-bold mb-2">비활성 회원</h3>
+          <div className="text-3xl font-bold">{totalInactive}</div>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* 고객 관리 요약 - 테이블형 */}
+      {/* 고객/판매자 관리 탭 */}
+      <div className="mb-6 flex gap-4">
+        <button
+          className={`px-4 py-2 rounded font-bold ${tab === 'CUSTOMER' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+          onClick={() => setTab('CUSTOMER')}
+        >
+          고객 관리
+        </button>
+        <button
+          className={`px-4 py-2 rounded font-bold ${tab === 'SELLER' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+          onClick={() => setTab('SELLER')}
+        >
+          판매자 관리
+        </button>
+      </div>
+      <div className="grid grid-cols-1 gap-8">
+        {/* 고객/판매자 관리 테이블 */}
         <div className="bg-white rounded shadow p-6 min-w-[280px] max-w-full">
-          <h2 className="text-lg font-bold mb-4">고객 관리</h2>
+          <h2 className="text-lg font-bold mb-4">{tab === 'CUSTOMER' ? '고객 관리' : '판매자 관리'}</h2>
           {loading ? (
             <div>로딩 중...</div>
           ) : (
+            <div className="overflow-y-auto" style={{ maxHeight: 320 }}>
+              <table className="min-w-full border text-sm">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="px-2 py-1">이름</th>
+                    <th className="px-2 py-1">이메일</th>
+                    {tab === 'SELLER' && <th className="px-2 py-1">사업자번호</th>}
+                    {tab === 'SELLER' && <th className="px-2 py-1">가입일</th>}
+                    <th className="px-2 py-1">상태</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(tab === 'CUSTOMER' ? customers.slice(0, 50) : sellers.slice(0, 50)).map(u => (
+                    <tr key={u.id}>
+                      <td className="px-2 py-1">{u.name}</td>
+                      <td className="px-2 py-1">{u.email}</td>
+                      {tab === 'SELLER' && <td className="px-2 py-1">{(u as Seller).businessNumber || '-'}</td>}
+                      {tab === 'SELLER' && <td className="px-2 py-1">{(u as Seller).joinedAt || '-'}</td>}
+                      <td className="px-2 py-1">{getStatusLabel(u)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        {/* 사용자 패널티 - 하단으로 이동 */}
+        <div className="bg-white rounded shadow p-6 min-w-[280px] max-w-full mt-8">
+          <h2 className="text-lg font-bold mb-4">사용자 패널티</h2>
+          <div style={{ border: '1px solid #eee' }}>
             <table className="min-w-full border text-sm">
               <thead>
                 <tr className="bg-gray-100">
                   <th className="px-2 py-1">이름</th>
-                  <th className="px-2 py-1">이메일</th>
-                  <th className="px-2 py-1">상태</th>
+                  <th className="px-2 py-1">사유</th>
+                  <th className="px-2 py-1">일자</th>
                 </tr>
               </thead>
-              <tbody>
-                {customers.slice(0, 5).map(c => (
-                  <tr key={c.id}>
-                    <td className="px-2 py-1">{c.name}</td>
-                    <td className="px-2 py-1">{c.email}</td>
-                    <td className="px-2 py-1">{c.status === true || c.status === 'Active' ? 'Active' : 'Blocked'}</td>
-                  </tr>
-                ))}
-              </tbody>
             </table>
-          )}
-        </div>
-        {/* 사용자 패널티 요약 - 테이블형 (API 연동) */}
-        <div className="bg-white rounded shadow p-6 min-w-[280px] max-w-full">
-          <h2 className="text-lg font-bold mb-4">사용자 패널티</h2>
-          <table className="min-w-full border text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-2 py-1">이름</th>
-                <th className="px-2 py-1">사유</th>
-                <th className="px-2 py-1">일자</th>
-              </tr>
-            </thead>
-            <tbody>
-              {penalties.map(p => (
-                <tr key={p.id}>
-                  <td className="px-2 py-1">{p.name}</td>
-                  <td className="px-2 py-1">{p.reason}</td>
-                  <td className="px-2 py-1">{p.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+              <table className="min-w-full border text-sm">
+                <tbody>
+                  {penalties.length === 0 ? (
+                    <tr><td colSpan={3} className="text-center py-2">데이터 없음</td></tr>
+                  ) : penalties.map((p, idx) => (
+                    <tr key={p.id || idx}>
+                      <td className="px-2 py-1">{getPenaltyUserName(p)}</td>
+                      <td className="px-2 py-1">{p.reason || p.cause || p.description || '-'}</td>
+                      <td className="px-2 py-1">{p.date || p.createdAt || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

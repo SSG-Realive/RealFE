@@ -160,6 +160,18 @@ const AdminDashboardPage = () => {
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">활성 회원</h3>
+            <p className="text-3xl font-bold text-green-600">
+              {dashboardData.memberSummaryStats?.activeMembers || 0}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">비활성 회원</h3>
+            <p className="text-3xl font-bold text-red-600">
+              {dashboardData.memberSummaryStats?.inactiveMembers || 0}
+            </p>
+          </div>
+          <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">대기 판매자</h3>
             <p className="text-3xl font-bold text-orange-600">
               {dashboardData.pendingSellerCount || 0}

@@ -7,7 +7,7 @@ interface Customer {
   id: number;
   name: string;
   email: string;
-  status: boolean | string;
+  is_active: boolean;
   image?: string;
 }
 
@@ -41,11 +41,38 @@ function CustomerListPage() {
       }
     })
       .then(res => {
-        setCustomers(res.data.data.content || []);
+        const customersWithBoolean = (res.data.data.content || []).map(c => ({
+          ...c,
+          is_active: c.is_active === true || c.is_active === 'true' || c.is_active === 1 || c.isActive === true || c.isActive === 'true' || c.isActive === 1
+        }));
+        setCustomers(customersWithBoolean);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, [search, status]);
+
+  // 고객 활성/비활성 토글
+  const handleToggleActive = async (customer: Customer) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    try {
+      await apiClient.put(`/admin/users/customers/${customer.id}/status`, {
+        isActive: !customer.is_active
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      alert(`고객 ${customer.name}의 상태가 변경되었습니다.`);
+      setCustomers(prev =>
+        prev.map(c =>
+          c.id === customer.id ? { ...c, is_active: !c.is_active } : c
+        )
+      );
+    } catch (err) {
+      alert('상태 변경 실패: ' + (err?.response?.data?.message || err?.message || '알 수 없는 오류'));
+    }
+  };
 
   return (
     <div className="p-8">
@@ -84,6 +111,7 @@ function CustomerListPage() {
               <th>이름</th>
               <th>이메일</th>
               <th>상태</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -93,7 +121,23 @@ function CustomerListPage() {
                 <td className="px-2 py-1"><img src={c.image || '/public/images/placeholder.png'} alt="customer" className="w-9 h-9 rounded-full object-cover" /></td>
                 <td className="px-2 py-1">{c.name}</td>
                 <td className="px-2 py-1">{c.email}</td>
-                <td className="px-2 py-1">{c.status === true || c.status === 'Active' ? 'Active' : 'Blocked'}</td>
+                <td className="px-2 py-1">{c.is_active ? 'Active' : 'Blocked'}</td>
+                <td className="px-2 py-1">
+                  <button
+                    style={{
+                      background: c.is_active ? '#f44336' : '#4caf50',
+                      color: '#fff',
+                      padding: '4px 12px',
+                      borderRadius: 4,
+                      border: 'none',
+                      fontWeight: 'bold',
+                      marginLeft: 8
+                    }}
+                    onClick={() => handleToggleActive(c)}
+                  >
+                    {c.is_active ? '정지' : '복구'}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

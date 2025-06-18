@@ -17,6 +17,7 @@ interface Seller {
 export default function AdminSellersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [activeFilter, setActiveFilter] = useState('');
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -54,7 +55,8 @@ export default function AdminSellersPage() {
 
   const filtered = sellers.filter(s =>
     (s.name?.includes(search) || s.email?.includes(search)) &&
-    (!status || (s.is_approved ? '승인' : '승인처리전') === status)
+    (!status || (s.is_approved ? '승인' : '승인처리전') === status) &&
+    (!activeFilter || (activeFilter === 'active' ? s.is_active : activeFilter === 'inactive' ? !s.is_active : true))
   );
 
   // 판매자 활성/비활성 토글
@@ -100,6 +102,15 @@ export default function AdminSellersPage() {
             <option value="승인">승인</option>
             <option value="승인처리전">승인처리전</option>
           </select>
+          <select
+            value={activeFilter}
+            onChange={e => setActiveFilter(e.target.value)}
+            style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+          >
+            <option value="">전체</option>
+            <option value="active">활성</option>
+            <option value="inactive">정지</option>
+          </select>
         </div>
         <div style={{ color: 'purple', fontWeight: 'bold', fontSize: 18 }}>
           총 판매자: {filtered.length}명
@@ -108,26 +119,26 @@ export default function AdminSellersPage() {
       {loading ? (
         <div>로딩 중...</div>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
-          <thead>
-            <tr style={{ background: '#f7f7f7' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
+        <thead>
+          <tr style={{ background: '#f7f7f7' }}>
               <th style={{ padding: 8, border: '1px solid #eee' }}>번호</th>
-              <th style={{ padding: 8, border: '1px solid #eee' }}>사진</th>
-              <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
-              <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
+            <th style={{ padding: 8, border: '1px solid #eee' }}>사진</th>
+            <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
+            <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>Status</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>요청</th>
               <th style={{ padding: 8, border: '1px solid #eee' }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+          </tr>
+        </thead>
+        <tbody>
             {filtered.map((s, idx) => (
-              <tr key={s.id}>
+            <tr key={s.id}>
                 <td style={{ padding: 8, border: '1px solid #eee', textAlign: 'center' }}>{idx + 1}</td>
                 <td style={{ padding: 8, border: '1px solid #eee' }}><img src={s.image || '/public/images/placeholder.png'} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
-                <td style={{ padding: 8, border: '1px solid #eee' }}>{s.name}</td>
-                <td style={{ padding: 8, border: '1px solid #eee' }}>{s.email}</td>
-                <td style={{ padding: 8, border: '1px solid #eee' }}>
+              <td style={{ padding: 8, border: '1px solid #eee' }}>{s.name}</td>
+              <td style={{ padding: 8, border: '1px solid #eee' }}>{s.email}</td>
+              <td style={{ padding: 8, border: '1px solid #eee' }}>
                   <span style={{ background: s.is_approved ? '#1976d2' : '#ffa726', color: '#fff', padding: '2px 10px', borderRadius: 4, fontWeight: 'bold', fontSize: 14 }}>
                     {s.is_approved ? '승인' : '승인처리전'}
                   </span>
@@ -159,11 +170,11 @@ export default function AdminSellersPage() {
                   >
                     {s.is_active ? '정지' : '복구'}
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       )}
     </div>
   );

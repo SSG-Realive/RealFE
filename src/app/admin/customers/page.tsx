@@ -13,10 +13,19 @@ interface Customer {
   image?: string;
 }
 
+interface Penalty {
+  id: number;
+  name: string;
+  reason: string;
+  date: string;
+}
+
 export default function AdminCustomersDashboard() {
   const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [penalties, setPenalties] = useState<Penalty[]>([]);
+  const [totalMembers, setTotalMembers] = useState(0);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -39,22 +48,50 @@ export default function AdminCustomersDashboard() {
       .then(res => {
         setCustomers(res.data.data.content || []);
         setLoading(false);
+        const customerCount = res.data.data.totalElements || (res.data.data.content?.length ?? 0);
+        // 판매자 목록도 불러와서 합산
+        apiClient.get(`/admin/users?userType=SELLER&page=0&size=100`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        })
+        .then(res2 => {
+          const sellerCount = res2.data.data.totalElements || (res2.data.data.content?.length ?? 0);
+          setTotalMembers(customerCount + sellerCount);
+        })
+        .catch(() => setTotalMembers(customerCount));
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setLoading(false);
+        setTotalMembers(0);
+      });
+
+    // 패널티 목록 불러오기
+    apiClient.get('/admin/penalties?userType=CUSTOMER&page=0&size=5', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(res => {
+        setPenalties(res.data.data.content || []);
+      })
+      .catch(() => setPenalties([]));
   }, []);
 
   // 고객 요약
-  const total = customers.length;
+  // const total = customers.length;
   const active = customers.filter(c => c.status === true || c.status === 'Active').length;
   const blocked = customers.filter(c => c.status === false || c.status === 'Blocked').length;
 
   return (
-    <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+    <div className="p-8">
       <h2 className="text-2xl font-bold mb-4">회원 대시보드</h2>
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded shadow p-6">
           <h3 className="text-lg font-bold mb-2">전체 회원</h3>
-          <div className="text-3xl font-bold">{total}</div>
+          <div className="text-3xl font-bold">{totalMembers}</div>
         </div>
         <div className="bg-white rounded shadow p-6">
           <h3 className="text-lg font-bold mb-2">활성 회원</h3>
@@ -65,9 +102,9 @@ export default function AdminCustomersDashboard() {
           <div className="text-3xl font-bold">{blocked}</div>
         </div>
       </div>
-      <div className="p-8 flex flex-row gap-8 overflow-x-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* 고객 관리 요약 - 테이블형 */}
-        <div className="bg-white rounded shadow p-6 min-w-[400px]">
+        <div className="bg-white rounded shadow p-6 min-w-[280px] max-w-full">
           <h2 className="text-lg font-bold mb-4">고객 관리</h2>
           {loading ? (
             <div>로딩 중...</div>
@@ -92,24 +129,25 @@ export default function AdminCustomersDashboard() {
             </table>
           )}
         </div>
-        {/* 사용자 패널티 요약 - 테이블형 (더미 데이터 유지) */}
-        <div className="bg-white rounded shadow p-6 min-w-[400px]">
+        {/* 사용자 패널티 요약 - 테이블형 (API 연동) */}
+        <div className="bg-white rounded shadow p-6 min-w-[280px] max-w-full">
           <h2 className="text-lg font-bold mb-4">사용자 패널티</h2>
           <table className="min-w-full border text-sm">
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-2 py-1">이름</th>
                 <th className="px-2 py-1">사유</th>
-                <th className="px-2 py-1">상태</th>
+                <th className="px-2 py-1">일자</th>
               </tr>
             </thead>
             <tbody>
-              {/* 기존 더미 데이터 유지 */}
-              <tr><td className="px-2 py-1">user1</td><td className="px-2 py-1">부정입찰</td><td className="px-2 py-1">2024-06-01</td></tr>
-              <tr><td className="px-2 py-1">user2</td><td className="px-2 py-1">허위정보</td><td className="px-2 py-1">2024-06-02</td></tr>
-              <tr><td className="px-2 py-1">user3</td><td className="px-2 py-1">욕설</td><td className="px-2 py-1">2024-06-03</td></tr>
-              <tr><td className="px-2 py-1">user4</td><td className="px-2 py-1">도배</td><td className="px-2 py-1">2024-06-04</td></tr>
-              <tr><td className="px-2 py-1">user5</td><td className="px-2 py-1">광고성</td><td className="px-2 py-1">2024-06-05</td></tr>
+              {penalties.map(p => (
+                <tr key={p.id}>
+                  <td className="px-2 py-1">{p.name}</td>
+                  <td className="px-2 py-1">{p.reason}</td>
+                  <td className="px-2 py-1">{p.date}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

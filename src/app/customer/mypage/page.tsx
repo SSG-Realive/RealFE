@@ -28,16 +28,9 @@ export default function MyPage() {
                 <div className="grid grid-cols-2 gap-4">
                     <button
                         className="bg-gray-100 p-4 rounded hover:bg-gray-200"
-                        onClick={() => router.push('/customer/wishlist')}
+                        onClick={() => router.push('/customer/mypage/wishlist')}
                     >
                         ❤️ 찜 목록
-                    </button>
-
-                    <button
-                        className="bg-gray-100 p-4 rounded hover:bg-gray-200"
-                        onClick={() => router.push('/customer/review')}
-                    >
-                        ✍ 내 리뷰
                     </button>
                 </div>
             </main>

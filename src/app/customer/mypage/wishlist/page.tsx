@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
-import MypageCard from '../MypageCard';
+import Navbar from '@/components/customer/Navbar';
 
-export default function Wishlist() {
+export default function WishlistPage() {
     const [products, setProducts] = useState<ProductListDTO[]>([]);
 
     useEffect(() => {
@@ -21,20 +20,23 @@ export default function Wishlist() {
     };
 
     return (
-        <MypageCard title="찜 목록">
-            {products.length === 0 ? (
-                <p className="text-gray-500">찜한 상품이 없습니다.</p>
-            ) : (
-                <>
-                    <ul className="grid grid-cols-2 gap-4">
-                        {products.slice(0, 2).map((p) => (
-                            <li key={p.id} className="border p-2 rounded">
+        <>
+            <Navbar />
+            <main className="max-w-6xl mx-auto px-6 py-10">
+                <h1 className="text-2xl font-bold mb-6">찜한 상품 전체 보기</h1>
+
+                {products.length === 0 ? (
+                    <p className="text-gray-500">찜한 상품이 없습니다.</p>
+                ) : (
+                    <ul className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        {products.map((p) => (
+                            <li key={p.id} className="border p-3 rounded shadow-sm">
                                 <img
                                     src={p.imageThumbnailUrl}
                                     alt={p.name}
-                                    className="w-full h-32 object-cover rounded"
+                                    className="w-full h-40 object-cover rounded"
                                 />
-                                <div className="mt-1 text-sm font-medium">{p.name}</div>
+                                <div className="mt-2 font-medium">{p.name}</div>
                                 <button
                                     className="text-red-500 text-sm mt-1"
                                     onClick={() => handleToggle(p.id)}
@@ -44,17 +46,8 @@ export default function Wishlist() {
                             </li>
                         ))}
                     </ul>
-
-                    <div className="mt-3 text-right">
-                        <Link
-                            href="/customer/mypage/wishlist"
-                            className="text-blue-500 text-sm hover:underline"
-                        >
-                            전체 보기 →
-                        </Link>
-                    </div>
-                </>
-            )}
-        </MypageCard>
+                )}
+            </main>
+        </>
     );
 }

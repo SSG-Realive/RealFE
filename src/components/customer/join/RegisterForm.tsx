@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import InputField from './InputField';
 import GenderSelector from './GenderSelector';
-import { MemberJoinDTO } from '@/types/custoemr/signup/signup';
+import { MemberJoinDTO } from '@/types/customer/signup/signup';
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState<MemberJoinDTO>({

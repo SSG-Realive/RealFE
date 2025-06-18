@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/components/customer/Navbar';
 import { fetchProductDetail } from '@/service/customer/productService';
 import { toggleWishlist } from '@/service/customer/wishlistService';
+import { addToCart } from '@/service/customer/cartService';
 import { ProductDetail } from '@/types/seller/product/product';
 
 export default function ProductDetailPage() {
@@ -13,23 +14,30 @@ export default function ProductDetailPage() {
     const [error, setError] = useState<string | null>(null);
     const [isWished, setIsWished] = useState<boolean>(false);
 
-    // 상품 상세 정보 가져오기
     useEffect(() => {
         if (id) {
             fetchProductDetail(Number(id))
                 .then((data) => {
                     setProduct(data);
-                    // 이 시점에 isWished 조회 API 있으면 여기서 setIsWished 호출 가능
                 })
                 .catch(() => setError('상품을 불러오지 못했습니다.'));
         }
     }, [id]);
 
-    // 찜 토글 핸들러
     const handleToggleWishlist = async () => {
         if (!product) return;
         const result = await toggleWishlist({ productId: product.id });
-        setIsWished(result); // 서버에서 true/false 반환
+        setIsWished(result);
+    };
+
+    const handleAddToCart = async () => {
+        if (!product) return;
+        try {
+            await addToCart({ productId: product.id, quantity: 1 });
+            alert('장바구니에 추가되었습니다.');
+        } catch {
+            alert('장바구니 추가 실패');
+        }
     };
 
     if (error) return <div className="text-red-500">{error}</div>;
@@ -53,6 +61,14 @@ export default function ProductDetailPage() {
                     aria-label="찜하기 버튼"
                 >
                     {isWished ? '❤️' : '🤍'}
+                </button>
+
+                {/* 🛒 장바구니 담기 버튼 */}
+                <button
+                    onClick={handleAddToCart}
+                    className="ml-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                >
+                    🛒 장바구니 담기
                 </button>
 
                 <img

@@ -75,7 +75,7 @@ export default function LoginForm() {
             setToken(data.data.accessToken);
 
             const redirectTo = searchParams?.get('redirectTo');
-            router.push(redirectTo || '/');
+            router.push(redirectTo || '/main');
         } else {
             setError('로그인 응답이 올바르지 않습니다.');
         }

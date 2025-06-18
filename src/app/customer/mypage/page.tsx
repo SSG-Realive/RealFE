@@ -32,6 +32,14 @@ export default function MyPage() {
                     >
                         ❤️ 찜 목록
                     </button>
+
+                    {/* ✅ 장바구니 이동 버튼 */}
+                    <button
+                        className="bg-gray-100 p-4 rounded hover:bg-gray-200"
+                        onClick={() => router.push('/customer/cart')}
+                    >
+                        🛒 장바구니
+                    </button>
                 </div>
             </main>
         </>

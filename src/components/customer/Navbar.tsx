@@ -63,6 +63,12 @@ export default function Navbar() {
                         >
                           마이페이지
                         </Link>
+                        <Link
+                            href="/customer/cart"
+                            className="text-gray-600 hover:text-gray-900"
+                        >
+                          장바구니
+                        </Link>
                         <button
                             onClick={handleLogout}
                             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"

@@ -5,8 +5,13 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchMyProfile } from '@/app/api/customer/member/route';
+import SearchBar from './SearchBar'; // ✅ 검색창 컴포넌트 임포트
 
-export default function Navbar() {
+interface NavbarProps {
+  onSearch?: (keyword: string) => void;
+}
+
+export default function Navbar({ onSearch }: NavbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -14,18 +19,11 @@ export default function Navbar() {
   const userName = useAuthStore((state) => state.userName);
   const setUserName = useAuthStore((state) => state.setUserName);
 
-  // ✅ 클라이언트 렌더링 이후인지 체크
   const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  // 로그인 페이지에서는 네비바를 숨김
-  if (pathname === '/customer/member/login') {
-    return null;
-  }
+  if (pathname === '/customer/member/login') return null;
 
-  // 로그인 상태일 때 이름 불러오기
   useEffect(() => {
     if (mounted && isAuthenticated() && !userName) {
       fetchMyProfile()
@@ -40,22 +38,30 @@ export default function Navbar() {
   };
 
   return (
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
+          <div className="flex items-center justify-between h-16">
+            {/* 왼쪽: 로고 */}
+            <div className="flex-shrink-0">
               <Link href="/main" className="text-xl font-bold text-gray-800">
                 Realive
               </Link>
             </div>
 
-            {/* ✅ 클라이언트 렌더링 후에만 보여주기 */}
+            {/* 가운데: 검색창 */}
+            <div className="flex-1 flex justify-center px-4">
+              <SearchBar onSearch={onSearch} />
+            </div>
+
+            {/* 오른쪽: 로그인/로그아웃 관련 */}
             {mounted && (
                 <div className="flex items-center space-x-4">
                   {isAuthenticated() ? (
                       <>
                         {userName && (
-                            <span className="text-gray-700">{userName}님, 반갑습니다.</span>
+                            <span className="text-gray-700 whitespace-nowrap hidden sm:inline">
+                      {userName}님
+                    </span>
                         )}
                         <Link
                             href="/customer/mypage"

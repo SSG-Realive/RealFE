@@ -1,16 +1,20 @@
+"use client";
 import React from 'react';
 import AdminNotification from './AdminNotification';
+import { useAdminAuthStore } from '@/store/admin/useAdminAuthStore';
+import { useRouter } from 'next/navigation';
 
 export default function AdminHeader({ title }: { title: string }) {
-  const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('adminToken');
+  const { accessToken, logout } = useAdminAuthStore();
+  const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    window.location.href = '/admin/login';
+    logout();
+    router.push('/admin/login');
   };
 
   const handleLogin = () => {
-    window.location.href = '/admin/login';
+    router.push('/admin/login');
   };
 
   return (
@@ -26,7 +30,7 @@ export default function AdminHeader({ title }: { title: string }) {
       <div style={{ fontWeight: 'bold', fontSize: 22, color: '#fff' }}>{title}</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <AdminNotification />
-        {isLoggedIn ? (
+        {accessToken ? (
           <button
             onClick={handleLogout}
             style={{

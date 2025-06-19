@@ -1,0 +1,118 @@
+// 관리자용 리뷰 관련 타입들
+
+export type ReviewReportStatus = 
+  | 'PENDING'           // 접수됨 (처리 대기)
+  | 'UNDER_REVIEW'      // 검토 중
+  | 'RESOLVED_KEPT'     // 처리 완료 - 리뷰 유지
+  | 'RESOLVED_HIDDEN'   // 처리 완료 - 리뷰 숨김/삭제
+  | 'RESOLVED_REJECTED' // 처리 완료 - 신고 기각
+  | 'REPORTER_ACCOUNT_INACTIVE'; // 신고자 계정 비활성화
+
+export interface AdminReview {
+  id: number;
+  productId: number;
+  productName: string;
+  productImage?: string;
+  customerId: number;
+  customerName: string;
+  customerImage?: string;
+  sellerId: number;
+  sellerName: string;
+  content: string;
+  rating: number;
+  isHidden: boolean;
+  createdAt: string;
+  updatedAt: string;
+  reportCount?: number;
+}
+
+export interface AdminReviewReport {
+  id: number;
+  reviewId: number;
+  review: AdminReview;
+  reporterId: number;
+  reporterName: string;
+  reason: string;
+  status: ReviewReportStatus;
+  createdAt: string;
+  processedAt?: string;
+}
+
+export interface AdminReviewQna {
+  id: number;
+  productId: number;
+  productName: string;
+  userId: number;
+  userName: string;
+  userImage?: string;
+  title: string;
+  content: string;
+  isAnswered: boolean;
+  answer?: string;
+  answerCreatedAt?: string;
+  status: 'PENDING' | 'ANSWERED' | 'HIDDEN';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminReviewListRequest {
+  page?: number;
+  size?: number;
+  search?: string;
+  productFilter?: string;
+  customerFilter?: string;
+  sellerFilter?: string;
+  sortBy?: 'createdAt' | 'rating';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface AdminReviewListResponse {
+  content: AdminReview[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+}
+
+export interface AdminReviewReportListRequest {
+  page?: number;
+  size?: number;
+  status: ReviewReportStatus;
+}
+
+export interface AdminReviewReportListResponse {
+  content: AdminReviewReport[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+}
+
+export interface AdminReviewQnaListRequest {
+  page?: number;
+  size?: number;
+  search?: string;
+  status?: string;
+  isAnswered?: boolean;
+}
+
+export interface AdminReviewQnaListResponse {
+  content: AdminReviewQna[];
+  totalElements: number;
+  totalPages: number;
+  currentPage: number;
+  size: number;
+}
+
+export interface AdminReviewUpdateRequest {
+  status: 'NORMAL' | 'HIDDEN' | 'DELETED';
+}
+
+export interface AdminReviewReportProcessRequest {
+  newStatus: ReviewReportStatus;
+  adminComment?: string;
+}
+
+export interface AdminReviewQnaAnswerRequest {
+  answer: string;
+} 

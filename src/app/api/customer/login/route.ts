@@ -1,34 +1,34 @@
-import { NextResponse } from 'next/server';  // Next.js 응답 객체
-import { LoginRequest, LoginResponse } from '@/app/types/customer/login';
-import api from '@/app/lib/axios';  // 커스텀 axios 인스턴스
+// src/app/api/customer/login/route.ts
+import { NextResponse } from 'next/server';
+import type { LoginRequest, LoginResponse } from '@/app/types/customer/login';
+import api from '@/app/lib/axios';
 import axios from 'axios';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const credentials: LoginRequest = {
-      email: body.email,
-      password: body.password
-    };
+    /* 1) 입력값 파싱 */
+    const { email, password } = (await request.json()) as LoginRequest;
 
-    const response = await api.post('api/public/auth/login', credentials);
-    
-    return NextResponse.json({
-      success: true,
-      data: response.data
-    });
-  } catch (error: unknown) {
-    console.error('Login error:', error);
-    
-    if (axios.isAxiosError(error) && error.response?.data?.message) {
-      return NextResponse.json(
-        { success: false, message: error.response.data.message },
-        { status: error.response.status || 400 }
-      );
+    /* 2) 백엔드 로그인 엔드포인트 호출
+       - URL 앞에 슬래시 포함 주의
+       - <LoginResponse> 제네릭으로 타입 지정 */
+    const { data } = await api.post<LoginResponse>(
+      '/api/public/auth/login',
+      { email, password }
+    );
+
+    /* 3) 백엔드가 내려준 플랫 JSON 그대로 반환 */
+    return NextResponse.json(data);        // 200 OK
+  } catch (err: unknown) {
+    /* 4) 에러 메시지 추출 */
+    if (axios.isAxiosError(err) && err.response) {
+      const { status, data } = err.response;
+      const message = (data as any).message ?? '로그인에 실패했습니다.';
+      return NextResponse.json({ message }, { status: status || 400 });
     }
-    
+
     return NextResponse.json(
-      { success: false, message: '로그인에 실패했습니다.' },
+      { message: '로그인에 실패했습니다.' },
       { status: 400 }
     );
   }

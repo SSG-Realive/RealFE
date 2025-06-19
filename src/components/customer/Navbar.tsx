@@ -1,100 +1,98 @@
 'use client';
 
-import { useAuthStore } from '@/store/customer/authStore';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-import SearchBar from './SearchBar'; // ✅ 검색창 컴포넌트 임포트
+import { useAuthStore } from '@/store/customer/authStore';   // ✅ 새 스토어 경로
 import { fetchMyProfile } from '@/service/customer/customerService';
+import SearchBar from './SearchBar';
 
 interface NavbarProps {
   onSearch?: (keyword: string) => void;
 }
 
 export default function Navbar({ onSearch }: NavbarProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const logout = useAuthStore((state) => state.logout);
-  const userName = useAuthStore((state) => state.userName);
-  const setUserName = useAuthStore((state) => state.setUserName);
+  const router       = useRouter();
+  const pathname     = usePathname();
+  const searchParams = useSearchParams();
 
+  /* 스토어 */
+  const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+
+  /* CSR 하이드레이션 여부 */
   useEffect(() => setMounted(true), []);
 
+  /* 로그인 페이지에서는 네비게이션 숨김 */
   if (pathname === '/customer/member/login') return null;
 
+  /* 로그인 상태면 한 번만 프로필 이름 가져오기 */
   useEffect(() => {
     if (mounted && isAuthenticated() && !userName) {
       fetchMyProfile()
-          .then((data) => setUserName(data.name))
-          .catch((e) => console.error('회원 이름 조회 실패:', e));
+        .then((data) => setUserName(data.name))
+        .catch((e) => console.error('회원 이름 조회 실패:', e));
     }
   }, [mounted, isAuthenticated, userName, setUserName]);
 
+  /* 로그아웃 */
   const handleLogout = () => {
     logout();
     router.push('/main');
   };
 
   return (
-      <nav className="bg-white shadow-md w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* 왼쪽: 로고 */}
-            <div className="flex-shrink-0">
-              <Link href="/main" className="text-xl font-bold text-gray-800">
-                Realive
-              </Link>
-            </div>
+    <nav className="w-full bg-white shadow-md">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* 로고 */}
+          <Link href="/main" className="flex-shrink-0 text-xl font-bold text-gray-800">
+            Realive
+          </Link>
 
-            {/* 가운데: 검색창 */}
-            <div className="flex-1 flex justify-center px-4">
-              <SearchBar onSearch={onSearch} />
-            </div>
+          {/* 검색창 */}
+          <div className="flex flex-1 justify-center px-4">
+            <SearchBar onSearch={onSearch} />
+          </div>
 
-            {/* 오른쪽: 로그인/로그아웃 관련 */}
-            {mounted && (
-                <div className="flex items-center space-x-4">
-                  {isAuthenticated() ? (
-                      <>
-                        {userName && (
-                            <span className="text-gray-700 whitespace-nowrap hidden sm:inline">
+          {/* 우측 메뉴 */}
+          {mounted && (
+            <div className="flex items-center space-x-4">
+              {isAuthenticated() ? (
+                <>
+                  {userName && (
+                    <span className="hidden whitespace-nowrap text-gray-700 sm:inline">
                       {userName}님
                     </span>
-                        )}
-                        <Link
-                            href="/customer/mypage"
-                            className="text-gray-600 hover:text-gray-900"
-                        >
-                          마이페이지
-                        </Link>
-                        <Link
-                            href="/customer/cart"
-                            className="text-gray-600 hover:text-gray-900"
-                        >
-                          장바구니
-                        </Link>
-                        <button
-                            onClick={handleLogout}
-                            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-                        >
-                          로그아웃
-                        </button>
-                      </>
-                  ) : (
-                      <Link
-                          href="/customer/member/login"
-                          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                      >
-                        로그인
-                      </Link>
                   )}
-                </div>
-            )}
-          </div>
+                  <Link href="/customer/mypage" className="text-gray-600 hover:text-gray-900">
+                    마이페이지
+                  </Link>
+                  <Link href="/customer/cart" className="text-gray-600 hover:text-gray-900">
+                    장바구니
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href={`/customer/member/login?redirectTo=${encodeURIComponent(
+                    pathname + (searchParams ? `?${searchParams}` : '')
+                  )}`}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                >
+                  로그인
+                </Link>
+              )}
+            </div>
+          )}
         </div>
-      </nav>
+      </div>
+    </nav>
   );
 }

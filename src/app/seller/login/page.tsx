@@ -16,24 +16,24 @@ export default function SellerLoginPage() {
 
   // ✅ 스토어에서 `setToken` 액션만 가져옵니다.
   // 이렇게 하면 token 상태가 바뀌어도 이 컴포넌트는 리렌더링되지 않아 효율적입니다.
-  const setToken = useSellerAuthStore((state) => state.setToken);
+  const setTokens = useSellerAuthStore((s) => s.setTokens);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+     
 
-    try {
-      // 1. 로그인 API를 호출합니다.
-      const data: LoginResponse = await login(email, password);
+     try {
+      const res: LoginResponse = await login(email, password);
 
-      // 2. 성공 시, 응답으로 받은 accessToken을 스토어의 setToken 액션을 통해 저장합니다.
-      setToken(data.accessToken);
-
-      // 3. 대시보드 페이지로 이동합니다.
-      router.push('/seller/dashboard');
+      if (res.accessToken && res.refreshToken) {
+        setTokens(res.accessToken, res.refreshToken);  // 여기만 변경
+        router.push('/seller/dashboard');
+      } else {
+        setError('로그인 응답이 올바르지 않습니다.');
+      }
     } catch (err: any) {
-      // 에러 처리
-      setError(err.response?.data?.message || '로그인 중 오류가 발생했습니다.');
+      setError(err.response?.data?.message ?? '로그인 중 오류가 발생했습니다.');
     }
   };
 

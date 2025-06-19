@@ -4,8 +4,9 @@ import { useAuthStore } from '@/store/customer/authStore';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchMyProfile } from '@/app/api/customer/member/route';
+
 import SearchBar from './SearchBar'; // ✅ 검색창 컴포넌트 임포트
+import { fetchMyProfile } from '@/service/customer/customerService';
 
 interface NavbarProps {
   onSearch?: (keyword: string) => void;

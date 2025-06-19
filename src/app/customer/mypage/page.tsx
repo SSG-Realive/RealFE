@@ -40,6 +40,14 @@ export default function MyPage() {
                     >
                         🛒 장바구니
                     </button>
+
+
+                    <button
+                        className="bg-gray-100 p-4 rounded hover:bg-gray-200"
+                        onClick={() => router.push('/customer/mypage/edit')}
+                    >
+                        ✏️&nbsp;개인정보 관리
+                    </button>
                 </div>
             </main>
         </>

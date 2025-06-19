@@ -35,4 +35,18 @@ api.interceptors.response.use(
   }
 );
 
+// 관리자용 adminApi 인스턴스 추가
+const adminApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_ROOT_URL,
+});
+adminApi.interceptors.request.use((config) => {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export { adminApi };
+
 export default api; 

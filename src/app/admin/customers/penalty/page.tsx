@@ -5,7 +5,7 @@ import apiClient from '@/lib/apiClient';
 
 interface Penalty {
   id: string;
-  customerId: number;
+  customerId: number; // Long 타입 (백엔드에서 Long으로 변경됨)
   reason: string;
   date: string;
 }

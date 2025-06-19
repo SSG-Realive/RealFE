@@ -1,35 +1,27 @@
 // src/hooks/useSellerAuthGuard.ts
+'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
-import { useHasHydrated } from './useHasHydrated';
+
 
 /**
- * Seller 페이지 인증 가드 훅.
- * 하이드레이션 완료 후 토큰을 검사하며, 없으면 로그인 페이지로 보냅니다.
- * @returns {boolean} 인증 확인 중이면 true, 완료되면 false를 반환합니다.
+ * 판매자 페이지 인증 가드
+ * 로컬스토리지 → 메모리 복원(hydrated) 완료 후 accessToken 존재 여부를 체크한다.
+ * 토큰이 없으면 /seller/login 으로 리다이렉트.
+ * @returns 로딩(검사) 중이면 true, 검사 완료면 false
  */
 export default function useSellerAuthGuard() {
   const router = useRouter();
-  const hasHydrated = useHasHydrated();
-  const token = useSellerAuthStore((state) => state.token);
-  const [isChecking, setIsChecking] = useState(true);
+  const { accessToken, hydrated } = useSellerAuthStore();   // ✅ 올바른 필드 사용
 
   useEffect(() => {
-    // 하이드레이션이 끝날 때까지 기다립니다.
-    if (!hasHydrated) {
-      return;
-    }
-
-    // 하이드레이션 후 토큰이 없으면 로그인 페이지로 보냅니다.
-    if (!token) {
+    if (!hydrated) return;          // 스토어 복원 전에는 대기
+    if (!accessToken) {
       router.replace('/seller/login');
-    } else {
-      // 토큰이 있으면 확인 절차를 종료합니다.
-      setIsChecking(false);
     }
-  }, [hasHydrated, token, router]);
+  }, [hydrated, accessToken, router]);
 
-  return isChecking;
+  return !hydrated;                 // true = 아직 검사(로딩) 중
 }

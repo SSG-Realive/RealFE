@@ -5,8 +5,9 @@ import axios, { type AxiosInstance } from 'axios';
 // 인자로 받을 스토어의 최소 타입을 정의합니다.
 // token을 가져오고 logout을 실행할 수 있는 스토어여야 합니다.
 interface AuthStore {
-  getState: () => {
-    token: string | null;
+   getState: () => {
+    accessToken: string | null;   // ✅ 필드명 변경
+    refreshToken: string | null;  //   (리프레시 토큰은 인터셉터 안 쓸 수도 있지만 함께 둡니다)
     logout: () => void;
   };
 }
@@ -21,12 +22,9 @@ export function createApiClient(store: AuthStore): AxiosInstance {
   // 요청 인터셉터: 요청을 보내기 전에 토큰을 헤더에 추가합니다.
   api.interceptors.request.use(
     (config) => {
-      // Zustand 스토어에서 현재 토큰을 가져옵니다.
-      const token = store.getState().token;
-
-      // 토큰이 있으면 Authorization 헤더를 설정합니다.
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      const { accessToken } = store.getState();   // ✅
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
       }
       return config;
     },

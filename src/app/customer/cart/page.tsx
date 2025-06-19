@@ -8,8 +8,8 @@ import {
     updateCartItemQuantity,
     deleteCartItem,
 } from '@/service/customer/cartService';
-import CartItemCard from '@/components/customer/CartItemCard';
-import Navbar from '@/components/customer/Navbar'; // ✅ 추가
+import CartItemCard from '@/components/customer/cart/CartItemCard';
+import Navbar from '@/components/customer/common/Navbar'; // ✅ 추가
 
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);

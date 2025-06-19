@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSellerOrders } from '@/service/sellerOrderService';
+import { getSellerOrders } from '@/service/seller/sellerOrderService';
 import { SellerOrderResponse } from '@/types/seller/sellerorder/sellerOrder';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';

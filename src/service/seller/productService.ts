@@ -2,9 +2,9 @@
 import { sellerApi } from '@/lib/apiClient';
 import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
 import { PageResponse } from '@/types/seller/page/pageResponse';
-import { ProductDetail } from '@/types/seller/product';
+import { ProductDetail } from '@/types/seller/product/product';
 
-import { ProductListItem } from '@/types/seller/productList';
+import { ProductListItem } from '@/types/seller/product/productList';
 
 // 판매자 상품 목록 조회 API
 export async function fetchMyProducts(): Promise<ProductDetail[]> {

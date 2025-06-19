@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getQnaList } from '@/service/sellerQnaService';
+import { getQnaList } from '@/service/seller/sellerQnaService';
 import { SellerQnaResponse } from '@/types/seller/sellerqna/sellerQnaResponse';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';

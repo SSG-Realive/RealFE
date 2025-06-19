@@ -32,7 +32,7 @@ const AdminDashboardPage = () => {
     if (typeof window !== 'undefined') {
       const adminToken = localStorage.getItem('adminToken');
       if (!adminToken) {
-        router.replace('/admin/login');
+      router.replace('/admin/login');
         return;
       }
     }

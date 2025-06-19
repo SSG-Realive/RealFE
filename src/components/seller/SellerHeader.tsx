@@ -3,14 +3,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getProfile, logout } from '@/service/sellerService';
+import { getProfile, logout } from '@/service/seller/sellerService';
 import { useEffect, useState } from 'react';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
 
 export default function SellerHeader() {
   const router = useRouter();
   const [name, setName] = useState<string>('');
-  const logoutStore = useSellerAuthStore((state) => state.logout); // ✅ 상태 초기화용
+  const token = useSellerAuthStore((state) => state.token);
+  const logoutStore = useSellerAuthStore((state) => state.logout);
 
   useEffect(() =>{
     const fetchName = async () => {
@@ -22,8 +23,14 @@ export default function SellerHeader() {
         console.error('프로필 정보 가져오기 실패', err);
       }
     }
-    fetchName();
-  }, []);
+
+    // ✅ 2. 토큰이 실제로 존재할 때만 fetchName 함수를 호출합니다.
+    if (token) {
+      fetchName();
+    }
+  }, [token]); // ✅ 3. 의존성 배열에 'token'을 추가합니다.
+
+
 
   const handleLogout = async () => {
     try {

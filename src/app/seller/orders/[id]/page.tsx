@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { getDeliveryDetail, updateDeliveryStatus, cancelOrderDelivery } from '@/service/deliveryService';
+import { getDeliveryDetail, updateDeliveryStatus, cancelOrderDelivery } from '@/service/seller/deliveryService';
 import { OrderDeliveryDetail } from '@/types/seller/sellerdelivery/sellerDelivery';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';

@@ -86,20 +86,20 @@ export default function AdminSellersPage() {
     <div>
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', gap: 8 }}>
-          <input
-            type="text"
-            placeholder="이름/이메일 검색"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ width: 200, padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
-          />
-          <select
-            value={status}
-            onChange={e => setStatus(e.target.value)}
-            style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
-          >
-            <option value="">전체</option>
-            <option value="승인">승인</option>
+        <input
+          type="text"
+          placeholder="이름/이메일 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 200, padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+        />
+        <select
+          value={status}
+          onChange={e => setStatus(e.target.value)}
+          style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+        >
+          <option value="">전체</option>
+          <option value="승인">승인</option>
             <option value="승인처리전">승인처리전</option>
           </select>
           <select
@@ -110,7 +110,7 @@ export default function AdminSellersPage() {
             <option value="">전체</option>
             <option value="active">활성</option>
             <option value="inactive">정지</option>
-          </select>
+        </select>
         </div>
         <div style={{ color: 'purple', fontWeight: 'bold', fontSize: 18 }}>
           총 판매자: {filtered.length}명

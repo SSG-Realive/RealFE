@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getQnaDetail, updateQna, deleteQna } from '@/service/sellerQnaService';
+import { getQnaDetail, updateQna, deleteQna } from '@/service/seller/sellerQnaService';
 
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';

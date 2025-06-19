@@ -4,7 +4,7 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { login } from '@/service/sellerService'; // 👈 위에서 확인한 서비스 함수
+import { login } from '@/service/seller/sellerService'; // 👈 위에서 확인한 서비스 함수
 import { LoginResponse } from '@/types/seller/login/loginResponse';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore'; // 👈 [2단계]에서 만든 스토어
 

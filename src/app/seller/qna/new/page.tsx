@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createQna } from '@/service/sellerQnaService';
+import { createQna } from '@/service/seller/sellerQnaService';
 
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';

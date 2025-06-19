@@ -2,69 +2,60 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/customer/authStore';
+import type { LoginResponse } from '@/types/customer/login/loginResponse';
 
 export default function LoginForm() {
-  const router = useRouter();
+  const router       = useRouter();
   const searchParams = useSearchParams();
-  const setToken = useAuthStore((state) => state.setToken);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const setTokens    = useAuthStore((s) => s.setTokens);
 
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error,    setError]    = useState('');
+
+  /* 카카오 실패 메시지 */
   useEffect(() => {
-    // URL에서 에러 파라미터 확인
-    const errorParam = searchParams?.get('error');
-    if (errorParam === 'kakao_login_failed') {
+    if (searchParams?.get('error') === 'kakao_login_failed') {
       setError('카카오 로그인에 실패했습니다. 다시 시도해주세요.');
     }
   }, [searchParams]);
 
+  /* 인풋 변경 */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /* 로그인 제출 */
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
-    try {
-      console.log('Attempting login with:', formData); // 디버깅용
+    const payload = {
+      email: formData.email.trim(),
+      password: formData.password,
+    };
 
-      const response = await fetch('/api/customer/login', {
+    try {
+      const res = await fetch('/api/customer/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      console.log('Login response status:', response.status); // 디버깅용
+      const data: LoginResponse = await res.json();
 
-      const data = await response.json();
-      console.log('Login response data:', data); // 디버깅용
-
-      if (!response.ok) {
-        // 서버에서 반환한 에러 메시지가 있으면 사용, 없으면 기본 메시지 사용
-        const errorMessage = data.message || data.error || '로그인에 실패했습니다.';
-        setError(errorMessage);
+      if (!res.ok) {
+        setError((data as any).message ?? '로그인에 실패했습니다.');
         return;
       }
 
-      if (data.success && data.data?.token) {
-        // 토큰 저장
-        setToken(data.data.token);
-        
-        // 이전 페이지로 리다이렉션 (없으면 홈으로)
-        const redirectTo = searchParams?.get('redirectTo');
-        console.log('Redirecting to:', redirectTo); // 디버깅용
-        router.push(redirectTo || '/');
+      /* ✅ access + refresh 토큰 저장 */
+      if (data.accessToken && data.refreshToken) {
+        setTokens(data.accessToken, data.refreshToken);
+
+        const redirectTo = searchParams?.get('redirectTo') || '/main';
+        router.push(redirectTo);
       } else {
         setError('로그인 응답이 올바르지 않습니다.');
       }
@@ -74,80 +65,72 @@ export default function LoginForm() {
     }
   };
 
+  /* 카카오 로그인 */
   const handleKakaoLogin = () => {
-    // 현재 URL에서 redirectTo 파라미터 가져오기
-    const redirectTo = searchParams?.get('redirectTo') || '/';
-    
-    // redirectTo 파라미터를 state로 전달
-    const state = encodeURIComponent(JSON.stringify({ redirectTo }));
-    
-    // Spring Security OAuth2 엔드포인트로 리다이렉트 (state 파라미터 포함)
-    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth2/authorization/kakao?state=${state}`;
+    const state = crypto.randomUUID();
+    const original = new URLSearchParams(window.location.search).get('redirectTo') || '/';
+    sessionStorage.setItem('loginRedirectUrl', original);
+
+    const redirectTo = encodeURIComponent(`${window.location.origin}/customer/oauth/callback`);
+    window.location.href =
+      `${process.env.NEXT_PUBLIC_API_ROOT_URL}/oauth2/authorization/kakao?state=${state}&redirectTo=${redirectTo}`;
   };
 
+  /* ---------- UI ---------- */
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* 이메일 */}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          이메일
-        </label>
+        <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일</label>
         <input
-          type="email"
           id="email"
           name="email"
+          type="email"
+          required
           value={formData.email}
           onChange={handleChange}
-          required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           placeholder="이메일을 입력하세요"
         />
       </div>
+
+      {/* 비밀번호 */}
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          비밀번호
-        </label>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
         <input
-          type="password"
           id="password"
           name="password"
+          type="password"
+          required
           value={formData.password}
           onChange={handleChange}
-          required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           placeholder="비밀번호를 입력하세요"
         />
       </div>
-      {error && (
-        <p className="text-red-500 text-sm text-center">{error}</p>
-      )}
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-      >
+
+      {error && <p className="text-sm text-center text-red-500">{error}</p>}
+
+      <button type="submit" className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700">
         로그인
       </button>
-      
+
       <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">또는</span>
+          <span className="bg-white px-2 text-gray-500">또는</span>
         </div>
       </div>
 
       <button
         type="button"
         onClick={handleKakaoLogin}
-        className="w-full bg-[#FEE500] text-[#000000] py-2 px-4 rounded-md hover:bg-[#FDD835] flex items-center justify-center gap-2"
+        className="flex w-full items-center justify-center gap-2 rounded bg-[#FEE500] py-2 px-4 text-[#000000] hover:bg-[#FDD835]"
+        aria-label="카카오로 로그인"
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -159,4 +142,4 @@ export default function LoginForm() {
       </button>
     </form>
   );
-} 
+}

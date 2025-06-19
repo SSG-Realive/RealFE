@@ -1,8 +1,10 @@
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore } from '@/store/customer/authStore';
 import axios from 'axios';
 
+// [customer] Zustand로 로그인 상태를 관리
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_ROOT_URL,
 });
 
 // 토큰이 필요없는 public API 경로들

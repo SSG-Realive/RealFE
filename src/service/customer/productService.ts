@@ -29,13 +29,16 @@ export async function fetchPublicProducts(
 export async function fetchProductDetail(productId: number): Promise<ProductDetail> {
     const res = await apiClient.get(`/public/items/${productId}`);
     return res.data;
-
-
 }
 
  // 관련 상품 추천
 
 export async function fetchRelatedProducts(productId: number): Promise<ProductListDTO[]> {
     const res = await apiClient.get(`/public/items/${productId}/related`);
+    return res.data;
+}
+
+export async function fetchPopularProducts(): Promise<ProductListDTO[]> {
+    const res = await apiClient.get('/public/items/popular');
     return res.data;
 }

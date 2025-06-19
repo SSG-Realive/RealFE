@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { fetchPublicProducts } from '@/service/customer/productService';
+import { fetchPublicProducts, fetchPopularProducts } from '@/service/customer/productService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import Navbar from '@/components/customer/Navbar';
 import ChatbotFloatingButton from '@/components/customer/ChatbotFloatingButton';
@@ -20,11 +20,12 @@ const ITEMS_PER_PAGE = 20;
 
 export default function CustomerHomePage() {
     const searchParams = useSearchParams();
-    const keywordFromUrl = searchParams.get('keyword') || ''; // ✅ 쿼리스트링에서 검색어 읽기
+    const keywordFromUrl = searchParams.get('keyword') || '';
 
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [setSearchKeyword] = useState(keywordFromUrl);
     const [products, setProducts] = useState<ProductListDTO[]>([]);
+    const [popularProducts, setPopularProducts] = useState<ProductListDTO[]>([]); // ✅ 인기 상품
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
 
@@ -37,6 +38,11 @@ export default function CustomerHomePage() {
         );
         setProducts((prev) => [...prev, ...newProducts]);
     };
+
+    // ✅ 인기 상품 초기 로딩
+    useEffect(() => {
+        fetchPopularProducts().then(setPopularProducts);
+    }, []);
 
     // 무한 스크롤 감지
     useEffect(() => {
@@ -59,7 +65,7 @@ export default function CustomerHomePage() {
         loadMore();
     }, [page]);
 
-    // 카테고리나 검색어 변경 시 초기화
+    // 카테고리 or 검색어 변경 시 초기화
     useEffect(() => {
         setPage(1);
         fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, keywordFromUrl).then(setProducts);
@@ -67,7 +73,19 @@ export default function CustomerHomePage() {
 
     return (
         <div>
-            <Navbar /> {/* ✅ handleSearch 제거됨 */}
+            <Navbar />
+
+            {/* 🔥 인기 상품 */}
+            {popularProducts.length > 0 && (
+                <div className="px-4 mb-8">
+                    <h2 className="text-lg font-bold mb-3">인기 상품 🔥</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {popularProducts.map((p) => (
+                            <ProductCard key={p.id} {...p} />
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* 카테고리 필터 */}
             <div className="flex gap-3 overflow-x-auto mb-6 px-4 py-2">
@@ -90,7 +108,7 @@ export default function CustomerHomePage() {
                 ))}
             </div>
 
-            {/* 상품 목록 */}
+            {/* 전체 상품 목록 */}
             <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                 {products.map((p) => (
                     <ProductCard key={p.id} {...p} />

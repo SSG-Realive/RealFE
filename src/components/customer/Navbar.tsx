@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-import { useAuthStore } from '@/store/customer/authStore';   // ✅ 새 스토어 경로
+import { useAuthStore } from '@/store/customer/authStore';
 import { fetchMyProfile } from '@/service/customer/customerService';
 import SearchBar from './SearchBar';
 
@@ -24,8 +24,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
   /* CSR 하이드레이션 여부 */
   useEffect(() => setMounted(true), []);
 
-  /* 로그인 페이지에서는 네비게이션 숨김 */
-  if (pathname === '/customer/member/login') return null;
+  /* 로그인 관련 페이지에서는 네비게이션 숨김 */
+  if (pathname === '/login' || pathname === '/customer/member/login' || pathname === '/seller/login') {
+    return null;
+  }
 
   /* 로그인 상태면 한 번만 프로필 이름 가져오기 */
   useEffect(() => {
@@ -60,6 +62,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
           {mounted && (
             <div className="flex items-center space-x-4">
               {isAuthenticated() ? (
+                // ✅ 이 부분을 제가 실수로 생략했습니다. 다시 복원했습니다.
                 <>
                   {userName && (
                     <span className="hidden whitespace-nowrap text-gray-700 sm:inline">
@@ -80,9 +83,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
                   </button>
                 </>
               ) : (
+                // ✅ 로그인 버튼의 href만 수정한 부분입니다.
                 <Link
-                  href={`/customer/member/login?redirectTo=${encodeURIComponent(
-                    pathname + (searchParams ? `?${searchParams}` : '')
+                  href={`/login?redirectTo=${encodeURIComponent(
+                    pathname + (searchParams?.toString() ? `?${searchParams}` : '')
                   )}`}
                   className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                 >

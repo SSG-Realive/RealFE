@@ -100,7 +100,7 @@ export default function ProductDetailPage() {
                                 <div
                                     key={item.id}
                                     className="border rounded p-2 hover:shadow cursor-pointer"
-                                    onClick={() => location.href = `/products/${item.id}`}
+                                    onClick={() => location.href = `/main/products/${item.id}`}
                                 >
                                     <img
                                         src={item.imageThumbnailUrl || '/default-thumbnail.png'}

@@ -40,10 +40,15 @@ export interface AdminReviewReport {
 
 export interface AdminReviewQna {
   id: number;
+  productId: number;
+  productName: string;
+  customerId: number;
+  userName: string;
   title: string;
   content?: string;
   answer?: string;
   isAnswered: boolean;
+  status: string; // PENDING, ANSWERED, HIDDEN
   createdAt: string;
   updatedAt?: string;
   answeredAt?: string;
@@ -51,10 +56,15 @@ export interface AdminReviewQna {
 
 export interface AdminReviewQnaDetail {
   id: number;
+  productId: number;
+  productName: string;
+  customerId: number;
+  userName: string;
   title: string;
   content: string;
   answer?: string;
   isAnswered: boolean;
+  status: string;
   createdAt: string;
   updatedAt: string;
   answeredAt?: string;

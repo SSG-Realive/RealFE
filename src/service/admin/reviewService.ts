@@ -17,17 +17,21 @@ import { paramsSerializer } from '@/lib/utils';
 
 // 리뷰 목록 조회
 export const getAdminReviewList = async (params: AdminReviewListRequest): Promise<AdminReviewListResponse> => {
+  console.log('리뷰 목록 API 호출:', '/admin/seller-reviews', params);
   const response = await adminApi.get('/admin/seller-reviews', { 
     params,
     paramsSerializer,
   });
-  return response.data.data;
+  console.log('리뷰 목록 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 상세 조회
 export const getAdminReview = async (reviewId: number): Promise<AdminReview> => {
+  console.log('리뷰 상세 API 호출:', `/admin/seller-reviews/${reviewId}`);
   const response = await adminApi.get(`/admin/seller-reviews/${reviewId}`);
-  return response.data.data;
+  console.log('리뷰 상세 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 상태 변경
@@ -37,17 +41,21 @@ export const updateAdminReview = async (reviewId: number, isHidden: boolean): Pr
 
 // 리뷰 신고 목록 조회
 export const getAdminReviewReportList = async (params: AdminReviewReportListRequest): Promise<AdminReviewReportListResponse> => {
+  console.log('리뷰 신고 목록 API 호출:', '/admin/reviews-reports/reports', params);
   const response = await adminApi.get('/admin/reviews-reports/reports', { 
     params,
     paramsSerializer,
   });
-  return response.data.data;
+  console.log('리뷰 신고 목록 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 신고 상세 조회
 export const getAdminReviewReport = async (reportId: number): Promise<AdminReviewReport> => {
+  console.log('리뷰 신고 상세 API 호출:', `/admin/reviews-reports/reports/${reportId}`);
   const response = await adminApi.get(`/admin/reviews-reports/reports/${reportId}`);
-  return response.data.data;
+  console.log('리뷰 신고 상세 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 신고 처리
@@ -57,25 +65,31 @@ export const processAdminReviewReport = async (reportId: number, request: AdminR
 
 // 리뷰 Q&A 목록 조회
 export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): Promise<AdminReviewQnaListResponse> => {
+  console.log('Q&A 목록 API 호출:', '/admin/qna/customer', params);
   const response = await adminApi.get('/admin/qna/customer', { 
     params,
     paramsSerializer,
   });
-  return response.data;
+  console.log('Q&A 목록 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 Q&A 상세 조회
 export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQnaDetail> => {
+  console.log('Q&A 상세 API 호출:', `/admin/qna/customer/${qnaId}`);
   const response = await adminApi.get(`/admin/qna/customer/${qnaId}`);
-  return response.data;
+  console.log('Q&A 상세 API 응답:', response.data);
+  return response.data.data || response.data;
 };
 
 // 리뷰 Q&A 답변 등록
 export const answerAdminReviewQna = async (qnaId: number, request: AdminReviewQnaAnswerRequest): Promise<void> => {
-  await adminApi.post(`/admin/seller-reviews/qna/${qnaId}/answer`, request);
+  console.log('Q&A 답변 등록 API 호출:', `/admin/qna/customer/${qnaId}`, request);
+  const response = await adminApi.patch(`/admin/qna/customer/${qnaId}`, request);
+  console.log('Q&A 답변 등록 API 응답:', response.data);
 };
 
 // 리뷰 Q&A 상태 변경
 export const updateAdminReviewQnaStatus = async (qnaId: number, isHidden: boolean): Promise<void> => {
-  await adminApi.patch(`/admin/seller-reviews/qna/${qnaId}`, { isHidden });
+  await adminApi.patch(`/admin/qna/customer/${qnaId}`, { isHidden });
 }; 

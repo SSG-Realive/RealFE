@@ -42,7 +42,7 @@ export default function ReportedReviewDetailPage() {
   const handleProcessReport = async (newStatus: ReviewReportStatus) => {
     if (!report) return;
     try {
-      await processAdminReviewReport(report.id, { newStatus });
+      await processAdminReviewReport(report.reportId, { newStatus });
       fetchReportDetail(); // Refresh data
     } catch (err: any) {
       if (err.response?.status === 403) {
@@ -72,6 +72,10 @@ export default function ReportedReviewDetailPage() {
   }
 
   const { review } = report;
+
+  if (!review) {
+    return <div className="p-8 text-center text-red-500">연관된 리뷰 정보를 찾을 수 없습니다.</div>
+  }
 
   return (
     <div className="p-8 max-w-4xl mx-auto">

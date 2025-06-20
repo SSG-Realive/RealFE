@@ -1,13 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getAdminReviewDetail, updateAdminReviewStatus } from "@/service/admin/reviewService";
+import { getAdminReview, updateAdminReview } from "@/service/admin/reviewService";
 import { AdminReview } from "@/types/admin/review";
 
 export default function ReviewDetailPage() {
   const router = useRouter();
   const params = useParams();
   const reviewId = Number(params.id);
+  
+  console.log('리뷰 상세 페이지 - params:', params);
+  console.log('리뷰 상세 페이지 - reviewId:', reviewId);
   
   const [review, setReview] = useState<AdminReview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +23,7 @@ export default function ReviewDetailPage() {
       setLoading(true);
       setError(null);
       
-      const data = await getAdminReviewDetail(reviewId);
+      const data = await getAdminReview(reviewId);
       setReview(data);
     } catch (err: any) {
       console.error('리뷰 상세 조회 실패:', err);
@@ -32,22 +35,33 @@ export default function ReviewDetailPage() {
 
   // 초기 로드
   useEffect(() => {
-    if (reviewId) {
+    console.log('리뷰 상세 페이지 - useEffect 실행');
+    console.log('리뷰 상세 페이지 - reviewId:', reviewId);
+    console.log('리뷰 상세 페이지 - reviewId 타입:', typeof reviewId);
+    console.log('리뷰 상세 페이지 - reviewId가 유효한지:', !isNaN(reviewId) && reviewId > 0);
+    
+    if (reviewId && !isNaN(reviewId) && reviewId > 0) {
+      console.log('리뷰 상세 페이지 - API 호출 시작');
       fetchReviewDetail();
+    } else {
+      console.error('리뷰 상세 페이지 - 유효하지 않은 reviewId:', reviewId);
+      setError('유효하지 않은 리뷰 ID입니다.');
+      setLoading(false);
     }
   }, [reviewId]);
 
   // 상태 변경
-  const handleStatusChange = async (newStatus: 'NORMAL' | 'HIDDEN' | 'DELETED') => {
+  const handleStatusChange = async (isHidden: boolean) => {
     if (!review) return;
 
-    if (!confirm(`리뷰 상태를 "${getStatusText(newStatus)}"로 변경하시겠습니까?`)) {
+    const statusText = isHidden ? "숨김" : "정상";
+    if (!confirm(`리뷰 상태를 "${statusText}"로 변경하시겠습니까?`)) {
       return;
     }
 
     try {
       setUpdating(true);
-      await updateAdminReviewStatus(reviewId, { status: newStatus });
+      await updateAdminReview(reviewId, isHidden);
       alert('상태가 변경되었습니다.');
       fetchReviewDetail(); // 상세 정보 새로고침
     } catch (err: any) {
@@ -59,25 +73,13 @@ export default function ReviewDetailPage() {
   };
 
   // 상태 텍스트 변환
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'NORMAL': return '정상';
-      case 'REPORTED': return '신고됨';
-      case 'HIDDEN': return '숨김';
-      case 'DELETED': return '삭제됨';
-      default: return status;
-    }
+  const getStatusText = (isHidden: boolean) => {
+    return isHidden ? '숨김' : '정상';
   };
 
   // 상태별 스타일
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case 'NORMAL': return 'text-green-600';
-      case 'REPORTED': return 'text-red-600';
-      case 'HIDDEN': return 'text-gray-600';
-      case 'DELETED': return 'text-red-800';
-      default: return '';
-    }
+  const getStatusStyle = (isHidden: boolean) => {
+    return isHidden ? 'text-gray-600' : 'text-green-600';
   };
 
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -159,7 +161,7 @@ export default function ReviewDetailPage() {
               </div>
               <div>
                 <span className="font-medium">작성자:</span>
-                <span className="ml-2">{review.userName}</span>
+                <span className="ml-2">{review.customerName}</span>
               </div>
               <div>
                 <span className="font-medium">평점:</span>
@@ -175,8 +177,8 @@ export default function ReviewDetailPage() {
               </div>
               <div>
                 <span className="font-medium">상태:</span>
-                <span className={`ml-2 ${getStatusStyle(review.status)}`}>
-                  {getStatusText(review.status)}
+                <span className={`ml-2 ${getStatusStyle(review.isHidden)}`}>
+                  {getStatusText(review.isHidden)}
                 </span>
               </div>
               {review.reportCount !== undefined && (
@@ -214,25 +216,18 @@ export default function ReviewDetailPage() {
           <h2 className="text-lg font-semibold mb-4">상태 관리</h2>
           <div className="flex gap-2">
             <button
-              onClick={() => handleStatusChange('NORMAL')}
-              disabled={updating || review.status === 'NORMAL'}
+              onClick={() => handleStatusChange(false)}
+              disabled={updating || !review.isHidden}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
             >
               정상으로 변경
             </button>
             <button
-              onClick={() => handleStatusChange('HIDDEN')}
-              disabled={updating || review.status === 'HIDDEN'}
+              onClick={() => handleStatusChange(true)}
+              disabled={updating || review.isHidden}
               className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
             >
               숨김으로 변경
-            </button>
-            <button
-              onClick={() => handleStatusChange('DELETED')}
-              disabled={updating || review.status === 'DELETED'}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
-            >
-              삭제로 변경
             </button>
           </div>
           {updating && (

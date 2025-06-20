@@ -40,12 +40,21 @@ export default function ReviewListPage() {
         sellerFilter: filters.sellerFilter || undefined,
       };
 
+      console.log('리뷰 목록 조회 요청:', params);
       const response = await getAdminReviewList(params);
+      console.log('리뷰 목록 조회 응답:', response);
       setReviews(response.content);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
     } catch (err: any) {
       console.error('리뷰 목록 조회 실패:', err);
+      console.error('에러 상세 정보:', {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.response?.headers
+      });
       setError(err.message || '리뷰 목록을 불러오는데 실패했습니다.');
       if (err.response?.status === 403) {
         router.replace('/admin/login');
@@ -57,7 +66,10 @@ export default function ReviewListPage() {
 
   useEffect(() => {
     if (accessToken) {
+      console.log('리뷰 목록 페이지 - accessToken 확인:', accessToken ? '있음' : '없음');
       fetchReviews(currentPage);
+    } else {
+      console.log('리뷰 목록 페이지 - accessToken 없음, 로그인 페이지로 이동');
     }
   }, [accessToken, currentPage, sortOption]);
 
@@ -176,7 +188,15 @@ export default function ReviewListPage() {
                 <td className="px-4 py-2 border text-center">
                   <button 
                     className="text-blue-600 underline"
-                    onClick={() => router.push(`/admin/review-management/${review.id}`)}
+                    onClick={() => {
+                      console.log('리뷰 상세 버튼 클릭:', review.id);
+                      try {
+                        router.push(`/admin/review-management/${review.id}`);
+                      } catch (error) {
+                        console.error('라우터 에러:', error);
+                        window.location.href = `/admin/review-management/${review.id}`;
+                      }
+                    }}
                   >
                     상세
                   </button>

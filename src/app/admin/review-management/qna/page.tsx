@@ -196,7 +196,15 @@ export default function ReviewQnaPage() {
                 <td className="px-4 py-2 border text-center">
                 <button 
                     className="text-blue-600 underline hover:text-blue-800" 
-                    onClick={() => router.push(`/admin/review-management/qna/${qna.id}`)}
+                    onClick={() => {
+                      console.log('Q&A 상세 버튼 클릭:', qna.id);
+                      try {
+                        router.push(`/admin/review-management/qna/${qna.id}`);
+                      } catch (error) {
+                        console.error('라우터 에러:', error);
+                        window.location.href = `/admin/review-management/qna/${qna.id}`;
+                      }
+                    }}
                 >
                     상세
                 </button>

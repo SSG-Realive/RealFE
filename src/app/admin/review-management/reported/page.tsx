@@ -32,12 +32,21 @@ export default function ReviewReportedPage() {
         status: statusFilter,
         sort: 'createdAt,desc',
       };
+      console.log('리뷰 신고 목록 조회 요청:', params);
       const response = await getAdminReviewReportList(params);
+      console.log('리뷰 신고 목록 조회 응답:', response);
       setReports(response.content || []);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
     } catch (err: any) {
       console.error("리뷰 신고 목록 조회 실패:", err);
+      console.error('에러 상세 정보:', {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.response?.headers
+      });
       setError(err.message || "리뷰 신고 목록을 불러오는데 실패했습니다.");
       if (err.response?.status === 403) {
         router.replace('/admin/login');
@@ -48,7 +57,12 @@ export default function ReviewReportedPage() {
   };
 
   useEffect(() => {
-    fetchReports(currentPage);
+    if (accessToken) {
+      console.log('리뷰 신고 페이지 - accessToken 확인:', accessToken ? '있음' : '없음');
+      fetchReports(currentPage);
+    } else {
+      console.log('리뷰 신고 페이지 - accessToken 없음, 로그인 페이지로 이동');
+    }
   }, [statusFilter, accessToken, currentPage]);
 
   const handleProcessReport = async (reportId: number, newStatus: ReviewReportStatus) => {
@@ -133,7 +147,15 @@ export default function ReviewReportedPage() {
                 <div className="flex items-center justify-center gap-2">
                   <button
                     className="text-blue-600 underline"
-                    onClick={() => router.push(`/admin/review-management/reported/${report.reportId}`)}
+                    onClick={() => {
+                      console.log('신고 상세 버튼 클릭:', report.reportId);
+                      try {
+                        router.push(`/admin/review-management/reported/${report.reportId}`);
+                      } catch (error) {
+                        console.error('라우터 에러:', error);
+                        window.location.href = `/admin/review-management/reported/${report.reportId}`;
+                      }
+                    }}
                   >
                     상세
                   </button>

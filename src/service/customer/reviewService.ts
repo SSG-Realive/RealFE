@@ -10,3 +10,17 @@ export async function fetchMyReviews(): Promise<ReviewResponseDTO[]> {
     const res = await apiClient.get('/reviews/my');
     return res.data.content ?? [];
 }
+
+export async function fetchReviewDetail(reviewId: number): Promise<ReviewResponseDTO> {
+    const res = await apiClient.get(`/reviews/${reviewId}`);
+    return res.data;
+}
+
+export async function getReviewDetail(reviewId: number): Promise<ReviewResponseDTO> {
+    const res = await apiClient.get(`/reviews/${reviewId}`);
+    return res.data;
+}
+
+export async function deleteReview(reviewId: number): Promise<void> {
+    await apiClient.delete(`/reviews/${reviewId}`);
+}

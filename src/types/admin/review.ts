@@ -58,12 +58,10 @@ export interface AdminReviewQna {
 export interface AdminReviewListRequest {
   page?: number;
   size?: number;
-  search?: string;
+  sort?: string;
   productFilter?: string;
   customerFilter?: string;
   sellerFilter?: string;
-  sortBy?: 'createdAt' | 'rating';
-  sortOrder?: 'asc' | 'desc';
 }
 
 export interface AdminReviewListResponse {
@@ -78,6 +76,7 @@ export interface AdminReviewReportListRequest {
   page?: number;
   size?: number;
   status: ReviewReportStatus;
+  sort?: string;
 }
 
 export interface AdminReviewReportListResponse {

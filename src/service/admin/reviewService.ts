@@ -12,15 +12,14 @@ import {
   AdminReviewQnaListResponse,
   AdminReviewQnaAnswerRequest,
 } from "@/types/admin/review";
+import { paramsSerializer } from '@/lib/utils';
 
 // 리뷰 목록 조회
 export const getAdminReviewList = async (params: AdminReviewListRequest): Promise<AdminReviewListResponse> => {
-  const { sortBy, sortOrder, ...rest } = params;
-  const queryParams = {
-    ...rest,
-    sort: sortBy && sortOrder ? `${sortBy},${sortOrder}` : 'createdAt,desc'
-  };
-  const response = await adminApi.get('/admin/seller-reviews', { params: queryParams });
+  const response = await adminApi.get('/admin/seller-reviews', { 
+    params,
+    paramsSerializer,
+  });
   return response.data;
 };
 
@@ -37,8 +36,10 @@ export const updateAdminReview = async (reviewId: number, isHidden: boolean): Pr
 
 // 리뷰 신고 목록 조회
 export const getAdminReviewReportList = async (params: AdminReviewReportListRequest): Promise<AdminReviewReportListResponse> => {
-  // 정렬 파라미터는 백엔드에서 지원하지 않으므로 제거
-  const response = await adminApi.get('/admin/reviews-reports/reports', { params });
+  const response = await adminApi.get('/admin/reviews-reports/reports', { 
+    params,
+    paramsSerializer,
+  });
   return response.data;
 };
 
@@ -50,7 +51,7 @@ export const getAdminReviewReport = async (reportId: number): Promise<AdminRevie
 
 // 리뷰 신고 처리
 export const processAdminReviewReport = async (reportId: number, request: AdminReviewReportProcessRequest): Promise<void> => {
-  await adminApi.patch(`/admin/reviews-reports/reports/${reportId}`, request);
+  await adminApi.put(`/admin/reviews-reports/reports/${reportId}/action`, request);
 };
 
 // 리뷰 Q&A 목록 조회

@@ -149,9 +149,9 @@ export default function ReviewReportedPage() {
 
       {/* 신고 테이블 */}
       <div className="overflow-x-auto">
-        <table className="min-w-full border text-sm">
-          <thead>
-            <tr className="bg-gray-100">
+      <table className="min-w-full border text-sm">
+        <thead>
+          <tr className="bg-gray-100">
               <th className="px-4 py-2 border">상품명</th>
               <th className="px-4 py-2 border">리뷰 작성자</th>
               <th className="px-4 py-2 border">신고자</th>
@@ -159,9 +159,9 @@ export default function ReviewReportedPage() {
               <th className="px-4 py-2 border">신고일</th>
               <th className="px-4 py-2 border">상태</th>
               <th className="px-4 py-2 border">처리</th>
-            </tr>
-          </thead>
-          <tbody>
+          </tr>
+        </thead>
+        <tbody>
             {reports?.map(report => (
               <tr key={report.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border">{report.review.productName}</td>
@@ -212,11 +212,11 @@ export default function ReviewReportedPage() {
                   {!['PENDING', 'UNDER_REVIEW'].includes(report.status) && (
                     <span className="text-gray-500">처리완료</span>
                   )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       </div>
 
       {/* 페이지네이션 */}

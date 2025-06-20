@@ -162,9 +162,9 @@ export default function ReviewQnaPage() {
 
       {/* Q&A 테이블 */}
       <div className="overflow-x-auto">
-        <table className="min-w-full border text-sm">
-          <thead>
-            <tr className="bg-gray-100">
+      <table className="min-w-full border text-sm">
+        <thead>
+          <tr className="bg-gray-100">
               <th className="px-4 py-2 border">상품명</th>
               <th className="px-4 py-2 border">제목</th>
               <th className="px-4 py-2 border">작성자</th>
@@ -172,9 +172,9 @@ export default function ReviewQnaPage() {
               <th className="px-4 py-2 border">상태</th>
               <th className="px-4 py-2 border">답변상태</th>
               <th className="px-4 py-2 border">상세</th>
-            </tr>
-          </thead>
-          <tbody>
+          </tr>
+        </thead>
+        <tbody>
             {qnas?.map(qna => (
               <tr key={qna.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2 border">{qna.productName}</td>
@@ -194,17 +194,17 @@ export default function ReviewQnaPage() {
                   </span>
                 </td>
                 <td className="px-4 py-2 border text-center">
-                  <button 
+                <button 
                     className="text-blue-600 underline hover:text-blue-800" 
                     onClick={() => router.push(`/admin/review-management/qna/${qna.id}`)}
-                  >
+                >
                     상세
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       </div>
 
       {/* 페이지네이션 */}
@@ -300,4 +300,4 @@ export default function ReviewQnaPage() {
       )}
     </div>
   );
-} 
+}

@@ -27,15 +27,15 @@ export default function ReviewManagementPage() {
       const reviewResponse = await getAdminReviewList({
         page: 0,
         size: 5,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sort: 'createdAt,desc',
       });
 
       // 신고 목록 (최신 5개)
       const reportResponse = await getAdminReviewReportList({
         page: 0,
         size: 5,
-        status: 'PENDING'
+        status: 'PENDING',
+        sort: 'createdAt,desc'
       });
 
       // Q&A 목록 (최신 5개)
@@ -286,8 +286,8 @@ export default function ReviewManagementPage() {
               </p>
             </CardContent>
           </Card>
+          </div>
         </div>
-      </div>
     </div>
   );
 } 

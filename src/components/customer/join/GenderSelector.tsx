@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type Gender = "MALE" | "FEMALE" | "UNSELECTED";; // 선택 전 상태 허용
+type Gender = "M" | "F" | "UNSELECTED";; // 선택 전 상태 허용
 
 interface Props {
   gender: Gender;
@@ -23,8 +23,8 @@ export default function GenderSelector({ gender, onChange }: Props) {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="UNSELECTED">선택</SelectItem>
-          <SelectItem value="MALE">남성</SelectItem>
-          <SelectItem value="FEMALE">여성</SelectItem>
+          <SelectItem value="M">남성</SelectItem>
+          <SelectItem value="F">여성</SelectItem>
         </SelectContent>
       </Select>
     </div>

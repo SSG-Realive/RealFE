@@ -47,7 +47,7 @@ export default function SocialSignupForm({ email, token, onSuccess }: Props) {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ROOT_URL}/api/customer/member/update-info`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ROOT_URL}/api/customer/update-info`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

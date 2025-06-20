@@ -1,5 +1,5 @@
 
-type GenderWithUnselected = 'MALE' | 'FEMALE' | 'UNSELECTED';
+type GenderWithUnselected = 'M' | 'F' | 'UNSELECTED';
 
 export interface MemberJoinDTO {
   email: string;
@@ -7,6 +7,6 @@ export interface MemberJoinDTO {
   name: string;
   phone: string;
   address: string;
-  birth: string;      // 예: "1999-01-01"
-  gender: 'MALE' | 'FEMALE';     // 예: "MALE" | "FEMALE"
+  birth: string;      
+  gender: 'M' | 'F';    
 }

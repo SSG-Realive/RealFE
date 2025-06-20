@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
-import { MemberReadDTO, MemberModifyDTO } from '@/types/custoemr/member';
+import { MemberModifyDTO, MemberReadDTO } from '@/types/customer/member/member';
+
 
 // 내 정보 조회
 export const fetchMyProfile = async (): Promise<MemberReadDTO> => {

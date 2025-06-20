@@ -19,8 +19,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 
-
-import { signup } from '@/service/customer/signupService';
 import { GenderWithUnselected, MemberJoinDTO } from '@/types/customer/signup';
 
 export default function RegisterForm() {
@@ -64,32 +62,43 @@ export default function RegisterForm() {
     try {
       const payload: MemberJoinDTO = {
         ...formData,
-        gender: formData.gender as 'MALE' | 'FEMALE',
+        gender: formData.gender as 'M' | 'F',
       };
 
-      // 변경: 직접 fetch 대신 authService.signup 호출
-      const data = await signup(payload);
+      const res = await fetch('/api/customer/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        alert(data.message || '회원가입 실패');
+        return;
+      }
 
       alert('회원가입 성공!');
 
-      if (data.token && data.email && data.name) {
+      // 🔐 상태 저장
+      if (data.token && payload.email && payload.name) {
         setAuth({
           token: data.token,
-          email: data.email,
-          name: data.name,
-          temporaryUser: data.temporaryUser || false,
+          email: payload.email,
+          name: payload.name,
+          temporaryUser: false,
         });
       }
 
       router.push(redirectTo);
-    } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || '회원가입 실패');
+    } catch (err) {
+      console.error('회원가입 오류:', err);
+      alert('회원가입 처리 중 오류가 발생했습니다.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10"> 
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
       <Card>
         <CardHeader>
           <CardTitle>신규 회원가입</CardTitle>
@@ -101,79 +110,42 @@ export default function RegisterForm() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
+            {/* 이메일 */}
             <div className="grid gap-2">
               <Label htmlFor="email">이메일</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="example@email.com"
-                required
-              />
+              <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
             </div>
+            {/* 비밀번호 */}
             <div className="grid gap-2">
               <Label htmlFor="password">비밀번호</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <Input id="password" name="password" type="password" value={formData.password} onChange={handleChange} required />
             </div>
+            {/* 이름 */}
             <div className="grid gap-2">
               <Label htmlFor="name">이름</Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+              <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
             </div>
+            {/* 전화번호 */}
             <div className="grid gap-2">
               <Label htmlFor="phone">전화번호</Label>
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone || ""}
-                onChange={handleChange}
-                placeholder="010-1234-5678"
-              />
+              <Input id="phone" name="phone" value={formData.phone || ""} onChange={handleChange} />
             </div>
+            {/* 주소 */}
             <div className="grid gap-2">
               <Label htmlFor="address">주소</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address || ""}
-                onChange={handleChange}
-              />
+              <Input id="address" name="address" value={formData.address || ""} onChange={handleChange} />
             </div>
+            {/* 생년월일 */}
             <div className="grid gap-2">
               <Label htmlFor="birth">생년월일</Label>
-              <Input
-                id="birth"
-                name="birth"
-                type="date"
-                value={formData.birth || ""}
-                onChange={handleChange}
-              />
+              <Input id="birth" name="birth" type="date" value={formData.birth || ""} onChange={handleChange} />
             </div>
 
-            <GenderSelector
-              gender={formData.gender}
-              onChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
-            />
+            <GenderSelector gender={formData.gender} onChange={(value) => setFormData(prev => ({ ...prev, gender: value }))} />
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full mt-4">
-            회원가입
-          </Button>
+          <Button type="submit" className="w-full mt-4">회원가입</Button>
         </CardFooter>
       </Card>
     </form>

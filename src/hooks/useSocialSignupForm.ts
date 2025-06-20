@@ -1,7 +1,7 @@
 // hooks/useSocialSignupForm.ts
 import { useState } from 'react';
 
-export type Gender = 'MALE' | 'FEMALE' | 'UNSELECTED';
+export type Gender = 'M' | 'F' | 'UNSELECTED';
 
 export function useSocialSignupForm(initialEmail: string) {
   const [userName, setUserName] = useState('');

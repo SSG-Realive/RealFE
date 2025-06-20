@@ -3,6 +3,7 @@ import axios from 'axios';
 import api from '@/app/lib/axios'; // 커스텀 axios 인스턴스
 import { MemberJoinDTO } from '@/types/customer/signup/signup';
 
+// 서버사이드 회원가입 요청 핸들러
 
 export async function POST(request: Request) {
   try {

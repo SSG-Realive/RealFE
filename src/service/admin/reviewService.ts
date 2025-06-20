@@ -89,6 +89,11 @@ export const answerAdminReviewQna = async (qnaId: number, request: AdminReviewQn
   console.log('Q&A 답변 등록 API 응답:', response.data);
 };
 
+// Q&A 삭제
+export const deleteAdminReviewQna = async (qnaId: number): Promise<void> => {
+  await adminApi.delete(`/admin/qna/customer/${qnaId}`);
+};
+
 // 리뷰 Q&A 상태 변경
 export const updateAdminReviewQnaStatus = async (qnaId: number, isHidden: boolean): Promise<void> => {
   await adminApi.patch(`/admin/qna/customer/${qnaId}`, { isHidden });

@@ -41,7 +41,7 @@ const AdminLoginPage = () => {
         setShowModal(true);
         setTimeout(() => {
           setShowModal(false);
-          router.push('/admin/dashboard');
+          router.push('/admin/dashboard?loginSuccess=true');
         }, 1200);
       } else {
         setModalType('error');

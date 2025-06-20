@@ -162,7 +162,7 @@ export default function ReviewManagementPage() {
             </thead>
             <tbody>
               {reviews?.slice(0, 5).map(review => (
-                <tr key={review.id} onClick={() => router.push(`/admin/review-management/${review.id}`)}>
+                <tr key={review.id} onClick={() => router.push(`/admin/review-management/list/${review.id}`)} className="cursor-pointer">
                   <td className="px-2 py-1">{review.productName}</td>
                   <td className="px-2 py-1">{review.customerName}</td>
                   <td className="px-2 py-1">{new Date(review.createdAt).toLocaleDateString()}</td>
@@ -194,9 +194,9 @@ export default function ReviewManagementPage() {
             </thead>
             <tbody>
               {reports?.slice(0, 5).map(report => (
-                <tr key={report.id} onClick={() => router.push(`/admin/review-management/reported/${report.id}`)}>
-                  <td className="px-2 py-1">{report.review.productName}</td>
-                  <td className="px-2 py-1">{report.review.customerName}</td>
+                <tr key={report.reportId} onClick={() => router.push(`/admin/review-management/reported/${report.reportId}`)} className="cursor-pointer">
+                  <td className="px-2 py-1">{report.review?.productName}</td>
+                  <td className="px-2 py-1">{report.review?.customerName}</td>
                   <td className="px-2 py-1 max-w-xs truncate" title={report.reason}>
                     {report.reason}
                   </td>
@@ -227,7 +227,7 @@ export default function ReviewManagementPage() {
             </thead>
             <tbody>
               {qnas?.slice(0, 5).map(qna => (
-                <tr key={qna.id} onClick={() => router.push(`/admin/review-management/qna/${qna.id}`)}>
+                <tr key={qna.id} onClick={() => router.push(`/admin/review-management/qna/${qna.id}`)} className="cursor-pointer">
                   <td className="px-2 py-1 max-w-xs truncate" title={qna.title}>
                     {qna.title}
                   </td>

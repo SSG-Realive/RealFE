@@ -13,7 +13,7 @@ export default function ReviewReportedPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<ReviewReportStatus>('PENDING');
+  const [statusFilter, setStatusFilter] = useState<ReviewReportStatus>('');
 
   useEffect(() => {
     if (!accessToken) {
@@ -105,6 +105,7 @@ export default function ReviewReportedPage() {
           onChange={(e) => setStatusFilter(e.target.value as ReviewReportStatus)}
           className="border rounded px-3 py-2"
         >
+          <option value="">전체</option>
           <option value="PENDING">접수됨</option>
           <option value="RESOLVED_KEPT">리뷰 유지</option>
           <option value="RESOLVED_HIDDEN">리뷰 숨김</option>
@@ -114,8 +115,6 @@ export default function ReviewReportedPage() {
       <table className="min-w-full border text-sm">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-4 py-2 border">상품명</th>
-            <th className="px-4 py-2 border">리뷰 작성자</th>
             <th className="px-4 py-2 border">신고자</th>
             <th className="px-4 py-2 border">신고 사유</th>
             <th className="px-4 py-2 border">신고일</th>
@@ -125,25 +124,23 @@ export default function ReviewReportedPage() {
         </thead>
         <tbody>
           {reports.map((report) => (
-            <tr key={report.id}>
-              <td className="px-4 py-2 border">{report.review.productName}</td>
-              <td className="px-4 py-2 border">{report.review.customerName}</td>
+            <tr key={report.reportId}>
               <td className="px-4 py-2 border">{report.reporterName}</td>
               <td className="px-4 py-2 border">{report.reason}</td>
-              <td className="px-4 py-2 border">{new Date(report.createdAt).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border">{new Date(report.reportedAt).toLocaleDateString()}</td>
               <td className={`px-4 py-2 border font-semibold ${getStatusStyle(report.status)}`}>{getStatusText(report.status)}</td>
               <td className="px-4 py-2 border">
                 <div className="flex items-center justify-center gap-2">
                   <button
                     className="text-blue-600 underline"
-                    onClick={() => router.push(`/admin/review-management/reported/${report.id}`)}
+                    onClick={() => router.push(`/admin/review-management/reported/${report.reportId}`)}
                   >
                     상세
                   </button>
                   {report.status === 'PENDING' && (
                     <>
-                      <button onClick={() => handleProcessReport(report.id, 'RESOLVED_KEPT')} className="bg-green-500 text-white px-2 py-1 rounded">유지</button>
-                      <button onClick={() => handleProcessReport(report.id, 'RESOLVED_HIDDEN')} className="bg-red-500 text-white px-2 py-1 rounded">숨김</button>
+                      <button onClick={() => handleProcessReport(report.reportId, 'RESOLVED_KEPT')} className="bg-green-500 text-white px-2 py-1 rounded">유지</button>
+                      <button onClick={() => handleProcessReport(report.reportId, 'RESOLVED_HIDDEN')} className="bg-red-500 text-white px-2 py-1 rounded">숨김</button>
                     </>
                   )}
                 </div>

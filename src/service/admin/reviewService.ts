@@ -61,13 +61,13 @@ export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): 
     params,
     paramsSerializer,
   });
-  return response.data.data;
+  return response.data;
 };
 
 // 리뷰 Q&A 상세 조회
 export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQnaDetail> => {
   const response = await adminApi.get(`/admin/qna/customer/${qnaId}`);
-  return response.data.data;
+  return response.data;
 };
 
 // 리뷰 Q&A 답변 등록

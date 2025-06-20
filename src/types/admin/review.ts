@@ -6,7 +6,8 @@ export type ReviewReportStatus =
   | 'RESOLVED_KEPT'     // 처리 완료 - 리뷰 유지
   | 'RESOLVED_HIDDEN'   // 처리 완료 - 리뷰 숨김/삭제
   | 'RESOLVED_REJECTED' // 처리 완료 - 신고 기각
-  | 'REPORTER_ACCOUNT_INACTIVE'; // 신고자 계정 비활성화
+  | 'REPORTER_ACCOUNT_INACTIVE' // 신고자 계정 비활성화
+  | ''; // 전체 상태를 위한 빈 문자열
 
 export interface AdminReview {
   id: number;
@@ -27,15 +28,14 @@ export interface AdminReview {
 }
 
 export interface AdminReviewReport {
-  id: number;
-  reviewId: number;
-  review: AdminReview;
+  reportId: number;
+  status: ReviewReportStatus;
+  reportedReviewId: number;
   reporterId: number;
   reporterName: string;
   reason: string;
-  status: ReviewReportStatus;
-  createdAt: string;
-  processedAt?: string;
+  reportedAt: string;
+  review?: AdminReview; // 상세 정보 조회 시에만 사용될 수 있도록 optional로 유지
 }
 
 export interface AdminReviewQna {
@@ -80,7 +80,7 @@ export interface AdminReviewListResponse {
 export interface AdminReviewReportListRequest {
   page?: number;
   size?: number;
-  status: ReviewReportStatus;
+  status?: ReviewReportStatus;
   sort?: string;
 }
 

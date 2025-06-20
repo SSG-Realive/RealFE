@@ -5,15 +5,15 @@ import axios from 'axios';
 // [customer] Zustand로 로그인 상태를 관리
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_ROOT_URL,
 });
 
 // 토큰이 필요없는 public API 경로들
 const publicPaths = [
   '/public/auth/login',
   '/public/auth/join',
-  '/api/public/auth/login',
-  '/api/public/auth/join',
+  '/public/auth/login',
+  '/public/auth/join',
   '/seller/login',
   '/admin/login'
 ];

@@ -38,3 +38,44 @@ export interface Page<T> {
     last: boolean;
     empty: boolean;
 }
+
+export interface DirectPaymentInfoDTO {
+    productId: number;
+    productName: string;
+    quantity: number;
+    price: number;
+    imageUrl: string;
+    // 필요하다면 백엔드에서 보내주는 다른 정보들도 추가할 수 있습니다.
+}
+
+
+
+export interface ProductQuantity {
+    productId: number;
+    quantity: number;
+}
+
+
+//   결제 처리 API의 요청 타입
+//  (단일 상품 구매와 장바구니 구매 모두에 사용 가능하도록 수정)
+ 
+export interface PayRequestDTO {
+    // 공통 정보
+    receiverName: string;
+    phone: string;
+    deliveryAddress: string;
+    
+    paymentMethod: 'CARD' | "CELL_PHONE" | "ACCOUNT"
+
+    // 토스페이먼츠 정보
+    paymentKey: string;
+    tossOrderId: string;
+    amount: number;
+
+    // ✨ 장바구니 결제 시 사용될 정보
+    orderItems?: ProductQuantity[];
+
+    // ✨ 단일 상품 결제 시 사용될 정보
+    productId?: number;
+    quantity?: number;
+}

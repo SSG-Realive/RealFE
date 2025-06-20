@@ -24,3 +24,10 @@ export async function getReviewDetail(reviewId: number): Promise<ReviewResponseD
 export async function deleteReview(reviewId: number): Promise<void> {
     await apiClient.delete(`/reviews/${reviewId}`);
 }
+
+export async function updateReview(
+    reviewId: number,
+    data: { content: string; rating: number }
+): Promise<void> {
+    await apiClient.put(`/reviews/${reviewId}`, data);
+}

@@ -24,7 +24,7 @@ export default function ReviewDetailPage() {
         try {
             await deleteReview(Number(id));
             alert('리뷰가 삭제되었습니다.');
-            router.push('/customer/mypage/reviews');
+            router.push('/customer/mypage/reviews'); // ✅ 목록 페이지로 이동
         } catch (err) {
             alert('삭제에 실패했습니다.');
         }
@@ -42,10 +42,10 @@ export default function ReviewDetailPage() {
                 <p className="text-gray-700 whitespace-pre-line mt-4">{review.content}</p>
                 <p className="text-xs text-gray-400 mt-2">{review.createdAt}</p>
 
-                {/* 버튼 */}
+                {/* 버튼 영역 */}
                 <div className="mt-6 flex gap-4">
                     <button
-                        onClick={() => router.push(`/mypage/reviews/${id}/edit`)}
+                        onClick={() => router.push(`/customer/mypage/reviews/${id}/edit`)} // ✅ 수정 링크
                         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                     >
                         수정

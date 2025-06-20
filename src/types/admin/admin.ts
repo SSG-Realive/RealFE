@@ -53,7 +53,7 @@ export interface PayoutLogDTO {
 
 export interface PenaltyLogDTO {
   id: number;
-  customerId: number;
+  customerId: number; // Long 타입 (백엔드에서 Long으로 변경됨)
   reason: string;
   points: number;
   description: string;

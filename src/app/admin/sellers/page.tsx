@@ -1,21 +1,25 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import apiClient from '@/lib/apiClient';
+import Link from 'next/link';
 
-const dummySellers = [
-  { id: 1, name: '이상훈', email: 'sang@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: 2, name: '박지민', email: 'park@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: 4, name: '최민수', email: 'choi@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/women/4.jpg' },
-  { id: 5, name: '정가영', email: 'jung@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/men/5.jpg' },
-  { id: 6, name: '한지민', email: 'han@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/women/6.jpg' },
-  { id: 8, name: '유재석', email: 'yoo@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/8.jpg' },
-  { id: 9, name: '강호동', email: 'kang@test.com', status: '승인 처리 전', image: 'https://randomuser.me/api/portraits/men/9.jpg' },
-  { id: 10, name: '신동엽', email: 'shin@test.com', status: '승인', image: 'https://randomuser.me/api/portraits/men/10.jpg' },
-];
+interface Seller {
+  id: number;
+  name: string;
+  email: string;
+  status: string;
+  image?: string;
+  is_approved: boolean;
+  is_active: boolean;
+}
 
 export default function AdminSellersPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [activeFilter, setActiveFilter] = useState('');
+  const [sellers, setSellers] = useState<Seller[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -23,14 +27,65 @@ export default function AdminSellersPage() {
     return null;
   }
 
-  const filtered = dummySellers.filter(s =>
-    (s.name.includes(search) || s.email.includes(search)) &&
-    (!status || s.status === status)
+  useEffect(() => {
+    setLoading(true);
+    const params = new URLSearchParams({
+      userType: 'SELLER',
+      page: '0',
+      size: '100',
+    });
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get(`/admin/users?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(res => {
+        const sellersWithBoolean = (res.data.data.content || []).map(s => ({
+          ...s,
+          is_approved: s.is_approved === true || s.is_approved === 'true' || s.is_approved === 1 || s.isApproved === true || s.isApproved === 'true' || s.isApproved === 1,
+          is_active: s.is_active === true || s.is_active === 'true' || s.is_active === 1 || s.isActive === true || s.isActive === 'true' || s.isActive === 1
+        }));
+        setSellers(sellersWithBoolean);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const filtered = sellers.filter(s =>
+    (s.name?.includes(search) || s.email?.includes(search)) &&
+    (!status || (s.is_approved ? '승인' : '승인처리전') === status) &&
+    (!activeFilter || (activeFilter === 'active' ? s.is_active : activeFilter === 'inactive' ? !s.is_active : true))
   );
+
+  // 판매자 활성/비활성 토글
+  const handleToggleActive = async (seller: Seller) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    try {
+      await apiClient.put(`/admin/users/sellers/${seller.id}/status`, {
+        isActive: !seller.is_active
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      alert(`판매자 ${seller.name}의 상태가 변경되었습니다.`);
+      setSellers(prev =>
+        prev.map(s =>
+          s.id === seller.id ? { ...s, is_active: !s.is_active } : s
+        )
+      );
+    } catch (err) {
+      alert('상태 변경 실패: ' + (err?.response?.data?.message || err?.message || '알 수 없는 오류'));
+    }
+  };
+
   return (
     <div>
-      <h2>판매자 관리</h2>
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 8 }}>
         <input
           type="text"
           placeholder="이름/이메일 검색"
@@ -45,40 +100,82 @@ export default function AdminSellersPage() {
         >
           <option value="">전체</option>
           <option value="승인">승인</option>
-          <option value="승인 처리 전">승인 처리 전</option>
+            <option value="승인처리전">승인처리전</option>
+          </select>
+          <select
+            value={activeFilter}
+            onChange={e => setActiveFilter(e.target.value)}
+            style={{ padding: 4, border: '1px solid #ccc', borderRadius: 4 }}
+          >
+            <option value="">전체</option>
+            <option value="active">활성</option>
+            <option value="inactive">정지</option>
         </select>
+        </div>
+        <div style={{ color: 'purple', fontWeight: 'bold', fontSize: 18 }}>
+          총 판매자: {filtered.length}명
+        </div>
       </div>
+      {loading ? (
+        <div>로딩 중...</div>
+      ) : (
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 24 }}>
         <thead>
           <tr style={{ background: '#f7f7f7' }}>
+              <th style={{ padding: 8, border: '1px solid #eee' }}>번호</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>사진</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>이름</th>
             <th style={{ padding: 8, border: '1px solid #eee' }}>이메일</th>
-            <th style={{ padding: 8, border: '1px solid #eee' }}>상태</th>
+              <th style={{ padding: 8, border: '1px solid #eee' }}>Status</th>
+              <th style={{ padding: 8, border: '1px solid #eee' }}>요청</th>
+              <th style={{ padding: 8, border: '1px solid #eee' }}>Action</th>
           </tr>
         </thead>
         <tbody>
-          {filtered.map((s) => (
+            {filtered.map((s, idx) => (
             <tr key={s.id}>
-              <td style={{ padding: 8, border: '1px solid #eee' }}><img src={s.image} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
+                <td style={{ padding: 8, border: '1px solid #eee', textAlign: 'center' }}>{idx + 1}</td>
+                <td style={{ padding: 8, border: '1px solid #eee' }}><img src={s.image || '/public/images/placeholder.png'} alt="seller" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} /></td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.name}</td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>{s.email}</td>
               <td style={{ padding: 8, border: '1px solid #eee' }}>
-                {s.status === '승인 처리 전' ? (
+                  <span style={{ background: s.is_approved ? '#1976d2' : '#ffa726', color: '#fff', padding: '2px 10px', borderRadius: 4, fontWeight: 'bold', fontSize: 14 }}>
+                    {s.is_approved ? '승인' : '승인처리전'}
+                  </span>
+                </td>
+                <td style={{ padding: 8, border: '1px solid #eee' }}>
+                  {!s.is_approved && (
+                    <>
+                      <button style={{ background: '#4caf50', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', fontWeight: 'bold', marginRight: 8 }} onClick={() => alert(`${s.name} 승인! (추후 구현)`)}>
+                        승인
+                      </button>
+                      <button style={{ background: '#f44336', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', fontWeight: 'bold' }} onClick={() => alert(`${s.name} 거절! (추후 구현)`)}>
+                        거절
+                      </button>
+                    </>
+                  )}
+                </td>
+                <td style={{ padding: 8, border: '1px solid #eee' }}>
                   <button
-                    style={{ background: '#4caf50', color: '#fff', padding: '4px 12px', borderRadius: 4, border: 'none', fontWeight: 'bold' }}
-                    onClick={() => alert(`${s.name} 판매자 승인처리! (추후 구현)`)}
+                    style={{
+                      background: s.is_active ? '#f44336' : '#4caf50',
+                      color: '#fff',
+                      padding: '4px 12px',
+                      borderRadius: 4,
+                      border: 'none',
+                      fontWeight: 'bold',
+                      marginLeft: 8
+                    }}
+                    onClick={() => handleToggleActive(s)}
                   >
-                    승인처리
+                    {s.is_active ? '정지' : '복구'}
                   </button>
-                ) : (
-                  s.status
-                )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      )}
     </div>
   );
 } 

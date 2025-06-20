@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/store/customer/authStore';
 import { fetchMyProfile } from '@/service/customer/customerService';
 import SearchBar from './SearchBar';
+import { requestLogout } from '@/service/customer/logoutService';
 
 interface NavbarProps {
   onSearch?: (keyword: string) => void;
@@ -16,6 +17,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
   const router       = useRouter();
   const pathname     = usePathname();
   const searchParams = useSearchParams();
+  const { logout: clearAuthState } = useAuthStore();
 
   /* 스토어 */
   const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
@@ -39,10 +41,26 @@ export default function Navbar({ onSearch }: NavbarProps) {
   }, [mounted, isAuthenticated, userName, setUserName]);
 
   /* 로그아웃 */
-  const handleLogout = () => {
-    logout();
-    router.push('/main');
-  };
+  const handleLogout = async  () => {
+    try{
+      await requestLogout();
+            alert('안전하게 로그아웃 되었습니다.');
+    }
+     catch (error) {
+      console.error("서버 로그아웃 요청 실패:", error);
+            // 서버 요청이 실패하더라도, 프런트엔드에서는 로그아웃 처리를 계속 진행해야 합니다.
+            alert('로그아웃 처리 중 오류가 발생했지만, 클라이언트에서는 로그아웃됩니다.');
+    } finally {
+            // 5. 서버 요청의 성공/실패 여부와 관계없이 항상 실행됩니다.
+            
+            // Zustand 스토어의 상태(및 로컬스토리지)를 비웁니다.
+            clearAuthState(); 
+            
+            // 메인 페이지로 이동시킵니다.
+            router.push('/main');
+        }
+    };        
+    
 
   return (
     <nav className="w-full bg-white shadow-md">

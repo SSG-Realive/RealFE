@@ -9,12 +9,13 @@ export async function POST(request: Request) {
     const body: MemberJoinDTO = await request.json();
 
     // 백엔드에 회원가입 요청
-    const response = await api.post('api/public/auth/join', body);
+    const response = await api.post('/public/auth/join', body);
 
     return NextResponse.json({
       success: true,
       message: response.data.message,
-      token: response.data.token,
+      accessToken: response.data.accessToken,
+      refreshToken: response.data.refreshToken,
     });
   } catch (error: any) {
     console.error('Signup error:', error);

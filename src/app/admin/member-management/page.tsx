@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import apiClient from "@/lib/apiClient";
 
 interface Member {
   id: number;
@@ -18,12 +19,39 @@ const dummyMembers: Member[] = [
 export default function MemberManagementPage() {
   const [filter, setFilter] = useState("");
   const [selected, setSelected] = useState<Member | null>(null);
+  const [totalMembers, setTotalMembers] = useState(0);
+
+  useEffect(() => {
+    // 전체 회원 수 가져오기
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get('/admin/stats/members-period', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(res => {
+      setTotalMembers(res.data.memberSummaryStats?.totalMembers || 0);
+    })
+    .catch(err => {
+      console.error('Failed to fetch total members:', err);
+    });
+  }, []);
 
   const filtered = dummyMembers.filter(m => m.name.includes(filter) || m.email.includes(filter));
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">회원</h1>
+      
+      {/* 전체 회원 수 카드 추가 */}
+      <div className="mb-6">
+        <div className="bg-white rounded shadow p-6">
+          <h3 className="text-lg font-bold mb-2">전체 회원</h3>
+          <div className="text-3xl font-bold text-purple-600">{totalMembers}</div>
+        </div>
+      </div>
+
       <div className="mb-4">
         <input
           type="text"

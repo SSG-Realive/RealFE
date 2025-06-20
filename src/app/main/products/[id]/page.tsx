@@ -18,6 +18,7 @@ export default function ProductDetailPage() {
     const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [isWished, setIsWished] = useState<boolean>(false);
+    const [wishlistLoading, setWishlistLoading] = useState<boolean>(false);
 
     useEffect(() => {
         if (!id) return;
@@ -30,16 +31,29 @@ export default function ProductDetailPage() {
         fetchRelatedProducts(productId).then(setRelated);
     }, [id]);
 
+    // ✅ 리뷰 fetch + 콘솔 확인 + .reviews 추출
     useEffect(() => {
-        if (product?.sellerId) {
-            fetchReviewsBySeller(product.sellerId).then(setReviews);
-        }
+        if (!product?.sellerId) return;
+
+        fetchReviewsBySeller(product.sellerId).then((res) => {
+            console.log('✅ 리뷰 응답:', res);
+            setReviews(res.reviews); // ⚠️ 반드시 .reviews만 넘겨야 함
+        });
     }, [product?.sellerId]);
 
     const handleToggleWishlist = async () => {
-        if (!product) return;
-        const result = await toggleWishlist({ productId: product.id });
-        setIsWished(result);
+        if (!product || wishlistLoading) return;
+        setWishlistLoading(true);
+        try {
+            const result = await toggleWishlist({ productId: product.id });
+            setIsWished(result);
+            alert(result ? '찜 목록에 추가되었습니다.' : '찜 목록에서 제거되었습니다.');
+        } catch (err) {
+            console.error('찜 처리 실패:', err);
+            alert('찜 처리 중 오류가 발생했습니다.');
+        } finally {
+            setWishlistLoading(false);
+        }
     };
 
     const handleAddToCart = async () => {
@@ -59,12 +73,7 @@ export default function ProductDetailPage() {
         <div>
             <Navbar />
 
-            <div className="max-w-4xl mx-auto px-6 py-10 relative">
-                {/* 리뷰 리스트 오른쪽 상단 */}
-                <div className="absolute top-10 right-0 w-full md:w-1/3">
-                    <ReviewList reviews={reviews} />
-                </div>
-
+            <div className="max-w-4xl mx-auto px-6 py-10">
                 <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
 
                 <p className="text-green-600 font-semibold mb-2">
@@ -75,6 +84,7 @@ export default function ProductDetailPage() {
                     onClick={handleToggleWishlist}
                     className="text-2xl mb-4"
                     aria-label="찜하기 버튼"
+                    disabled={wishlistLoading}
                 >
                     {isWished ? '❤️' : '🤍'}
                 </button>
@@ -106,6 +116,12 @@ export default function ProductDetailPage() {
                     {product.seller && <p>판매자: {product.seller}</p>}
                 </div>
 
+                {/* ✅ 리뷰 영역 */}
+                <div className="mt-10 border-t pt-6">
+                    <h2 className="text-lg font-semibold mb-4">고객 리뷰</h2>
+                    <ReviewList reviews={reviews} />
+                </div>
+
                 {/* 관련 상품 추천 */}
                 {related.length > 0 && (
                     <div className="mt-10 border-t pt-6">
@@ -115,7 +131,7 @@ export default function ProductDetailPage() {
                                 <div
                                     key={item.id}
                                     className="border rounded p-2 hover:shadow cursor-pointer"
-                                    onClick={() => location.href = `/main/products/${item.id}`}
+                                    onClick={() => (location.href = `/main/products/${item.id}`)}
                                 >
                                     <img
                                         src={item.imageThumbnailUrl || '/default-thumbnail.png'}

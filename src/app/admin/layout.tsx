@@ -17,7 +17,7 @@ const pathTitleMap: { path: string; title: string }[] = [
   { path: '/admin/auction-management', title: '경매' },
   { path: '/admin/review-management', title: '리뷰' },
   { path: '/admin/dashboard', title: '대시보드' },
-  { path: '/admin/sellers', title: '판매자' },
+  { path: '/admin/sellers', title: '판매자 관리' },
   { path: '/admin/products', title: '상품 관리' },
   { path: '/admin/settlement-management', title: '정산관리' },
 ];

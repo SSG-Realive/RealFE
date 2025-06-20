@@ -3,10 +3,10 @@ import { ReviewResponseDTO } from '@/types/customer/review/review';
 
 export async function fetchReviewsBySeller(sellerId: number): Promise<ReviewResponseDTO[]> {
     const res = await apiClient.get(`/reviews/seller/${sellerId}`);
-    return res.data.reviews; // List만 추출
+    return res.data.reviews ?? [];
 }
 
 export async function fetchMyReviews(): Promise<ReviewResponseDTO[]> {
-    const res = await apiClient.get('/customer/reviews/my');
-    return res.data;
+    const res = await apiClient.get('/reviews/my');
+    return res.data.content ?? [];
 }

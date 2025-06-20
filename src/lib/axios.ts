@@ -1,38 +1,51 @@
-import { useAuthStore } from '@/store/customer/authStore';
-import axios from 'axios';
+// import { useAuthStore } from '@/store/customer/authStore';
+// import axios, { AxiosHeaders } from 'axios';
 
-// [customer] Zustand로 로그인 상태를 관리
+// const api = axios.create({
+//   baseURL: process.env.NEXT_PUBLIC_API_ROOT_URL,
+// });
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_ROOT_URL,
-});
+// // 토큰이 필요 없는 public API 경로들 (루트 경로 기준으로 변경 가능)
+// const publicPaths = [
+//   '/api/public/auth/login',
+//   '/api/public/auth/join'
+// ];
 
-// 토큰이 필요없는 public API 경로들
-const publicPaths = [
-  '/public/auth/login',
-  '/public/auth/join'
-];
+// api.interceptors.request.use((config) => {
+//   const url = config.url || '';
 
-api.interceptors.request.use((config) => {
-  // public API 경로인 경우 토큰을 포함하지 않음
-  const isPublicPath = publicPaths.some(path => config.url?.includes(path));
-  if (!isPublicPath) {
-    const token = useAuthStore.getState().token;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
-});
+//   const isPublicPath = publicPaths.some(path => url.startsWith(path));
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().logout();
-    }
-    return Promise.reject(error);
-  }
-);
+//   if (!isPublicPath) {
+//     const accessToken = useAuthStore.getState().accessToken;
+//     if (accessToken) {
+//       if (config.headers) {
+//         if (typeof (config.headers as AxiosHeaders).set === 'function') {
+//           // AxiosHeaders 인스턴스일 경우
+//           (config.headers as AxiosHeaders).set('Authorization', `Bearer ${accessToken}`);
+//         } else {
+//           // 일반 객체 타입일 경우
+//           (config.headers as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+//         }
+//       } else {
+//         // headers가 없으면 AxiosHeaders 객체로 새로 생성
+//         config.headers = new AxiosHeaders({ Authorization: `Bearer ${accessToken}` });
+//       }
+//     }
+//   }
 
-export default api; 
+//   return config;
+// });
+
+
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response?.status === 401) {
+//       useAuthStore.getState().logout();
+//     }
+//     return Promise.reject(error);
+//   }
+// );
+
+// export default api;

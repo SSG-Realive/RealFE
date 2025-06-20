@@ -3,15 +3,16 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 
 export default function useRequireAuth() {
-  const token = useAuthStore((state) => state.token);
+  // 정확한 키(accessToken)로 가져오기
+  const accessToken = useAuthStore((state) => state.accessToken);
   const router = useRouter();
 
   useEffect(() => {
-    if (!token) {
+    if (!accessToken) {
       const currentPath = window.location.pathname;
       router.replace(`/customer/member/login?redirectTo=${encodeURIComponent(currentPath)}`);
     }
-  }, [token, router]);
+  }, [accessToken, router]);
 
-  return token;
+  return accessToken;
 }

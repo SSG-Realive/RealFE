@@ -1,6 +1,7 @@
-import api from '@/lib/axios';
+import apiClient from "@/lib/apiClient";
+
 
 export const fetchCustomerAuctions = async () => {
-  const response = await api.get('/api/customer/auctions');
+  const response = await apiClient.get('customer/auctions');
   return response.data;
 };

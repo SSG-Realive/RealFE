@@ -25,14 +25,19 @@ export default function OAuthCallbackPage() {
         console.log('sessionStorage에서 가져온 원래 URL:', originalUrl);
         
         if (token && email) {
-            setAuth({ token, email, temporaryUser: isTemporaryUser });
+            setAuth({
+                accessToken: token,
+                refreshToken: null, // 필요 시 추후 발급
+                email,
+                name: '', // 닉네임 없으면 빈 문자열
+                temporaryUser: isTemporaryUser,
+            });
 
             if (isTemporaryUser) {
-            // 소셜 회원가입 폼 페이지로 이동
                 router.push('/customer/socialsignup');
             } else {
                 router.push(originalUrl || '/');
-            } 
+            }
         }
     }, [searchParams, setAuth, router]);
     return <div>로그인 처리 중입니다...</div>;

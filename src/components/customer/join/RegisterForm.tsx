@@ -80,16 +80,15 @@ export default function RegisterForm() {
 
       alert('회원가입 성공!');
 
-      // 🔐 상태 저장
-      if (data.token && payload.email && payload.name) {
+      if (data.accessToken && data.email && data.name) {
         setAuth({
-          token: data.token,
-          email: payload.email,
-          name: payload.name,
+          accessToken: data.accessToken,        // 'token' → 'accessToken' 변경
+          refreshToken: null,                    // 새 필드, 없으면 null로 처리
+          email: data.email,
+          name: data.name,
           temporaryUser: false,
         });
-      }
-
+    }
       router.push(redirectTo);
     } catch (err) {
       console.error('회원가입 오류:', err);

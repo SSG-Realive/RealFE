@@ -3,29 +3,24 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
-import { LoginResponse } from '@/types/customer/login/login';
-
+import type { LoginResponse } from '@/types/customer/login/loginResponse';
 
 export default function LoginForm() {
-  const router = useRouter();
+  const router       = useRouter();
   const searchParams = useSearchParams();
-  const setAuth = useAuthStore((state) => state.setAuth);
+  const setTokens    = useAuthStore((s) => s.setTokens);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error,    setError]    = useState('');
 
-  /* 카카오 로그인 실패 메시지 */
+  /* 카카오 실패 메시지 */
   useEffect(() => {
-    const errorParam = searchParams?.get('error');
-    if (errorParam === 'kakao_login_failed') {
+    if (searchParams?.get('error') === 'kakao_login_failed') {
       setError('카카오 로그인에 실패했습니다. 다시 시도해주세요.');
     }
   }, [searchParams]);
 
-  /* 인풋 변경 핸들러 */
+  /* 인풋 변경 */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -51,21 +46,15 @@ export default function LoginForm() {
       const data: LoginResponse = await res.json();
 
       if (!res.ok) {
-        const message = (data as any).message ?? '로그인에 실패했습니다.';
-        setError(message);
+        setError((data as any).message ?? '로그인에 실패했습니다.');
         return;
       }
 
-      // 로그인 성공 후
-      if (data.accessToken && data.email && data.name) {
-        setAuth({
-          accessToken: data.accessToken,
-          refreshToken: null,
-          email: data.email,
-          name: data.name,
-          temporaryUser: false,
-        });
-        const redirectTo = searchParams?.get('redirectTo') || '/';
+      /* ✅ access + refresh 토큰 저장 */
+      if (data.accessToken && data.refreshToken) {
+        setTokens(data.accessToken, data.refreshToken);
+
+        const redirectTo = searchParams?.get('redirectTo') || '/main';
         router.push(redirectTo);
       } else {
         setError('로그인 응답이 올바르지 않습니다.');
@@ -90,37 +79,39 @@ export default function LoginForm() {
   /* ---------- UI ---------- */
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* 이메일 */}
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일</label>
         <input
           id="email"
           name="email"
           type="email"
+          required
           value={formData.email}
           onChange={handleChange}
-          required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           placeholder="이메일을 입력하세요"
         />
       </div>
+
+      {/* 비밀번호 */}
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
         <input
           id="password"
           name="password"
           type="password"
+          required
           value={formData.password}
           onChange={handleChange}
-          required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
           placeholder="비밀번호를 입력하세요"
         />
       </div>
+
       {error && <p className="text-sm text-center text-red-500">{error}</p>}
-      <button
-        type="submit"
-        className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700"
-      >
+
+      <button type="submit" className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700">
         로그인
       </button>
 

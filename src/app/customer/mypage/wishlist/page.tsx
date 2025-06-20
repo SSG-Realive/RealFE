@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
-import Navbar from '@/components/customer/Navbar';
+import Navbar from '@/components/customer/common/Navbar';
 
 export default function WishlistPage() {
     const [products, setProducts] = useState<ProductListDTO[]>([]);

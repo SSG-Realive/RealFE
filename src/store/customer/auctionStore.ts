@@ -1,6 +1,7 @@
+import customerApi from '@/lib/apiClient';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import api from '@/lib/axios';
+
 
 interface Auction {
   id: number;
@@ -95,12 +96,12 @@ export const useAuctionStore = create<AuctionState>()(
 
         try {
           const url = category
-            ? `/api/customer/auctions?page=${requestPage}&category=${encodeURIComponent(category)}`
-            : `/api/customer/auctions?page=${requestPage}`;
+            ? `/customer/auctions?page=${requestPage}&category=${encodeURIComponent(category)}`
+            : `/customer/auctions?page=${requestPage}`;
 
           console.log('Store: API URL', url);
 
-          const res = await api.get<ApiResponse<PaginatedAuctionResponse>>(url);
+          const res = await customerApi.get<ApiResponse<PaginatedAuctionResponse>>(url);
           
           if (res.data.status === 200) {
             const newData = res.data.data.content;

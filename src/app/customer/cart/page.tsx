@@ -87,7 +87,7 @@ export default function CartPage() {
         // 선택된 상품들을 전역 스토어에 저장
         setItemsForCheckout(itemsToCheckout);
         // 결제 페이지로 이동
-        router.push('customer/orders/new'); // customer 경로는 실제 프로젝트에 맞게 확인
+        router.push('/customer/orders/new'); // customer 경로는 실제 프로젝트에 맞게 확인
     };
 
     if (loading) return <div className="p-10">로딩 중...</div>;

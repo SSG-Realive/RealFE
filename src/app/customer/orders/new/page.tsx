@@ -1,4 +1,4 @@
-// app/orders/new/page.tsx (사용자 DTO 및 경로 반영 최종본)
+
 
 'use client';
 
@@ -6,9 +6,9 @@ import { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import { fetchMyProfile } from '@/service/customer/customerService';
-import { fetchCartList } from '@/service/customer/cartService'; // ✨ 1. import 경로 수정
+import { fetchCartList } from '@/service/customer/cartService'; 
 import { loadPaymentWidget, PaymentWidgetInstance } from '@tosspayments/payment-widget-sdk';
-import type { CartItem } from '@/types/customer/cart/cart'; // ✨ 제공해주신 CartItem 타입 사용
+import type { CartItem } from '@/types/customer/cart/cart'; 
 import { MemberReadDTO } from '@/types/customer/member/member';
 
 import './OrderPage.css';

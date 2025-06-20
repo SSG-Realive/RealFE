@@ -20,7 +20,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
   const { logout: clearAuthState } = useAuthStore();
 
   /* 스토어 */
-  const { isAuthenticated, logout, name, setUserName } = useAuthStore();
+  const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
   const [mounted, setMounted] = useState(false);
 
   /* CSR 하이드레이션 여부 */
@@ -33,7 +33,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
 
   /* 로그인 상태면 한 번만 프로필 이름 가져오기 */
   useEffect(() => {
-    if (mounted && isAuthenticated() && !name) {
+    if (mounted && isAuthenticated() && !userName) {
       fetchMyProfile()
         .then((data) => setUserName(data.name))
         .catch((e) => console.error('회원 이름 조회 실패:', e));
@@ -82,9 +82,9 @@ export default function Navbar({ onSearch }: NavbarProps) {
               {isAuthenticated() ? (
                 // ✅ 이 부분을 제가 실수로 생략했습니다. 다시 복원했습니다.
                 <>
-                  {name && (
+                  {userName && (
                     <span className="hidden whitespace-nowrap text-gray-700 sm:inline">
-                      {name}님
+                      {userName}님
                     </span>
                   )}
                   <Link href="/customer/mypage" className="text-gray-600 hover:text-gray-900">

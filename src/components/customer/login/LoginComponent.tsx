@@ -42,7 +42,7 @@ export default function LoginForm() {
     };
 
     try {
-      const res = await fetch('/api/customer/login', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ROOT_URL}/api/public/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -59,10 +59,11 @@ export default function LoginForm() {
       // 로그인 성공 후
       if (data.accessToken && data.email && data.name) {
         setAuth({
+          id: data.id,
           accessToken: data.accessToken,
           refreshToken: null,
           email: data.email,
-          name: data.name,
+          userName: data.name,
           temporaryUser: false,
         });
         const redirectTo = searchParams?.get('redirectTo') || '/';

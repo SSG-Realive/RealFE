@@ -12,7 +12,6 @@ export default function SocialSignupPage() {
     accessToken,
     refreshToken,
     isTemporaryUser,
-    setUserName,
     setAuth,
   } = useAuthStore();
 
@@ -22,19 +21,6 @@ export default function SocialSignupPage() {
     }
   }, [email, accessToken, isTemporaryUser, router]);
 
-  const handleSuccess = (name: string) => {
-    setUserName(name);
-    setAuth({
-      accessToken: accessToken || '',
-      refreshToken: refreshToken || null,
-      email: email || '',
-      name,
-      temporaryUser: false,
-    });
-    alert('회원가입이 완료되었습니다!');
-    router.push('/');
-  };
-
   if (!email || !accessToken || !isTemporaryUser) return null;
 
   return (
@@ -43,7 +29,18 @@ export default function SocialSignupPage() {
       <SocialSignupForm
         email={email}
         token={accessToken}
-        onSuccess={handleSuccess}
+        onSuccess={(user) => {
+          setAuth({
+            id: user.id,
+            accessToken: accessToken,
+            refreshToken: refreshToken || null,
+            email: email,
+            userName: user.userName,
+            temporaryUser: false,
+          });
+          alert('회원가입이 완료되었습니다!');
+          router.push('/');
+        }}
       />
     </div>
   );

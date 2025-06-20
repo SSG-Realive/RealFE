@@ -31,15 +31,15 @@ export default function ProductDetailPage() {
         fetchRelatedProducts(productId).then(setRelated);
     }, [id]);
 
-    // ✅ 리뷰 fetch + 콘솔 확인 + .reviews 추출
+    // ✅ 리뷰 API 호출
     useEffect(() => {
-        if (!product?.sellerId) return;
-
-        fetchReviewsBySeller(product.sellerId).then((res) => {
-            console.log('✅ 리뷰 응답:', res);
-            setReviews(res.reviews); // ⚠️ 반드시 .reviews만 넘겨야 함
-        });
-    }, [product?.sellerId]);
+        if (product && typeof product.sellerId === 'number') {
+            fetchReviewsBySeller(product.sellerId).then((res) => {
+                console.log('✅ 리뷰 응답:', res);
+                setReviews(res); // ✅ .reviews 아님
+            });
+        }
+    }, [product]);
 
     const handleToggleWishlist = async () => {
         if (!product || wishlistLoading) return;
@@ -116,13 +116,13 @@ export default function ProductDetailPage() {
                     {product.seller && <p>판매자: {product.seller}</p>}
                 </div>
 
-                {/* ✅ 리뷰 영역 */}
+                {/* ✅ 리뷰 리스트 */}
                 <div className="mt-10 border-t pt-6">
-                    <h2 className="text-lg font-semibold mb-4">고객 리뷰</h2>
+                    <h2 className="text-lg font-semibold mb-4">판매자 리뷰</h2>
                     <ReviewList reviews={reviews} />
                 </div>
 
-                {/* 관련 상품 추천 */}
+                {/* ✅ 관련 상품 */}
                 {related.length > 0 && (
                     <div className="mt-10 border-t pt-6">
                         <h2 className="text-lg font-semibold mb-4">이런 상품은 어떠세요?</h2>

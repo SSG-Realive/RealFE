@@ -65,7 +65,7 @@ export default function RegisterForm() {
         gender: formData.gender as 'M' | 'F',
       };
 
-      const res = await fetch('/api/customer/signup', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_ROOT_URL}/api/public/auth/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -82,10 +82,11 @@ export default function RegisterForm() {
 
       if (data.accessToken && data.email && data.name) {
         setAuth({
+          id: data.id,
           accessToken: data.accessToken,        // 'token' → 'accessToken' 변경
           refreshToken: null,                    // 새 필드, 없으면 null로 처리
           email: data.email,
-          name: data.name,
+          userName: data.name,
           temporaryUser: false,
         });
     }

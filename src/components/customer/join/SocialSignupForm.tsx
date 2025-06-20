@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 interface Props {
   email: string;
   token: string;
-  onSuccess: (userName: string) => void;
+  onSuccess: (user: { id: number; userName: string }) => void;
 }
 
 export default function SocialSignupForm({ email, token, onSuccess }: Props) {
@@ -66,7 +66,9 @@ export default function SocialSignupForm({ email, token, onSuccess }: Props) {
 
       if (!res.ok) throw new Error('회원가입 실패');
 
-      onSuccess(userName);
+      const data = await res.json();  // 여기 꼭 추가
+
+      onSuccess({ id: data.id, userName });
     } catch (err) {
       console.error(err);
       alert('회원가입에 실패했습니다.');

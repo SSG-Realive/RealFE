@@ -10,6 +10,9 @@ export const customerApi = createApiClient(useAuthStore);
 // Seller용 API 클라이언트
 export const sellerApi = createApiClient(useSellerAuthStore);
 
+// admin용 API 클라이언트
+// export const adminApi = createApiClient(useAdminAuthStore);
+
 // 기본적으로는 customerApi를 내보내거나,
 // 혹은 사용하는 곳에서 명시적으로 customerApi, sellerApi를 import해서 사용합니다.
 export default customerApi;

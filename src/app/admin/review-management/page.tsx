@@ -221,7 +221,6 @@ export default function ReviewManagementPage() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-2 py-1">제목</th>
-                <th className="px-2 py-1">작성자</th>
                 <th className="px-2 py-1">날짜</th>
                 <th className="px-2 py-1">답변상태</th>
               </tr>
@@ -232,7 +231,6 @@ export default function ReviewManagementPage() {
                   <td className="px-2 py-1 max-w-xs truncate" title={qna.title}>
                     {qna.title}
                   </td>
-                  <td className="px-2 py-1">{qna.userName}</td>
                   <td className="px-2 py-1">{new Date(qna.createdAt).toLocaleDateString()}</td>
                   <td className={`px-2 py-1 ${getQnaStatusStyle(qna.isAnswered)}`}>
                     {getQnaStatusText(qna.isAnswered)}
@@ -286,8 +284,8 @@ export default function ReviewManagementPage() {
               </p>
             </CardContent>
           </Card>
-          </div>
         </div>
+      </div>
     </div>
   );
 } 

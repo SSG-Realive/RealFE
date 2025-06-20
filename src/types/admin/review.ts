@@ -40,19 +40,24 @@ export interface AdminReviewReport {
 
 export interface AdminReviewQna {
   id: number;
-  productId: number;
-  productName: string;
-  userId: number;
-  userName: string;
-  userImage?: string;
+  title: string;
+  content?: string;
+  answer?: string;
+  isAnswered: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  answeredAt?: string;
+}
+
+export interface AdminReviewQnaDetail {
+  id: number;
   title: string;
   content: string;
-  isAnswered: boolean;
   answer?: string;
-  answerCreatedAt?: string;
-  status: 'PENDING' | 'ANSWERED' | 'HIDDEN';
+  isAnswered: boolean;
   createdAt: string;
   updatedAt: string;
+  answeredAt?: string;
 }
 
 export interface AdminReviewListRequest {

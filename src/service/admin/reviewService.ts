@@ -11,6 +11,7 @@ import {
   AdminReviewQnaListRequest,
   AdminReviewQnaListResponse,
   AdminReviewQnaAnswerRequest,
+  AdminReviewQnaDetail,
 } from "@/types/admin/review";
 import { paramsSerializer } from '@/lib/utils';
 
@@ -56,13 +57,16 @@ export const processAdminReviewReport = async (reportId: number, request: AdminR
 
 // 리뷰 Q&A 목록 조회
 export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): Promise<AdminReviewQnaListResponse> => {
-  const response = await adminApi.get('/admin/seller-reviews/qna', { params });
+  const response = await adminApi.get('/admin/qna/customer', { 
+    params,
+    paramsSerializer,
+  });
   return response.data;
 };
 
 // 리뷰 Q&A 상세 조회
-export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQna> => {
-  const response = await adminApi.get(`/admin/seller-reviews/qna/${qnaId}`);
+export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQnaDetail> => {
+  const response = await adminApi.get(`/admin/qna/customer/${qnaId}`);
   return response.data;
 };
 

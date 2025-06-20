@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getAdminReviewList, updateReviewVisibility } from "@/service/admin/reviewService";
+import { getAdminReviewList, updateAdminReview } from "@/service/admin/reviewService";
 import { AdminReview, AdminReviewListRequest } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
 
@@ -16,7 +16,6 @@ export default function ReviewListPage() {
   const [sortOption, setSortOption] = useState('createdAt,desc');
   const [filters, setFilters] = useState({
     productFilter: '',
-    customerFilter: '',
     sellerFilter: '',
   });
 
@@ -38,7 +37,6 @@ export default function ReviewListPage() {
         size: 10,
         sort: sortOption,
         productFilter: filters.productFilter || undefined,
-        customerFilter: filters.customerFilter || undefined,
         sellerFilter: filters.sellerFilter || undefined,
       };
 
@@ -71,7 +69,7 @@ export default function ReviewListPage() {
 
   const handleToggleVisibility = async (reviewId: number, isHidden: boolean) => {
     try {
-      await updateReviewVisibility(reviewId, { isHidden: !isHidden });
+      await updateAdminReview(reviewId, !isHidden);
       // Refresh list
       setReviews(reviews.map(r => r.id === reviewId ? { ...r, isHidden: !isHidden } : r));
     } catch (err: any) {
@@ -109,19 +107,12 @@ export default function ReviewListPage() {
         />
         <input
           type="text"
-          placeholder="고객명 검색"
-          value={filters.customerFilter}
-          onChange={(e) => handleFilterChange('customerFilter', e.target.value)}
-          className="border rounded px-3 py-2"
-        />
-        <input
-          type="text"
           placeholder="판매자명 검색"
           value={filters.sellerFilter}
           onChange={(e) => handleFilterChange('sellerFilter', e.target.value)}
           className="border rounded px-3 py-2"
         />
-        <button 
+        <button
           onClick={applyFilters}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >

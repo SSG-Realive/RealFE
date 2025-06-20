@@ -21,13 +21,13 @@ export const getAdminReviewList = async (params: AdminReviewListRequest): Promis
     params,
     paramsSerializer,
   });
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 상세 조회
 export const getAdminReview = async (reviewId: number): Promise<AdminReview> => {
   const response = await adminApi.get(`/admin/seller-reviews/${reviewId}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 상태 변경
@@ -41,13 +41,13 @@ export const getAdminReviewReportList = async (params: AdminReviewReportListRequ
     params,
     paramsSerializer,
   });
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 신고 상세 조회
 export const getAdminReviewReport = async (reportId: number): Promise<AdminReviewReport> => {
   const response = await adminApi.get(`/admin/reviews-reports/reports/${reportId}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 신고 처리
@@ -61,13 +61,13 @@ export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): 
     params,
     paramsSerializer,
   });
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 Q&A 상세 조회
 export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQnaDetail> => {
   const response = await adminApi.get(`/admin/qna/customer/${qnaId}`);
-  return response.data;
+  return response.data.data;
 };
 
 // 리뷰 Q&A 답변 등록

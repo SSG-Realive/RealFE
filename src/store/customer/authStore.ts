@@ -1,71 +1,73 @@
-// src/store/customer/useAuthStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface AuthState {
-  /* 토큰 */
+  id: number | null;
   accessToken: string | null;
   refreshToken: string | null;
-
-  /* 프로필 정보 */
   email: string | null;
   userName: string | null;
   isTemporaryUser: boolean;
+  hydrated: boolean;
 
-  /* 액션 */
+  // 액션
   setAuth: (p: {
+    id: number;
     accessToken: string;
-    refreshToken: string;
+    refreshToken: string | null;
     email: string;
     userName: string;
     temporaryUser: boolean;
   }) => void;
   setTokens: (a: string | null, r: string | null) => void;
-  setUserName: (name: string | null) => void;   // ✅ 추가
+  setUserName: (name: string | null) => void;
   logout: () => void;
 
-  /* 헬퍼 */
-  hydrated: boolean;          // 로컬스토리지 → 메모리 복원 여부
+  // 인증 여부 체크
   isAuthenticated: () => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
+      id: null,
       accessToken: null,
       refreshToken: null,
-
       email: null,
       userName: null,
       isTemporaryUser: false,
-
       hydrated: false,
 
-      /* 전체 세팅 */
-      setAuth: ({ accessToken, refreshToken, email, userName, temporaryUser }) =>
-        set({ accessToken, refreshToken, email, userName, isTemporaryUser: temporaryUser }),
+      setAuth: ({ id, accessToken, refreshToken, email, userName, temporaryUser }) =>
+        set({
+          id,
+          accessToken,
+          refreshToken,
+          email,
+          userName,
+          isTemporaryUser: temporaryUser,
+        }),
 
-      /* 토큰만 세팅 */
       setTokens: (a, r) => set({ accessToken: a, refreshToken: r }),
-
-      /* 인증 여부 */
-      isAuthenticated: () => !!get().accessToken && get().hydrated,
 
       setUserName: (name) => set({ userName: name }),
 
-      /* 로그아웃 */
       logout: () =>
         set({
+          id: null,
           accessToken: null,
           refreshToken: null,
           email: null,
           userName: null,
           isTemporaryUser: false,
         }),
+
+      isAuthenticated: () => !!get().accessToken && get().hydrated,
     }),
     {
-      name: 'auth-storage',         // localStorage key
+      name: 'auth-storage', // localStorage key
       partialize: (s) => ({
+        id: s.id,
         accessToken: s.accessToken,
         refreshToken: s.refreshToken,
         email: s.email,
@@ -73,7 +75,9 @@ export const useAuthStore = create<AuthState>()(
         isTemporaryUser: s.isTemporaryUser,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state) (state as any).hydrated = true; // 복원 완료 표시
+        if (state) {
+          state.hydrated = true;
+        }
       },
     }
   )

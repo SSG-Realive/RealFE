@@ -10,7 +10,7 @@ export type ReviewReportStatus =
   | ''; // 전체 상태를 위한 빈 문자열
 
 export interface AdminReview {
-  id: number;
+  reviewId: number;
   productId: number;
   productName: string;
   productImage?: string;
@@ -19,7 +19,8 @@ export interface AdminReview {
   customerImage?: string;
   sellerId: number;
   sellerName: string;
-  content: string;
+  content?: string;
+  contentSummary?: string;
   rating: number;
   isHidden: boolean;
   createdAt: string;
@@ -141,4 +142,61 @@ export interface AdminReviewQnaAnswerRequest {
 
 export interface AdminReportedReview {
   // ... existing code ...
+}
+
+export enum TrafficLightRating {
+  RED = 'RED',    // 1-2점: 부정적
+  YELLOW = 'YELLOW', // 3점: 중립적
+  GREEN = 'GREEN'    // 4-5점: 긍정적
+}
+
+// 별점을 신호등으로 변환하는 유틸리티 함수
+export function getTrafficLightFromRating(rating: number): TrafficLightRating {
+  if (rating <= 2) return TrafficLightRating.RED;
+  if (rating === 3) return TrafficLightRating.YELLOW;
+  return TrafficLightRating.GREEN;
+}
+
+// 신호등 이모지 반환
+export function getTrafficLightEmoji(rating: number): string {
+  const trafficLight = getTrafficLightFromRating(rating);
+  switch (trafficLight) {
+    case TrafficLightRating.RED: return '🔴';
+    case TrafficLightRating.YELLOW: return '🟡';
+    case TrafficLightRating.GREEN: return '🟢';
+    default: return '⚪';
+  }
+}
+
+// 신호등 텍스트 반환
+export function getTrafficLightText(rating: number): string {
+  const trafficLight = getTrafficLightFromRating(rating);
+  switch (trafficLight) {
+    case TrafficLightRating.RED: return '부정적';
+    case TrafficLightRating.YELLOW: return '보통';
+    case TrafficLightRating.GREEN: return '긍정적';
+    default: return '평가없음';
+  }
+}
+
+// 신호등 CSS 클래스 반환
+export function getTrafficLightClass(rating: number): string {
+  const trafficLight = getTrafficLightFromRating(rating);
+  switch (trafficLight) {
+    case TrafficLightRating.RED: return 'text-red-500';
+    case TrafficLightRating.YELLOW: return 'text-yellow-500';
+    case TrafficLightRating.GREEN: return 'text-green-500';
+    default: return 'text-gray-500';
+  }
+}
+
+// 신호등 배경색 클래스 반환
+export function getTrafficLightBgClass(rating: number): string {
+  const trafficLight = getTrafficLightFromRating(rating);
+  switch (trafficLight) {
+    case TrafficLightRating.RED: return 'bg-red-100 border-red-300';
+    case TrafficLightRating.YELLOW: return 'bg-yellow-100 border-yellow-300';
+    case TrafficLightRating.GREEN: return 'bg-green-100 border-green-300';
+    default: return 'bg-gray-100 border-gray-300';
+  }
 } 

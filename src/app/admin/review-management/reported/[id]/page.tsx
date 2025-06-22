@@ -1,6 +1,7 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } from "@/types/admin/review";
 import { getAdminReviewReport, processAdminReviewReport } from "@/service/admin/reviewService";
 import { AdminReviewReport, ReviewReportStatus } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
@@ -109,7 +110,12 @@ export default function ReportedReviewDetailPage() {
             <p><span className="font-semibold">신고 사유:</span> {report.reason}</p>
             <p><span className="font-semibold">리뷰 원문:</span></p>
             <blockquote className="border-l-4 pl-4 text-gray-700 italic">{report.content}</blockquote>
-            <p><span className="font-semibold">평점:</span> {'★'.repeat(report.rating)}</p>
+            <p><span className="font-semibold">평점:</span> 
+              <div className={`inline-flex items-center space-x-2 mt-1 px-3 py-1 rounded-full border ${getTrafficLightBgClass(report.rating)}`}>
+                <span className="text-xl">{getTrafficLightEmoji(report.rating)}</span>
+                <span className="text-sm font-medium">{getTrafficLightText(report.rating)}</span>
+              </div>
+            </p>
           </div>
         </div>
         

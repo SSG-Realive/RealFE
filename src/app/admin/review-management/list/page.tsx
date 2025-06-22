@@ -161,8 +161,8 @@ export default function ReviewListPage() {
           </thead>
           <tbody>
             {reviews?.map(review => (
-              <tr key={review.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{review.productName}</td>
+              <tr key={review.reviewId} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border">{review.productName || 'N/A'}</td>
                 <td className="px-4 py-2 border">{review.customerName}</td>
                 <td className="px-4 py-2 border">{review.sellerName}</td>
                 <td className="px-4 py-2 border max-w-xs truncate" title={review.content}>
@@ -189,12 +189,12 @@ export default function ReviewListPage() {
                   <button 
                     className="text-blue-600 underline"
                     onClick={() => {
-                      console.log('리뷰 상세 버튼 클릭:', review.id);
+                      console.log('리뷰 상세 버튼 클릭:', review.reviewId);
                       try {
-                        router.push(`/admin/review-management/${review.id}`);
+                        router.push(`/admin/review-management/list/${review.reviewId}`);
                       } catch (error) {
                         console.error('라우터 에러:', error);
-                        window.location.href = `/admin/review-management/${review.id}`;
+                        window.location.href = `/admin/review-management/list/${review.reviewId}`;
                       }
                     }}
                   >

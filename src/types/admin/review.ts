@@ -29,13 +29,21 @@ export interface AdminReview {
 
 export interface AdminReviewReport {
   reportId: number;
-  status: ReviewReportStatus;
-  reportedReviewId: number;
   reporterId: number;
   reporterName: string;
+  reviewId: number;
   reason: string;
   reportedAt: string;
-  review?: AdminReview; // 상세 정보 조회 시에만 사용될 수 있도록 optional로 유지
+  status: ReviewReportStatus;
+  
+  // review: AdminReportedReview | null; // 삭제
+  // 아래는 AdminReportedReview의 필드들입니다.
+  customerId: number;
+  customerName: string;
+  customerImage: string | null;
+  productName: string;
+  content: string;
+  rating: number;
 }
 
 export interface AdminReviewQna {
@@ -129,4 +137,8 @@ export interface AdminReviewReportProcessRequest {
 
 export interface AdminReviewQnaAnswerRequest {
   answer: string;
+}
+
+export interface AdminReportedReview {
+  // ... existing code ...
 } 

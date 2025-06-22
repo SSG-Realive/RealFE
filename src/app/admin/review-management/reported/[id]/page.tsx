@@ -71,12 +71,6 @@ export default function ReportedReviewDetailPage() {
     return <div className="p-8">신고된 리뷰 정보를 찾을 수 없습니다.</div>;
   }
 
-  const { review } = report;
-
-  if (!review) {
-    return <div className="p-8 text-center text-red-500">연관된 리뷰 정보를 찾을 수 없습니다.</div>
-  }
-
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">신고된 리뷰 상세</h2>
@@ -87,10 +81,10 @@ export default function ReportedReviewDetailPage() {
           <div>
             <h3 className="text-lg font-semibold border-b pb-2 mb-4">리뷰 작성자 정보</h3>
             <div className="flex items-center gap-4">
-              <img src={review.customerImage || '/images/placeholder.png'} alt={review.customerName} className="w-16 h-16 rounded-full border" />
+              <img src={report.customerImage || '/images/placeholder.png'} alt={report.customerName} className="w-16 h-16 rounded-full border" />
               <div>
-                <p className="text-xl font-bold">{review.customerName}</p>
-                <p className="text-sm text-gray-500">고객 ID: {review.customerId}</p>
+                <p className="text-xl font-bold">{report.customerName}</p>
+                <p className="text-sm text-gray-500">고객 ID: {report.customerId}</p>
               </div>
             </div>
           </div>
@@ -111,11 +105,11 @@ export default function ReportedReviewDetailPage() {
         <div>
           <h3 className="text-lg font-semibold border-b pb-2 mb-4">신고 내용</h3>
           <div className="space-y-4">
-            <p><span className="font-semibold">상품명:</span> {review.productName}</p>
+            <p><span className="font-semibold">상품명:</span> {report.productName}</p>
             <p><span className="font-semibold">신고 사유:</span> {report.reason}</p>
             <p><span className="font-semibold">리뷰 원문:</span></p>
-            <blockquote className="border-l-4 pl-4 text-gray-700 italic">{review.content}</blockquote>
-            <p><span className="font-semibold">평점:</span> {'★'.repeat(review.rating)}</p>
+            <blockquote className="border-l-4 pl-4 text-gray-700 italic">{report.content}</blockquote>
+            <p><span className="font-semibold">평점:</span> {'★'.repeat(report.rating)}</p>
           </div>
         </div>
         
@@ -127,6 +121,9 @@ export default function ReportedReviewDetailPage() {
               <p className="text-lg">{getStatusText(report.status)}</p>
             </div>
             <div className="flex gap-2">
+              {report.status === 'PENDING' && (
+                 <button onClick={() => handleProcessReport('UNDER_REVIEW')} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">검토 시작</button>
+              )}
               {report.status === 'UNDER_REVIEW' && (
                 <>
                   <button onClick={() => handleProcessReport('RESOLVED_KEPT')} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">리뷰 유지</button>
@@ -134,9 +131,12 @@ export default function ReportedReviewDetailPage() {
                   <button onClick={() => handleProcessReport('RESOLVED_REJECTED')} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">신고 기각</button>
                 </>
               )}
-               {report.status === 'PENDING' && (
-                 <button onClick={() => handleProcessReport('UNDER_REVIEW')} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">검토 시작</button>
-               )}
+              {report.status === 'RESOLVED_KEPT' && (
+                <button onClick={() => handleProcessReport('RESOLVED_HIDDEN')} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">리뷰 숨김으로 변경</button>
+              )}
+              {report.status === 'RESOLVED_HIDDEN' && (
+                <button onClick={() => handleProcessReport('RESOLVED_KEPT')} className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">리뷰 유지로 변경</button>
+              )}
             </div>
           </div>
         </div>

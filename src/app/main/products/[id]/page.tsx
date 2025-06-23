@@ -85,13 +85,11 @@ export default function ProductDetailPage() {
     const handleOrderNow = async () => {
         if (!product) return;
         try {
-            // 현재 수량을 바탕으로 장바구니에 추가
-            await addToCart({ productId: product.id, quantity: quantity }); // 현재 선택된 수량 반영
-            alert('상품이 장바구니에 추가되었습니다. 장바구니 페이지로 이동합니다.');
+            await addToCart({ productId: product.id, quantity: 1 });
             router.push('/customer/cart'); // 장바구니 페이지로 이동
         } catch (error) {
             console.error('주문 처리 중 오류 발생:', error);
-            alert('주문 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            alert('주문 처리 중 오류가 발생했습니다.');
         }
     };
 
@@ -143,13 +141,8 @@ export default function ProductDetailPage() {
             alert('수량을 선택해주세요.');
             return;
         }
-        // sessionStorage를 사용하여 상품 ID와 수량을 전달
-        // 이 방법은 간단하지만, 새로고침 시 데이터가 사라질 수 있으므로 더 견고한 방법(예: 전역 상태 관리 라이브러리)을 고려할 수 있습니다.
-        sessionStorage.setItem('directBuyProductId', product.id.toString());
-        sessionStorage.setItem('directBuyQuantity', quantity.toString());
-
-        // 구매하기 페이지로 리다이렉트 (쿼리 파라미터 없이)
-        router.push('/customer/orders/direct');
+        // 구매하기 페이지로 리다이렉트 (Next.js의 router.push 사용)
+        router.push(`/customer/order/direct?productId=${product.id}&quantity=${quantity}`);
     };
 
     // 에러 상태일 경우 에러 메시지를 표시합니다.
@@ -250,10 +243,10 @@ export default function ProductDetailPage() {
                                 aria-label="찜하기 버튼"
                                 disabled={wishlistLoading}
                             >
-                                {isWished ?' ❤️ 찜 취소' : '🤍 찜하기'}
-                                    </button>
-                                    <button
-                                    onClick={handleAddToCart} // 장바구니 담기 버튼
+                                {isWished ? '❤️ 찜 취소' : '🤍 찜하기'}
+                            </button>
+                            <button
+                                onClick={handleAddToCart} // 장바구니 담기 버튼
                                 className="flex-1 px-5 py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                             >
                                 🛒 장바구니 담기
@@ -308,12 +301,11 @@ export default function ProductDetailPage() {
             {/* ===== 하단 상세정보 및 푸터 영역 ===== */}
             <ProductDetailFooter product={product} isSticky={isFooterSticky} triggerRef={triggerRef} />
 
-            {/* ✅ 새롭게 추가된 바로 주문 플로팅 푸터 */}
             <div
                 className={`
-                    fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg-top
+                    fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-lg-top 
                     transform transition-transform duration-300 ease-in-out
-                    ${isFooterSticky ? 'translate-y-0' : 'translate-y-full'}
+                    ${isFooterSticky ? 'translate-y-0' : 'translate-y-full'} 
                     z-20
                 `}
             >
@@ -331,7 +323,7 @@ export default function ProductDetailPage() {
                 </div>
             </div>
         </div>
-);
+    );
 }
 
 
@@ -382,9 +374,6 @@ function ProductDetailFooter({ product, isSticky, triggerRef }: FooterProps) {
                             <tr className="border-b border-gray-200">
                                 <td className="py-3 px-4 bg-gray-100 font-semibold">판매자</td>
                                 <td className="py-3 px-4 text-gray-800">{product.sellerName}</td>
-                                <td className="py-3 px-4 bg-gray-100 font-semibold">브랜드</td>
-                                {/* ProductDetail 타입에 브랜드 필드가 명시적으로 없으므로 판매자명을 대신 사용 */}
-                                <td className="py-3 px-4 text-gray-800">{product.sellerName}</td>
                             </tr>
                             <tr className="border-b border-gray-200">
                                 <td className="py-3 px-4 bg-gray-100 font-semibold">사이즈</td>
@@ -425,7 +414,7 @@ function ProductDetailFooter({ product, isSticky, triggerRef }: FooterProps) {
                     )}
                 </div>
 
-                <div className="py-20 text-center text-gray-400 h-[300px] bg-gray-100"> {/* 높이 조정 */}
+                <div className="py-20 text-center text-gray-400 h-[3000px] bg-gray-100">
                     상품 상세 설명 영역 (e.g. 긴 이미지)
                     {/* 일반적으로 긴 상품 상세 설명 이미지나 추가적인 텍스트가 여기에 들어갑니다. */}
                 </div>

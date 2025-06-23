@@ -1,9 +1,7 @@
-'use client';
-
-import Slider from 'react-slick';
-import Link from 'next/link';
 import { useAuctionStore } from '@/store/customer/auctionStore';
-import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
+import Slider from 'react-slick';
 
 export default function WeeklyAuctionSlider() {
   const { auctions, fetchAuctions } = useAuctionStore();
@@ -11,11 +9,8 @@ export default function WeeklyAuctionSlider() {
   const [centerIndex, setCenterIndex] = useState(0);
   const [slidesToShow, setSlidesToShow] = useState(5);
 
-  // 1. 경매 목록 로딩 및 반응형 slidesToShow 설정
   useEffect(() => {
-    if (auctions.length === 0) {
-      fetchAuctions();
-    }
+    if (auctions.length === 0) fetchAuctions();
 
     const handleResize = () => {
       const width = window.innerWidth;
@@ -24,24 +19,18 @@ export default function WeeklyAuctionSlider() {
       else setSlidesToShow(5);
     };
 
-    handleResize(); // 최초 한 번
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [fetchAuctions, auctions.length]);
 
-  // 2. 실제 슬라이드 중심 추적
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const current = sliderRef.current?.innerSlider?.state?.currentSlide ?? 0;
-      const calculatedCenter =
-        (current + Math.floor(slidesToShow / 2)) % (auctions.length || 1);
-      setCenterIndex(calculatedCenter);
-    }, 100);
+  // afterChange 핸들러에서 슬라이드 인덱스 받아 처리
+  const handleAfterChange = (currentSlide: number) => {
+    const calculatedCenter =
+      (currentSlide + Math.floor(slidesToShow / 2)) % (auctions.length || 1);
+    setCenterIndex(calculatedCenter);
+  };
 
-    return () => clearInterval(interval);
-  }, [slidesToShow, auctions.length]);
-
-  // 3. 정렬된 옥션 목록
   const sorted = [...auctions]
     .filter((a) => a.createdAt)
     .sort(
@@ -50,7 +39,6 @@ export default function WeeklyAuctionSlider() {
     )
     .slice(0, 10);
 
-  // 4. 슬라이더 설정
   const settings = {
     infinite: true,
     speed: 700,
@@ -63,15 +51,10 @@ export default function WeeklyAuctionSlider() {
     autoplaySpeed: 3500,
     arrows: false,
     dots: false,
+    afterChange: handleAfterChange,
     responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 3 },
-      },
-      {
-        breakpoint: 768,
-        settings: { slidesToShow: 1 },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
     ],
   };
 

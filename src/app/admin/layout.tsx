@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div style={{ display: 'flex' }}>
       <AdminSidebar />
-      <div style={{ flex: 1, background: '#f9fafb' }}>
+      <div style={{ flex: 1, background: '#f3f4f6' }}>
         <AdminHeader title={title} />
         <main style={{ padding: '24px' }}>{children}</main>
       </div>

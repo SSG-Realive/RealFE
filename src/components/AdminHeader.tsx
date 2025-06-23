@@ -22,16 +22,16 @@ export default function AdminHeader({ title }: { title: string }) {
 
   return (
     <header style={{
-      background: '#fff',
-      color: '#1f2937',
+      background: '#1f2937',
+      color: '#e5e7eb',
       padding: '16px 24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       minHeight: 56,
-      borderBottom: '1px solid #e5e7eb'
+      borderBottom: '1px solid #4b5563'
     }}>
-      <h1 style={{ fontWeight: 'bold', fontSize: 20, color: '#1f2937' }}>{title}</h1>
+      <h1 style={{ fontWeight: 'bold', fontSize: 20, color: '#e5e7eb' }}>{title}</h1>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <AdminNotification />
         {isClient && (

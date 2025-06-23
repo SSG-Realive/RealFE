@@ -25,6 +25,7 @@ export default function DirectOrderPage() {
     const [loading, setLoading] = useState(true);
     const [pageError, setPageError] = useState<string | null>(null);
 
+
     // 배송지 폼 상태
     const [shippingInfo, setShippingInfo] = useState({
         receiverName: '',
@@ -84,6 +85,7 @@ export default function DirectOrderPage() {
                 } else {
                     setPageError('주문 정보를 불러오는 데 실패했습니다.');
                 }
+
             } finally {
                 setLoading(false);
             }
@@ -91,6 +93,28 @@ export default function DirectOrderPage() {
 
         loadOrderData();
     }, []);
+
+
+    // --- 토스페이먼츠 위젯 렌더링 ---
+    useEffect(() => {
+        if (!userProfile || !customerId || finalAmount === 0) return;
+
+        const initializeWidget = async () => {
+            try {
+                const tossPayments = await loadPaymentWidget(TOSS_CLIENT_KEY, customerId.toString());
+                
+                tossPayments.renderPaymentMethods('#payment-widget', { value: finalAmount }, { variantKey: 'DEFAULT' });
+                tossPayments.renderAgreement('#agreement', { variantKey: 'DEFAULT' });
+
+                paymentWidgetRef.current = tossPayments;
+            } catch (error) {
+                console.error("토스페이먼츠 위젯 렌더링 실패:", error);
+                setError('결제 위젯을 불러오는데 실패했습니다.');
+            }
+        };
+
+        initializeWidget();
+    }, [userProfile, customerId, finalAmount]);
 
     // --- 이벤트 핸들러 ---
     const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,6 +130,7 @@ export default function DirectOrderPage() {
 
 
     const handlePayment = async () => {
+
         if (!productInfo || !userProfile) {
             alert("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
             return;
@@ -178,10 +203,10 @@ export default function DirectOrderPage() {
             <section className="order-section">
                 <h2>주문 상품</h2>
                 <div className="product-summary-card">
-                    <img src={productInfo.imageUrl || '/default-image.png'} alt={productInfo.productName} />
+                    <img src={productInfo.imageUrl || '/images/placeholder.png'} alt={productInfo.productName} />
                     <div className="product-details">
-                        <p>{productInfo.productName}</p>
-                        <p>수량: {productInfo.quantity}개</p>
+                        <p className="product-name">{productInfo.productName}</p>
+                        <p className="product-quantity">수량: {productInfo.quantity}개</p>
                     </div>
                     <p className="product-price">{(productInfo.price * productInfo.quantity).toLocaleString()}원</p>
                 </div>
@@ -209,10 +234,11 @@ export default function DirectOrderPage() {
                     <label htmlFor="address">주소</label>
                     <input id="address" name="address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
                     {/* TODO: 주소 검색 버튼 및 기능 추가 */}
+
                 </div>
             </section>
 
-            {/* 4. 결제 수단 선택 */}
+            {/* 4. 결제 수단 */}
             <section className="order-section">
                 <h2>결제 수단</h2>
                 <div className="payment-selector">
@@ -247,28 +273,31 @@ export default function DirectOrderPage() {
                         계좌이체
                     </label>
                 </div>
+
             </section>
 
-            {/* 5. 최종 결제 금액 요약 */}
-            <section className="order-summary">
+            {/* 5. 결제 동의 및 금액 요약 */}
+            <aside className="order-summary">
+                <div id="agreement" />
                 <h3>결제 금액</h3>
                 <div className="summary-row">
                     <span>총 상품금액</span>
-                    <span>{(productInfo.price * productInfo.quantity).toLocaleString()}원</span>
+                    <span>{totalProductPrice.toLocaleString()}원</span>
                 </div>
                 <div className="summary-row">
                     <span>배송비</span>
-                    <span>+ 3,000원</span> {/* TODO: 배송비 정책에 따라 동적 계산 */}
+                    <span>+ {deliveryFee.toLocaleString()}원</span>
                 </div>
                 <div className="summary-row total">
                     <span>최종 결제 금액</span>
-                    <span>{(productInfo.price * productInfo.quantity + 3000).toLocaleString()}원</span>
+                    <span>{finalAmount.toLocaleString()}원</span>
                 </div>
             </section>
 
             <button className="payment-button" onClick={handlePayment}>
                 결제하기
             </button>
+
         </div>
     );
 }

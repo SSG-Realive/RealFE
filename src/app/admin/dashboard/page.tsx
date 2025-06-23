@@ -106,7 +106,7 @@ const AdminDashboardPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
       </div>
     );
@@ -137,28 +137,28 @@ const AdminDashboardPage = () => {
           <p className="text-sm text-gray-500">오늘의 현황을 요약합니다.</p>
         </div>
         <div className="flex gap-2 bg-white p-1 rounded-lg shadow-sm">
-          <button
-            onClick={() => setPeriodType('DAILY')}
+            <button
+              onClick={() => setPeriodType('DAILY')}
             className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
-              periodType === 'DAILY'
+                periodType === 'DAILY'
                 ? 'bg-gray-800 text-white'
                 : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            일간
-          </button>
-          <button
-            onClick={() => setPeriodType('MONTHLY')}
+              }`}
+            >
+              일간
+            </button>
+            <button
+              onClick={() => setPeriodType('MONTHLY')}
             className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
-              periodType === 'MONTHLY'
+                periodType === 'MONTHLY'
                 ? 'bg-gray-800 text-white'
                 : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            월간
-          </button>
+              }`}
+            >
+              월간
+            </button>
+          </div>
         </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 p-6 rounded-2xl shadow-lg flex flex-col justify-between" style={{ backgroundColor: '#EDE7E3' }}>
@@ -221,13 +221,13 @@ const AdminDashboardPage = () => {
             <h3 className="text-xl font-bold text-gray-800 mb-4">회원 통계</h3>
             <div style={{ height: '350px' }}>
               <DashboardChart data={dashboardData} type="member" />
-            </div>
+          </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">경매 통계</h3>
             <div style={{ height: '350px' }}>
               <DashboardChart data={dashboardData} type="auction" />
-            </div>
+        </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">리뷰 통계</h3>

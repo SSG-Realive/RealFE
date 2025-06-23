@@ -8,7 +8,6 @@ import Navbar from '@/components/customer/common/Navbar';
 import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
 import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
-import HorizontalProductSlider from '@/components/main/HorizontalProductSlider';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
 
 

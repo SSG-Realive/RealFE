@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { AdminDashboardDTO } from '@/types/admin/admin';
-import { getAdminDashboard } from '@/service/admin/adminService';
+import { getAdminDashboard, getMonthlySummariesForPeriod } from '@/service/admin/adminService';
 import { useRouter } from 'next/navigation';
 import Modal from '@/components/Modal';
 import { useAdminAuthStore } from '@/store/admin/useAdminAuthStore';
@@ -35,9 +35,11 @@ const MemberStatusItem = ({ icon, label, value, iconBgColor }: { icon: React.Rea
 const AdminDashboardPage = () => {
   const [dashboardData, setDashboardData] = useState<AdminDashboardDTO | null>(null);
   const [loading, setLoading] = useState(true);
+  const [salesLoading, setSalesLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [periodType, setPeriodType] = useState<'DAILY' | 'MONTHLY'>('DAILY');
   const [showModal, setShowModal] = useState(false);
+  const [monthlySalesData, setMonthlySalesData] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -101,8 +103,38 @@ const AdminDashboardPage = () => {
   };
 
   useEffect(() => {
-    fetchDashboardData();
+    const fetchData = async () => {
+      // periodType이 바뀔 때 sales chart만 로딩 상태로 설정
+      setSalesLoading(true);
+      
+      if (periodType === 'DAILY') {
+        await fetchDashboardData();
+      } else { // MONTHLY
+        // 다른 차트 데이터도 월간 기준으로 업데이트
+        await fetchDashboardData(); 
+        
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setMonth(endDate.getMonth() - 5);
+        const start = startDate.toISOString().split('T')[0];
+        const end = endDate.toISOString().split('T')[0];
+        
+        getMonthlySummariesForPeriod(start, end).then((data) => {
+          setMonthlySalesData(data || []);
+        });
+      }
+      setSalesLoading(false);
+    };
+
+    if (!loading) { // 첫 페이지 로딩이 아닐 때만 실행
+      fetchData();
+    }
   }, [periodType]);
+
+  // 첫 페이지 로딩
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   if (loading) {
     return (
@@ -214,20 +246,30 @@ const AdminDashboardPage = () => {
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">매출 추이</h3>
             <div style={{ height: '350px' }}>
-              <DashboardChart data={dashboardData} type="sales" />
+              {salesLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800"></div>
+                </div>
+              ) : (
+                <DashboardChart
+                  data={periodType === 'MONTHLY' ? monthlySalesData : dashboardData}
+                  type="sales"
+                  periodType={periodType}
+                />
+              )}
             </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">회원 통계</h3>
             <div style={{ height: '350px' }}>
               <DashboardChart data={dashboardData} type="member" />
-          </div>
+            </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">경매 통계</h3>
             <div style={{ height: '350px' }}>
               <DashboardChart data={dashboardData} type="auction" />
-        </div>
+            </div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4">리뷰 통계</h3>

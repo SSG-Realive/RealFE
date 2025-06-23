@@ -22,31 +22,31 @@ export default function AdminHeader({ title }: { title: string }) {
 
   return (
     <header style={{
-      background: '#333',
-      color: '#fff',
-      padding: 16,
+      background: '#fff',
+      color: '#1f2937',
+      padding: '16px 24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minHeight: 56
+      minHeight: 56,
+      borderBottom: '1px solid #e5e7eb'
     }}>
-      <div style={{ fontWeight: 'bold', fontSize: 22, color: '#fff' }}>{title}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <h1 style={{ fontWeight: 'bold', fontSize: 20, color: '#1f2937' }}>{title}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <AdminNotification />
         {isClient && (
           isLoggedIn ? (
             <button
               onClick={handleLogout}
               style={{
-                marginLeft: 12,
-                padding: '6px 18px',
-                background: '#fff',
-                color: '#333',
+                padding: '8px 16px',
+                background: '#14b8a6',
+                color: '#fff',
                 border: 'none',
                 borderRadius: 6,
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                fontSize: 15
+                fontSize: 14
               }}
             >
               로그아웃
@@ -55,15 +55,14 @@ export default function AdminHeader({ title }: { title: string }) {
             <button
               onClick={handleLogin}
               style={{
-                marginLeft: 12,
-                padding: '6px 18px',
-                background: '#fff',
-                color: '#333',
+                padding: '8px 16px',
+                background: '#14b8a6',
+                color: '#fff',
                 border: 'none',
                 borderRadius: 6,
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                fontSize: 15
+                fontSize: 14
               }}
             >
               로그인

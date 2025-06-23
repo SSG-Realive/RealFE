@@ -115,7 +115,7 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="bg-white">
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -125,24 +125,24 @@ const AdminDashboardPage = () => {
       />
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
-          <div className="flex gap-4">
+          <h1 className="text-2xl font-bold text-gray-800">관리자 대시보드</h1>
+          <div className="flex gap-2">
             <button
               onClick={() => setPeriodType('DAILY')}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 rounded-md text-sm font-medium ${
                 periodType === 'DAILY'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-700'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               일간
             </button>
             <button
               onClick={() => setPeriodType('MONTHLY')}
-              className={`px-4 py-2 rounded ${
+              className={`px-4 py-2 rounded-md text-sm font-medium ${
                 periodType === 'MONTHLY'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-700'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               월간
@@ -151,38 +151,38 @@ const AdminDashboardPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">총 주문</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">총 주문</h3>
             <p className="text-3xl font-bold text-blue-600">
               {dashboardData.salesSummaryStats?.totalOrdersInPeriod || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">총 매출</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">총 매출</h3>
             <p className="text-3xl font-bold text-green-600">
               {dashboardData.salesSummaryStats?.totalRevenueInPeriod?.toLocaleString() || 0}원
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">전체 회원</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">전체 회원</h3>
             <p className="text-3xl font-bold text-purple-600">
               {dashboardData.memberSummaryStats?.totalMembers || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">활성 회원</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">활성 회원</h3>
             <p className="text-3xl font-bold text-green-600">
               {dashboardData.memberSummaryStats?.activeMembers || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">비활성 회원</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">비활성 회원</h3>
             <p className="text-3xl font-bold text-red-600">
               {dashboardData.memberSummaryStats?.inactiveMembers || 0}
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">대기 판매자</h3>
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h3 className="text-base font-semibold text-gray-600 mb-2">대기 판매자</h3>
             <p className="text-3xl font-bold text-orange-600">
               {dashboardData.pendingSellerCount || 0}
             </p>
@@ -190,13 +190,13 @@ const AdminDashboardPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">매출 추이</h3>
             <DashboardChart
               data={dashboardData}
             />
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">회원 통계</h3>
             <DashboardChart
               data={dashboardData}

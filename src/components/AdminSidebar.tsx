@@ -44,7 +44,7 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   const getLinkStyle = (path: string) => {
-    const isActive = pathname === path || (path !== '/admin/dashboard' && pathname.startsWith(path));
+    const isActive = pathname === path;
     return {
       padding: '8px 16px',
       borderRadius: '4px',
@@ -60,7 +60,9 @@ export default function AdminSidebar() {
     return {
       display: 'block',
       padding: '6px 12px',
+      borderRadius: '4px',
       color: isActive ? '#ffffff' : '#d1d5db',
+      backgroundColor: isActive ? '#14b8a6' : 'transparent',
       textDecoration: 'none',
       fontSize: '14px',
     };

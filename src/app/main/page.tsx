@@ -20,7 +20,7 @@ export default function CustomerHomePage() {
     const searchParams = useSearchParams();
     const categoryFromUrl = searchParams.get('category');
     const keywordFromUrl = searchParams.get('keyword') || '';
-
+    const [popularProducts, setPopularProducts] = useState<ProductListDTO[]>([]);
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [keyword, setKeyword] = useState<string>('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);

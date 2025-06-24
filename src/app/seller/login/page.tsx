@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { login } from '@/service/seller/sellerService'; // 👈 위에서 확인한 서비스 함수
 import { LoginResponse } from '@/types/seller/login/loginResponse';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore'; // 👈 [2단계]에서 만든 스토어
+import Link from 'next/link';
 
 export default function SellerLoginPage() {
   const [email, setEmail] = useState('');
@@ -61,6 +62,32 @@ export default function SellerLoginPage() {
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <button type="submit" style={{ width: '100%' }}>로그인</button>
+        <Link
+          href="/seller/signup"
+          style={{
+            display: 'block',
+            width: '100%',
+            marginTop: '1rem',
+            padding: '0.9rem 0',
+            borderRadius: '8px',
+            border: '2px solid #2563eb',
+            background: '#fff',
+            color: '#2563eb',
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            textAlign: 'center',
+            textDecoration: 'none',
+            transition: 'background 0.2s, color 0.2s',
+          }}
+          onMouseOver={e => {
+            (e.target as HTMLElement).style.background = '#e0e7ff';
+          }}
+          onMouseOut={e => {
+            (e.target as HTMLElement).style.background = '#fff';
+          }}
+        >
+          회원가입
+        </Link>
       </form>
     </div>
   );

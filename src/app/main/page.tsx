@@ -83,9 +83,11 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <section className="bg-white py-0">
-                <BannerCarousel />
-            </section>
+            {!categoryId && !keyword && (
+                <section className="bg-white py-0">
+                    <BannerCarousel />
+                </section>
+            )}
 
             {/* 옥션 슬라이더 */}
             <section className="bg-[#f8f5f2] py-10">

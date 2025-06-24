@@ -6,12 +6,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { useAuthStore } from '@/store/customer/authStore';
+import { useCartStore } from '@/store/customer/useCartStore';
+import { fetchCartList } from '@/service/customer/cartService';
 import { fetchMyProfile } from '@/service/customer/customerService';
-import SearchBar from './SearchBar';
 import { requestLogout } from '@/service/customer/logoutService';
-import CategoryDropdown from './CategoryDropdown';
 
-// 아이콘
+import SearchBar from './SearchBar';
+import CategoryDropdown from './CategoryDropdown';
 import { UserCircle, ShoppingCart } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,17 +27,16 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const { logout: clearAuthState } = useAuthStore();
 
     const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
+    const { itemCount } = useCartStore(); // ✅ 장바구니 수량
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => setMounted(true), []);
 
-    if (
-        pathname === '/login' ||
-        pathname === '/customer/member/login' ||
-        pathname === '/seller/login'
-    ) {
-        return null;
-    }
+    useEffect(() => {
+        if (mounted && isAuthenticated()) {
+            fetchCartList(); // ✅ 로그인 시 장바구니 수량 로딩
+        }
+    }, [mounted, isAuthenticated]);
 
     useEffect(() => {
         if (mounted && isAuthenticated() && !userName) {
@@ -58,6 +58,14 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
             router.push('/main');
         }
     };
+
+    if (
+        pathname === '/login' ||
+        pathname === '/customer/member/login' ||
+        pathname === '/seller/login'
+    ) {
+        return null;
+    }
 
     return (
         <nav className="w-full sticky top-0 z-50 bg-white/85 backdrop-blur-sm">
@@ -88,8 +96,13 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                     <Link href="/customer/mypage" className="hover:text-gray-800" title="My Page">
                                         <UserCircle size={20} />
                                     </Link>
-                                    <Link href="/customer/cart" className="hover:text-gray-800" title="Cart">
+                                    <Link href="/customer/cart" className="relative hover:text-gray-800" title="Cart">
                                         <ShoppingCart size={20} />
+                                        {itemCount > 0 && (
+                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                                {itemCount}
+                                            </span>
+                                        )}
                                     </Link>
                                     <button onClick={handleLogout} className="hover:text-red-500 text-xs">
                                         LOGOUT
@@ -134,8 +147,13 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                     <Link href="/customer/mypage" title="My Page">
                                         <UserCircle size={20} />
                                     </Link>
-                                    <Link href="/customer/cart" title="Cart">
+                                    <Link href="/customer/cart" className="relative" title="Cart">
                                         <ShoppingCart size={20} />
+                                        {itemCount > 0 && (
+                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                                {itemCount}
+                                            </span>
+                                        )}
                                     </Link>
                                     <button onClick={handleLogout} className="hover:text-red-500 text-xs">
                                         LOGOUT

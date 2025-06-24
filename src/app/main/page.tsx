@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fetchPublicProducts, fetchPopularProducts } from '@/service/customer/productService';
-import { toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import Navbar from '@/components/customer/common/Navbar';
 import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
@@ -52,6 +51,7 @@ export default function CustomerHomePage() {
     // ✅ 무한 스크롤을 위한 IntersectionObserver
     useEffect(() => {
         if (!loader.current) return;
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -60,26 +60,13 @@ export default function CustomerHomePage() {
             },
             { rootMargin: '100px' }
         );
+
         observer.observe(loader.current);
 
         return () => {
             if (loader.current) observer.unobserve(loader.current);
         };
     }, []);
-
-    const handleToggleWishlist = async (productId: number) => {
-        try {
-            const newStatus = await toggleWishlist({ productId });
-            setProducts((prev) =>
-                prev.map((item) => (item.id === productId ? { ...item, isWished: newStatus } : item))
-            );
-            setPopularProducts((prev) =>
-                prev.map((item) => (item.id === productId ? { ...item, isWished: newStatus } : item))
-            );
-        } catch {
-            window.location.href = '/login';
-        }
-    };
 
     return (
         <div>
@@ -99,9 +86,11 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <div className="mt-10 mb-8"> {/* 여백 추가 */}
-                <BannerCarousel />
-            </div>
+            {!categoryFromUrl && (
+                <div className="mb-8">
+                    <BannerCarousel />
+                </div>
+            )}
 
             {/* 옥션 슬라이드 */}
             <WeeklyAuctionSlider />
@@ -117,11 +106,12 @@ export default function CustomerHomePage() {
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
                     {products.map((p, index) => (
-                    <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                        <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
                     ))}
                     <div ref={loader} className="h-10 col-span-full" />
                 </div>
             </section>
+
 
             <ChatbotFloatingButton />
         </div>

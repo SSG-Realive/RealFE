@@ -39,9 +39,12 @@ export default function SellerDashboardPage() {
       <>
         <SellerHeader />
         <SellerLayout>
-          <main className="p-8 w-full">
-            <h1 className="text-2xl font-bold mb-6">판매자 대시보드</h1>
-            <div>로딩 중...</div>
+          <main className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+            <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 대시보드</h1>
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">로딩 중...</span>
+            </div>
           </main>
         </SellerLayout>
       </>
@@ -52,24 +55,24 @@ export default function SellerDashboardPage() {
     <>
       <SellerHeader />
       <SellerLayout>
-        <main className="p-8 w-full">
-          <h1 className="text-2xl font-bold mb-6">판매자 대시보드</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <section className="bg-white p-6 rounded-lg shadow-sm">
+        <main className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+          <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 대시보드</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <section className="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
               <h2 className="text-gray-600 text-sm font-semibold mb-2">등록 상품 수</h2>
-              <p className="text-2xl font-bold text-gray-800">{dashboard.totalProductCount}개</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-800">{dashboard.totalProductCount}개</p>
             </section>
-            <section className="bg-white p-6 rounded-lg shadow-sm">
+            <section className="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
               <h2 className="text-gray-600 text-sm font-semibold mb-2">미답변 문의 수</h2>
-              <p className="text-2xl font-bold text-red-500">{dashboard.unansweredQnaCount}건</p>
+              <p className="text-xl md:text-2xl font-bold text-red-500">{dashboard.unansweredQnaCount}건</p>
             </section>
-            <section className="bg-white p-6 rounded-lg shadow-sm">
+            <section className="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
               <h2 className="text-gray-600 text-sm font-semibold mb-2">오늘 등록된 상품</h2>
-              <p className="text-2xl font-bold text-gray-800">{dashboard.todayProductCount}개</p>
+              <p className="text-xl md:text-2xl font-bold text-gray-800">{dashboard.todayProductCount}개</p>
             </section>
-            <section className="bg-white p-6 rounded-lg shadow-sm">
+            <section className="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
               <h2 className="text-gray-600 text-sm font-semibold mb-2">진행 중인 주문</h2>
-              <p className="text-2xl font-bold text-blue-500">{dashboard.inProgressOrderCount}건</p>
+              <p className="text-xl md:text-2xl font-bold text-blue-500">{dashboard.inProgressOrderCount}건</p>
             </section>
           </div>
         </main>

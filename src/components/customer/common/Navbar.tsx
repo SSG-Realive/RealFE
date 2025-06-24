@@ -57,9 +57,9 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     };
 
     return (
-        <nav className="w-full sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-            <div className="w-full px-4 py-3 space-y-3">
-                {/* ✅ PC 화면 */}
+        <nav className="w-full sticky top-0 z-50 bg-white/85 backdrop-blur-sm">
+            <div className="w-full px-4 py-3 space-y-4">
+                {/* ✅ PC 헤더 */}
                 <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center w-full">
                     <Link href="/main" className="flex-shrink-0">
                         <Image
@@ -73,7 +73,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     </Link>
 
                     <div className="flex justify-center">
-                        <div className="w-full max-w-[900px]">
+                        <div className="w-full max-w-[900px] px-2">
                             <SearchBar onSearch={onSearch} />
                         </div>
                     </div>
@@ -101,12 +101,12 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     )}
                 </div>
 
-                {/* ✅ PC 카테고리 드롭다운 */}
-                <div className="hidden md:block">
+                {/* ✅ PC 카테고리 */}
+                <div className="hidden md:block mt-4">
                     <CategoryDropdown onCategorySelect={onCategorySelect} />
                 </div>
 
-                {/* ✅ 모바일 상단 */}
+                {/* ✅ 모바일 헤더 */}
                 <div className="flex items-center justify-between md:hidden">
                     <Link href="/main" className="flex items-center">
                         <Image
@@ -146,8 +146,8 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     <SearchBar onSearch={onSearch} />
                 </div>
 
-                {/* ✅ 모바일 카테고리 드롭다운 */}
-                <div className="block md:hidden">
+                {/* ✅ 모바일 카테고리 */}
+                <div className="block md:hidden mt-4">
                     <CategoryDropdown onCategorySelect={onCategorySelect} />
                 </div>
             </div>

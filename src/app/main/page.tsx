@@ -11,7 +11,6 @@ import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
 
-
 const ITEMS_PER_PAGE = 20;
 
 export default function CustomerHomePage() {
@@ -26,34 +25,28 @@ export default function CustomerHomePage() {
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
 
-    // ✅ URL 파라미터를 상태로 반영
     useEffect(() => {
         setCategoryId(categoryFromUrl ? Number(categoryFromUrl) : null);
         setKeyword(keywordFromUrl);
         setPage(1);
     }, [categoryFromUrl, keywordFromUrl]);
 
-    // ✅ 인기 상품 불러오기
     useEffect(() => {
         fetchPopularProducts().then(setPopularProducts);
     }, []);
 
-    // ✅ categoryId 또는 keyword가 바뀌었을 때 상품 초기화 & 새로 불러오기
     useEffect(() => {
         setProducts([]);
         fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, keyword).then(setProducts);
     }, [categoryId, keyword]);
 
-    // ✅ 페이지가 증가할 때 다음 페이지 상품 추가
     useEffect(() => {
         if (page === 1) return;
-
         fetchPublicProducts(categoryId, page, ITEMS_PER_PAGE, keyword).then((newProducts) => {
             setProducts((prev) => [...prev, ...newProducts]);
         });
     }, [page]);
 
-    // ✅ 무한 스크롤을 위한 IntersectionObserver
     useEffect(() => {
         if (!loader.current) return;
 
@@ -67,7 +60,6 @@ export default function CustomerHomePage() {
         );
 
         observer.observe(loader.current);
-
         return () => {
             if (loader.current) observer.unobserve(loader.current);
         };
@@ -91,33 +83,41 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <div className="mt-10 mb-8"> {/* 여백 추가 */}
+            <section className="bg-white py-0">
                 <BannerCarousel />
-            </div>
+            </section>
 
-            {/* 옥션-슬라이드 */}
-            <WeeklyAuctionSlider />
-
-            {/* 🔥 인기 상품 */}
-            {popularProducts.length > 0 && (
-                <div className="px-4 mb-8">
-                    <h2 className="text-lg font-bold mb-3">인기 상품 🔥</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {popularProducts.map((p, index) => (
-                            <ProductCard key={`popular-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                        ))}
-                    </div>
+            {/* 옥션 슬라이더 */}
+            <section className="bg-[#f8f5f2] py-10">
+                <div className="max-w-6xl mx-auto px-4">
+                    <WeeklyAuctionSlider />
                 </div>
+            </section>
+
+            {/* 인기 상품 */}
+            {popularProducts.length > 0 && (
+                <section className="bg-gray-50 py-12">
+                    <div className="max-w-6xl mx-auto px-4">
+                        <h2 className="text-lg font-bold mb-3">인기 상품</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {popularProducts.map((p, index) => (
+                                <ProductCard key={`popular-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
             )}
 
-            {/* 📦 상품 목록 */}
-            <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {products.map((p, index) => (
-                    <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                ))}
-                <div ref={loader} className="h-10 col-span-full" />
-            </div>
-
+            {/* 전체 상품 목록 */}
+            <section className="bg-[#f9f9f7] px-6 py-10 mx-4 mt-12 rounded-[2rem] shadow-inner">
+                <h2 className="text-lg font-semibold mb-6 text-black">전체 상품</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {products.map((p, index) => (
+                        <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                    ))}
+                    <div ref={loader} className="h-10 col-span-full" />
+                </div>
+            </section>
             <ChatbotFloatingButton />
         </div>
     );

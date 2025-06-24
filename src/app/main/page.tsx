@@ -10,6 +10,7 @@ import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingB
 import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
+import PopularProductsGrid from '@/components/main/PopularProductsGrid';
 
 
 const ITEMS_PER_PAGE = 20;
@@ -22,7 +23,6 @@ export default function CustomerHomePage() {
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [keyword, setKeyword] = useState<string>('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);
-    const [popularProducts, setPopularProducts] = useState<ProductListDTO[]>([]);
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
 
@@ -32,11 +32,6 @@ export default function CustomerHomePage() {
         setKeyword(keywordFromUrl);
         setPage(1);
     }, [categoryFromUrl, keywordFromUrl]);
-
-    // ✅ 인기 상품 불러오기
-    useEffect(() => {
-        fetchPopularProducts().then(setPopularProducts);
-    }, []);
 
     // ✅ categoryId 또는 keyword가 바뀌었을 때 상품 초기화 & 새로 불러오기
     useEffect(() => {
@@ -91,32 +86,32 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <div className="mt-10 mb-8"> {/* 여백 추가 */}
-                <BannerCarousel />
-            </div>
-
-            {/* 옥션-슬라이드 */}
-            <WeeklyAuctionSlider />
-
-            {/* 🔥 인기 상품 */}
-            {popularProducts.length > 0 && (
-                <div className="px-4 mb-8">
-                    <h2 className="text-lg font-bold mb-3">인기 상품 🔥</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {popularProducts.map((p, index) => (
-                            <ProductCard key={`popular-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                        ))}
-                    </div>
+            {!categoryFromUrl && (
+                <div className="mb-8">
+                    <BannerCarousel />
                 </div>
             )}
 
-            {/* 📦 상품 목록 */}
-            <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {products.map((p, index) => (
-                    <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                ))}
-                <div ref={loader} className="h-10 col-span-full" />
-            </div>
+            {/* 옥션 슬라이드 */}
+            <WeeklyAuctionSlider />
+
+            <PopularProductsGrid />
+
+            {/* 상품 목록 */}
+            <section className="max-w-screen-xl mx-auto px-1 py-30">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">전체상품</h2>
+                <p className="text-sm text-gray-600 mb-6">
+                    다양한 상품을 확인하고 원하는 제품을 찾아보세요.
+                </p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    {products.map((p, index) => (
+                        <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                    ))}
+                    <div ref={loader} className="h-10 col-span-full" />
+                </div>
+            </section>
+
 
             <ChatbotFloatingButton />
         </div>

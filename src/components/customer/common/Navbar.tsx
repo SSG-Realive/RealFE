@@ -6,10 +6,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 import { useAuthStore } from '@/store/customer/authStore';
+import { useCartStore } from '@/store/customer/useCartStore';
+import { fetchCartList } from '@/service/customer/cartService';
 import { fetchMyProfile } from '@/service/customer/customerService';
-import SearchBar from './SearchBar';
 import { requestLogout } from '@/service/customer/logoutService';
+
+import SearchBar from './SearchBar';
 import CategoryDropdown from './CategoryDropdown';
+import { UserCircle, ShoppingCart } from 'lucide-react';
 
 interface NavbarProps {
     onSearch?: (keyword: string) => void;
@@ -23,17 +27,16 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const { logout: clearAuthState } = useAuthStore();
 
     const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
+    const { itemCount } = useCartStore(); // ✅ 장바구니 수량
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => setMounted(true), []);
 
-    if (
-        pathname === '/login' ||
-        pathname === '/customer/member/login' ||
-        pathname === '/seller/login'
-    ) {
-        return null;
-    }
+    useEffect(() => {
+        if (mounted && isAuthenticated()) {
+            fetchCartList(); // ✅ 로그인 시 장바구니 수량 로딩
+        }
+    }, [mounted, isAuthenticated]);
 
     useEffect(() => {
         if (mounted && isAuthenticated() && !userName) {
@@ -46,20 +49,28 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const handleLogout = async () => {
         try {
             await requestLogout();
-            alert('안전하게 로그아웃 되었습니다.');
+            alert('You have been safely logged out.');
         } catch (error) {
-            console.error('서버 로그아웃 요청 실패:', error);
-            alert('로그아웃 처리 중 오류가 발생했지만, 클라이언트에서는 로그아웃됩니다.');
+            console.error('Logout request failed:', error);
+            alert('Logout error occurred. Client will logout anyway.');
         } finally {
             clearAuthState();
             router.push('/main');
         }
     };
 
+    if (
+        pathname === '/login' ||
+        pathname === '/customer/member/login' ||
+        pathname === '/seller/login'
+    ) {
+        return null;
+    }
+
     return (
-        <nav className="w-full sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-            <div className="w-full px-4 py-3 space-y-3">
-                {/* ✅ PC 화면 */}
+        <nav className="w-full sticky top-0 z-50 bg-white/85 backdrop-blur-sm">
+            <div className="w-full px-4 py-3 space-y-4">
+                {/* ✅ PC 헤더 */}
                 <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center w-full">
                     <Link href="/main" className="flex-shrink-0">
                         <Image
@@ -73,40 +84,50 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     </Link>
 
                     <div className="flex justify-center">
-                        <div className="w-full max-w-[900px]">
+                        <div className="w-full max-w-[900px] px-2">
                             <SearchBar onSearch={onSearch} />
                         </div>
                     </div>
 
                     {mounted && (
-                        <div className="flex items-center justify-end space-x-3 text-xs text-gray-600">
+                        <div className="flex items-center justify-end space-x-4 text-sm text-gray-700">
                             {isAuthenticated() ? (
                                 <>
-                                    {userName && <span className="hidden sm:inline">{userName}님</span>}
-                                    <Link href="/customer/mypage" className="hover:text-gray-800">마이페이지</Link>
-                                    <Link href="/customer/cart" className="hover:text-gray-800">장바구니</Link>
-                                    <button onClick={handleLogout} className="hover:text-red-500">로그아웃</button>
+                                    <Link href="/customer/mypage" className="hover:text-gray-800" title="My Page">
+                                        <UserCircle size={20} />
+                                    </Link>
+                                    <Link href="/customer/cart" className="relative hover:text-gray-800" title="Cart">
+                                        <ShoppingCart size={20} />
+                                        {itemCount > 0 && (
+                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                                {itemCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                    <button onClick={handleLogout} className="hover:text-red-500 text-xs">
+                                        LOGOUT
+                                    </button>
                                 </>
                             ) : (
                                 <Link
                                     href={`/login?redirectTo=${encodeURIComponent(
                                         pathname + (searchParams?.toString() ? `?${searchParams}` : '')
                                     )}`}
-                                    className="hover:text-blue-500"
+                                    className="hover:text-blue-500 text-xs"
                                 >
-                                    로그인
+                                    LOGIN
                                 </Link>
                             )}
                         </div>
                     )}
                 </div>
 
-                {/* ✅ PC 카테고리 드롭다운 */}
-                <div className="hidden md:block">
+                {/* ✅ PC 카테고리 */}
+                <div className="hidden md:block mt-4">
                     <CategoryDropdown onCategorySelect={onCategorySelect} />
                 </div>
 
-                {/* ✅ 모바일 상단 */}
+                {/* ✅ 모바일 헤더 */}
                 <div className="flex items-center justify-between md:hidden">
                     <Link href="/main" className="flex items-center">
                         <Image
@@ -123,18 +144,29 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                         <div className="flex items-center space-x-3 text-sm text-gray-600">
                             {isAuthenticated() ? (
                                 <>
-                                    <Link href="/customer/mypage" className="hover:text-gray-800">마이페이지</Link>
-                                    <Link href="/customer/cart" className="hover:text-gray-800">장바구니</Link>
-                                    <button onClick={handleLogout} className="hover:text-red-500">로그아웃</button>
+                                    <Link href="/customer/mypage" title="My Page">
+                                        <UserCircle size={20} />
+                                    </Link>
+                                    <Link href="/customer/cart" className="relative" title="Cart">
+                                        <ShoppingCart size={20} />
+                                        {itemCount > 0 && (
+                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                                {itemCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                    <button onClick={handleLogout} className="hover:text-red-500 text-xs">
+                                        LOGOUT
+                                    </button>
                                 </>
                             ) : (
                                 <Link
                                     href={`/login?redirectTo=${encodeURIComponent(
                                         pathname + (searchParams?.toString() ? `?${searchParams}` : '')
                                     )}`}
-                                    className="hover:text-blue-500"
+                                    className="hover:text-blue-500 text-xs"
                                 >
-                                    로그인
+                                    LOGIN
                                 </Link>
                             )}
                         </div>
@@ -146,8 +178,8 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     <SearchBar onSearch={onSearch} />
                 </div>
 
-                {/* ✅ 모바일 카테고리 드롭다운 */}
-                <div className="block md:hidden">
+                {/* ✅ 모바일 카테고리 */}
+                <div className="block md:hidden mt-4">
                     <CategoryDropdown onCategorySelect={onCategorySelect} />
                 </div>
             </div>

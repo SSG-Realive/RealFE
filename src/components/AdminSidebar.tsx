@@ -70,7 +70,7 @@ export default function AdminSidebar() {
 
   return (
     <aside
-      className="w-full md:w-[220px] bg-gray-900 text-gray-200 min-h-screen p-6"
+      className="w-full md:w-[220px] bg-gray-900 text-gray-200 min-h-screen h-full p-6"
     >
       <h2 className="font-bold text-2xl mb-8 text-teal-500 px-4">관리자</h2>
       <nav>

@@ -155,7 +155,7 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <div>
+    <div className="w-full max-w-full min-h-screen bg-gray-50 overflow-x-hidden">
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}

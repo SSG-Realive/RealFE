@@ -104,6 +104,11 @@ export default function ProductManagementPage() {
     stockRange: ""
   });
   
+  // 페이징 관련 state 추가
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [pageSize] = useState(10);
+  
   // 계층형 카테고리 드롭다운을 위한 상태
   const [selectedParentCategory, setSelectedParentCategory] = useState<number | null>(null);
   const [categoryHierarchy, setCategoryHierarchy] = useState<{
@@ -299,6 +304,14 @@ export default function ProductManagementPage() {
     }
   };
 
+  // 페이징된 상품 목록 계산
+  const paginatedProducts = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <div className="p-8">
       {/* CSS 스타일 주입 */}
@@ -477,9 +490,9 @@ export default function ProductManagementPage() {
             </div>
           </div>  
 
-          {/* 상품 카드 그리드 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
-            {filtered.map((product) => (
+          {/* 데스크탑 상품 카드 그리드 */}
+          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+            {paginatedProducts.map((product) => (
               <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 {/* 상품 이미지 */}
                 <div className="aspect-square bg-gray-100 relative">
@@ -559,6 +572,114 @@ export default function ProductManagementPage() {
               </div>
             ))}
           </div>
+
+          {/* 모바일 카드형 리스트 */}
+          <div className="block md:hidden space-y-4">
+            {paginatedProducts.map((product, idx) => (
+              <div key={product.id} className="bg-white rounded-lg shadow-md p-4">
+                <div className="flex items-start gap-4">
+                  {/* 상품 이미지 */}
+                  <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0 relative">
+                    {product.productImages && product.productImages.length > 0 ? (
+                      <img
+                        src={product.productImages[0]}
+                        alt={product.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Package className="w-8 h-8" />
+                      </div>
+                    )}
+                    <div className="absolute top-1 right-1">
+                      <span className={`px-1 py-0.5 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
+                        {product.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 상품 정보 */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    
+                    <div className="space-y-1 text-sm text-gray-600 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Package className="w-3 h-3" />
+                        <span className="truncate">{product.categoryName}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        <span className="font-medium text-blue-600">
+                          {product.price.toLocaleString()}원
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ShoppingCart className="w-3 h-3" />
+                        <span className={`font-medium ${
+                          product.stock === 0 ? 'text-red-600' : 
+                          product.stock === 1 ? 'text-orange-600' : 
+                          product.stock <= 2 ? 'text-yellow-600' : 'text-green-600'
+                        }`}>
+                          재고: {product.stock}개
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 액션 버튼 */}
+                    <button
+                      onClick={() => handleQuickView(product)}
+                      className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 text-sm"
+                    >
+                      <Eye className="w-4 h-4" />
+                      상세 보기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 페이징 */}
+          {Math.ceil(filtered.length / pageSize) > 1 && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  이전
+                </button>
+                
+                {Array.from({ length: Math.min(5, Math.ceil(filtered.length / pageSize)) }, (_, i) => {
+                  const pageNum = Math.max(1, Math.min(Math.ceil(filtered.length / pageSize) - 4, currentPage - 2)) + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 border rounded ${
+                        currentPage === pageNum 
+                          ? 'bg-blue-500 text-white' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === Math.ceil(filtered.length / pageSize)}
+                  className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  다음
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 결과가 없을 때 */}
           {filtered.length === 0 && (

@@ -93,14 +93,14 @@ export default function AdminSidebar() {
                 {customerOpen ? '▴' : '▾'}
               </button>
             </div>
+            <Accordion open={customerOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="w-full"><Link href="/admin/customers/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/list')}>고객 관리</Link></li>
+                <li className="w-full"><Link href="/admin/sellers" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/sellers')}>판매자 관리</Link></li>
+                <li className="w-full"><Link href="/admin/customers/penalty" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/penalty')}>사용자 패널티</Link></li>
+              </ul>
+            </Accordion>
           </li>
-          <Accordion open={customerOpen}>
-            <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
-              <li className="w-full"><Link href="/admin/customers/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/list')}>고객 관리</Link></li>
-              <li className="w-full"><Link href="/admin/sellers" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/sellers')}>판매자 관리</Link></li>
-              <li className="w-full"><Link href="/admin/customers/penalty" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/penalty')}>사용자 패널티</Link></li>
-            </ul>
-          </Accordion>
           <li className="my-2">
             <Link href="/admin/products" className="block px-4 py-3 rounded text-lg font-semibold hover:bg-teal-600 transition-colors" style={getLinkStyle('/admin/products')}>
               상품관리
@@ -119,14 +119,14 @@ export default function AdminSidebar() {
                 {auctionOpen ? '▴' : '▾'}
               </button>
             </div>
+            <Accordion open={auctionOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/list" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/list')}>경매 목록</Link></li>
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/bid" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/bid')}>입찰 내역</Link></li>
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/register" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/register')}>경매 등록</Link></li>
+              </ul>
+            </Accordion>
           </li>
-          <Accordion open={auctionOpen}>
-            <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
-              <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/list" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/list')}>경매 목록</Link></li>
-              <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/bid" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/bid')}>입찰 내역</Link></li>
-              <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/register" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/register')}>경매 등록</Link></li>
-            </ul>
-          </Accordion>
           <li className="my-2">
             <Link href="/admin/settlement-management" className="block px-4 py-3 rounded text-lg font-semibold hover:bg-teal-600 transition-colors" style={getLinkStyle('/admin/settlement-management')}>
               정산관리
@@ -145,14 +145,14 @@ export default function AdminSidebar() {
                 {reviewOpen ? '▴' : '▾'}
               </button>
             </div>
+            <Accordion open={reviewOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="w-full"><Link href="/admin/review-management/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/list')}>리뷰 목록</Link></li>
+                <li className="w-full"><Link href="/admin/review-management/reported" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/reported')}>리뷰 신고 관리</Link></li>
+                <li className="w-full"><Link href="/admin/review-management/qna" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/qna')}>Q&A 관리</Link></li>
+              </ul>
+            </Accordion>
           </li>
-          <Accordion open={reviewOpen}>
-            <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
-              <li className="w-full"><Link href="/admin/review-management/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/list')}>리뷰 목록</Link></li>
-              <li className="w-full"><Link href="/admin/review-management/reported" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/reported')}>리뷰 신고 관리</Link></li>
-              <li className="w-full"><Link href="/admin/review-management/qna" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/qna')}>Q&A 관리</Link></li>
-            </ul>
-          </Accordion>
         </ul>
       </nav>
     </aside>

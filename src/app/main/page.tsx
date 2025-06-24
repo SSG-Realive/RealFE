@@ -86,7 +86,7 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <div className="mt-10 mb-8"> {/* 여백 추가 */}
+            <div className="mt-10 mb-8 sm:mt-10 sm:mb-8"> {/* 여백 추가 */}
                 <BannerCarousel />
             </div>
 

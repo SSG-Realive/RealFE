@@ -63,7 +63,7 @@ export default function WeeklyAuctionSlider() {
     { breakpoint: 1920, settings: { slidesToShow: 7 } },
     { breakpoint: 1600, settings: { slidesToShow: 5 } },
     { breakpoint: 1200, settings: { slidesToShow: 3 } },
-    { breakpoint: 768, settings: { slidesToShow: 1 } },
+    { breakpoint: 768, settings: { slidesToShow: 3 } },
   ],
   };
 
@@ -119,6 +119,12 @@ export default function WeeklyAuctionSlider() {
 
       {/* 스타일 */}
       <style jsx global>{`
+
+        @media (max-width: 767px) {
+          button {
+            display: none;
+          }
+        }
         /* 해당 컴포넌트에만 적용되도록 범위 제한 */
         .weekly-auction-container .realive-auction-slide {
           transition: transform 0.4s ease, filter 0.4s ease;

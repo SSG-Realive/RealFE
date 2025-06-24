@@ -1,19 +1,35 @@
-'use client';
-
-import Slider from 'react-slick';
-import Link from 'next/link';
 import { useAuctionStore } from '@/store/customer/auctionStore';
-import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
+import Slider from 'react-slick';
 
 export default function WeeklyAuctionSlider() {
   const { auctions, fetchAuctions } = useAuctionStore();
   const sliderRef = useRef<Slider>(null);
+  const [centerIndex, setCenterIndex] = useState(0);
+  const [slidesToShow, setSlidesToShow] = useState(5);
 
   useEffect(() => {
-    if (auctions.length === 0) {
-      fetchAuctions();
-    }
+    if (auctions.length === 0) fetchAuctions();
+
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 768) setSlidesToShow(1);
+      else if (width < 1024) setSlidesToShow(3);
+      else setSlidesToShow(5);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [fetchAuctions, auctions.length]);
+
+  // afterChange 핸들러에서 슬라이드 인덱스 받아 처리
+  const handleAfterChange = (currentSlide: number) => {
+    const calculatedCenter =
+      (currentSlide + Math.floor(slidesToShow / 2)) % (auctions.length || 1);
+    setCenterIndex(calculatedCenter);
+  };
 
   const sorted = [...auctions]
     .filter((a) => a.createdAt)
@@ -29,21 +45,16 @@ export default function WeeklyAuctionSlider() {
     cssEase: 'ease-in-out',
     centerMode: true,
     centerPadding: '0px',
-    slidesToShow: 5,
+    slidesToShow,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3500,
-    arrows: false, // 기본 화살표 제거
+    arrows: false,
     dots: false,
+    afterChange: handleAfterChange,
     responsive: [
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: 3 },
-      },
-      {
-        breakpoint: 768,
-        settings: { slidesToShow: 1 },
-      },
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -51,28 +62,42 @@ export default function WeeklyAuctionSlider() {
     <section className="relative px-4 mt-14">
       <h2 className="text-xl font-bold text-center mb-6">금주의 옥션상품</h2>
 
-      {/* 슬라이더 + 화살표 wrapper */}
       <div className="relative">
         <Slider ref={sliderRef} {...settings}>
-          {sorted.map((auction) => (
-            <div key={auction.id} className="px-2 realive-auction-slide">
-              <Link href={`/auctions/${auction.id}`}>
-                <div className="w-full aspect-w-16 aspect-h-9 rounded-lg shadow overflow-hidden bg-gray-100">
-                    <img
-                        src={auction.adminProduct?.imageUrl || '/images/placeholder.png'}
-                        alt={auction.adminProduct?.productName || '상품 이미지'}
+          {sorted.map((auction, index) => {
+            const isCenter = index === centerIndex;
+
+            return (
+              <div key={`${auction.id}-${index}`} className="px-2">
+                <div
+                  className={`realive-auction-slide ${
+                    isCenter ? 'active-center-style' : ''
+                  }`}
+                >
+                  <Link href={`/auctions/${auction.id}`}>
+                    <div className="w-full aspect-w-16 aspect-h-9 rounded-lg shadow overflow-hidden bg-gray-100">
+                      <img
+                        src={
+                          auction.adminProduct?.imageUrl ||
+                          '/images/placeholder.png'
+                        }
+                        alt={
+                          auction.adminProduct?.productName || '상품 이미지'
+                        }
                         className="object-contain w-full h-full"
-                    />
+                      />
+                    </div>
+                  </Link>
+                  <p className="text-sm text-center mt-1 truncate">
+                    {auction.adminProduct?.productName || '상품 없음'}
+                  </p>
                 </div>
-              </Link>
-              <p className="text-sm text-center mt-1 truncate">
-                {auction.adminProduct?.productName || '상품 없음'}
-              </p>
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </Slider>
 
-        {/* 왼쪽 화살표 - 1,2번 사이 위치 */}
+        {/* 왼쪽 화살표 */}
         <button
           onClick={() => sliderRef.current?.slickPrev()}
           className="absolute z-10 top-[50%] left-[20%] -translate-y-1/2 text-3xl bg-white shadow rounded-full p-2 hover:scale-110 transition"
@@ -81,7 +106,7 @@ export default function WeeklyAuctionSlider() {
           &#10094;
         </button>
 
-        {/* 오른쪽 화살표 - 4,5번 사이 위치 */}
+        {/* 오른쪽 화살표 */}
         <button
           onClick={() => sliderRef.current?.slickNext()}
           className="absolute z-10 top-[50%] right-[20%] -translate-y-1/2 text-3xl bg-white shadow rounded-full p-2 hover:scale-110 transition"
@@ -99,7 +124,7 @@ export default function WeeklyAuctionSlider() {
           opacity: 0.7;
         }
 
-        .slick-center .realive-auction-slide {
+        .active-center-style {
           transform: scale(1.05);
           filter: brightness(1);
           opacity: 1;

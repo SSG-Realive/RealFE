@@ -1,5 +1,7 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import apiClient from '@/lib/apiClient';
 
 // 더미 데이터
 const dummyPenalties = [
@@ -13,7 +15,34 @@ export default function PenaltyDetailPage() {
   const router = useRouter();
   const { id } = params;
 
-  const penalty = dummyPenalties.find(p => p.id === id);
+  const [penalty, setPenalty] = useState<any>(null);
+  const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
+
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get(`/admin/penalties/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(res => setPenalty(res.data))
+      .catch(() => setPenalty(null));
+    // 고객 목록도 불러오기
+    apiClient.get('/admin/users?userType=CUSTOMER&page=0&size=100', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(res => setCustomers(res.data.data.content || []))
+      .catch(() => setCustomers([]));
+  }, [id]);
+
+  const getCustomerName = (customerId: number) => {
+    const c = customers.find(c => c.id === customerId);
+    return c ? `${c.name} (${c.email})` : customerId;
+  };
 
   if (!penalty) {
     return <div className="p-8">패널티 정보를 찾을 수 없습니다.</div>;
@@ -24,9 +53,9 @@ export default function PenaltyDetailPage() {
       <h2 className="text-2xl font-bold mb-6">패널티 상세</h2>
       <div className="bg-white rounded-lg p-6 shadow">
         <div className="flex items-center gap-4 mb-6">
-          <img src={penalty.userImage} alt={penalty.user} className="w-16 h-16 rounded-full border" />
+          <img src={penalty.userImage || '/public/images/placeholder.png'} alt={penalty.customerId} className="w-16 h-16 rounded-full border" />
           <div>
-            <p className="text-lg font-semibold">{penalty.user}</p>
+            <p className="text-lg font-semibold">{getCustomerName(penalty.customerId)}</p>
             <p className="text-gray-500">사용자</p>
           </div>
         </div>

@@ -1,17 +1,45 @@
 "use client";
-import { useState } from "react";
+import apiClient from '@/lib/apiClient';
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function PenaltyRegisterPage() {
   const router = useRouter();
-  const [user, setUser] = useState("");
+  const [customerId, setCustomerId] = useState("");
   const [reason, setReason] = useState("");
+  const [points, setPoints] = useState(10);
+  const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
+  const [search, setSearch] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    apiClient.get(`/admin/users?userType=CUSTOMER&page=0&size=100&searchTerm=${search}`,
+      { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(res => setCustomers(res.data.data.content || []));
+  }, [search]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 실제 등록 로직은 API 연동 필요
-    alert(`패널티가 등록되었습니다.\n사용자: ${user}\n사유: ${reason}`);
-    router.push("/admin/customers/penalty");
+    const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    try {
+      await apiClient.post('/admin/penalties', {
+        customerId: Number(customerId),
+        reason,
+        points,
+        description: reason
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      alert('패널티가 등록되었습니다.');
+      router.push('/admin/customers/penalty');
+      window.location.reload();
+    } catch (err) {
+      const error = err as any;
+      alert('등록 실패: ' + (error?.response?.data?.message || error?.message || '알 수 없는 오류'));
+    }
   };
 
   return (
@@ -20,17 +48,35 @@ export default function PenaltyRegisterPage() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="text"
-          placeholder="사용자명"
-          value={user}
-          onChange={e => setUser(e.target.value)}
+          placeholder="고객 이름/이메일 검색"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="border rounded px-3 py-2"
+        />
+        <select
+          value={customerId}
+          onChange={e => setCustomerId(e.target.value)}
           className="border rounded px-3 py-2"
           required
-        />
+        >
+          <option value="">고객 선택</option>
+          {customers.map(c => (
+            <option key={c.id} value={c.id}>{c.name} ({c.email})</option>
+          ))}
+        </select>
         <input
           type="text"
           placeholder="사유"
           value={reason}
           onChange={e => setReason(e.target.value)}
+          className="border rounded px-3 py-2"
+          required
+        />
+        <input
+          type="number"
+          placeholder="포인트"
+          value={points}
+          onChange={e => setPoints(Number(e.target.value))}
           className="border rounded px-3 py-2"
           required
         />

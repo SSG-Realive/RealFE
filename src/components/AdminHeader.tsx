@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminNotification from './AdminNotification';
 
 export default function AdminHeader({ title }: { title: string }) {
-  const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('adminToken');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const token = localStorage.getItem('adminToken');
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -15,51 +22,52 @@ export default function AdminHeader({ title }: { title: string }) {
 
   return (
     <header style={{
-      background: '#333',
-      color: '#fff',
-      padding: 16,
+      background: '#1f2937',
+      color: '#e5e7eb',
+      padding: '16px 24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      minHeight: 56
+      minHeight: 56,
+      borderBottom: '1px solid #4b5563'
     }}>
-      <div style={{ fontWeight: 'bold', fontSize: 22, color: '#fff' }}>{title}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <h1 style={{ fontWeight: 'bold', fontSize: 20, color: '#e5e7eb' }}>{title}</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <AdminNotification />
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            style={{
-              marginLeft: 12,
-              padding: '6px 18px',
-              background: '#fff',
-              color: '#333',
-              border: 'none',
-              borderRadius: 6,
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              fontSize: 15
-            }}
-          >
-            로그아웃
-          </button>
-        ) : (
-          <button
-            onClick={handleLogin}
-            style={{
-              marginLeft: 12,
-              padding: '6px 18px',
-              background: '#fff',
-              color: '#333',
-              border: 'none',
-              borderRadius: 6,
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              fontSize: 15
-            }}
-          >
-            로그인
-          </button>
+        {isClient && (
+          isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '8px 16px',
+                background: '#14b8a6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 6,
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              로그아웃
+            </button>
+          ) : (
+            <button
+              onClick={handleLogin}
+              style={{
+                padding: '8px 16px',
+                background: '#14b8a6',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 6,
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontSize: 14
+              }}
+            >
+              로그인
+            </button>
+          )
         )}
       </div>
     </header>

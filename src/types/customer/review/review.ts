@@ -1,16 +1,12 @@
-export interface ReviewResponse {
-    id: number;
+export interface ReviewResponseDTO {
+    reviewId: number;
+    orderId: number;
+    customerId: number;
+    sellerId: number;
+    productName: string;
     rating: number;
     content: string;
-    productId: number;
-    customerNickname: string;
+    imageUrls: string[];
     createdAt: string;
-    images: string[];
-}
-
-export interface ReviewCreateRequest {
-    rating: number;
-    content: string;
-    productId: number;
-    images?: File[];
+    isHidden: boolean;
 }

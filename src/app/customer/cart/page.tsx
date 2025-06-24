@@ -2,259 +2,221 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CartListResponseDTO } from '@/types/cart/cartListResponseDTO';
-import { CartItemUpdateRequestDTO } from '@/types/cart/cartItemUpdateRequestDTO';
+import { CartItem } from '@/types/customer/cart/cart';
+import {
+    fetchCartList,
+    updateCartItemQuantity,
+    deleteCartItem,
+} from '@/service/customer/cartService';
+import { useCartStore } from '@/store/customer/useCartStore';
+import CartItemCard from '@/components/customer/cart/CartItemCard';
+import Navbar from '@/components/customer/common/Navbar';
 
-function CartPage() {
-    const [cartData, setCartData] = useState<CartListResponseDTO | null>(null);
+export default function CartPage() {
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const router = useRouter();
 
-    // 장바구니 데이터 가져오기
-    const fetchCartItems = async () => {
-        setLoading(true);
-        try {
-            const response = await fetch('http://localhost:8080/api/customer/cart', {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            // 백엔드가 200 OK와 함께 빈 리스트 또는 데이터 반환 예상
-            if (!response.ok) {
-                // 200 OK가 아닌 경우 (예: 401 Unauthorized, 500 Internal Server Error 등)
-                // 백엔드가 장바구니 없을 때 404나 204를 보낸다면 이 부분을 조정해야 합니다.
-                // 현재 컨트롤러는 200 OK에 빈 배열을 보낼 가능성이 높습니다.
-                throw new Error('장바구니 정보를 가져오는데 실패했습니다. 상태 코드: ' + response.status);
-            }
-
-            const data: CartListResponseDTO = await response.json();
-            setCartData(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // 수량 변경 처리
-    const handleQuantityChange = async (cartItemId: number, productId: number | null, newQuantity: number) => {
-        if (productId === null) {
-            alert('상품 ID를 찾을 수 없어 수량을 변경할 수 없습니다.');
-            return;
-        }
-        if (newQuantity < 0) return;
-
-        try {
-            const updateData: CartItemUpdateRequestDTO = {
-                productId: productId,
-                quantity: newQuantity
-            };
-
-            const response = await fetch(`http://localhost:8080/api/customer/cart/${cartItemId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(updateData)
-            });
-
-            if (!response.ok) {
-                // 204 No Content가 아닌 다른 실패 코드 (예: 400 Bad Request, 500 Internal Server Error)
-                throw new Error('수량 변경에 실패했습니다. 상태 코드: ' + response.status);
-            }
-
-            // 백엔드가 204 No Content를 보낼 경우 (수량이 0이 되어 삭제될 때)
-            // response.json()을 호출하면 에러가 발생하므로 조건부 호출
-            // if (response.status !== 204) {
-            //     const data: CartItemResponseDTO = await response.json();
-            //     // 필요하다면 여기에서 특정 항목만 업데이트
-            // }
-
-            // 수량 변경 또는 삭제 후 항상 전체 목록 새로고침
-            await fetchCartItems();
-        } catch (err) {
-            alert(err instanceof Error ? err.message : '수량 변경 중 오류가 발생했습니다.');
-        }
-    };
-
-    // 장바구니 항목 삭제 (개별 상품 삭제)
-    const handleRemoveItem = async (cartItemId: number) => {
-        if (!confirm('정말로 이 상품을 장바구니에서 삭제하시겠습니까?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`http://localhost:8080/api/customer/cart/${cartItemId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('상품 삭제에 실패했습니다. 상태 코드: ' + response.status);
-            }
-            // 204 No Content 응답이므로 response.json()은 필요 없음
-
-            await fetchCartItems();
-        } catch (err) {
-            alert(err instanceof Error ? err.message : '상품 삭제 중 오류가 발생했습니다.');
-        }
-    };
-
-    // 장바구니 비우기 활성화
-    const handleClearCart = async () => {
-        if (!confirm('정말로 장바구니를 모두 비우시겠습니까?')) {
-            return;
-        }
-
-        try {
-            const response = await fetch('http://localhost:8080/api/customer/cart', {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('장바구니 비우기에 실패했습니다. 상태 코드: ' + response.status);
-            }
-            // 204 No Content 응답이므로 response.json()은 필요 없음
-
-            setCartData({ items: [], totalItems: 0, totalCartPrice: 0 });
-            alert('장바구니가 성공적으로 비워졌습니다.');
-        } catch (err) {
-            alert(err instanceof Error ? err.message : '장바구니 비우기 중 오류가 발생했습니다.');
-        }
-    };
-
-    // 결제 페이지로 이동
-    const handlePayment = () => {
-        if (!cartData || cartData.items.length === 0) {
-            alert('장바구니에 상품이 없습니다.');
-            return;
-        }
-        router.push('/orders/cart-payment');
-    };
+    const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
 
     useEffect(() => {
-        fetchCartItems();
+        fetchCartList()
+            .then(items => {
+                setCartItems(items);
+                setSelectedItemIds(new Set(items.map(item => item.cartItemId)));
+            })
+            .catch(() => alert('장바구니 불러오기 실패'))
+            .finally(() => setLoading(false));
     }, []);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <div className="text-gray-700">로딩 중...</div>
-            </div>
-        );
-    }
+    const totalPrice = cartItems
+        .filter(item => selectedItemIds.has(item.cartItemId))
+        .reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
 
-    if (error) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100">
-                <div className="text-red-500">{error}</div>
-            </div>
-        );
-    }
+    const handleQuantityChange = async (cartItemId: number, newQty: number) => {
+        if (newQty < 1) return;
+
+        try {
+            await updateCartItemQuantity({ cartItemId, quantity: newQty }); // service 수정 반영
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item
+                )
+            );
+        } catch (error) {
+            alert('수량 변경에 실패했습니다.');
+        }
+    };
+
+    const handleDelete = async (cartItemId: number) => {
+        if (!confirm('이 상품을 장바구니에서 삭제하시겠습니까?')) return;
+
+        try {
+            await deleteCartItem({ cartItemId }); // service 수정 반영
+            setCartItems((prevItems) => prevItems.filter((item) => item.cartItemId !== cartItemId));
+            setSelectedItemIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(cartItemId);
+                return newSet;
+            });
+            alert('상품이 장바구니에서 제거되었습니다.');
+        } catch (error) {
+            alert('상품 삭제에 실패했습니다.');
+        }
+    };
+
+    const handleToggleSelect = (cartItemId: number) => {
+        setSelectedItemIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(cartItemId)) {
+                newSet.delete(cartItemId);
+            } else {
+                newSet.add(cartItemId);
+            }
+            return newSet;
+        });
+    };
+
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.checked) {
+            setSelectedItemIds(new Set(cartItems.map(item => item.cartItemId)));
+        } else {
+            setSelectedItemIds(new Set());
+        }
+    };
+
+    const handleDeleteSelected = async () => {
+        if (selectedItemIds.size === 0) {
+            alert('삭제할 상품을 선택해주세요.');
+            return;
+        }
+        if (!confirm(`선택된 ${selectedItemIds.size}개의 상품을 장바구니에서 삭제하시겠습니까?`)) return;
+
+        try {
+            const deletePromises = Array.from(selectedItemIds).map(id => deleteCartItem({ cartItemId: id })); // service 수정 반영
+            await Promise.all(deletePromises);
+
+            setCartItems((prev) => prev.filter((item) => !selectedItemIds.has(item.cartItemId)));
+            setSelectedItemIds(new Set());
+            alert(`${selectedItemIds.size}개의 상품이 삭제되었습니다.`);
+            setIsEditMode(false);
+        } catch (err) {
+            alert('선택 삭제 중 오류가 발생했습니다.');
+        }
+    };
+
+    // ✨ 장바구니 비우기 핸들러 추가
+    const handleClearCart = async () => {
+        if (!confirm('장바구니의 모든 상품을 삭제하시겠습니까?')) return;
+
+        try {
+            // 모든 cartItem.cartItemId를 가져와서 일괄 삭제
+            const allCartItemIds = cartItems.map(item => item.cartItemId);
+            const deletePromises = allCartItemIds.map(id => deleteCartItem({ cartItemId: id }));
+            await Promise.all(deletePromises);
+
+            setCartItems([]); // 장바구니 비우기
+            setSelectedItemIds(new Set()); // 선택 초기화
+            alert('장바구니의 모든 상품이 삭제되었습니다.');
+            setIsEditMode(false); // 편집 모드 해제
+        } catch (err) {
+            alert('장바구니 비우기 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleCheckout = () => {
+        const itemsToCheckout = cartItems.filter(item => selectedItemIds.has(item.cartItemId));
+
+        if (itemsToCheckout.length === 0) {
+            alert("결제할 상품을 선택해주세요.");
+            return;
+        }
+        setItemsForCheckout(itemsToCheckout);
+        router.push('/customer/orders/new');
+    };
+
+    if (loading) return <div className="p-10">로딩 중...</div>;
 
     return (
-        <div className="w-full min-h-screen bg-gray-100 flex flex-col items-center py-10">
-            <div className="w-full max-w-4xl mt-8">
-                <div className="bg-gray-300 w-full py-4 text-center text-xl font-bold text-gray-800 mb-8">
-                    장바구니
-                </div>
-
-                {!cartData || cartData.items.length === 0 ? (
-                    <div className="bg-white rounded-lg shadow-md p-6 text-center py-8">
-                        <p className="text-gray-500">장바구니가 비어있습니다.</p>
-                        <button
-                            onClick={handlePayment}
-                            className="mt-6 bg-blue-600 text-white px-8 py-3 rounded-md disabled:opacity-50"
-                            disabled={true}
-                        >
-                            결제하기
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        <div className="bg-white rounded-lg shadow-md">
-                            {cartData.items.map((item) => (
-                                <div key={item.cartItemId} className="flex items-center py-4 px-6 border-b last:border-b-0">
-                                    <div className="w-6 h-6 border-2 border-gray-300 bg-gray-200 mr-4 flex-shrink-0"></div>
-
-                                    <div className="w-32 h-24 bg-gray-200 flex items-center justify-center text-gray-500 text-sm flex-shrink-0">
-                                        {item.productImage ? (
-                                            <img
-                                                src={item.productImage}
-                                                alt={item.productName || '상품 이미지'}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            '사진 / 영상'
-                                        )}
-                                    </div>
-                                    <div className="ml-6 flex-grow flex items-center justify-between">
-                                        <div className="flex-grow">
-                                            <h3 className="text-xl font-semibold text-gray-800">상품 이름: {item.productName || '알 수 없는 상품'}</h3>
-                                            <p className="text-gray-600 mt-1">수량: {item.quantity} | 가격: {(item.productPrice || 0).toLocaleString()}원</p>
-                                            <p className="font-semibold mt-1">총 가격: {(item.totalPrice || 0).toLocaleString()}원</p>
-                                        </div>
-
-                                        <div className="flex-shrink-0 ml-8 flex flex-col space-y-2">
-                                            <div className="flex items-center justify-center border border-gray-300 rounded overflow-hidden">
-                                                <button
-                                                    onClick={() => item.productId !== null && handleQuantityChange(item.cartItemId, item.productId, item.quantity - 1)}
-                                                    className="px-3 py-2 bg-gray-50 hover:bg-gray-100 disabled:opacity-50"
-                                                    disabled={item.quantity <= 0}
-                                                >
-                                                    -
-                                                </button>
-                                                <span className="px-4 py-2 text-center">{item.quantity}</span>
-                                                <button
-                                                    onClick={() => item.productId !== null && handleQuantityChange(item.cartItemId, item.productId, item.quantity + 1)}
-                                                    className="px-3 py-2 bg-gray-50 hover:bg-gray-100"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-
-                                            <button
-                                                onClick={() => handleRemoveItem(item.cartItemId)}
-                                                className="bg-red-500 text-white w-24 h-10 flex items-center justify-center rounded hover:bg-red-600"
-                                            >
-                                                삭제
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="flex justify-between items-center w-full mt-8 px-6 py-4 bg-white rounded-lg shadow-md">
-                            <button
-                                onClick={handleClearCart}
-                                className="px-6 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold"
-                            >
+        <>
+            <Navbar />
+            <main className="max-w-4xl mx-auto p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">🛒 장바구니</h1>
+                    {cartItems.length > 0 && (
+                        <div className="flex gap-2">
+                            {/* ✨ 장바구니 비우기 버튼 추가 (편집 모드와 무관하게 항상 보일 수 있음) */}
+                            <button onClick={handleClearCart} className="text-sm text-red-600 px-3 py-1 border border-red-600 rounded hover:bg-red-50">
                                 장바구니 비우기
                             </button>
-                            <div className="text-2xl font-bold text-gray-800">
-                                총 금액: {cartData.totalCartPrice.toLocaleString()}원
-                            </div>
-                            <button
-                                onClick={handlePayment}
-                                className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 font-semibold"
-                            >
-                                결제하기
+                            <button onClick={() => setIsEditMode(prev => !prev)} className="text-sm text-gray-600 px-3 py-1 border rounded hover:bg-gray-100">
+                                {isEditMode ? '편집 취소' : '상품 편집'}
                             </button>
                         </div>
+                    )}
+                </div>
+
+                {cartItems.length === 0 ? (
+                    <p className="text-gray-500 text-center py-20">장바구니가 비어있습니다.</p>
+                ) : (
+                    <>
+                        <div className="mb-4 border-b pb-4">
+                            <label className="flex items-center space-x-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    className="h-5 w-5"
+                                    onChange={handleSelectAll}
+                                    checked={selectedItemIds.size > 0 && selectedItemIds.size === cartItems.length}
+                                />
+                                <span>전체선택 ({selectedItemIds.size}/{cartItems.length})</span>
+                            </label>
+                        </div>
+
+                        <ul className="space-y-6"> {/* ✨ 각 리스트 아이템 사이 간격 증가 */}
+                            {cartItems.map((item) => (
+                                <CartItemCard
+                                    key={item.cartItemId}
+                                    item={item}
+                                    onQuantityChange={handleQuantityChange}
+                                    onDelete={handleDelete}
+                                    isSelected={selectedItemIds.has(item.cartItemId)}
+                                    onToggleSelect={handleToggleSelect}
+                                />
+                            ))}
+                        </ul>
                     </>
                 )}
-            </div>
-        </div>
+            </main>
+
+            {(cartItems.length > 0) && (
+                <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+                    <div className="max-w-4xl mx-auto p-4 flex justify-between items-center">
+                        <div className="text-lg font-bold">
+                            총 금액: {totalPrice.toLocaleString()}원
+                        </div>
+                        <div className="flex gap-2">
+                            {isEditMode && (
+                                <button
+                                    onClick={handleDeleteSelected}
+                                    disabled={selectedItemIds.size === 0}
+                                    className="py-3 px-4 bg-red-500 text-white font-bold rounded-md disabled:bg-gray-300"
+                                >
+                                    선택 상품 삭제 ({selectedItemIds.size})
+                                </button>
+                            )}
+                            <button
+                                onClick={handleCheckout}
+                                disabled={selectedItemIds.size === 0}
+                                className="py-3 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
+                            >
+                                선택 상품 결제하기
+                            </button>
+                        </div>
+                    </div>
+                </footer>
+            )}
+        </>
     );
 }
-
-export default CartPage;

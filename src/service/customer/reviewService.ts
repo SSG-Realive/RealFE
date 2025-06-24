@@ -1,34 +1,33 @@
 import apiClient from '@/lib/apiClient';
-import {
-    ReviewCreateRequest,
-    ReviewUpdateRequest,
-    ReviewResponse,
-    MyReviewResponse,
-} from '@/types/customer/review;
+import { ReviewResponseDTO } from '@/types/customer/review/review';
 
-// 🔹 특정 상품의 리뷰 목록 조회
-export async function fetchProductReviews(productId: number): Promise<ReviewResponse[]> {
-    const res = await apiClient.get(`/customer/reviews/product/${productId}`);
+export async function fetchReviewsBySeller(sellerId: number): Promise<ReviewResponseDTO[]> {
+    const res = await apiClient.get(`/reviews/seller/${sellerId}`);
+    return res.data.reviews ?? [];
+}
+
+export async function fetchMyReviews(): Promise<ReviewResponseDTO[]> {
+    const res = await apiClient.get('/reviews/my');
+    return res.data.content ?? [];
+}
+
+export async function fetchReviewDetail(reviewId: number): Promise<ReviewResponseDTO> {
+    const res = await apiClient.get(`/reviews/${reviewId}`);
     return res.data;
 }
 
-// 🔹 리뷰 작성
-export async function createReview(data: ReviewCreateRequest): Promise<void> {
-    await apiClient.post('/customer/reviews', data);
+export async function getReviewDetail(reviewId: number): Promise<ReviewResponseDTO> {
+    const res = await apiClient.get(`/reviews/${reviewId}`);
+    return res.data;
 }
 
-// 🔹 리뷰 수정
-export async function updateReview(reviewId: number, data: ReviewUpdateRequest): Promise<void> {
-    await apiClient.put(`/customer/reviews/${reviewId}`, data);
-}
-
-// 🔹 리뷰 삭제
 export async function deleteReview(reviewId: number): Promise<void> {
-    await apiClient.delete(`/customer/reviews/${reviewId}`);
+    await apiClient.delete(`/reviews/${reviewId}`);
 }
 
-// 🔹 내가 쓴 리뷰 목록
-export async function fetchMyReviews(): Promise<MyReviewResponse[]> {
-    const res = await apiClient.get('/customer/reviews/my');
-    return res.data;
+export async function updateReview(
+    reviewId: number,
+    data: { content: string; rating: number }
+): Promise<void> {
+    await apiClient.put(`/reviews/${reviewId}`, data);
 }

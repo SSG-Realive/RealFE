@@ -17,7 +17,7 @@ const pathTitleMap: { path: string; title: string }[] = [
   { path: '/admin/auction-management', title: '경매' },
   { path: '/admin/review-management', title: '리뷰' },
   { path: '/admin/dashboard', title: '대시보드' },
-  { path: '/admin/sellers', title: '판매자' },
+  { path: '/admin/sellers', title: '판매자 관리' },
   { path: '/admin/products', title: '상품 관리' },
   { path: '/admin/settlement-management', title: '정산관리' },
 ];
@@ -34,9 +34,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div style={{ display: 'flex' }}>
       <AdminSidebar />
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, background: '#f3f4f6' }}>
         <AdminHeader title={title} />
-        <main style={{ padding: '20px' }}>{children}</main>
+        <main style={{ padding: '24px' }}>{children}</main>
       </div>
     </div>
   );

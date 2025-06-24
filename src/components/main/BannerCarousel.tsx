@@ -6,9 +6,9 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const bannerImages = [
-  '/images/배너1.jpg',
-  '/images/배너2.jpg',
-  '/images/배너3.jpg',
+  '/images/banner1.jpg',
+  '/images/banner2.jpg',
+  '/images/banner3.jpg',
 ];
 
 const CustomArrow = ({

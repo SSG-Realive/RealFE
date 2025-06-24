@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fetchPublicProducts, fetchPopularProducts } from '@/service/customer/productService';
+import { toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import Navbar from '@/components/customer/common/Navbar';
 import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
@@ -51,7 +52,6 @@ export default function CustomerHomePage() {
     // ✅ 무한 스크롤을 위한 IntersectionObserver
     useEffect(() => {
         if (!loader.current) return;
-
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -60,13 +60,13 @@ export default function CustomerHomePage() {
             },
             { rootMargin: '100px' }
         );
-
         observer.observe(loader.current);
 
         return () => {
             if (loader.current) observer.unobserve(loader.current);
         };
     }, []);
+
 
     return (
         <div>
@@ -86,17 +86,26 @@ export default function CustomerHomePage() {
             />
 
             {/* 배너 */}
-            <div className="mt-10 mb-8 sm:mt-10 sm:mb-8"> {/* 여백 추가 */}
+            <div className="mt-4 mb-4 sm:mt-10 sm:mb-8"> {/* 여백 추가 */}
                 <BannerCarousel />
             </div>
 
             {/* 옥션 슬라이드 */}
-            <WeeklyAuctionSlider />
+            <div className="mt-1 mb-1 sm:mt-10 sm:mb-8">
+                <WeeklyAuctionSlider />
+            </div>
+            
 
             <PopularProductsGrid />
 
+            <img
+                src="/images/banner-bottom.jpg"
+                alt="프로모션 배너"
+                className="w-full  object-cover"
+            />
+
             {/* 상품 목록 */}
-            <section className="max-w-screen-xl mx-auto px-1 py-30">
+            <section className="max-w-screen-xl mx-auto px-1 py-30 sm:mt-10 sm:mb-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">전체상품</h2>
                 <p className="text-sm text-gray-600 mb-6">
                     다양한 상품을 확인하고 원하는 제품을 찾아보세요.
@@ -109,7 +118,6 @@ export default function CustomerHomePage() {
                     <div ref={loader} className="h-10 col-span-full" />
                 </div>
             </section>
-
 
             <ChatbotFloatingButton />
         </div>

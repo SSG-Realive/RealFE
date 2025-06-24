@@ -56,7 +56,7 @@ export default function WeeklyAuctionSlider() {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3500,
-    arrows: false,
+    arrows: true,
     dots: false,
     afterChange: handleAfterChange,
   responsive: [
@@ -68,7 +68,7 @@ export default function WeeklyAuctionSlider() {
   };
 
   return (
-    <section className="relative px-4 mt-14 weekly-auction-container">
+    <section className="relative px-4 sm:mt-14 mt-1 weekly-auction-container">
       <h2 className="text-xl font-bold text-center mb-6">금주의 옥션상품</h2>
 
       <div className="relative">

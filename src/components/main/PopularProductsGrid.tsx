@@ -17,17 +17,17 @@ export default function PopularProductsGrid() {
   }, []);
 
   return (
-    <section className="bg-gray-50 rounded-2xl p-6 mt-10 shadow-sm border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">🔥 인기상품</h2>
+    <section className="max-w-screen-2xl mx-auto bg-gray-50 rounded-2xl py-10 px-20 mt-10 ">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">인기상품</h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {products.map((product) => (
           <Link
             key={product.id}
             href={`/main/products/${product.id}`}
-            className="flex flex-col items-center text-center hover:scale-[1.015] transition-transform"
+            className="flex flex-col items-start hover:scale-[1.015] transition-transform"
           >
-            <div className="w-full aspect-square bg-gray-100 overflow-hidden rounded-xl border">
+            <div className="w-full aspect-square bg-gray-100 overflow-hidden rounded-xl">
               {product.imageThumbnailUrl ? (
                 <img
                   src={product.imageThumbnailUrl}
@@ -40,10 +40,10 @@ export default function PopularProductsGrid() {
                 </div>
               )}
             </div>
-            <p className="mt-3 text-sm font-medium text-gray-800 truncate w-full">
+            <p className="mt-3 text-sm font-medium text-gray-800 truncate w-full text-left">
               {product.name}
             </p>
-            <p className="text-green-600 font-semibold text-sm mt-1">
+            <p className="text-gray-800 font-semibold text-sm mt-1 text-left">
               {product.price.toLocaleString()}원
             </p>
           </Link>

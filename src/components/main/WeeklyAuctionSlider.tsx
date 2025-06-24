@@ -16,15 +16,20 @@ export default function WeeklyAuctionSlider() {
 
     const handleResize = () => {
       const width = window.innerWidth;
-      if (width < 768) setSlidesToShow(1);
-      else if (width < 1024) setSlidesToShow(3);
-      else setSlidesToShow(5);
+
+      if (width < 768) setSlidesToShow(1);       // 모바일
+      else if (width < 1200) setSlidesToShow(3); // 태블릿 작은 화면
+      else if (width < 1600) setSlidesToShow(5); // 15인치 모니터 정도
+      else if (width < 1920) setSlidesToShow(7); // 큰 데스크탑
+      else setSlidesToShow(9);                    // 와이드 모니터 등
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [fetchAuctions, auctions.length]);
+
+
 
   // 최신 순으로 10개 정렬
   const sorted = useMemo(() => {
@@ -54,10 +59,12 @@ export default function WeeklyAuctionSlider() {
     arrows: false,
     dots: false,
     afterChange: handleAfterChange,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 1 } },
-    ],
+  responsive: [
+    { breakpoint: 1920, settings: { slidesToShow: 7 } },
+    { breakpoint: 1600, settings: { slidesToShow: 5 } },
+    { breakpoint: 1200, settings: { slidesToShow: 3 } },
+    { breakpoint: 768, settings: { slidesToShow: 1 } },
+  ],
   };
 
   return (
@@ -72,15 +79,12 @@ export default function WeeklyAuctionSlider() {
               <div key={`${auction.id}-${index}`} className="px-2">
                 <div className="realive-auction-slide">
                   <Link href={`/auctions/${auction.id}`}>
-                    <div className="w-full aspect-w-16 aspect-h-9 rounded-lg shadow overflow-hidden bg-gray-100">
+                    <div className="w-full max-w-[250px] mx-auto aspect-square rounded-lg shadow overflow-hidden bg-gray-100">
                       <img
                         src={
-                          auction.adminProduct?.imageUrl ||
-                          '/images/placeholder.png'
+                          auction.adminProduct?.imageUrl || '/images/placeholder.png'
                         }
-                        alt={
-                          auction.adminProduct?.productName || '상품 이미지'
-                        }
+                        alt={auction.adminProduct?.productName || '상품 이미지'}
                         className="object-contain w-full h-full"
                       />
                     </div>

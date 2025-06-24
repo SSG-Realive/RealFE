@@ -18,6 +18,11 @@ export default function SellerQnaPage() {
     const [page, setPage] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => {
+        setSidebarOpen(!sidebarOpen);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -39,9 +44,11 @@ export default function SellerQnaPage() {
 
     return (
         <>
-            <SellerHeader/>
+            <div className="hidden">
+                <SellerHeader toggleSidebar={toggleSidebar} />
+            </div>
             <SellerLayout> {/* ✅ 명시적 적용 */}
-                <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+                <div className="flex-1 w-full h-full px-4 py-8 bg-gray-100">
                     <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 QnA 목록</h1>
 
                     <div className="flex justify-end mb-4 md:mb-6">
@@ -80,7 +87,7 @@ export default function SellerQnaPage() {
                                                             ? 'bg-green-100 text-green-800' 
                                                             : 'bg-red-100 text-red-800'
                                                     }`}>
-                                                        {qna.isAnswered ? '✅ 답변 완료' : '❌ 미답변'}
+                                            {qna.isAnswered ? '✅ 답변 완료' : '❌ 미답변'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -100,24 +107,24 @@ export default function SellerQnaPage() {
 
                     {totalPages > 1 && (
                         <div className="mt-6 flex gap-2 justify-center items-center">
-                            <button
-                                onClick={() => setPage((p) => Math.max(p - 1, 0))}
-                                disabled={page === 0}
+                        <button
+                            onClick={() => setPage((p) => Math.max(p - 1, 0))}
+                            disabled={page === 0}
                                 className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                            >
-                                이전
-                            </button>
+                        >
+                            이전
+                        </button>
                             <span className="text-sm px-4 py-2 bg-white border border-gray-300 rounded-md">
-                                {page + 1} / {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
-                                disabled={page >= totalPages - 1}
+                        {page + 1} / {totalPages}
+                    </span>
+                        <button
+                            onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
+                            disabled={page >= totalPages - 1}
                                 className="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                            >
-                                다음
-                            </button>
-                        </div>
+                        >
+                            다음
+                        </button>
+                    </div>
                     )}
                 </div>
             </SellerLayout>

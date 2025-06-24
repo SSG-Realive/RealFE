@@ -71,7 +71,9 @@ export default function ProductDetailPage() {
 
     return (
         <>
-            <SellerHeader />
+            <div className="hidden">
+                <SellerHeader />
+            </div>
             <SellerLayout>
                 <div className="max-w-3xl mx-auto p-4 sm:p-6">
                     <h1 className="text-xl sm:text-2xl font-bold mb-4 break-words">{product.name}</h1>

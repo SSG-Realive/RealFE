@@ -14,7 +14,12 @@ export default function SellerOrderListPage() {
   const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
     if (checking) return; // ✅ 인증 확인 중이면 아무것도 하지 않음
@@ -38,38 +43,33 @@ export default function SellerOrderListPage() {
 
   if (checking || loading) {
     return (
-      <>
-        <SellerHeader />
-        <SellerLayout>
-          <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">로딩 중...</span>
-            </div>
+      <SellerLayout>
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">로딩 중...</span>
           </div>
-        </SellerLayout>
-      </>
+        </div>
+      </SellerLayout>
     );
   }
 
   return (
-    <>
-      <SellerHeader />
-      <SellerLayout>
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
-          <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 주문 목록</h1>
+    <SellerLayout>
+      <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+        <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 주문 목록</h1>
 
-          {error ? (
+        {error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <p className="text-red-600">{error}</p>
             </div>
-          ) : orders.length === 0 ? (
+        ) : orders.length === 0 ? (
             <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
               <p className="text-gray-500 text-lg">등록된 주문이 없습니다.</p>
             </div>
-          ) : (
+        ) : (
             <div className="grid gap-4">
-              {orders.map((order) => (
+            {orders.map((order) => (
                 <div key={order.orderId} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="space-y-3">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
@@ -99,20 +99,19 @@ export default function SellerOrderListPage() {
                     </div>
                     
                     <div className="pt-2 border-t border-gray-100">
-                      <button
-                        onClick={() => router.push(`/seller/orders/${order.orderId}`)}
+                  <button
+                    onClick={() => router.push(`/seller/orders/${order.orderId}`)}
                         className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                      >
-                        배송 상세 정보 보기
-                      </button>
+                  >
+                    배송 상세 정보 보기
+                  </button>
                     </div>
                   </div>
                 </div>
-              ))}
+            ))}
             </div>
-          )}
-        </div>
-      </SellerLayout>
-    </>
+        )}
+      </div>
+    </SellerLayout>
   );
 }

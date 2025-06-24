@@ -137,51 +137,53 @@ export default function ProductEditPage() {
 
     return (
         <>
-            <SellerHeader />
+            <div className="hidden">
+                <SellerHeader />
+            </div>
             <SellerLayout>
                 <div className="max-w-4xl mx-auto p-4 sm:p-6">
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
                         <h1 className="text-xl sm:text-2xl font-bold mb-6 text-gray-900">상품 수정</h1>
 
                         <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
-                            {/* 카테고리 선택 */}
+                        {/* 카테고리 선택 */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         카테고리 (1차)
                                     </label>
-                                    <select
-                                        value={parentCategoryIdState}
-                                        onChange={handleParentCategoryChange}
+                            <select
+                                value={parentCategoryIdState}
+                                onChange={handleParentCategoryChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        required
-                                    >
-                                        <option value="">-- 선택 --</option>
-                                        {parentCategories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                required
+                            >
+                                <option value="">-- 선택 --</option>
+                                {parentCategories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         카테고리 (2차)
                                     </label>
-                                    <select
-                                        value={form.categoryId || ''}
-                                        onChange={handleSubCategoryChange}
+                            <select
+                                value={form.categoryId || ''}
+                                onChange={handleSubCategoryChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        required
-                                    >
-                                        <option value="">-- 선택 --</option>
-                                        {subCategories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                required
+                            >
+                                <option value="">-- 선택 --</option>
+                                {subCategories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                ))}
+                            </select>
+                        </div>
                             </div>
 
-                            {/* 상품명 */}
+                        {/* 상품명 */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     상품명
@@ -194,9 +196,9 @@ export default function ProductEditPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     placeholder="상품명을 입력하세요"
                                 />
-                            </div>
+                        </div>
 
-                            {/* 가격 */}
+                        {/* 가격 */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     가격
@@ -210,9 +212,9 @@ export default function ProductEditPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     placeholder="가격을 입력하세요"
                                 />
-                            </div>
+                        </div>
 
-                            {/* 상품 설명 */}
+                        {/* 상품 설명 */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     상품 설명
@@ -226,9 +228,9 @@ export default function ProductEditPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                                     placeholder="상품 설명을 입력하세요"
                                 />
-                            </div>
+                        </div>
 
-                            {/* 재고 */}
+                        {/* 재고 */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     재고
@@ -242,9 +244,9 @@ export default function ProductEditPage() {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     placeholder="재고 수량을 입력하세요"
                                 />
-                            </div>
+                        </div>
 
-                            {/* 크기 */}
+                        {/* 크기 */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -259,7 +261,7 @@ export default function ProductEditPage() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="가로"
                                     />
-                                </div>
+                        </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -274,7 +276,7 @@ export default function ProductEditPage() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         placeholder="세로"
                                     />
-                                </div>
+                        </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -290,58 +292,58 @@ export default function ProductEditPage() {
                                         placeholder="높이"
                                     />
                                 </div>
-                            </div>
+                        </div>
 
-                            {/* 상태 */}
+                        {/* 상태 */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     상품 상태
                                 </label>
-                                <select
-                                    name="status"
-                                    value={form.status}
-                                    onChange={handleChange}
+                            <select
+                                name="status"
+                                value={form.status}
+                                onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    required
-                                >
-                                    <option value="상">상</option>
-                                    <option value="중">중</option>
-                                    <option value="하">하</option>
-                                </select>
-                            </div>
+                                required
+                            >
+                                <option value="상">상</option>
+                                <option value="중">중</option>
+                                <option value="하">하</option>
+                            </select>
+                        </div>
 
-                            {/* 활성화 여부 */}
+                        {/* 활성화 여부 */}
                             <div className="flex items-center">
-                                <input
-                                    type="checkbox"
+                            <input
+                                type="checkbox"
                                     id="active"
                                     checked={form.isActive}
-                                    disabled={form.stock === 0}  // 재고가 0이면 체크박스 비활성화
-                                    onChange={(e) => {
-                                        if (form.stock === 0 && e.target.checked) {
-                                            alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.');
-                                            return;  // 체크 방지
-                                        }
+                                disabled={form.stock === 0}  // 재고가 0이면 체크박스 비활성화
+                                onChange={(e) => {
+                                    if (form.stock === 0 && e.target.checked) {
+                                        alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.');
+                                        return;  // 체크 방지
+                                    }
                                         setForm({ ...form, isActive: e.target.checked });
-                                    }}
+                                }}
                                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
+                            />
                                 <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
                                     활성화 여부
                                 </label>
-                            </div>
+                        </div>
 
-                            {/* 썸네일 및 서브 이미지 */}
+                        {/* 썸네일 및 서브 이미지 */}
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         대표 이미지
                                     </label>
                                     {form?.imageThumbnailUrl && (
-                                        <div className="mb-2 text-sm text-gray-600">
-                                            현재 등록된 파일명: {form.imageThumbnailUrl.split('/').pop()}
-                                        </div>
-                                    )}
+                                <div className="mb-2 text-sm text-gray-600">
+                                    현재 등록된 파일명: {form.imageThumbnailUrl.split('/').pop()}
+                                </div>
+                            )}
                                     <input 
                                         type="file" 
                                         accept="image/*" 
@@ -355,7 +357,7 @@ export default function ProductEditPage() {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         대표 영상
                                     </label>
-                                    <input 
+                                    <input
                                         type="file" 
                                         accept="video/*" 
                                         onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)} 
@@ -367,7 +369,7 @@ export default function ProductEditPage() {
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         서브 이미지
                                     </label>
-                                    <input 
+                                    <input
                                         type="file" 
                                         accept="image/*" 
                                         multiple 
@@ -389,7 +391,7 @@ export default function ProductEditPage() {
                             >
                                 수정하기
                             </button>
-                        </form>
+                    </form>
                     </div>
                 </div>
             </SellerLayout>

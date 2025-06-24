@@ -22,6 +22,11 @@ export default function SellerMePage() {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태는 true로 시작
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   // ▼▼▼ 이 useEffect를 추가합니다 ▼▼▼
   useEffect(() => {
@@ -81,7 +86,9 @@ export default function SellerMePage() {
   if (checking || loading) {
     return (
         <>
-          <SellerHeader />
+          <div className="hidden">
+            <SellerHeader toggleSidebar={toggleSidebar} />
+          </div>
           <SellerLayout>
             <div className="p-4 sm:p-8">로딩 중...</div>
           </SellerLayout>
@@ -91,7 +98,9 @@ export default function SellerMePage() {
 
   return (
       <>
-        <SellerHeader />
+        <div className="hidden">
+          <SellerHeader toggleSidebar={toggleSidebar} />
+        </div>
         <SellerLayout>
           <div className="max-w-2xl mx-auto p-4 sm:p-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">

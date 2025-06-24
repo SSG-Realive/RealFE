@@ -19,9 +19,14 @@ export default function ProductListPage() {
   const [products, setProducts] = useState<ProductListItem[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   useEffect(() => {
     if (checking) return;
@@ -70,9 +75,11 @@ export default function ProductListPage() {
     ); // ✅ 인증 확인 중 UI 
   return (
     <>
-      <SellerHeader />
+      <div className="hidden">
+        <SellerHeader toggleSidebar={toggleSidebar} />
+      </div>
       <SellerLayout>
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+        <div className="flex-1 w-full h-full px-4 py-8 bg-gray-100">
           <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">내 상품 목록</h1>
 
           {/* 🔍 검색 필터 */}
@@ -120,12 +127,12 @@ export default function ProductListPage() {
                       <p>상태: <span className="font-medium">{product.status}</span></p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => router.push(`/seller/products/${product.id}`)}
+                <button
+                  onClick={() => router.push(`/seller/products/${product.id}`)}
                     className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                  >
-                    상세 보기
-                  </button>
+                >
+                  상세 보기
+                </button>
                 </div>
               </div>
             ))}
@@ -133,21 +140,21 @@ export default function ProductListPage() {
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-6 space-x-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => goToPage(i + 1)}
+          <div className="flex justify-center mt-6 space-x-2">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => goToPage(i + 1)}
                   className={`px-3 py-2 border rounded-md text-sm ${
                     currentPage === i + 1 
                       ? 'bg-blue-600 text-white border-blue-600' 
                       : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-50'
                   } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
           )}
         </div>
       </SellerLayout>

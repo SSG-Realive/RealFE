@@ -1,12 +1,14 @@
+'use client';
+
 import { useAuctionStore } from '@/store/customer/auctionStore';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import Slider from 'react-slick';
 
 export default function WeeklyAuctionSlider() {
   const { auctions, fetchAuctions } = useAuctionStore();
   const sliderRef = useRef<Slider>(null);
-  const [centerIndex, setCenterIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [slidesToShow, setSlidesToShow] = useState(5);
 
   useEffect(() => {
@@ -24,20 +26,20 @@ export default function WeeklyAuctionSlider() {
     return () => window.removeEventListener('resize', handleResize);
   }, [fetchAuctions, auctions.length]);
 
-  // afterChange 핸들러에서 슬라이드 인덱스 받아 처리
-  const handleAfterChange = (currentSlide: number) => {
-    const calculatedCenter =
-      (currentSlide + Math.floor(slidesToShow / 2)) % (auctions.length || 1);
-    setCenterIndex(calculatedCenter);
-  };
+  // 최신 순으로 10개 정렬
+  const sorted = useMemo(() => {
+    return [...auctions]
+      .filter((a) => a.createdAt)
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
+      )
+      .slice(0, 10);
+  }, [auctions]);
 
-  const sorted = [...auctions]
-    .filter((a) => a.createdAt)
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-    )
-    .slice(0, 10);
+  const handleAfterChange = (current: number) => {
+    setCurrentSlide(current);
+  };
 
   const settings = {
     infinite: true,
@@ -59,21 +61,16 @@ export default function WeeklyAuctionSlider() {
   };
 
   return (
-    <section className="relative px-4 mt-14">
+    <section className="relative px-4 mt-14 weekly-auction-container">
       <h2 className="text-xl font-bold text-center mb-6">금주의 옥션상품</h2>
 
       <div className="relative">
         <Slider ref={sliderRef} {...settings}>
           {sorted.map((auction, index) => {
-            const isCenter = index === centerIndex;
-
+            // centerMode에서는 slick-center 클래스를 사용하는 것이 더 안정적
             return (
               <div key={`${auction.id}-${index}`} className="px-2">
-                <div
-                  className={`realive-auction-slide ${
-                    isCenter ? 'active-center-style' : ''
-                  }`}
-                >
+                <div className="realive-auction-slide">
                   <Link href={`/auctions/${auction.id}`}>
                     <div className="w-full aspect-w-16 aspect-h-9 rounded-lg shadow overflow-hidden bg-gray-100">
                       <img
@@ -116,19 +113,32 @@ export default function WeeklyAuctionSlider() {
         </button>
       </div>
 
+      {/* 스타일 */}
       <style jsx global>{`
-        .realive-auction-slide {
+        /* 해당 컴포넌트에만 적용되도록 범위 제한 */
+        .weekly-auction-container .realive-auction-slide {
           transition: transform 0.4s ease, filter 0.4s ease;
           transform: scale(0.9);
           filter: brightness(0.92);
           opacity: 0.7;
         }
 
-        .active-center-style {
+        /* centerMode에서 slick이 자동으로 추가하는 slick-center 클래스 활용 */
+        .weekly-auction-container .slick-center .realive-auction-slide {
           transform: scale(1.05);
           filter: brightness(1);
           opacity: 1;
           z-index: 2;
+        }
+
+        /* 슬라이더 오버플로우 설정으로 잘림 방지 - 해당 컴포넌트에만 적용 */
+        .weekly-auction-container .slick-list {
+          overflow: visible;
+          padding: 20px 0;
+        }
+        
+        .weekly-auction-container .slick-slide {
+          overflow: visible;
         }
       `}</style>
     </section>

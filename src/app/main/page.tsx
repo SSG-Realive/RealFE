@@ -10,6 +10,7 @@ import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingB
 import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
+import PopularProductsGrid from '@/components/main/PopularProductsGrid';
 
 
 const ITEMS_PER_PAGE = 20;
@@ -22,7 +23,6 @@ export default function CustomerHomePage() {
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [keyword, setKeyword] = useState<string>('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);
-    const [popularProducts, setPopularProducts] = useState<ProductListDTO[]>([]);
     const [page, setPage] = useState(1);
     const loader = useRef<HTMLDivElement | null>(null);
 
@@ -32,11 +32,6 @@ export default function CustomerHomePage() {
         setKeyword(keywordFromUrl);
         setPage(1);
     }, [categoryFromUrl, keywordFromUrl]);
-
-    // ✅ 인기 상품 불러오기
-    useEffect(() => {
-        fetchPopularProducts().then(setPopularProducts);
-    }, []);
 
     // ✅ categoryId 또는 keyword가 바뀌었을 때 상품 초기화 & 새로 불러오기
     useEffect(() => {
@@ -98,17 +93,7 @@ export default function CustomerHomePage() {
             {/* 옥션-슬라이드 */}
             <WeeklyAuctionSlider />
 
-            {/* 🔥 인기 상품 */}
-            {popularProducts.length > 0 && (
-                <div className="px-4 mb-8">
-                    <h2 className="text-lg font-bold mb-3">인기 상품 🔥</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {popularProducts.map((p, index) => (
-                            <ProductCard key={`popular-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                        ))}
-                    </div>
-                </div>
-            )}
+            <PopularProductsGrid />
 
             {/* 📦 상품 목록 */}
             <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">

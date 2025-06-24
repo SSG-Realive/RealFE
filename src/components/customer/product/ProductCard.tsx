@@ -1,71 +1,72 @@
 'use client';
 
-import { toggleWishlist } from '@/service/customer/wishlistService';
-import { ProductListDTO } from '@/types/seller/product/product';
 import { useState } from 'react';
 import Link from 'next/link';
+import { ProductListDTO } from '@/types/seller/product/product';
+import { Heart } from 'lucide-react'; // lucide-react 아이콘 사용
+
+interface Props extends ProductListDTO {
+    onToggle?: (productId: number) => void;
+}
 
 export default function ProductCard({
                                         id,
                                         name,
                                         price,
                                         imageThumbnailUrl,
-                                        isActive,
-                                        isWished: initialWished = false,
-                                    }: ProductListDTO & { isWished?: boolean }) {
-    const [isWished, setIsWished] = useState<boolean>(initialWished);
-    const [loading, setLoading] = useState<boolean>(false);
+                                        isWished,
+                                        onToggle,
+                                    }: Props) {
+    const [hovered, setHovered] = useState(false);
+    const [liked, setLiked] = useState(isWished);
 
-    const handleToggle = async (e: React.MouseEvent) => {
+    const handleToggleLike = async (e: React.MouseEvent) => {
         e.preventDefault();
-        if (loading) return;
-
-        setLoading(true);
-        try {
-            const result = await toggleWishlist({ productId: id });
-            setIsWished(result);
-
-
-            if (result) {
-                alert('찜 목록에 추가되었습니다.');
-            } else {
-                alert('찜 목록에서 제거되었습니다.');
-            }
-        } catch (err) {
-            console.error('찜 토글 실패:', err);
-            alert('찜 처리 중 오류가 발생했습니다.');
-        } finally {
-            setLoading(false);
-        }
+        setLiked((prev) => !prev);
+        onToggle?.(id);
     };
 
     return (
         <Link href={`/main/products/${id}`}>
-            <div className="bg-white shadow rounded overflow-hidden border p-3 hover:shadow-md transition">
-                {imageThumbnailUrl ? (
-                    <img
-                        src={imageThumbnailUrl}
-                        alt={name}
-                        className="w-full h-48 object-cover"
-                    />
-                ) : (
-                    <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500">
-                        이미지 없음
-                    </div>
-                )}
-                <div className="mt-3">
-                    <p className="text-sm font-semibold truncate">{name}</p>
-                    <p className="text-green-600 font-bold text-sm">
-                        {price.toLocaleString()}원
+            <div
+                className="relative bg-[#f9f9f7] rounded-2xl overflow-hidden p-3 hover:shadow-md transition"
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => setHovered(false)}
+            >
+                <div className="relative">
+                    {imageThumbnailUrl ? (
+                        <img
+                            src={imageThumbnailUrl}
+                            alt={name}
+                            className="w-full h-48 object-cover rounded-xl"
+                        />
+                    ) : (
+                        <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-500 rounded-xl">
+                            이미지 없음
+                        </div>
+                    )}
+
+                    {hovered && (
+                        <button
+                            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+                bg-white/60 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white/80 transition z-10"
+                            onClick={handleToggleLike}
+                        >
+                            <Heart
+                                size={20}
+                                stroke={liked ? 'red' : 'gray'}
+                                fill={liked ? 'red' : 'none'}
+                            />
+                        </button>
+                    )}
+                </div>
+
+                <div className="mt-3 text-black">
+                    <p className="text-sm font-light truncate">{name}</p>
+                    <p className="text-sm font-light">
+                        {price.toLocaleString()}
+                        <span className="text-xs align-middle ml-0.5">원</span>
                     </p>
-                    <button
-                        onClick={handleToggle}
-                        className="mt-2 text-xl"
-                        aria-label="찜하기 버튼"
-                        disabled={loading}
-                    >
-                        {isWished ? '❤️' : '🤍'}
-                    </button>
                 </div>
             </div>
         </Link>

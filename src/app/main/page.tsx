@@ -93,7 +93,11 @@ export default function CustomerHomePage() {
             )}
 
             {/* 옥션 슬라이드 */}
-            <WeeklyAuctionSlider />
+            {!categoryFromUrl && (
+                <div className="mb-8">
+                    <WeeklyAuctionSlider />
+                </div>
+            )}
 
             <PopularProductsGrid />
 

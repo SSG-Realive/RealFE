@@ -35,7 +35,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div style={{ display: 'flex' }}>
       {/* 데스크탑용 사이드바 */}
       <div className="hidden md:block">
-        <AdminSidebar />
+        <div className="fixed left-0 top-0 h-screen w-[220px] z-40 bg-gray-900">
+          <AdminSidebar />
+        </div>
       </div>
       {/* 모바일 오버레이용 사이드바 */}
       <div id="mobile-sidebar-overlay" className="fixed inset-0 z-40 bg-black bg-opacity-40 hidden md:hidden" onClick={() => { document.getElementById('mobile-sidebar')?.classList.add('-translate-x-full'); document.getElementById('mobile-sidebar-overlay')?.classList.add('hidden'); }} />
@@ -43,7 +45,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <button className="absolute top-4 right-4 text-white text-2xl" onClick={() => { document.getElementById('mobile-sidebar')?.classList.add('-translate-x-full'); document.getElementById('mobile-sidebar-overlay')?.classList.add('hidden'); }}>×</button>
         <AdminSidebar />
       </div>
-      <div className="flex-1 w-full min-h-screen bg-gray-100">
+      <div className="flex-1 w-full min-h-screen bg-gray-100 ml-[220px]">
         <AdminHeader title={title} />
         <main className="p-6">{children}</main>
       </div>

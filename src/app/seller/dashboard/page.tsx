@@ -256,10 +256,20 @@ export default function SellerDashboardPage() {
             <section className="bg-white p-4 md:p-6 rounded-lg shadow-sm border">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-gray-600 text-sm font-semibold mb-2">평균 평점</h2>
-                  <p className="text-xl md:text-2xl font-bold text-yellow-600">{dashboard?.averageRating?.toFixed(1) || '0.0'}점</p>
+                  <h2 className="text-gray-600 text-sm font-semibold mb-2">판매자 등급</h2>
+                  <p className="text-xl md:text-2xl font-bold" style={{color: dashboard?.sellerRating === 'GREEN' ? '#22c55e' : dashboard?.sellerRating === 'YELLOW' ? '#eab308' : '#ef4444'}}>
+                    {dashboard?.sellerRating === 'GREEN' && '🟢 초록'}
+                    {dashboard?.sellerRating === 'YELLOW' && '🟡 노랑'}
+                    {dashboard?.sellerRating === 'RED' && '🔴 빨강'}
+                    {!dashboard?.sellerRating && '등급 없음'}
+                  </p>
                 </div>
-                <Star className="w-8 h-8 text-yellow-600" />
+                <span className="text-3xl">
+                  {dashboard?.sellerRating === 'GREEN' && '🟢'}
+                  {dashboard?.sellerRating === 'YELLOW' && '🟡'}
+                  {dashboard?.sellerRating === 'RED' && '🔴'}
+                  {!dashboard?.sellerRating && '❔'}
+                </span>
               </div>
             </section>
           </div>

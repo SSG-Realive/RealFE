@@ -8,6 +8,7 @@ export interface SellerDashboardResponse{
     totalCustomers: number;
     averageRating: number;
     totalReviews: number;
+    sellerRating?: 'RED' | 'YELLOW' | 'GREEN';
 }
 
 export interface SellerSalesStatsDTO {

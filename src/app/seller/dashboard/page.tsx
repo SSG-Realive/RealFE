@@ -9,7 +9,7 @@ import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySal
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import dynamic from 'next/dynamic';
-import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel } from 'lucide-react';
+import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel, Armchair } from 'lucide-react';
 
 // ApexCharts를 동적으로 import (SSR 문제 방지)
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -208,12 +208,12 @@ export default function SellerDashboardPage() {
         <h1 className="text-2xl font-extrabold mb-8 text-[#5b4636] tracking-wide">판매자 대시보드</h1>
         {/* 상단 카드 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-            <Package className="w-10 h-10 text-[#bfa06a]" />
+          <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
             <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 등록 상품</h2>
-              <p className="text-2xl font-extrabold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
+              <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
+              <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
             </div>
+            <Armchair className="w-8 h-8 text-[#bfa06a]" />
           </section>
           <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
             <DollarSign className="w-10 h-10 text-[#bfa06a]" />

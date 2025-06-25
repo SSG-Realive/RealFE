@@ -220,3 +220,7 @@ body.seller-login button:hover,
 body.seller-signup button:hover {
   background: #1d4ed8 !important;
 }
+
+html, body {
+  background-color: #a89f91 !important;
+}

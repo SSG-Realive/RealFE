@@ -9,15 +9,20 @@ import { fetchAllCategories } from '@/service/categoryService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import { Category } from '@/types/common/category';
 
+
 import Navbar from '@/components/customer/common/Navbar';
 import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
 import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
 import PopularProductsGrid from '@/components/main/PopularProductsGrid';
-import BottomBannerCarousel from '@/components/main/BottomBannerCarousel';
+import CategoryDropdown from '@/components/customer/common/CategoryDropdown';
+import MiddleBannerCarousel from '@/components/main/MiddleBannerCarousel';
+import ExtraBanner from '@/components/main/ExtraBanner';
+import Section from '@/components/customer/product/Section';
+import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 export default function CustomerHomePage() {
     const pathname = usePathname();
@@ -25,7 +30,6 @@ export default function CustomerHomePage() {
 
     const categoryFromUrl = searchParams.get('category');
     const keywordFromUrl = searchParams.get('keyword') || '';
-
     const [categoryId, setCategoryId] = useState<number | null>(null);
     const [keyword, setKeyword] = useState<string>('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);
@@ -45,7 +49,6 @@ export default function CustomerHomePage() {
     useEffect(() => {
         setCategoryId(categoryFromUrl ? Number(categoryFromUrl) : null);
         setKeyword(keywordFromUrl);
-        setPage(1);
     }, [categoryFromUrl, keywordFromUrl]);
 
     useEffect(() => {
@@ -89,14 +92,14 @@ export default function CustomerHomePage() {
                 }}
             />
 
-            {/* ✅ 상단 배너 - 검색/카테고리 없을 때만 */}
+            {/* ✅ 상단 배너 - 메인 & 검색/카테고리 없을 때만 */}
             {showMainTopBanners && (
-                <div className="mt-8 mb-8 w-full max-w-none px-0">
+                <div className="mb-8">
                     <BannerCarousel />
                 </div>
             )}
 
-            {/* ✅ 카테고리 없을 때만 옥션 배너 */}
+            {/* ✅ 옥션 배너 - 카테고리 없을 때만 */}
             {!categoryId && (
                 <div className="mt-1 mb-1 sm:mt-10 sm:mb-8">
                     <WeeklyAuctionSlider />
@@ -105,10 +108,7 @@ export default function CustomerHomePage() {
 
             <PopularProductsGrid />
 
-            {/* ✅ 하단 배너 - 상품 목록 위로 이동 */}
-            <div className="mt-20 mb-10">
-                <BottomBannerCarousel images={['/images/banner4.png', '/images/banner5.png']} />
-            </div>
+            {showMainTopBanners && <ExtraBanner />}
 
             {/* ✅ 상품 목록 */}
             <section className="max-w-screen-xl mx-auto px-1 py-30 sm:mt-10 sm:mb-8">
@@ -118,12 +118,24 @@ export default function CustomerHomePage() {
                     </h2>
                 </div>
                 <p className="text-sm text-gray-600 mb-6">
-                    다양한 상품을 확인하고 원하는 제품을 찾아보세요.
+                    카테고리 없애고 필터 추가
                 </p>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                <div className="mb-4">
+                    <CategoryDropdown
+                        isCompact={true}
+                        onCategorySelect={(id) => {
+                            const query = new URLSearchParams();
+                            if (id !== -1) query.set('category', String(id));
+                            if (keyword) query.set('keyword', keyword);
+                            window.location.href = `/main?${query.toString()}`;
+                        }}
+                    />
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
                     {products.map((p, index) => (
-                        <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                        <ProductCard key={`product-${p.id}-${index}`} {...p} />
                     ))}
                 </div>
 
@@ -139,13 +151,27 @@ export default function CustomerHomePage() {
                 )}
             </section>
 
-            {/* ✅ 중간 배너 - 맨 아래로 위치 변경 */}
+            {showMainTopBanners && <MiddleBannerCarousel />}
+
             {showMainTopBanners && (
-                <div className="max-w-screen-xl mx-auto px-4 my-10">
+                <>
+                    <Section title="거실 가구" categoryId={10} limit={5} />
+                    <Section title="침실 가구" categoryId={20} limit={5} />
+                    <Section title="주방·다이닝 가구" categoryId={30} limit={5} />
+                    <Section title="서재·오피스 가구" categoryId={40} limit={5} />
+                    <Section title="기타 가구" categoryId={50} limit={5} />
+                </>
+            )}
+
+            {showMainTopBanners && <BottomInspirationSlider />}
+
+            {/* ✅ 하단 배너 - 메인페이지에서 항상 보임 */}
+            {pathname === '/main' && (
+                <div className="w-full">
                     <img
                         src="/images/banner-bottom.jpg"
                         alt="프로모션 배너"
-                        className="w-full rounded-xl shadow-md object-cover"
+                        className="w-full h-auto object-cover"
                     />
                 </div>
             )}

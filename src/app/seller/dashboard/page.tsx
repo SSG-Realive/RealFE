@@ -48,11 +48,18 @@ export default function SellerDashboardPage() {
         const statsData = await getSalesStatistics(startDate, endDate);
         setSalesStats(statsData);
 
-        // 일별/월별 추이
+        // 일별 추이 (최근 30일)
         const dailyData = await getDailySalesTrend(startDate, endDate);
         setDailyTrend(dailyData);
 
-        const monthlyData = await getMonthlySalesTrend(startDate, endDate);
+        // 월별 추이 (최근 6개월)
+        const endMonthDate = new Date();
+        const startMonthDate = new Date();
+        startMonthDate.setMonth(endMonthDate.getMonth() - 5);
+        startMonthDate.setDate(1); // 각 월의 1일로 맞추기
+        const startMonthStr = startMonthDate.toISOString().split('T')[0];
+        const endMonthStr = endMonthDate.toISOString().split('T')[0];
+        const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
         setMonthlyTrend(monthlyData);
 
       } catch (err) {
@@ -64,6 +71,19 @@ export default function SellerDashboardPage() {
 
     fetchDashboardData();
   }, [checking]);
+
+  // 최근 6개월 yearMonth 배열 생성
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push(d.toISOString().slice(0, 7)); // 'YYYY-MM'
+  }
+  // monthlyTrend를 yearMonth 기준으로 매칭, 없으면 0원
+  const monthlyTrendFilled = months.map(month => {
+    const found = monthlyTrend.find(item => item.yearMonth === month);
+    return found || { yearMonth: month, orderCount: 0, revenue: 0 };
+  });
 
   // 일별 매출 차트 옵션
   const dailyChartOptions = {
@@ -139,7 +159,7 @@ export default function SellerDashboardPage() {
       enabled: false
     },
     xaxis: {
-      categories: monthlyTrend.map(item => item.yearMonth),
+      categories: monthlyTrendFilled.map(item => item.yearMonth),
       labels: {
         style: {
           colors: '#6B7280'
@@ -164,7 +184,7 @@ export default function SellerDashboardPage() {
   const monthlyChartSeries = [
     {
       name: '월별 매출',
-      data: monthlyTrend.map(item => item.revenue)
+      data: monthlyTrendFilled.map(item => item.revenue)
     }
   ];
 

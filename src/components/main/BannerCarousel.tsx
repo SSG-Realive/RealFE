@@ -12,16 +12,16 @@ const bannerImages = [
 ];
 
 const CustomArrow = ({
-                         onClick,
-                         direction,
-                     }: {
+    onClick,
+    direction,
+}: {
     onClick?: () => void;
     direction: 'left' | 'right';
 }) => {
     return (
         <div
             onClick={onClick}
-            className={`absolute top-1/2 z-20 transform -translate-y-1/2 bg-black bg-opacity-50 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
+            className={`custom-arrow absolute top-1/2 z-20 transform -translate-y-1/2 bg-black bg-opacity-50 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
                 direction === 'left' ? 'left-3' : 'right-3'
             }`}
         >
@@ -29,6 +29,7 @@ const CustomArrow = ({
         </div>
     );
 };
+
 
 export default function BannerCarousel() {
     const settings = {
@@ -47,6 +48,13 @@ export default function BannerCarousel() {
     return (
         <>
             <style>{`
+
+        @media (max-width: 767px) {
+          .custom-arrow {
+                display: none !important;
+            }
+        }
+        
         .custom-dots {
           position: static !important;
           display: flex !important;

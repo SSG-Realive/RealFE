@@ -14,7 +14,7 @@ import PopularProductsGrid from '@/components/main/PopularProductsGrid';
 
 const ITEMS_PER_PAGE = 20;
 
-// ✅ 카테고리 ID → 이름 매핑 (추후 API 연동 가능)
+//
 const categoryMap: Record<number, string> = {
     10: '거실 가구',
     20: '침실 가구',

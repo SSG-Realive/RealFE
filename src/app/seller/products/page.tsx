@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { Package, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator } from 'lucide-react';
+import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator } from 'lucide-react';
 
 import { getMyProducts } from '@/service/seller/productService';
 import { ProductListItem } from '@/types/seller/product/productList';
@@ -99,7 +99,7 @@ export default function ProductListPage() {
                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
                 <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalProductCount}개</p>
               </div>
-              <Package className="w-8 h-8 text-[#bfa06a]" />
+              <Armchair className="w-8 h-8 text-[#bfa06a]" />
             </section>
             <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
               <div>

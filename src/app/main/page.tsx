@@ -15,6 +15,15 @@ import CategoryDropdown from '@/components/customer/common/CategoryDropdown';
 
 const ITEMS_PER_PAGE = 20; // 5열 * 5행
 
+//
+const categoryMap: Record<number, string> = {
+    10: '거실 가구',
+    20: '침실 가구',
+    30: '주방·다이닝 가구',
+    40: '서재·오피스 가구',
+    50: '기타 가구',
+};
+
 export default function CustomerHomePage() {
     const searchParams = useSearchParams();
     const categoryFromUrl = searchParams.get('category');
@@ -61,6 +70,7 @@ export default function CustomerHomePage() {
                 <WeeklyAuctionSlider />
             </div>
 
+            {/* ✅ 인기 상품 */}
             <PopularProductsGrid />
 
             <img

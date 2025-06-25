@@ -89,30 +89,29 @@ export default function CustomerHomePage() {
                 }}
             />
 
-            {/* ✅ 배너 */}
-            {!categoryFromUrl && (
-                <div className="mb-8">
-                    <BannerCarousel />
-                </div>
-            )}
+            {/* 배너 */}
+            <div className="mt-4 mb-4 sm:mt-10 sm:mb-8"> {/* 여백 추가 */}
+                <BannerCarousel />
+            </div>
 
-            {/* ✅ 옥션 */}
-            {!categoryFromUrl && (
-                <div className="mb-8">
-                    <WeeklyAuctionSlider />
-                </div>
-            )}
+            {/* 옥션 슬라이드 */}
+            <div className="mt-1 mb-1 sm:mt-10 sm:mb-8">
+                <WeeklyAuctionSlider />
+            </div>
+            
 
             {/* ✅ 인기 상품 */}
             <PopularProductsGrid />
 
-            {/* ✅ 상품 목록 */}
-            <section className="max-w-screen-xl mx-auto px-1 py-30">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                    {categoryId && categoryMap[categoryId]
-                        ? categoryMap[categoryId]
-                        : '전체상품'}
-                </h2>
+            <img
+                src="/images/banner-bottom.jpg"
+                alt="프로모션 배너"
+                className="w-full  object-cover"
+            />
+
+            {/* 상품 목록 */}
+            <section className="max-w-screen-xl mx-auto px-1 py-30 sm:mt-10 sm:mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">전체상품</h2>
                 <p className="text-sm text-gray-600 mb-6">
                     다양한 상품을 확인하고 원하는 제품을 찾아보세요.
                 </p>

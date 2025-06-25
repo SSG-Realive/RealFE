@@ -72,7 +72,7 @@ export default function ProductDetailPage() {
     return (
         <>
             <div className="hidden">
-                <SellerHeader />
+            <SellerHeader />
             </div>
             <SellerLayout>
                 <div className="max-w-3xl mx-auto p-4 sm:p-6">

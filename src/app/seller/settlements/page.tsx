@@ -61,9 +61,9 @@ export default function SellerSettlementPage() {
     return (
         <>
             <div className="hidden">
-                <SellerHeader toggleSidebar={toggleSidebar} />
+            <SellerHeader toggleSidebar={toggleSidebar} />
             </div>
-            <SellerLayout>
+        <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8 bg-gray-100">
                     <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 정산 내역</h1>
 

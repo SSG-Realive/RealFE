@@ -45,7 +45,7 @@ export default function SellerQnaPage() {
     return (
         <>
             <div className="hidden">
-                <SellerHeader toggleSidebar={toggleSidebar} />
+            <SellerHeader toggleSidebar={toggleSidebar} />
             </div>
             <SellerLayout> {/* ✅ 명시적 적용 */}
                 <div className="flex-1 w-full h-full px-4 py-8 bg-gray-100">

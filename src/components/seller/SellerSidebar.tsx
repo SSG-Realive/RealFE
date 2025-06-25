@@ -34,7 +34,7 @@ const SellerSidebar: FC<SellerSidebarProps & { className?: string }> = ({ onClos
   return (
     <aside className={className + " bg-[#f1f1f2] min-h-screen border-r"}>
       <div className="px-6 py-10">
-        <h1 className="text-xl font-extrabold mb-10 text-gray-700 tracking-tight">판매자센터</h1>
+        <h1 className="text-xl font-extrabold mb-10 text-white tracking-tight">판매자센터</h1>
         <nav>
           <ul className="space-y-1">
             {menuItems.map((item) => {

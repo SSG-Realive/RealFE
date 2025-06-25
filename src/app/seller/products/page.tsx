@@ -76,7 +76,7 @@ export default function ProductListPage() {
   return (
     <>
       <div className="hidden">
-        <SellerHeader toggleSidebar={toggleSidebar} />
+      <SellerHeader toggleSidebar={toggleSidebar} />
       </div>
       <SellerLayout>
         <div className="flex-1 w-full h-full px-4 py-8 bg-gray-100">

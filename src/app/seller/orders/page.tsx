@@ -44,20 +44,20 @@ export default function SellerOrderListPage() {
   if (checking || loading) {
     return (
       <SellerLayout>
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">로딩 중...</span>
+          <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">로딩 중...</span>
+            </div>
           </div>
-        </div>
       </SellerLayout>
     );
   }
 
   return (
     <SellerLayout>
-      <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
-        <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 주문 목록</h1>
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 px-4 md:px-8 py-6">
+          <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">판매자 주문 목록</h1>
 
         {error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

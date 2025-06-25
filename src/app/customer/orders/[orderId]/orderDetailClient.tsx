@@ -3,7 +3,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
+// Image 컴포넌트를 사용하지 않으므로 import를 제거할 수 있습니다.
+// import Image from 'next/image'; // 주석 처리 또는 제거
 import { OrderResponseDTO } from '@/types/orders/orderResponseDTO'; // DTO 타입 임포트
 import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO'; // DTO 타입 임포트
 
@@ -188,25 +189,22 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                         {orderData.orderItems.map((item) => (
                             <div key={item.productId} className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                                 <div className="flex-shrink-0">
-                                    {/* 이미지 URL 유효성 검사 강화 */}
-                                    {item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.trim() !== '' ? (
-                                        <Image
-                                            src={item.imageUrl}
-                                            alt={item.productName}
-                                            width={96}
-                                            height={96}
-                                            className="rounded-lg object-cover w-24 h-24"
-                                            onError={(e) => {
-                                                e.currentTarget.src = `https://placehold.co/96x96/aabbcc/ffffff?text=No+Image`;
-                                                e.currentTarget.onerror = null;
-                                            }}
-                                        />
-                                    ) : (
-                                        // 이미지 URL이 없거나 유효하지 않을 때만 이 대체 UI를 렌더링합니다.
-                                        <div className="flex items-center justify-center bg-gray-200 rounded-lg w-24 h-24 text-gray-500 text-sm">
-                                            이미지 없음
-                                        </div>
-                                    )}
+                                    <img
+                                        // item.imageUrl이 유효하면 해당 URL 사용, 그렇지 않으면 대체 이미지 경로 사용
+                                        src={item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.trim() !== ''
+                                            ? item.imageUrl
+                                            : '/images/placeholder.png' // public/images/no-image.png 파일이 있어야 합니다.
+                                        }
+                                        alt={item.productName || "상품 이미지"} // alt 속성 추가
+                                        width={96}
+                                        height={96}
+                                        className="rounded-lg object-cover w-24 h-24"
+                                        onError={(e) => {
+                                            // 이미지 로드 실패 시 무조건 로컬 대체 이미지로 변경하고 onError 핸들러 제거
+                                            e.currentTarget.src = '/images/placeholder.png';
+                                            e.currentTarget.onerror = null; // 이것이 무한 루프 방지 핵심입니다.
+                                        }}
+                                    />
                                 </div>
                                 <div className="flex-grow text-center md:text-left">
                                     <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>

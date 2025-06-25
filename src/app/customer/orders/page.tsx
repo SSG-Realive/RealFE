@@ -205,6 +205,12 @@ export default function OrderListPage() {
                             {/* Add a new div to wrap the two buttons */}
                             <div className="order-actions">
                                 <button
+                                    className="button-outline"
+                                    onClick={() => router.push(`/customer/reviews/new?orderId=${order.orderId}&sellerId=${order.sellerId}`)}
+                                >
+                                    리뷰 작성
+                                </button>
+                                <button
                                     className="button-outline button-delete"
                                     onClick={() => handleDeleteClick(order.orderId)}
                                     disabled={isDeleting && orderToDeleteId === order.orderId}

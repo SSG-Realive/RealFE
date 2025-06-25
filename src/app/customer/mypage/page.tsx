@@ -32,6 +32,12 @@ export default function MyPage() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <button
                             className="bg-black text-white p-4 rounded hover:bg-gray-800 transition"
+                            onClick={() => router.push('/customer/orders')}
+                        >
+                            구매내역
+                        </button>
+                        <button
+                            className="bg-black text-white p-4 rounded hover:bg-gray-800 transition"
                             onClick={() => router.push('/customer/mypage/wishlist')}
                         >
                             찜 목록

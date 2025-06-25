@@ -111,7 +111,11 @@ export default function OrderListPage() {
                         </div>
                         <div className="order-card-footer">
                             <p className="total-price">총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong></p>
-                            <button className="button-outline">주문 상세</button>
+                            <button className="button-outline"
+                                    onClick={() => router.push(`/customer/orders/${order.orderId}`)}>
+                                주문 상세
+                            </button>
+
                         </div>
                     </div>
                 ))}

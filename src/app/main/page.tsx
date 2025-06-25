@@ -91,7 +91,7 @@ export default function CustomerHomePage() {
 
             {/* ✅ 상단 배너 - 검색/카테고리 없을 때만 */}
             {showMainTopBanners && (
-                <div className="mb-8">
+                <div className="mt-8 mb-8 w-full max-w-none px-0">
                     <BannerCarousel />
                 </div>
             )}

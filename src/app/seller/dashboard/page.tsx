@@ -40,15 +40,15 @@ export default function SellerDashboardPage() {
         const dashboardData = await getDashboard();
         setDashboard(dashboardData);
 
-        // 최근 30일 기준으로 통계 데이터
-        const endDate = new Date().toISOString().split('T')[0];
-        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-        // 판매 통계
-        const statsData = await getSalesStatistics(startDate, endDate);
+        // 총 매출(전체 누적) 통계
+        const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
+        const statsEndDate = new Date().toISOString().split('T')[0];
+        const statsData = await getSalesStatistics(statsStartDate, statsEndDate);
         setSalesStats(statsData);
 
         // 일별 추이 (최근 30일)
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
         const dailyData = await getDailySalesTrend(startDate, endDate);
         setDailyTrend(dailyData);
 

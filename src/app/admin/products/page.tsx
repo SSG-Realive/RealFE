@@ -76,18 +76,18 @@ export default function ProductDashboardPage() {
   }, []);
 
   const fetchProductStats = async () => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('adminToken');
-      
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('adminToken');
+        
       // 전체 상품 통계
       const allProductsRes = await apiClient.get('/admin/products?size=1000', {
-        headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
       });
       
       // 관리자 매입 상품 통계
       const adminProductsRes = await apiClient.get('/admin/owned-products?size=1000', {
-        headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` }
       });
 
       const allProducts = allProductsRes.data.dtoList || [];
@@ -333,8 +333,8 @@ export default function ProductDashboardPage() {
                 <span className="font-medium">{stats?.averagePrice.toLocaleString()}원</span>
               </div>
             </div>
-          </div>
-
+      </div>
+      
           {/* 상품 상태 분포 */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
@@ -384,13 +384,13 @@ export default function ProductDashboardPage() {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">상품 목록</h2>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
                   className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                >
+          >
                   <Filter className="w-4 h-4" />
                   필터
-                </button>
+          </button>
                 <Link
                   href="/admin/products/new"
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -400,14 +400,14 @@ export default function ProductDashboardPage() {
                 </Link>
               </div>
             </div>
-          </div>
+        </div>
 
           {/* 필터 섹션 */}
-          {showFilters && (
+        {showFilters && (
             <div className="p-6 border-b border-gray-200 bg-gray-50">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
                   <select
                     value={filterOptions.category}
                     onChange={(e) => setFilterOptions({...filterOptions, category: e.target.value})}
@@ -418,24 +418,24 @@ export default function ProductDashboardPage() {
                     <option value="전자제품">전자제품</option>
                     <option value="의류">의류</option>
                   </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">상태</label>
-                  <select
-                    value={filterOptions.status}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">상태</label>
+              <select
+                value={filterOptions.status}
                     onChange={(e) => setFilterOptions({...filterOptions, status: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+              >
                     <option value="">전체</option>
-                    <option value="상">상</option>
-                    <option value="중">중</option>
-                    <option value="하">하</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">가격 범위</label>
-                  <select
-                    value={filterOptions.priceRange}
+                <option value="상">상</option>
+                <option value="중">중</option>
+                <option value="하">하</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">가격 범위</label>
+              <select
+                value={filterOptions.priceRange}
                     onChange={(e) => setFilterOptions({...filterOptions, priceRange: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -444,12 +444,12 @@ export default function ProductDashboardPage() {
                     <option value="50000-100000">5-10만원</option>
                     <option value="100000-500000">10-50만원</option>
                     <option value="500000+">50만원 이상</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">재고 범위</label>
-                  <select
-                    value={filterOptions.stockRange}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">재고 범위</label>
+              <select
+                value={filterOptions.stockRange}
                     onChange={(e) => setFilterOptions({...filterOptions, stockRange: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
@@ -457,9 +457,9 @@ export default function ProductDashboardPage() {
                     <option value="0">품절</option>
                     <option value="1-5">1-5개</option>
                     <option value="5+">5개 이상</option>
-                  </select>
-                </div>
-              </div>
+              </select>
+            </div>
+          </div>
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={applyFilters}
@@ -473,7 +473,7 @@ export default function ProductDashboardPage() {
                 >
                   초기화
                 </button>
-              </div>
+        </div>
             </div>
           )}
 
@@ -482,59 +482,59 @@ export default function ProductDashboardPage() {
             {/* 데스크탑 상품 카드 그리드 */}
             <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {paginatedProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  {/* 상품 이미지 */}
-                  <div className="aspect-square bg-gray-100 relative">
-                    {product.productImages && product.productImages.length > 0 ? (
-                      <img
-                        src={product.productImages[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <Package className="w-12 h-12" />
-                      </div>
-                    )}
-                    
-                    {/* 상태 배지 */}
-                    <div className="absolute top-2 right-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
-                        {product.status}
+              <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                {/* 상품 이미지 */}
+                <div className="aspect-square bg-gray-100 relative">
+                  {product.productImages && product.productImages.length > 0 ? (
+                    <img
+                      src={product.productImages[0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Package className="w-12 h-12" />
+                    </div>
+                  )}
+                  
+                  {/* 상태 배지 */}
+                  <div className="absolute top-2 right-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
+                      {product.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 상품 정보 */}
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
+                  
+                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-1">
+                        <Package className="w-3 h-3" />
+                        <span className="truncate">{product.categoryName}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                      <span className="font-medium text-blue-600">
+                        {product.price.toLocaleString()}원
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <ShoppingCart className="w-3 h-3" />
+                      <span className={`font-medium ${
+                        product.stock === 0 ? 'text-red-600' : 
+                        product.stock === 1 ? 'text-orange-600' : 
+                        product.stock <= 2 ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
+                        재고: {product.stock}개
                       </span>
                     </div>
                   </div>
 
-                  {/* 상품 정보 */}
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                      {product.name}
-                    </h3>
-                    
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Package className="w-3 h-3" />
-                        <span className="truncate">{product.categoryName}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        <span className="font-medium text-blue-600">
-                          {product.price.toLocaleString()}원
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <ShoppingCart className="w-3 h-3" />
-                        <span className={`font-medium ${
-                          product.stock === 0 ? 'text-red-600' : 
-                          product.stock === 1 ? 'text-orange-600' : 
-                          product.stock <= 2 ? 'text-yellow-600' : 'text-green-600'
-                        }`}>
-                          재고: {product.stock}개
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 액션 버튼 */}
+                  {/* 액션 버튼 */}
                     <button
                       onClick={() => handleQuickView(product)}
                       className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 text-sm"
@@ -605,15 +605,15 @@ export default function ProductDashboardPage() {
                       <button
                         onClick={() => handleQuickView(product)}
                         className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 text-sm"
-                      >
-                        <Eye className="w-4 h-4" />
-                        상세 보기
-                      </button>
-                    </div>
+                    >
+                      <Eye className="w-4 h-4" />
+                      상세 보기
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
+          </div>
 
             {/* 페이징 */}
             {Math.ceil(filteredProducts.length / pageSize) > 1 && (
@@ -655,25 +655,25 @@ export default function ProductDashboardPage() {
               </div>
             )}
 
-            {/* 결과가 없을 때 */}
+          {/* 결과가 없을 때 */}
             {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-6xl mb-4">📦</div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">상품을 찾을 수 없습니다</h3>
-                <p className="text-gray-600 mb-4">
-                  검색 조건을 변경하거나 필터를 초기화해보세요.
-                </p>
-                <button 
-                  onClick={clearFilters}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                >
-                  필터 초기화
-                </button>
-              </div>
-            )}
-          </div>
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">📦</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">상품을 찾을 수 없습니다</h3>
+              <p className="text-gray-600 mb-4">
+                검색 조건을 변경하거나 필터를 초기화해보세요.
+              </p>
+              <button 
+                onClick={clearFilters}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+              >
+                필터 초기화
+              </button>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </div>
   );
-}
+} 

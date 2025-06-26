@@ -21,6 +21,7 @@ import ExtraBanner from '@/components/main/ExtraBanner';
 import Section from '@/components/customer/product/Section';
 import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 import SectionWithSubCategoryButtons from "@/components/customer/product/SectionWithSubCategoryButtons";
+import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -107,6 +108,13 @@ export default function CustomerHomePage() {
             <PopularProductsGrid />
 
             {showMainTopBanners && <ExtraBanner />}
+
+            {/* ✅ 여기에 추천 판매자 섹션을 배치합니다. */}
+{showMainTopBanners && (
+    <div className="my-8 md:my-12"> {/* 위아래 여백을 줍니다 */}
+        <FeaturedSellersSection />
+    </div>
+)}
 
             {/* ✅ 상품 리스트만 표시 (카테고리 드롭다운 제거됨) */}
             <section className="max-w-screen-xl mx-auto px-1 py-30 sm:mt-10 sm:mb-8">

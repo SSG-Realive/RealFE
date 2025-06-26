@@ -10,7 +10,7 @@ const defaultImages = [
     '/images/banner5.png',
 ];
 
-export default function BottomBannerCarousel({ images = defaultImages }: { images?: string[] }) {
+export default function MiddleBannerCarousel({ images = defaultImages }: { images?: string[] }) {
     const settings = {
         dots: true,
         dotsClass: 'slick-dots custom-dots',

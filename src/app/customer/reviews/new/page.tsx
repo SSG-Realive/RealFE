@@ -3,33 +3,55 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Navbar from '@/components/customer/common/Navbar';
 
 function ReviewPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    // 주문 ID와 판매자 ID는 URL 파라미터에서 가져옴
     const orderIdParam = searchParams.get('orderId');
     const sellerIdParam = searchParams.get('sellerId');
 
     const [orderId, setOrderId] = useState<number | null>(null);
     const [sellerId, setSellerId] = useState<number | null>(null);
+
     const [rating, setRating] = useState<number>(5);
     const [content, setContent] = useState('');
     const [images, setImages] = useState<File[]>([]);
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
 
+    const [alreadyReviewed, setAlreadyReviewed] = useState<boolean | null>(null); // 중복 여부
+
+    // 초기 로딩 및 리뷰 중복 체크
     useEffect(() => {
-        if (orderIdParam) setOrderId(Number(orderIdParam));
-        if (sellerIdParam) setSellerId(Number(sellerIdParam));
+        if (orderIdParam && sellerIdParam) {
+            const parsedOrderId = Number(orderIdParam);
+            const parsedSellerId = Number(sellerIdParam);
+            setOrderId(parsedOrderId);
+            setSellerId(parsedSellerId);
+
+            // 중복 체크 API 호출
+            axios
+                .get('/api/reviews/check-exists', {
+                    params: {
+                        orderId: parsedOrderId,
+                        sellerId: parsedSellerId,
+                    },
+                })
+                .then((res) => {
+                    setAlreadyReviewed(res.data.exists);
+                })
+                .catch((err) => {
+                    console.error('중복 체크 실패:', err);
+                    setAlreadyReviewed(null); // 오류 시 판단 유보
+                });
+        }
     }, [orderIdParam, sellerIdParam]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
-        const files = Array.from(e.target.files);
-        setImages(files);
+        setImages(Array.from(e.target.files));
     };
 
     const uploadImages = async () => {
@@ -41,7 +63,7 @@ function ReviewPage() {
                 const res = await axios.post('/api/uploads', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
                 });
-                urls.push(res.data.url); // 이미지 업로드 후 반환되는 URL
+                urls.push(res.data.url);
             } catch (err) {
                 console.error('이미지 업로드 실패:', err);
             }
@@ -76,8 +98,32 @@ function ReviewPage() {
         }
     };
 
+    // 중복 여부 확인 중
+    if (alreadyReviewed === null) {
+        return <p className="text-center py-10">리뷰 정보를 확인 중입니다...</p>;
+    }
+
+    // 이미 리뷰 작성된 경우
+    if (alreadyReviewed) {
+        return (
+            <div className="container max-w-xl mx-auto py-10">
+                <Navbar/>
+                <h1 className="text-2xl font-bold mb-4">리뷰 작성 불가</h1>
+                <p>이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
+                <button
+                    className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
+                    onClick={() => router.push('/customer/reviews/my')}
+                >
+                    내 리뷰 보기
+                </button>
+            </div>
+        );
+    }
+
+    // 리뷰 작성 폼
     return (
         <div className="container max-w-xl mx-auto py-10">
+            <Navbar/>
             <h1 className="text-2xl font-bold mb-6">리뷰 작성</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -89,7 +135,7 @@ function ReviewPage() {
                         required
                     >
                         {[...Array(9)].map((_, i) => {
-                            const val = (i + 2) / 2; // 1.0 ~ 5.0
+                            const val = (i + 2) / 2;
                             return (
                                 <option key={val} value={val}>
                                     {val}점

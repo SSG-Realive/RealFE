@@ -44,7 +44,7 @@ export default function MyPage() {
                         
                             <button
                             className="flex flex-col items-center justify-center w-24 h-24 rounded-full bg-black text-white hover:bg-gray-800 transition"
-                            onClick={() => router.push('/customer/mypage/orders')}
+                            onClick={() => router.push('/customer/orders')}
                             >
                             <ReceiptText size={24} />
                             <span className="text-sm mt-1">구매내역</span>

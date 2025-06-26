@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 // Image 컴포넌트를 사용하지 않으므로 import를 제거할 수 있습니다.
 // import Image from 'next/image'; // 주석 처리 또는 제거
 import { OrderResponseDTO } from '@/types/orders/orderResponseDTO'; // DTO 타입 임포트
-import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO'; // DTO 타입 임포트
+import Navbar from '@/components/customer/common/Navbar';
+import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO';
+import {useRouter} from "next/navigation"; // DTO 타입 임포트
 
 
 // --- 데이터 페칭 함수 (클라이언트에서 실행) ---
@@ -50,6 +52,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     const [orderData, setOrderData] = useState<OrderResponseDTO | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter();
+
 
     useEffect(() => {
         let token: string | null = null;
@@ -110,6 +114,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (loading) {
         return (
             <div className="container mx-auto p-4 text-center font-inter">
+                <Navbar/>
                 <p>주문 정보를 불러오는 중...</p>
             </div>
         );
@@ -118,6 +123,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (error) {
         return (
             <div className="container mx-auto p-4 font-inter">
+                <Navbar/>
                 <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
                     주문 상세
                 </h1>
@@ -135,6 +141,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (!orderData) {
         return (
             <div className="container mx-auto p-4 text-center text-gray-700 font-inter">
+                <Navbar/>
                 <h1 className="text-3xl font-bold mb-6">주문 상세</h1>
                 <p>주문 정보를 찾을 수 없습니다.</p>
             </div>
@@ -144,6 +151,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     // --- 주문 상세 정보 UI 렌더링 (기존과 동일) ---
     return (
         <div className="container mx-auto p-4 bg-gray-50 min-h-screen font-inter">
+            <Navbar/>
             <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-900 leading-tight">
                 주문 상세 정보
             </h1>
@@ -210,6 +218,13 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                     <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>
                                     <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
                                     <p className="text-xl font-bold text-blue-700">{item.price.toLocaleString()}원</p>
+                                    <button
+                                        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                                        onClick={() =>
+                                            router.push(`/customer/reviews/new?orderId=${orderData.orderId}&sellerId=${item.sellerId}`)}
+                                    >
+                                        리뷰 작성
+                                    </button>
                                 </div>
                             </div>
                         ))}

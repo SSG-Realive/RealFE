@@ -4,6 +4,7 @@
 
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
+import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend } from '@/service/seller/sellerService';
 import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySalesDTO } from '@/types/seller/dashboard/sellerDashboardResponse';
 import { useEffect, useState } from 'react';
@@ -208,46 +209,59 @@ export default function SellerDashboardPage() {
     <SellerLayout>
       <main className="bg-[#a89f91] min-h-screen w-full px-4 py-8">
         <h1 className="text-2xl font-extrabold mb-8 text-[#5b4636] tracking-wide">판매자 대시보드</h1>
-        {/* 상단 카드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          <section
-            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-            onClick={() => router.push('/seller/products')}
-          >
-            <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
-              <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
-            </div>
-            <Armchair className="w-8 h-8 text-[#bfa06a]" />
-          </section>
-          <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-            <DollarSign className="w-10 h-10 text-[#bfa06a]" />
-            <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 매출</h2>
-              <p className="text-2xl font-extrabold text-[#388e3c]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
-            </div>
-          </section>
-          <section
-            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-            onClick={() => router.push('/seller/orders')}
-          >
-            <Gavel className="w-10 h-10 text-[#bfa06a]" />
-            <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 주문 수</h2>
-              <p className="text-2xl font-extrabold text-[#5b4636]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
-            </div>
-          </section>
-          <section
-            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-            onClick={() => router.push('/seller/qna')}
-          >
-            <MessageCircle className="w-10 h-10 text-[#bfa06a]" />
-            <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">미답변 문의</h2>
-              <p className="text-2xl font-extrabold text-[#bfa06a]">{dashboard?.unansweredQnaCount ?? 0}건</p>
-            </div>
-          </section>
+        {/* 상단 카드 레이아웃 */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-8">
+          {/* 좌측: 신호등 카드(크게) */}
+          <div className="flex-1 min-w-[320px] max-w-[400px] flex items-stretch">
+            <TrafficLightStatusCard
+              title="판매자 등급"
+              rating={dashboard?.averageRating ?? 0}
+              count={dashboard?.totalReviews ?? 0}
+              className="h-full w-full text-2xl"
+            />
+          </div>
+          {/* 우측: 나머지 카드들 */}
+          <div className="flex-[2] grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section
+              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+              onClick={() => router.push('/seller/products')}
+            >
+              <div>
+                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
+                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
+              </div>
+              <Armchair className="w-8 h-8 text-[#bfa06a]" />
+            </section>
+            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
+              <DollarSign className="w-10 h-10 text-[#bfa06a]" />
+              <div>
+                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 매출</h2>
+                <p className="text-2xl font-extrabold text-[#388e3c]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
+              </div>
+            </section>
+            <section
+              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+              onClick={() => router.push('/seller/orders')}
+            >
+              <Gavel className="w-10 h-10 text-[#bfa06a]" />
+              <div>
+                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 주문 수</h2>
+                <p className="text-2xl font-extrabold text-[#5b4636]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
+              </div>
+            </section>
+            <section
+              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+              onClick={() => router.push('/seller/qna')}
+            >
+              <MessageCircle className="w-10 h-10 text-[#bfa06a]" />
+              <div>
+                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">미답변 문의</h2>
+                <p className="text-2xl font-extrabold text-[#bfa06a]">{dashboard?.unansweredQnaCount ?? 0}건</p>
+              </div>
+            </section>
+          </div>
         </div>
+        
         {/* 차트 영역 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a]">

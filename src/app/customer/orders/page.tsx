@@ -126,8 +126,9 @@ export default function OrderListPage() {
     }
 
     return (
-        <div className="container order-list-page">
+        <div>
             <Navbar/>
+        <div className="container order-list-page">
             <h1>주문 내역</h1>
 
             <div className="order-list-container">
@@ -235,6 +236,7 @@ export default function OrderListPage() {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 }

@@ -190,7 +190,7 @@ export default function CustomerHomePage() {
                 </>
             )}
 
-            {showMainTopBanners && <BottomInspirationSlider />}
+            <BottomInspirationSlider />
 
             {pathname === '/main' && (
                 <div className="w-full">

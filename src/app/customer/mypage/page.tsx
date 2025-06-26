@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import Navbar from '@/components/customer/common/Navbar';
 import { Heart, ShoppingCart, Package, Gavel, Clock3, UserCog, Star, ReceiptText } from 'lucide-react';
-import MiddleBannerCarousel from "@/components/main/MiddleBannerCarousel";
+import ExtraBannerCarousel from '@/components/main/ExtraBanner';
+
 
 export default function MyPage() {
     const router = useRouter();
@@ -121,11 +122,9 @@ export default function MyPage() {
                     </section>
 
                     {/* ✅ 하단 배너 - 상품 목록 위로 이동 */}
-                    <div className="mt-20 mb-0 max-w-4xl mx-auto">
-                        <MiddleBannerCarousel images={[
-                            { src: '/images/banner4.png', link: '/main?category=25' },
-                            { src: '/images/banner5.png', link: '/main?category=54' },
-                        ]} />
+                    {/* ✅ 하단 배너 교체 - ExtraBannerCarousel 사용 */}
+                    <div className="mt-20 mb-0 max-w-6xl mx-auto">
+                        <ExtraBannerCarousel />
                     </div>
                 </div>
             </main>

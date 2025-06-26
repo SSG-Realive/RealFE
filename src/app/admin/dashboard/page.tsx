@@ -328,13 +328,16 @@ const AdminDashboardPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Modal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-          title="로그인 성공"
-          message="관리자 페이지에 오신 것을 환영합니다!"
-          type="success"
-        />
+        {/* 로그인 성공 모달 */}
+        {showModal && (
+          <Modal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            title="로그인 성공"
+            message="관리자 페이지에 오신 것을 환영합니다!"
+            type="success"
+          />
+        )}
 
         {/* 헤더 섹션 */}
         <div className="mb-8">

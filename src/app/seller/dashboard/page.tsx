@@ -222,44 +222,44 @@ export default function SellerDashboardPage() {
           </div>
           {/* 우측: 나머지 카드들 */}
           <div className="flex-[2] grid grid-cols-1 md:grid-cols-2 gap-6">
-            <section
-              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-              onClick={() => router.push('/seller/products')}
-            >
-              <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
-                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
-              </div>
-              <Armchair className="w-8 h-8 text-[#bfa06a]" />
-            </section>
-            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-              <DollarSign className="w-10 h-10 text-[#bfa06a]" />
-              <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 매출</h2>
-                <p className="text-2xl font-extrabold text-[#388e3c]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
-              </div>
-            </section>
-            <section
-              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-              onClick={() => router.push('/seller/orders')}
-            >
-              <Gavel className="w-10 h-10 text-[#bfa06a]" />
-              <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 주문 수</h2>
-                <p className="text-2xl font-extrabold text-[#5b4636]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
-              </div>
-            </section>
-            <section
-              className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
-              onClick={() => router.push('/seller/qna')}
-            >
-              <MessageCircle className="w-10 h-10 text-[#bfa06a]" />
-              <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-1">미답변 문의</h2>
-                <p className="text-2xl font-extrabold text-[#bfa06a]">{dashboard?.unansweredQnaCount ?? 0}건</p>
-              </div>
-            </section>
-          </div>
+          <section
+            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            onClick={() => router.push('/seller/products')}
+          >
+            <div>
+              <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
+              <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
+            </div>
+            <Armchair className="w-8 h-8 text-[#bfa06a]" />
+          </section>
+          <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
+            <DollarSign className="w-10 h-10 text-[#bfa06a]" />
+            <div>
+              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 매출</h2>
+              <p className="text-2xl font-extrabold text-[#388e3c]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
+            </div>
+          </section>
+          <section
+            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            onClick={() => router.push('/seller/orders')}
+          >
+            <Gavel className="w-10 h-10 text-[#bfa06a]" />
+            <div>
+              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 주문 수</h2>
+              <p className="text-2xl font-extrabold text-[#5b4636]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
+            </div>
+          </section>
+          <section
+            className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            onClick={() => router.push('/seller/qna')}
+          >
+            <MessageCircle className="w-10 h-10 text-[#bfa06a]" />
+            <div>
+              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">미답변 문의</h2>
+              <p className="text-2xl font-extrabold text-[#bfa06a]">{dashboard?.unansweredQnaCount ?? 0}건</p>
+            </div>
+          </section>
+        </div>
         </div>
         
         {/* 차트 영역 */}

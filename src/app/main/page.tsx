@@ -20,6 +20,7 @@ import MiddleBannerCarousel from '@/components/main/MiddleBannerCarousel';
 import ExtraBanner from '@/components/main/ExtraBanner';
 import Section from '@/components/customer/product/Section';
 import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
+import SectionWithSubCategoryButtons from "@/components/customer/product/SectionWithSubCategoryButtons";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -139,7 +140,7 @@ export default function CustomerHomePage() {
             {showMainTopBanners && (
                 <>
                     <div className="mb-10">
-                        <Section title="거실 가구" categoryId={10} limit={5} />
+                        <SectionWithSubCategoryButtons title="거실 가구" categoryId={10} limit={5} />
                         <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
                             <Link href="/main?category=10" className="text-sm text-black font-semibold hover:underline">
                                 more
@@ -147,7 +148,7 @@ export default function CustomerHomePage() {
                         </div>
                     </div>
                     <div className="mb-10">
-                        <Section title="침실 가구" categoryId={20} limit={5} />
+                        <SectionWithSubCategoryButtons title="침실 가구" categoryId={20} limit={5} />
                         <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
                             <Link href="/main?category=20" className="text-sm text-black font-semibold hover:underline">
                                 more
@@ -155,7 +156,7 @@ export default function CustomerHomePage() {
                         </div>
                     </div>
                     <div className="mb-10">
-                        <Section title="주방·다이닝 가구" categoryId={30} limit={5} />
+                        <SectionWithSubCategoryButtons title="주방·다이닝 가구" categoryId={30} limit={5} />
                         <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
                             <Link href="/main?category=30" className="text-sm text-black font-semibold hover:underline">
                                 more
@@ -163,7 +164,7 @@ export default function CustomerHomePage() {
                         </div>
                     </div>
                     <div className="mb-10">
-                        <Section title="서재·오피스 가구" categoryId={40} limit={5} />
+                        <SectionWithSubCategoryButtons title="서재·오피스 가구" categoryId={40} limit={5} />
                         <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
                             <Link href="/main?category=40" className="text-sm text-black font-semibold hover:underline">
                                 more
@@ -171,7 +172,7 @@ export default function CustomerHomePage() {
                         </div>
                     </div>
                     <div className="mb-10">
-                        <Section title="기타 가구" categoryId={50} limit={5} />
+                        <SectionWithSubCategoryButtons title="기타 가구" categoryId={50} limit={5} />
                         <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
                             <Link href="/main?category=50" className="text-sm text-black font-semibold hover:underline">
                                 more

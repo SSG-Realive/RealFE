@@ -39,6 +39,25 @@ export default function FeaturedSellersSection() {
 
     return (
         <section className="my-10 px-4">
+            {/* 🔧 슬라이더 dot 스타일 */}
+            <style>{`
+        .slick-dots {
+          display: flex !important;
+          justify-content: center;
+          margin-top: 12px;
+        }
+        .slick-dots li {
+          margin: 0 4px;
+        }
+        .slick-dots li button:before {
+          color: #bbb;
+          font-size: 10px;
+        }
+        .slick-dots li.slick-active button:before {
+          color: #111;
+        }
+      `}</style>
+
             <div className="max-w-7xl mx-auto p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
                     Today’s Seller Picks
@@ -52,7 +71,7 @@ export default function FeaturedSellersSection() {
                             </h3>
 
                             <Slider
-                                dots={false}
+                                dots={true} // ✅ 하단 점 추가
                                 infinite={true}
                                 speed={500}
                                 slidesToShow={3}
@@ -61,14 +80,8 @@ export default function FeaturedSellersSection() {
                                 autoplaySpeed={3000}
                                 pauseOnHover={true}
                                 responsive={[
-                                    {
-                                        breakpoint: 1024,
-                                        settings: { slidesToShow: 2 },
-                                    },
-                                    {
-                                        breakpoint: 640,
-                                        settings: { slidesToShow: 1 },
-                                    },
+                                    { breakpoint: 1024, settings: { slidesToShow: 2 } },
+                                    { breakpoint: 640, settings: { slidesToShow: 1 } },
                                 ]}
                             >
                                 {seller.products.map((product) => (

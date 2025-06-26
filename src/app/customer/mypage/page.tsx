@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import Navbar from '@/components/customer/common/Navbar';
 import { Heart, ShoppingCart, Package, Gavel, Clock3, UserCog, Star, ReceiptText } from 'lucide-react';
-import BottomBannerCarousel from '@/components/main/BottomBannerCarousel';
+import MiddleBannerCarousel from "@/components/main/MiddleBannerCarousel";
 
 export default function MyPage() {
     const router = useRouter();
@@ -44,7 +44,7 @@ export default function MyPage() {
                         
                             <button
                             className="flex flex-col items-center justify-center w-24 h-24 rounded-full bg-black text-white hover:bg-gray-800 transition"
-                            onClick={() => router.push('/customer/mypage/orders')}
+                            onClick={() => router.push('/customer/orders')}
                             >
                             <ReceiptText size={24} />
                             <span className="text-sm mt-1">구매내역</span>
@@ -122,7 +122,10 @@ export default function MyPage() {
 
                     {/* ✅ 하단 배너 - 상품 목록 위로 이동 */}
                     <div className="mt-20 mb-0 max-w-4xl mx-auto">
-                        <BottomBannerCarousel images={['/images/banner4.png', '/images/banner5.png']} />
+                        <MiddleBannerCarousel images={[
+                            { src: '/images/banner4.png', link: '/main?category=25' },
+                            { src: '/images/banner5.png', link: '/main?category=54' },
+                        ]} />
                     </div>
                 </div>
             </main>

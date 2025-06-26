@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import { fetchPublicProducts } from '@/service/customer/productService';
 import { fetchAllCategories } from '@/service/categoryService';
@@ -15,10 +16,14 @@ import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
 import PopularProductsGrid from '@/components/main/PopularProductsGrid';
-import CategoryDropdown from '@/components/customer/common/CategoryDropdown';
-import BottomBannerCarousel from '@/components/main/BottomBannerCarousel';
+import MiddleBannerCarousel from '@/components/main/MiddleBannerCarousel';
+import ExtraBanner from '@/components/main/ExtraBanner';
+import Section from '@/components/customer/product/Section';
+import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
+import SectionWithSubCategoryButtons from "@/components/customer/product/SectionWithSubCategoryButtons";
+import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
 
-const ITEMS_PER_PAGE = 20; // 5열 * 5행
+const ITEMS_PER_PAGE = 10;
 
 export default function CustomerHomePage() {
     const pathname = usePathname();
@@ -88,14 +93,12 @@ export default function CustomerHomePage() {
                 }}
             />
 
-            {/* ✅ 상단 배너 - 검색/카테고리 없을 때만 */}
             {showMainTopBanners && (
                 <div className="mb-8">
                     <BannerCarousel />
                 </div>
             )}
 
-            {/* ✅ 카테고리 없을 때만 옥션 배너 */}
             {!categoryId && (
                 <div className="mt-1 mb-1 sm:mt-10 sm:mb-8">
                     <WeeklyAuctionSlider />
@@ -104,37 +107,23 @@ export default function CustomerHomePage() {
 
             <PopularProductsGrid />
 
-            {/* 상품 목록 */}
-            <section className="max-w-screen-xl mx-auto px-4 sm:px-6 py-30 sm:mt-10 sm:mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">전체상품</h2>
-            {/* ✅ 하단 배너 - 상품 목록 위로 이동 */}
-            <div className="mt-20 mb-10">
-                <BottomBannerCarousel images={['/images/banner4.png', '/images/banner5.png']} />
-            </div>
-            </section>
+            {showMainTopBanners && <ExtraBanner />}
 
-            {/* ✅ 상품 목록 */}
+            {/* ✅ 여기에 추천 판매자 섹션을 배치합니다. */}
+{showMainTopBanners && (
+    <div className="my-8 md:my-12"> {/* 위아래 여백을 줍니다 */}
+        <FeaturedSellersSection />
+    </div>
+)}
+
+            {/* ✅ 상품 리스트만 표시 (카테고리 드롭다운 제거됨) */}
             <section className="max-w-screen-xl mx-auto px-1 py-30 sm:mt-10 sm:mb-8">
                 <div className="flex justify-between items-center mb-2">
                     <h2 className="text-2xl font-bold text-gray-800">
                         {getTopCategoryName(categoryId)}
                     </h2>
                 </div>
-                <p className="text-sm text-gray-600 mb-6">
-                    다양한 상품을 확인하고 원하는 제품을 찾아보세요.
-                </p>
-
-                <div className="mb-4">
-                    <CategoryDropdown
-                        isCompact={true}
-                        onCategorySelect={(id) => {
-                            const query = new URLSearchParams();
-                            if (id !== -1) query.set('category', String(id));
-                            if (keyword) query.set('keyword', keyword);
-                            window.location.href = `/main?${query.toString()}`;
-                        }}
-                    />
-                </div>
+                <p className="text-sm text-gray-600 mb-6">필터 예정</p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
                     {products.map((p, index) => (
@@ -148,20 +137,70 @@ export default function CustomerHomePage() {
                             onClick={loadMore}
                             className="px-6 py-2 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg border border-gray-300"
                         >
-                            더보기
+                            more
                         </button>
                     </div>
                 )}
             </section>
 
-            {/* ✅ 중간 배너 - 맨 아래로 위치 변경 */}
+            {showMainTopBanners && <MiddleBannerCarousel />}
+
             {showMainTopBanners && (
-                <div className="max-w-screen-xl mx-auto px-4 my-10">
-                    <img
-                        src="/images/banner-bottom.jpg"
-                        alt="프로모션 배너"
-                        className="w-full rounded-xl shadow-md object-cover"
-                    />
+                <>
+                    <div className="mb-10">
+                        <SectionWithSubCategoryButtons title="거실 가구" categoryId={10} limit={5} />
+                        <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
+                            <Link href="/main?category=10" className="text-sm text-black font-semibold hover:underline">
+                                more
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mb-10">
+                        <SectionWithSubCategoryButtons title="침실 가구" categoryId={20} limit={5} />
+                        <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
+                            <Link href="/main?category=20" className="text-sm text-black font-semibold hover:underline">
+                                more
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mb-10">
+                        <SectionWithSubCategoryButtons title="주방·다이닝 가구" categoryId={30} limit={5} />
+                        <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
+                            <Link href="/main?category=30" className="text-sm text-black font-semibold hover:underline">
+                                more
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mb-10">
+                        <SectionWithSubCategoryButtons title="서재·오피스 가구" categoryId={40} limit={5} />
+                        <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
+                            <Link href="/main?category=40" className="text-sm text-black font-semibold hover:underline">
+                                more
+                            </Link>
+                        </div>
+                    </div>
+                    <div className="mb-10">
+                        <SectionWithSubCategoryButtons title="기타 가구" categoryId={50} limit={5} />
+                        <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
+                            <Link href="/main?category=50" className="text-sm text-black font-semibold hover:underline">
+                                more
+                            </Link>
+                        </div>
+                    </div>
+                </>
+            )}
+
+            {showMainTopBanners && <BottomInspirationSlider />}
+
+            {pathname === '/main' && (
+                <div className="w-full">
+                    <Link href="/main?category=25">
+                        <img
+                            src="/images/banner-bottom.jpg"
+                            alt="프로모션 배너"
+                            className="w-full h-auto object-cover cursor-pointer"
+                        />
+                    </Link>
                 </div>
             )}
 

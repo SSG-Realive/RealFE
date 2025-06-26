@@ -2,15 +2,20 @@
 
 import React from 'react';
 import Slider from 'react-slick';
+import Link from 'next/link';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const defaultImages = [
-    '/images/banner4.png',
-    '/images/banner5.png',
+    { src: '/images/banner4.png', link: '/main?category=25' },
+    { src: '/images/banner5.png', link: '/main?category=54' },
 ];
 
-export default function BottomBannerCarousel({ images = defaultImages }: { images?: string[] }) {
+export default function MiddleBannerCarousel({
+                                                 images = defaultImages,
+                                             }: {
+    images?: { src: string; link: string }[];
+}) {
     const settings = {
         dots: true,
         dotsClass: 'slick-dots custom-dots',
@@ -56,22 +61,25 @@ export default function BottomBannerCarousel({ images = defaultImages }: { image
             <div className="w-full flex justify-center mt-12 mb-20 px-2 sm:px-4 overflow-visible">
                 <div className="w-full max-w-7xl rounded-lg overflow-hidden">
                     <Slider {...settings}>
-                        {images.map((src, index) => (
+                        {images.map((item, index) => (
                             <div key={index}>
-                                <img
-                                    src={src}
-                                    alt={`하단 배너 ${index + 1}`}
-                                    className="
-                    w-full
-                    h-[180px]          // 모바일
-                    sm:h-[260px]       // 태블릿
-                    md:h-[320px]       // 일반 태블릿 이상
-                    lg:h-[380px]       // 데스크탑
-                    xl:h-[420px]       // 큰 데스크탑
-                    object-cover
-                    rounded-lg
-                  "
-                                />
+                                <Link href={item.link}>
+                                    <img
+                                        src={item.src}
+                                        alt={`하단 배너 ${index + 1}`}
+                                        className="
+                                            w-full
+                                            h-[180px]        // 모바일
+                                            sm:h-[260px]     // 태블릿
+                                            md:h-[320px]     // 일반 태블릿 이상
+                                            lg:h-[380px]     // 데스크탑
+                                            xl:h-[420px]     // 큰 데스크탑
+                                            object-cover
+                                            rounded-lg
+                                            cursor-pointer
+                                        "
+                                    />
+                                </Link>
                             </div>
                         ))}
                     </Slider>

@@ -45,7 +45,7 @@ interface Product {
 interface Category {
   id: number;
   name: string;
-  parentId: number | null;
+  xparentId: number | null;
   parent?: Category | null;
 }
 

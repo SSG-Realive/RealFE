@@ -215,7 +215,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                     <p className="text-xl font-bold text-blue-700">{item.price.toLocaleString()}원</p>
                                     <button
                                         className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
-                                        onClick={() => router.push(`/customer/reviews/new?orderId=${orderData.orderId}&productId=${item.productId}`)}
+                                        onClick={() =>
+                                            router.push(`/customer/reviews/new?orderId=${orderData.orderId}&sellerId=${item.sellerId}`)}
                                     >
                                         리뷰 작성
                                     </button>

@@ -4,10 +4,8 @@ import React, {useCallback, useEffect, useState} from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getOrderList, deleteOrder } from '@/service/order/orderService';
 import { useAuthStore } from '@/store/customer/authStore';
-import { Page, Order } from '@/types/customer/order/order';
+import { Page, Order, OrderItem } from '@/types/customer/order/order';
 
-// 이 페이지를 위한 CSS 파일을 임포트합니다.
-// This page imports CSS file for styling.
 import './OrderListPage.css';
 
 export default function OrderListPage() {
@@ -23,24 +21,16 @@ export default function OrderListPage() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
-    // 삭제 확인 모달 관련 상태
-    // State related to delete confirmation modal
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [orderToDeleteId, setOrderToDeleteId] = useState<number | null>(null);
-    const [isDeleting, setIsDeleting] = useState<boolean>(false); // 삭제 중 로딩 상태
-    // Loading state while deleting
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
-    // 삭제 실패 모달 관련 상태 추가
-    // Add state related to delete failure modal
     const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     const currentPage = Number(searchParams.get('page')) || 0;
-    const pageSize = 10; // 페이지 당 아이템 수 (서비스 함수와 일치)
-    // Items per page (matches service function)
+    const pageSize = 10;
 
-    // 주문 목록을 가져오는 함수
-    // Function to fetch order list
     const fetchOrders = useCallback(async () => {
         setIsLoading(true);
         setError(null);
@@ -55,99 +45,62 @@ export default function OrderListPage() {
         }
     }, [currentPage]);
 
-    // 인증 상태 및 주문 목록 로드 useEffect
-    // useEffect for authentication status and order list loading
     useEffect(() => {
-        if (!hydrated) {
-            return;
-        }
-
+        if (!hydrated) return;
         if (!isAuthenticated()) {
             setIsLoading(false);
-            // router.push('/login'); // 로그인 페이지로 리다이렉트 (필요하다면 활성화)
-            // Redirect to login page (activate if needed)
             return;
         }
-
         fetchOrders();
     }, [fetchOrders, hydrated, isAuthenticated]);
 
-    // 페이지 변경 핸들러
-    // Page change handler
     const handlePageChange = (pageNumber: number) => {
         const params = new URLSearchParams(searchParams);
         params.set('page', String(pageNumber));
         router.push(`${pathname}?${params.toString()}`);
     };
 
-    // 삭제 버튼 클릭 핸들러
-    // Delete button click handler
     const handleDeleteClick = (orderId: number) => {
         setOrderToDeleteId(orderId);
-        setShowDeleteModal(true); // 모달 열기
-        // Open modal
+        setShowDeleteModal(true);
     };
 
-    // 삭제 확인 핸들러
-    // Delete confirmation handler
     const handleConfirmDelete = async () => {
         if (orderToDeleteId === null) return;
-
-        setIsDeleting(true); // 삭제 중 상태 시작
-        // Start deleting state
+        setIsDeleting(true);
         try {
             await deleteOrder(orderToDeleteId);
-            setShowDeleteModal(false); // 삭제 확인 모달 닫기
-            // Close delete confirmation modal
-            setOrderToDeleteId(null); // ID 초기화
-            // Reset ID
-            await fetchOrders(); // 주문 목록 새로고침
-            // Refresh order list
-            // 성공 메시지는 alert 대신 모달 등으로 대체하는 것이 더 좋습니다.
-            // It's better to replace success messages with a modal instead of alert.
-            // alert('주문 내역이 성공적으로 삭제되었습니다.'); // Replaced by custom modal message
+            setShowDeleteModal(false);
+            setOrderToDeleteId(null);
+            await fetchOrders();
             setErrorMessage('주문 내역이 성공적으로 삭제되었습니다.');
-            setShowErrorModal(true); // Use the same error modal for success messages for simplicity, or create a separate success modal.
+            setShowErrorModal(true);
         } catch (err) {
             const msg = (err as Error).message || '알 수 없는 오류가 발생했습니다.';
             console.error("주문 삭제 실패:", err);
-            setShowDeleteModal(false); // 삭제 확인 모달 닫기
-            // Close delete confirmation modal
-            setOrderToDeleteId(null); // ID 초기화
-            // Reset ID
-
-            // 에러 모달 표시
-            // Display error modal
+            setShowDeleteModal(false);
+            setOrderToDeleteId(null);
             setErrorMessage(`삭제 실패: ${msg}`);
             setShowErrorModal(true);
         } finally {
-            setIsDeleting(false); // 삭제 중 상태 종료
-            // End deleting state
+            setIsDeleting(false);
         }
     };
 
-    // 삭제 취소 핸들러
-    // Delete cancellation handler
     const handleCancelDelete = () => {
         setShowDeleteModal(false);
         setOrderToDeleteId(null);
     };
 
-    // 에러 모달 닫기 핸들러
-    // Error modal close handler
     const handleErrorModalClose = () => {
         setShowErrorModal(false);
         setErrorMessage('');
     };
 
-    // 로딩 중 스켈레톤 UI 표시
-    // Display skeleton UI while loading
     if (isLoading) {
         return <OrderListSkeleton />;
     }
 
-    // 로그인 필요 메시지 표시 (인증되지 않은 경우)
-    // Display login required message (if not authenticated)
     if (hydrated && !isAuthenticated()) {
         return (
             <div className="container notice-section">
@@ -158,8 +111,6 @@ export default function OrderListPage() {
         );
     }
 
-    // 에러 발생 시 메시지 표시
-    // Display message when error occurs
     if (error) {
         return (
             <div className="container error-alert">
@@ -169,8 +120,6 @@ export default function OrderListPage() {
         );
     }
 
-    // 주문 내역이 없는 경우 메시지 표시
-    // Display message if there are no order details
     if (!ordersPage || ordersPage.empty) {
         return <div className="container notice-section">주문 내역이 없습니다.</div>;
     }
@@ -203,15 +152,7 @@ export default function OrderListPage() {
                         <div className="order-card-footer">
                             <p className="total-price">총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong></p>
 
-                            {/* 두 버튼을 감싸는 새로운 div 추가 */}
-                            {/* Add a new div to wrap the two buttons */}
                             <div className="order-actions">
-                                <button
-                                    className="button-outline"
-                                    onClick={() => router.push(`/customer/reviews/new?orderId=${orderId}&sellerId=${sellerId}`)}
-                                >
-                                    리뷰 작성
-                                </button>
                                 <button
                                     className="button-outline button-delete"
                                     onClick={() => handleDeleteClick(order.orderId)}
@@ -258,8 +199,6 @@ export default function OrderListPage() {
                 </button>
             </div>
 
-            {/* 삭제 확인 모달 컴포넌트: 페이지의 최상위 레벨에 위치 */}
-            {/* Delete confirmation modal component: Located at the top level of the page */}
             {showDeleteModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
@@ -281,8 +220,6 @@ export default function OrderListPage() {
                 </div>
             )}
 
-            {/* 삭제 실패 메시지 모달 컴포넌트: 페이지의 최상위 레벨에 위치 */}
-            {/* Delete failure message modal component: Located at the top level of the page */}
             {showErrorModal && (
                 <div className="modal-overlay">
                     <div className="modal-content modal-error">
@@ -300,8 +237,6 @@ export default function OrderListPage() {
     );
 }
 
-// 스켈레톤 UI 컴포넌트
-// Skeleton UI component
 function OrderListSkeleton(): React.ReactElement {
     return (
         <div className="container order-list-page">

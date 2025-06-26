@@ -64,67 +64,98 @@ export default function WishlistPage() {
         }
     };
 
-    // ✅ 부모 카테고리 필터 처리
+    // 부모 카테고리 목록 (중복 제거 + null 제외)
     const parentCategories = Array.from(
         new Set(products.map((p) => p.parentCategoryName).filter(Boolean))
     ) as string[];
 
+    // 선택된 부모 카테고리 필터링
     const filteredProducts = selectedParentCategory
         ? products.filter((p) => p.parentCategoryName === selectedParentCategory)
         : products;
 
     if (loading) return <div>로딩 중...</div>;
 
-    console.log(products)
-
     return (
         <>
             <Navbar />
             <div className="bg-gray-100 min-h-screen py-8">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">
-                    {/* 상단 제목/버튼 박스 + 필터 추가 */}
+
+                    {/* 상단 제목 및 버튼 */}
                     <section className="bg-white rounded-lg shadow p-4">
-                        <h1 className="text-xl font-bold text-slate-600 mb-2">찜한 상품</h1>
+                        <h1 className="text-xl text-rose-500 font-semibold mb-10 ml-3 mt-3">찜한 상품</h1>
+
                         {products.length > 0 && (
                             <>
-                                <div className="flex justify-between items-center mt-4">
-                                    <span className="text-sm text-gray-500 ml-1">{filteredProducts.length}개</span>
-                                    <button onClick={toggleEditMode} className="text-sm text-gray-600">
+                                {/* 카테고리 필터 (박스 폭 맞춤) */}
+                                <div className="relative select-none text-sm text-gray-500 max-w-full px-0 mt-10">
+
+                                    {/* 위쪽 긴 얇은 선 */}
+                                    <hr className="absolute top-0 left-0 w-full border-t border-gray-300" />
+
+                                    <div className="relative flex items-center space-x-6 mt-4 py-2select-none text-sm text-gray-500">
+                                        {/* 아래쪽 긴 얇은 선 */}
+                                        <hr className="absolute bottom-0 left-0 w-full border-t border-gray-300" />
+                                        {/* 전체 버튼 */}
+                                        <div
+                                            onClick={() => setSelectedParentCategory(null)}
+                                            className="relative cursor-pointer px-2 py-1"
+                                        >
+                                            <span
+                                                className={`relative z-10 ${
+                                                selectedParentCategory === null ? 'text-slate-600 font-semibold' : ''
+                                                }`}
+                                            >
+                                                전체
+                                            </span>
+                                            {/* 선택된 항목 아래 짧은 진한 선 */}
+                                            {selectedParentCategory === null && (
+                                                <hr className="absolute bottom-0 left-1/2 w-10 border-t border-slate-600 transform -translate-x-1/2" />
+                                            )}
+                                        </div>
+                                        {/* 동적 카테고리들 */}
+                                        {parentCategories.map((name) => (
+                                            <div
+                                                key={name}
+                                                onClick={() => setSelectedParentCategory(name)}
+                                                className="relative cursor-pointer px-2 py-1"
+                                            >
+                                                <span
+                                                    className={`relative z-10 ${
+                                                    selectedParentCategory === name ? 'text-slate-600 font-semibold' : ''
+                                                    }`}
+                                                >
+                                                    {name}
+                                                </span>
+                                                {selectedParentCategory === name && (
+                                                    <hr className="absolute bottom-0 left-1/2 w-10 border-t border-slate-600 transform -translate-x-1/2" />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* 개수와 상품 편집 버튼 — 카테고리 아래에 */}
+                                <div className="flex justify-between items-center mt-4 px-4">
+                                    <span className="text-sm text-gray-500">
+                                        {/* 전체 포함 항상 표시 */}
+                                        <span className="text-sm text-gray-500 mr-1">
+                                        {selectedParentCategory === null ? '전체' : selectedParentCategory}
+                                        </span>
+                                        <span className="text-rose-500 text-sm">{filteredProducts.length}</span>개
+                                    </span>
+                                    <button onClick={toggleEditMode} className="text-sm text-gray-600 bg-white border border-gray-300 px-3 py-1 rounded-md hover:bg-gray-50">
                                         {isEditMode ? '편집 취소' : '상품 편집'}
                                     </button>
                                 </div>
-
-                                {/* ✅ 1차 카테고리 필터 버튼 */}
-                                <div className="flex flex-wrap gap-2 mt-4">
-                                    <button
-                                        onClick={() => setSelectedParentCategory(null)}
-                                        className={`px-3 py-1 rounded-full border ${
-                                            selectedParentCategory === null
-                                                ? 'bg-blue-500 text-white'
-                                                : 'bg-white text-gray-600'
-                                        }`}
-                                    >
-                                        전체
-                                    </button>
-                                    {parentCategories.map((name) => (
-                                        <button
-                                            key={name}
-                                            onClick={() => setSelectedParentCategory(name)}
-                                            className={`px-3 py-1 rounded-full border ${
-                                                selectedParentCategory === name
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-white text-gray-600'
-                                            }`}
-                                        >
-                                            {name}
-                                        </button>
-                                    ))}
-                                </div>
                             </>
+
                         )}
                     </section>
 
-                    {/* 상품 목록 박스 */}
+
+                    {/* 상품 목록 */}
                     <section className="bg-white rounded-lg shadow p-4">
                         {isEditMode && filteredProducts.length > 0 && (
                             <div className="flex items-center mb-4 pb-2 border-b">
@@ -189,7 +220,7 @@ export default function WishlistPage() {
                 </main>
             </div>
 
-
+            {/* 선택 삭제 버튼 (편집 모드일 때 하단에 고정) */}
             {isEditMode && (
                 <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
                     <div className="max-w-xl lg:max-w-4xl mx-auto p-4">

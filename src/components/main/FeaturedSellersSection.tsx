@@ -1,63 +1,105 @@
+'use client';
+
 import { fetchFeaturedSellersWithProducts } from "@/service/customer/productService";
 import { FeaturedSellerWithProducts } from "@/types/product";
 import { useEffect, useState } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ProductImage from "@/components/ProductImage";
 
 export default function FeaturedSellersSection() {
-  const [featured, setFeatured] = useState<FeaturedSellerWithProducts[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+    const [featured, setFeatured] = useState<FeaturedSellerWithProducts[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchFeaturedSellersWithProducts()
-      .then(data => {
-        setFeatured(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('추천 섹션 로드 실패', err);
-        setError(err.message ?? '알 수 없는 에러');
-        setLoading(false);
-      });
-  }, []);
+    useEffect(() => {
+        fetchFeaturedSellersWithProducts()
+            .then(data => {
+                const valid = data.filter(seller => seller.products.length > 0);
+                const shuffled = valid.sort(() => 0.5 - Math.random());
+                const picked = shuffled.slice(0, 3);
+                setFeatured(picked);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error('추천 섹션 로드 실패', err);
+                setError(err.message ?? '알 수 없는 에러');
+                setLoading(false);
+            });
+    }, []);
 
-  if (loading) {
-    return <div className="text-center py-8">로딩 중...</div>;
-  }
+    if (loading) {
+        return <div className="text-center py-8">로딩 중...</div>;
+    }
 
-  if (error) {
-    return <div className="text-center py-8 text-red-500">추천 섹션을 불러올 수 없습니다: {error}</div>;
-  }
+    if (error) {
+        return <div className="text-center py-8 text-red-500">추천 섹션을 불러올 수 없습니다: {error}</div>;
+    }
 
-  return (
-    <section className="my-8">
-      <h2 className="text-2xl font-semibold mb-4">오늘의 추천 판매자 상품</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {featured.map(seller => (
-          <div
-            key={seller.sellerId}
-            className="border rounded-2xl p-4 shadow-md hover:shadow-lg transition"
-          >
-            <h3 className="text-lg font-medium mb-3">{seller.sellerName}</h3>
-            <ul className="space-y-3">
-              {seller.products.map(product => (
-                <li key={product.productId} className="flex items-center space-x-3">
-                  <img
-                    src={product.imageThumbnailUrl}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div>
-                    <p className="font-semibold truncate max-w-xs">{product.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ₩{product.price.toLocaleString()}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
+    return (
+        <section className="my-10 px-4">
+            <div className="max-w-7xl mx-auto p-6">
+                <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
+                    Today’s Seller Picks
+                </h2>
+
+                <div className="space-y-10">
+                    {featured.map((seller) => (
+                        <div key={seller.sellerId}>
+                            <h3 className="text-lg font-bold text-gray-700 mb-4 text-center">
+                                {seller.sellerName}
+                            </h3>
+
+                            <Slider
+                                dots={false}
+                                infinite={true}
+                                speed={500}
+                                slidesToShow={3}
+                                slidesToScroll={1}
+                                autoplay={true}
+                                autoplaySpeed={3000}
+                                pauseOnHover={true}
+                                responsive={[
+                                    {
+                                        breakpoint: 1024,
+                                        settings: { slidesToShow: 2 },
+                                    },
+                                    {
+                                        breakpoint: 640,
+                                        settings: { slidesToShow: 1 },
+                                    },
+                                ]}
+                            >
+                                {seller.products.map((product) => (
+                                    <div key={product.productId} className="px-2">
+                                        <div className="w-full max-w-xs mx-auto text-left">
+                                            {/* ✅ 이미지 비율 고정 */}
+                                            <div className="relative aspect-[4/3] mb-2">
+                                                <ProductImage
+                                                    src={product.imageThumbnailUrl}
+                                                    alt={product.name}
+                                                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow"
+                                                />
+                                            </div>
+
+                                            <div className="mt-4 text-black">
+                                                <p className="text-base font-medium truncate">
+                                                    {product.name}
+                                                </p>
+                                                <p className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {product.price.toLocaleString()}
+                                                    <span className="text-xs align-middle ml-1">원</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </Slider>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
 }

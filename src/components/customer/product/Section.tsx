@@ -21,7 +21,7 @@ export default function Section({ title, categoryId, limit = 10 }: SectionProps)
     return (
         <section className="max-w-screen-xl mx-auto px-4 py-10">
             <h2 className="text-xl font-bold text-gray-800 mb-2">{title}</h2>
-            <p className="text-sm text-gray-500 mb-6">2차 카테고리 + 더보기 버튼 추가</p>
+            <p className="text-sm text-gray-500 mb-6">2차 카테고리</p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {products.map((product) => (

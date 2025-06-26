@@ -85,7 +85,6 @@ export default function PopularProductsGrid() {
     return (
         <section className="relative max-w-screen-2xl mx-auto bg-gray-50 rounded-2xl py-4 px-4 sm:py-6 sm:px-8 md:py-10 md:px-20 mt-6 sm:mt-10">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">인기상품</h2>
-
             <Slider {...settings}>
                 {products.map((product) => (
                     <div key={product.id} className="px-2">

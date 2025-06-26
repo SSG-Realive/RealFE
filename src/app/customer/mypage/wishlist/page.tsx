@@ -89,64 +89,90 @@ export default function WishlistPage() {
     return (
         <>
             <Navbar />
-            <main className="max-w-xl lg:max-w-4xl mx-auto px-4 py-8">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-xl font-bold">찜한 상품</h1>
-                    {products.length > 0 && (
-                        <button onClick={toggleEditMode} className="text-sm text-gray-600">
-                            {isEditMode ? '편집 취소' : '상품 편집'}
-                        </button>
-                    )}
+            <main className="max-w-xl lg:max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+            {/*  상단 제목/버튼 박스 */}
+            <section className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+                {/* 왼쪽: 타이틀 + 개수 */}
+                <div className="flex items-center gap-3">
+                    <h1 className="text-xl font-bold text-rose-400">찜한 상품</h1>
+                    <span className="text-sm text-gray-500">{products.length}개</span>
                 </div>
 
+                {/* 오른쪽: 편집 버튼 */}
+                {products.length > 0 && (
+                    <button onClick={toggleEditMode} className="text-sm text-gray-600">
+                    {isEditMode ? '편집 취소' : '상품 편집'}
+                    </button>
+                )}
+            </section>
+
+
+            {/* ✅ 상품 목록 박스 */}
+            <section className="bg-white rounded-lg shadow p-4">
                 {isEditMode && products.length > 0 && (
-                     <div className="flex items-center mb-4 pb-2 border-b">
-                        <input
-                            type="checkbox"
-                            className="w-5 h-5"
-                            onChange={handleSelectAll}
-                            checked={selectedIds.size > 0 && selectedIds.size === products.length}
-                        />
-                        <label className="ml-2 text-sm">
-                            전체선택 ({selectedIds.size}/{products.length})
-                        </label>
-                    </div>
+                <div className="flex items-center mb-4 pb-2 border-b">
+                    <input
+                    type="checkbox"
+                    className="w-5 h-5"
+                    onChange={handleSelectAll}
+                    checked={selectedIds.size > 0 && selectedIds.size === products.length}
+                    />
+                    <label className="ml-2 text-sm">
+                    전체선택 ({selectedIds.size}/{products.length})
+                    </label>
+                </div>
                 )}
 
                 {products.length === 0 ? (
-                    <div className="text-center py-20 text-gray-500">찜한 상품이 없습니다.</div>
+                <div className="text-center py-20 text-gray-500">찜한 상품이 없습니다.</div>
                 ) : (
-                    <ul className="space-y-6">
-                        {products.map((p) => (
-                            <li key={p.id} className="flex items-center bg-white rounded-lg shadow-sm p-4 relative">
-                                {isEditMode && (
-                                    <input
-                                        type="checkbox"
-                                        className="w-5 h-5 mr-4 flex-shrink-0"
-                                        checked={selectedIds.has(p.id)}
-                                        onChange={() => handleSelectProduct(p.id)}
-                                    />
-                                )}
-                                <Link href={`/main/products/${p.id}`} className="flex items-center flex-grow">
-                                    <img
-                                        src={p.imageThumbnailUrl}
-                                        alt={p.name}
-                                        className="w-24 h-24 object-cover rounded-md flex-shrink-0"
-                                    />
-                                    <div className="flex-grow ml-4">
-                                        <p className="text-sm text-gray-500">{p.sellerName}</p>
-                                        <h3 className="font-medium hover:underline leading-tight">{p.name}</h3>
-                                        <p className="font-bold mt-1">{p.price.toLocaleString()}원</p>
-                                    </div>
-                                </Link>
-                                <button onClick={(e) => handleDeleteOne(e, p.id)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">
-                                    &times;
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+                <ul className="space-y-6">
+                    {products.map((p) => (
+                    <li
+                        key={p.id}
+                        className="flex items-center bg-gray-50 rounded-lg shadow-sm p-4 relative"
+                    >
+                        {isEditMode && (
+                        <input
+                            type="checkbox"
+                            className="w-5 h-5 mr-4 flex-shrink-0"
+                            checked={selectedIds.has(p.id)}
+                            onChange={() => handleSelectProduct(p.id)}
+                        />
+                        )}
+                        <Link
+                        href={`/main/products/${p.id}`}
+                        className="flex items-center flex-grow"
+                        >
+                        <img
+                            src={p.imageThumbnailUrl}
+                            alt={p.name}
+                            className="w-24 h-24 object-cover rounded-md flex-shrink-0"
+                        />
+                        <div className="flex-grow ml-4">
+                            <p className="text-sm text-gray-500">{p.sellerName}</p>
+                            <h3 className="font-medium hover:underline leading-tight">
+                            {p.name}
+                            </h3>
+                            <p className="font-bold mt-1">
+                            {p.price.toLocaleString()}원
+                            </p>
+                        </div>
+                        </Link>
+                        <button
+                        onClick={(e) => handleDeleteOne(e, p.id)}
+                        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl"
+                        >
+                        &times;
+                        </button>
+                    </li>
+                    ))}
+                </ul>
                 )}
+            </section>
             </main>
+
 
             {isEditMode && (
                 <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">

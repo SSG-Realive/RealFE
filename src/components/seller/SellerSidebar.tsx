@@ -9,6 +9,11 @@ interface MenuItem {
   href: string;
 }
 
+interface SellerSidebarProps {
+  onClose?: () => void;
+  isOpen?: boolean;
+}
+
 const menuItems: MenuItem[] = [
   { label: "대시보드", href: "/seller/dashboard" },
   { label: "마이페이지", href: "/seller/me" },
@@ -18,28 +23,35 @@ const menuItems: MenuItem[] = [
   { label: "고객문의확인", href: "/seller/qna" },
 ];
 
-const SellerSidebar: FC = () => {
-  const pathname = usePathname ();
+const SellerSidebar: FC<SellerSidebarProps & { className?: string }> = ({ onClose, className }) => {
+  const pathname = usePathname();
   const currentPath = pathname;
+  const handleMenuClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
   return (
-    <aside className="w-60 min-h-screen bg-gray-800 text-white flex-shrink-0">
-      <div className="px-6 py-8">
-        <h1 className="text-2xl font-bold mb-8">판매자</h1>
+    <aside className={className + " bg-[#4b3a2f] min-h-screen border-r border-[#3e2f23] shadow-lg"}>
+      <div className="px-6 pt-8 pb-10">
+        <Link href="/seller/dashboard">
+          <span className="text-2xl font-extrabold mb-10 text-[#e9dec7] tracking-tight block hover:text-[#bfa06a] transition-colors">Realive</span>
+        </Link>
         <nav>
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {menuItems.map((item) => {
               const isActive = currentPath.startsWith(item.href);
               return (
                 <li key={item.href}>
-                  <Link href={item.href}>
+                  <Link href={item.href} onClick={handleMenuClick}>
                     <div
-                      className={`block px-4 py-2 rounded-md transition-colors ${
+                      className={`flex items-center px-5 py-3 rounded-lg font-medium transition-colors duration-200 text-base ${
                         isActive
-                          ? "bg-gray-700 text-green-300"
-                          : "hover:bg-gray-700 hover:text-green-200"
+                          ? "bg-[#bfa06a] border-l-4 border-[#3e2f23] text-[#4b3a2f] font-semibold shadow-sm"
+                          : "text-[#e9dec7] hover:bg-[#bfa06a] active:bg-[#4b3a2f] hover:text-[#4b3a2f]"
                       }`}
                     >
-                      <span className="text-sm font-medium">{item.label}</span>
+                      <span>{item.label}</span>
                     </div>
                   </Link>
                 </li>

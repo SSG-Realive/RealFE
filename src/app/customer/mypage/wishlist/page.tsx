@@ -75,6 +75,8 @@ export default function WishlistPage() {
 
     if (loading) return <div>로딩 중...</div>;
 
+    console.log(products)
+
     return (
         <>
             <Navbar />

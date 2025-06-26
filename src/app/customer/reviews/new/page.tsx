@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Navbar from '@/components/customer/common/Navbar';
 
 function ReviewPage() {
     const router = useRouter();
@@ -32,7 +33,7 @@ function ReviewPage() {
 
             // 중복 체크 API 호출
             axios
-                .get('/api/reviews/exists', {
+                .get('/api/reviews/check-exists', {
                     params: {
                         orderId: parsedOrderId,
                         sellerId: parsedSellerId,
@@ -106,6 +107,7 @@ function ReviewPage() {
     if (alreadyReviewed) {
         return (
             <div className="container max-w-xl mx-auto py-10">
+                <Navbar/>
                 <h1 className="text-2xl font-bold mb-4">리뷰 작성 불가</h1>
                 <p>이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
                 <button
@@ -121,6 +123,7 @@ function ReviewPage() {
     // 리뷰 작성 폼
     return (
         <div className="container max-w-xl mx-auto py-10">
+            <Navbar/>
             <h1 className="text-2xl font-bold mb-6">리뷰 작성</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

@@ -4,6 +4,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getOrderList, deleteOrder } from '@/service/order/orderService';
 import { useAuthStore } from '@/store/customer/authStore';
+import Navbar from '@/components/customer/common/Navbar';
 import { Page, Order, OrderItem } from '@/types/customer/order/order';
 
 import './OrderListPage.css';
@@ -126,6 +127,7 @@ export default function OrderListPage() {
 
     return (
         <div className="container order-list-page">
+            <Navbar/>
             <h1>주문 내역</h1>
 
             <div className="order-list-container">

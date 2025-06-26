@@ -17,9 +17,10 @@ interface CategoryGroup {
 
 interface Props {
     onCategorySelect?: (id: number) => void;
+    isCompact?: boolean;
 }
 
-export default function CategoryDropdown({ onCategorySelect }: Props) {
+export default function CategoryDropdown({ onCategorySelect, isCompact }: Props) {
     const [categories, setCategories] = useState<CategoryGroup[]>([]);
     const [hoveredId, setHoveredId] = useState<number | null>(null);
     const [hoveredFirstId, setHoveredFirstId] = useState<number | null>(null);
@@ -60,7 +61,11 @@ export default function CategoryDropdown({ onCategorySelect }: Props) {
         typeof window !== 'undefined' && window.innerWidth < 768;
 
     return (
-        <div className="overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar px-4 py-0 bg-transparent backdrop-blur-none text-sm relative z-50 mb-0">
+        <div
+        className={`overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar px-4 py-0 bg-transparent backdrop-blur-none text-sm relative mb-0 ${
+            isCompact ? 'z-10' : 'z-50'
+        }`}
+        >
             <div className="inline-flex items-center gap-4 w-full">
                 {/* ✅ ALL */}
                 <div
@@ -78,12 +83,17 @@ export default function CategoryDropdown({ onCategorySelect }: Props) {
                         }
                     }}
                 >
-          <span
-              className="inline-block px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800"
-              onClick={() => goToCategory(null)}
-          >
-            ALL
-          </span>
+                <span
+                className={
+                    isCompact
+                    ? 'inline-block relative px-2 sm:px-3 py-0.5 sm:py-1 cursor-pointer text-[11px] sm:text-sm font-medium bg-black text-white rounded-full hover:bg-gray-800 transition tracking-tight z-10'
+                    : 'inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800 z-50'
+                }
+                onClick={() => goToCategory(null)}
+                >
+                ALL
+                </span>
+
 
                     {!isMobile() && allOpen && (
                         <div className="absolute top-full left-0 mt-1 bg-[rgba(255,255,255,0.85)] backdrop-blur-sm shadow-md rounded z-50 min-w-[180px] py-2">
@@ -144,12 +154,16 @@ export default function CategoryDropdown({ onCategorySelect }: Props) {
                                 }
                             }}
                         >
-              <span
-                  className="inline-block px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800"
-                  onClick={() => goToCategory(cat.id)}
-              >
-                {cat.name}
-              </span>
+                        <span
+                        className={
+                            isCompact
+                            ? 'inline-block relative px-2 sm:px-3 py-0.5 sm:py-1 cursor-pointer text-[11px] sm:text-sm font-medium bg-black text-white rounded-full hover:bg-gray-800 transition tracking-tight z-10'
+                            : 'inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800 z-50'
+                        }
+                        onClick={() => goToCategory(cat.id)}
+                        >
+                        {cat.name}
+                        </span>
 
                             {!isMobile() && isOpen && cat.subCategories.length > 0 && (
                                 <div className="absolute top-full left-0 mt-1 bg-[rgba(255,255,255,0.85)] backdrop-blur-sm shadow-lg rounded z-50 min-w-[160px] py-2">

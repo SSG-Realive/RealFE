@@ -5,23 +5,23 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-const bannerImages = [
-  '/images/banner1.jpg',
-  '/images/banner2.jpg',
-  '/images/banner3.jpg',
+const defaultImages = [
+    '/images/banner1.jpg',
+    '/images/banner2.jpg',
+    '/images/banner3.jpg',
 ];
 
 const CustomArrow = ({
-                         onClick,
-                         direction,
-                     }: {
+    onClick,
+    direction,
+}: {
     onClick?: () => void;
     direction: 'left' | 'right';
 }) => {
     return (
         <div
             onClick={onClick}
-            className={`absolute top-1/2 z-20 transform -translate-y-1/2 bg-black bg-opacity-50 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
+            className={`custom-arrow absolute top-1/2 z-20 transform -translate-y-1/2 bg-black bg-opacity-50 text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full cursor-pointer ${
                 direction === 'left' ? 'left-3' : 'right-3'
             }`}
         >
@@ -30,7 +30,7 @@ const CustomArrow = ({
     );
 };
 
-export default function BannerCarousel() {
+export default function BannerCarousel({ images = defaultImages }: { images?: string[] }) {
     const settings = {
         dots: true,
         dotsClass: 'slick-dots custom-dots',
@@ -47,6 +47,13 @@ export default function BannerCarousel() {
     return (
         <>
             <style>{`
+
+        @media (max-width: 767px) {
+          .custom-arrow {
+                display: none !important;
+            }
+        }
+        
         .custom-dots {
           position: static !important;
           display: flex !important;
@@ -77,27 +84,28 @@ export default function BannerCarousel() {
         .slick-prev, .slick-next {
           display: none !important;
         }
-        /* 모바일에서 dot 사이즈 축소 */
-        @media (max-width: 767px) {
-            .custom-dots {
-            margin-top: 8px !important; /* 이미지와의 간격 좁힘 */
-            gap: 1px !important;        /* dot 간 간격 좁힘 */
-            }
 
-            .custom-dots li {
+        @media (max-width: 767px) {
+          .custom-dots {
+            margin-top: 8px !important;
+            gap: 1px !important;
+          }
+
+          .custom-dots li {
             width: 20px;
             height: 4px;
-            }
+          }
 
-            .custom-dots li button {
+          .custom-dots li button {
             height: 4px;
-            }
+          }
         }
       `}</style>
 
-            <div className="w-full h-[200px] sm:h-[280px] md:h-[420px] lg:h-[560px] relative overflow-hidden">
+            <div className="w-full aspect-[3/1] relative overflow-hidden">
+
                 <Slider {...settings}>
-                    {bannerImages.map((src, index) => (
+                    {images.map((src, index) => (
                         <div key={index}>
                             <img
                                 src={src}

@@ -2,13 +2,14 @@
 
 import React from 'react';
 import Slider from 'react-slick';
+import Link from 'next/link';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const defaultImages = [
-    '/images/banner1.jpg',
-    '/images/banner2.jpg',
-    '/images/banner3.jpg',
+    { src: '/images/banner1.jpg', link: '/main?category=21' },
+    { src: '/images/banner2.jpg', link: '/main?category=25' },
+    { src: '/images/banner3.jpg', link: '/main?category=53' },
 ];
 
 const CustomArrow = ({
@@ -30,7 +31,11 @@ const CustomArrow = ({
     );
 };
 
-export default function BannerCarousel({ images = defaultImages }: { images?: string[] }) {
+export default function BannerCarousel({
+                                           images = defaultImages,
+                                       }: {
+    images?: { src: string; link: string }[];
+}) {
     const settings = {
         dots: true,
         dotsClass: 'slick-dots custom-dots',
@@ -47,11 +52,10 @@ export default function BannerCarousel({ images = defaultImages }: { images?: st
     return (
         <>
             <style>{`
-
         @media (max-width: 767px) {
           .custom-arrow {
-                display: none !important;
-            }
+            display: none !important;
+          }
         }
         
         .custom-dots {
@@ -104,13 +108,15 @@ export default function BannerCarousel({ images = defaultImages }: { images?: st
 
             <div className="w-full aspect-[3/1] relative overflow-hidden">
                 <Slider {...settings}>
-                    {images.map((src, index) => (
+                    {images.map((item, index) => (
                         <div key={index}>
-                            <img
-                                src={src}
-                                alt={`배너 ${index + 1}`}
-                                className="w-full h-full object-cover"
-                            />
+                            <Link href={item.link}>
+                                <img
+                                    src={item.src}
+                                    alt={`배너 ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                />
+                            </Link>
                         </div>
                     ))}
                 </Slider>

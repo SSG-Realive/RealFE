@@ -53,7 +53,7 @@ export async function fetchFeaturedSellersWithProducts(
   minReviews = 3
 ): Promise<FeaturedSellerWithProducts[]> {
   const response = await apiClient.get<FeaturedSellerWithProducts[]>(
-    '/api/public/items/featured-sellers-with-products',
+    '/public/items/featured-sellers-with-products',
     {
       params: { candidateSize, sellersPick, productsPerSeller, minReviews },
     }

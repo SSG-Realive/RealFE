@@ -2,21 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import Slider from 'react-slick';
+import Link from 'next/link';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 export default function ExtraBannerCarousel() {
     const bannerImages = [
-        '/images/banner6.jpg',
-        '/images/banner7.jpg',
-        '/images/banner8.jpg',
+        { src: '/images/banner6.jpg', link: '/main?category=11' },
+        { src: '/images/banner7.jpg', link: '/main?category=21' },
+        { src: '/images/banner8.jpg', link: '/main?category=11' },
     ];
 
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 640); // tailwind 기준 sm: 640px
+            setIsMobile(window.innerWidth < 640); // Tailwind 기준 sm: 640px
         };
 
         handleResize(); // 초기 실행
@@ -40,26 +41,32 @@ export default function ExtraBannerCarousel() {
             <div className="max-w-screen-xl mx-auto">
                 {isMobile ? (
                     <Slider {...sliderSettings}>
-                        {bannerImages.map((src, idx) => (
+                        {bannerImages.map((item, idx) => (
                             <div key={idx} className="px-2">
-                                <img
-                                    src={src}
-                                    alt={`배너 ${idx + 1}`}
-                                    className="w-full h-auto object-contain rounded-lg shadow-md"
-                                />
+                                <Link href={item.link}>
+                                    <img
+                                        src={item.src}
+                                        alt={`배너 ${idx + 1}`}
+                                        className="w-full h-auto object-contain rounded-lg shadow-md cursor-pointer"
+                                    />
+                                </Link>
                             </div>
                         ))}
                     </Slider>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {bannerImages.map((src, idx) => (
-                            <div key={idx} className="w-full overflow-hidden shadow-sm rounded-lg bg-white">
+                        {bannerImages.map((item, idx) => (
+                            <Link
+                                key={idx}
+                                href={item.link}
+                                className="w-full overflow-hidden shadow-sm rounded-lg bg-white block"
+                            >
                                 <img
-                                    src={src}
+                                    src={item.src}
                                     alt={`배너 ${idx + 1}`}
-                                    className="w-full h-auto object-contain"
+                                    className="w-full h-auto object-contain cursor-pointer"
                                 />
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 )}

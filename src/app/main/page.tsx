@@ -115,7 +115,7 @@ export default function CustomerHomePage() {
                         {getTopCategoryName(categoryId)}
                     </h2>
                 </div>
-                <p className="text-sm text-gray-600 mb-6">전체 상품 리스트</p>
+                <p className="text-sm text-gray-600 mb-6">필터 예정</p>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
                     {products.map((p, index) => (

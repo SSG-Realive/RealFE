@@ -22,38 +22,46 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
         fetchAllCategories().then((all) => {
             const filtered = all.filter((c) => c.parentId === categoryId);
             setSubCategories(filtered);
-            setSelectedSubId(filtered[0]?.id || null); // 첫 번째 자동 선택
+            setSelectedSubId(null); // 처음에는 전체 보기
         });
     }, [categoryId]);
 
     useEffect(() => {
-        if (selectedSubId !== null) {
-            fetchPublicProducts(selectedSubId, 1, limit).then(setProducts);
-        }
-    }, [selectedSubId]);
+        const targetId = selectedSubId ?? categoryId; // 선택된 2차가 없으면 1차 카테고리로 전체 조회
+        fetchPublicProducts(targetId, 1, limit).then(setProducts);
+    }, [selectedSubId, categoryId, limit]);
 
     return (
         <div className="mb-12 max-w-screen-xl mx-auto px-2 sm:px-0">
             {/* 🔹 타이틀과 버튼을 같은 줄에 배치 */}
-            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800 mr-4 whitespace-nowrap">{title}</h2>
-                <div className="flex gap-2 flex-wrap sm:flex-nowrap overflow-x-auto">
-                    {subCategories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setSelectedSubId(cat.id)}
-                            className={`px-3 py-1 rounded-full border text-sm whitespace-nowrap transition ${
-                                selectedSubId === cat.id
-                                    ? 'bg-black text-white'
-                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                            }`}
-                        >
-                            {cat.name}
-                        </button>
-                    ))}
-                </div>
+            <div className="flex flex-wrap sm:flex-nowrap items-center justify-start gap-2 mb-4 overflow-x-auto no-scrollbar">
+                <h2 className="text-xl font-bold text-gray-800 whitespace-nowrap">{title}</h2>
+                <button
+                    onClick={() => setSelectedSubId(null)}
+                    className={`text-sm whitespace-nowrap transition ${
+                        selectedSubId === null
+                            ? 'text-black font-semibold underline'
+                            : 'text-gray-500 hover:text-black'
+                    }`}
+                >
+                    전체
+                </button>
+                {subCategories.map((cat) => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setSelectedSubId(cat.id)}
+                        className={`text-sm whitespace-nowrap transition ${
+                            selectedSubId === cat.id
+                                ? 'text-black font-semibold underline'
+                                : 'text-gray-500 hover:text-black'
+                        }`}
+                    >
+                        {cat.name}
+                    </button>
+                ))}
             </div>
 
+            {/* 🔹 상품 목록 */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {products.map((p) => (
                     <ProductCard key={p.id} {...p} />

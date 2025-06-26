@@ -14,6 +14,8 @@ export default function OrderListPage() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const orderId = searchParams.get('orderId');
+    const sellerId = searchParams.get('sellerId');
 
     const { hydrated, isAuthenticated } = useAuthStore();
 
@@ -206,7 +208,7 @@ export default function OrderListPage() {
                             <div className="order-actions">
                                 <button
                                     className="button-outline"
-                                    onClick={() => router.push(`/customer/reviews/new?orderId=${order.orderId}&sellerId=${order.sellerId}`)}
+                                    onClick={() => router.push(`/customer/reviews/new?orderId=${orderId}&sellerId=${sellerId}`)}
                                 >
                                     리뷰 작성
                                 </button>

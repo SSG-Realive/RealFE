@@ -187,6 +187,7 @@ export default function WishlistPage() {
                 </main>
             </div>
 
+
             {isEditMode && (
                 <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
                     <div className="max-w-xl lg:max-w-4xl mx-auto p-4">

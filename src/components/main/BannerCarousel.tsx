@@ -103,6 +103,7 @@ export default function BannerCarousel({ images = defaultImages }: { images?: st
       `}</style>
 
             <div className="w-full aspect-[3/1] relative overflow-hidden">
+
                 <Slider {...settings}>
                     {images.map((src, index) => (
                         <div key={index}>

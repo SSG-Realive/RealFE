@@ -221,9 +221,6 @@ body.seller-signup button:hover {
   color: #e9dec7 !important;
 }
 
-html, body {
-  background-color: #a89f91 !important;
-}
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

@@ -31,13 +31,17 @@ function ReviewPage() {
             setOrderId(parsedOrderId);
             setSellerId(parsedSellerId);
 
+            const token = localStorage.getItem('auth-storage');
+            const headers = token ? { Authorization: `Bearer ${token}` } : {}; // ✅ 토큰이 있다면 Authorization 헤더 생성
+
             // 중복 체크 API 호출
             axios
-                .get('/api/reviews/check-exists', {
+                .get('http://localhost:8080/api/reviews/check-exists', {
                     params: {
                         orderId: parsedOrderId,
                         sellerId: parsedSellerId,
                     },
+                    withCredentials: true, // <-- 여기에 추가
                 })
                 .then((res) => {
                     setAlreadyReviewed(res.data.exists);

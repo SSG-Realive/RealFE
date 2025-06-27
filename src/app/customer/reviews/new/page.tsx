@@ -65,7 +65,7 @@ function ReviewPage() {
 
             // 중복 체크 API 호출
             axios
-                .get('http://localhost:8080/api/reviews/check-exists', {
+                .get('http://localhost:8080/api/customer/reviews/check-exists', {
                     params: {
                         orderId: parsedOrderId,
                         sellerId: parsedSellerId,
@@ -153,7 +153,7 @@ function ReviewPage() {
             // Next.js API Route로 직접 처리되는지 확인해야 합니다.
             // 이전 에러에서 /api/reviews/check-exists를 'http://localhost:8080/api/reviews/check-exists'로 변경하여 해결했으므로,
             // 여기도 'http://localhost:8080/api/reviews'로 변경하는 것이 일관성 있습니다.
-            await axios.post('http://localhost:8080/api/reviews', payload, { // <-- 이 부분을 직접 백엔드 주소로 변경
+            await axios.post('http://localhost:8080/api/customer/reviews', payload, { // <-- 이 부분을 직접 백엔드 주소로 변경
                 headers: submitHeaders,
             });
             setMessage('리뷰가 성공적으로 등록되었습니다.');

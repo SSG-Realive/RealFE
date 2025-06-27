@@ -5,21 +5,18 @@ import Image from 'next/image';
 
 export default function Home() {
   useEffect(() => {
-    const style = document.createElement('style');
-    style.innerHTML = `
-      /* Next.js 에러 오버레이 숨기기 */
-      [data-nextjs-toast] {
-        display: none !important;
-      }
-      iframe.__next-error-overlay__ {
-        display: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
+    const hideErrorOverlay = () => {
+      const iframe = document.querySelector('iframe.__next-error-overlay__') as HTMLElement | null;
+      const toast = document.querySelector('[data-nextjs-toast]') as HTMLElement | null;
+
+      if (iframe) iframe.style.display = 'none';
+      if (toast) toast.style.display = 'none';
     };
+
+    const interval = setInterval(hideErrorOverlay, 500);
+    return () => clearInterval(interval);
   }, []);
+
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">

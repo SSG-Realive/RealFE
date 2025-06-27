@@ -14,8 +14,6 @@ import {
     Star,
     ReceiptText
 } from 'lucide-react';
-import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
-import Link from 'next/link';
 
 export default function MyPage() {
     const router = useRouter();

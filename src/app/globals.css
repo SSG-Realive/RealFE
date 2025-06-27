@@ -133,7 +133,7 @@
 
 @layer base {
   html {
-    font-size: 22px; /* ✅ 기본 크기 키우기 (기본은 보통 16px) */
+    font-size: 20px; /* ✅ 기본 크기 키우기 (기본은 보통 16px) */
   }
 
   * {
@@ -149,6 +149,10 @@
   h1, h2, h3, h4, h5 {
     font-family: 'Minhye', serif;
     line-height: 1.2;
+  }
+
+  input, textarea, select, button {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif !important;
   }
 }
 

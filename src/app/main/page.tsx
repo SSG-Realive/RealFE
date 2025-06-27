@@ -135,7 +135,7 @@ export default function CustomerHomePage() {
                             onClick={loadMore}
                             className="px-6 py-2 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg border border-gray-300"
                         >
-                            more
+                            더보기
                         </button>
                     </div>
                 )}
@@ -162,11 +162,6 @@ export default function CustomerHomePage() {
                                 categoryId={id}
                                 limit={5}
                             />
-                            <div className="text-right mt-2 max-w-screen-xl mx-auto px-2 sm:px-0">
-                                <Link href={`/main?category=${id}`} className="text-sm text-black font-semibold hover:underline">
-                                    more
-                                </Link>
-                            </div>
                         </div>
                     ))}
                 </>

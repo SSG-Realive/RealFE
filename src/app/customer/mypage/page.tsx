@@ -5,13 +5,21 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import Navbar from '@/components/customer/common/Navbar';
 import { Heart, ShoppingCart, Package, Gavel, Clock3, UserCog, Star, ReceiptText } from 'lucide-react';
-import MiddleBannerCarousel from "@/components/main/MiddleBannerCarousel";
+import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+
 
 export default function MyPage() {
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const categoryFromUrl = searchParams.get('category');
+    const keywordFromUrl = searchParams.get('keyword') || '';
     const router = useRouter();
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const userName = useAuthStore((state) => state.userName); 
     const [mounted, setMounted] = useState(false);
+    const showMainTopBanners = pathname === '/main' && !categoryFromUrl && !keywordFromUrl;
 
     useEffect(() => setMounted(true), []);
 
@@ -44,7 +52,7 @@ export default function MyPage() {
                         
                             <button
                             className="flex flex-col items-center justify-center w-24 h-24 rounded-full bg-black text-white hover:bg-gray-800 transition"
-                            onClick={() => router.push('/customer/mypage/orders')}
+                            onClick={() => router.push('/customer/orders')}
                             >
                             <ReceiptText size={24} />
                             <span className="text-sm mt-1">구매내역</span>
@@ -120,12 +128,17 @@ export default function MyPage() {
                         </div>
                     </section>
 
-                    {/* ✅ 하단 배너 - 상품 목록 위로 이동 */}
-                    <div className="mt-20 mb-0 max-w-4xl mx-auto">
-                        <MiddleBannerCarousel images={[
-                            { src: '/images/banner4.png', link: '/main?category=25' },
-                            { src: '/images/banner5.png', link: '/main?category=54' },
-                        ]} />
+                    <BottomInspirationSlider />
+
+                    {/* ✅ 하단 배너 항상 표시 (원하는 경로로 연결) */}
+                    <div className="w-full mt-10">
+                    <Link href="/main?category=25">
+                        <img
+                        src="/images/banner-bottom.jpg"
+                        alt="프로모션 배너"
+                        className="w-full h-auto object-cover cursor-pointer"
+                        />
+                    </Link>
                     </div>
                 </div>
             </main>

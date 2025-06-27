@@ -82,7 +82,7 @@ export default function RegisterForm({ onSuccess }: Props) {
       const data = await res.json();
       console.log('응답 data:', data);
 
-      if (!res.ok || !data.success) {
+      if (!res.ok) {
         alert(data.message || '회원가입 실패');
         return;
       }

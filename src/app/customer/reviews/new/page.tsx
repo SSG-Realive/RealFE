@@ -42,6 +42,7 @@ function ReviewPage() {
                         sellerId: parsedSellerId,
                     },
                     withCredentials: true, // <-- 여기에 추가
+                    headers: headers, // ✅ 생성된 headers 객체를 여기에 전달
                 })
                 .then((res) => {
                     setAlreadyReviewed(res.data.exists);

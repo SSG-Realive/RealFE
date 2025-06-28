@@ -59,15 +59,15 @@ export default function SellerOrderListPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'INIT':
-        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#e9dec7] text-[#bfa06a]">주문 접수</span>;
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#bfa06a]">주문 접수</span>;
       case 'DELIVERY_PREPARING':
-        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#fbeee0] text-[#bfa06a]">배송 준비</span>;
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#bfa06a]">배송 준비</span>;
       case 'DELIVERY_IN_PROGRESS':
         return <span className="px-2 py-1 rounded text-xs font-bold bg-[#bfa06a] text-[#5b4636]">배송 중</span>;
       case 'DELIVERY_COMPLETED':
         return <span className="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-700">배송 완료</span>;
       default:
-        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#e9dec7] text-[#bfa06a]">{status}</span>;
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#bfa06a]">{status}</span>;
     }
   };
 
@@ -89,28 +89,28 @@ export default function SellerOrderListPage() {
           <div className="w-full h-full px-4 py-8">
             <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">주문 관리</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-              <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+              <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 주문 수</h2>
                   <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalOrders}건</p>
                 </div>
                 <Armchair className="w-8 h-8 text-[#bfa06a]" />
               </section>
-              <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+              <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-2">배송 준비</h2>
                   <p className="text-xl md:text-2xl font-bold text-[#bfa06a]">{preparingOrders}건</p>
                 </div>
                 <Clock className="w-8 h-8 text-[#bfa06a]" />
               </section>
-              <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+              <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-2">배송 중</h2>
                   <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{inProgressOrders}건</p>
                 </div>
                 <Truck className="w-8 h-8 text-[#bfa06a]" />
               </section>
-              <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+              <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-2">배송 완료</h2>
                   <p className="text-xl md:text-2xl font-bold text-[#388e3c]">{completedOrders}건</p>
@@ -124,12 +124,12 @@ export default function SellerOrderListPage() {
                 placeholder="고객명, 상품명, 주문번호 검색"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
-                className="flex-1 border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+                className="flex-1 border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
               />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+                className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
               >
                 <option value="">전체 상태</option>
                 <option value="INIT">주문 접수</option>
@@ -154,9 +154,9 @@ export default function SellerOrderListPage() {
                 <p className="text-[#bfa06a] text-lg">주문이 없습니다.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto bg-[#e9dec7] rounded-lg shadow-sm border border-[#bfa06a]">
+              <div className="overflow-x-auto bg-[#e3f6f5] rounded-lg shadow-sm border border-[#bfa06a]">
                 <table className="min-w-full divide-y divide-[#bfa06a]">
-                  <thead className="bg-[#e9dec7]">
+                  <thead className="bg-[#e3f6f5]">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">주문번호</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">주문일시</th>
@@ -167,7 +167,7 @@ export default function SellerOrderListPage() {
                       <th className="px-6 py-3 text-center text-xs font-medium text-[#bfa06a] uppercase tracking-wider">액션</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-[#e9dec7] divide-y divide-[#bfa06a]">
+                  <tbody className="bg-[#e3f6f5] divide-y divide-[#bfa06a]">
                     {filteredOrders.map((order) => (
                       <tr key={order.orderId} className="hover:bg-[#bfa06a] transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#5b4636]">#{order.orderId}</td>

@@ -121,11 +121,11 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* 상품 기본 정보 카드 */}
-                    <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8 mb-6">
+                    <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8 mb-6">
                         <div className="flex flex-col lg:flex-row gap-6">
                             {/* 상품 이미지 */}
                             <div className="lg:w-1/3">
-                                <div className="aspect-square bg-[#e9dec7] rounded-xl overflow-hidden border border-[#bfa06a]">
+                                <div className="aspect-square bg-[#e3f6f5] rounded-xl overflow-hidden border border-[#bfa06a]">
                                     {product.imageThumbnailUrl ? (
                                         <img
                                             src={product.imageThumbnailUrl}
@@ -145,21 +145,21 @@ export default function ProductDetailPage() {
                                 <h2 className="text-2xl font-bold text-[#5b4636] mb-4">{product.name}</h2>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div className="flex items-center gap-3 p-3 bg-[#e9dec7] rounded-xl border border-[#bfa06a]">
+                                    <div className="flex items-center gap-3 p-3 bg-[#e3f6f5] rounded-xl border border-[#bfa06a]">
                                         <DollarSign className="w-5 h-5 text-[#bfa06a]" />
                                         <div>
                                             <p className="text-sm text-[#5b4636]">가격</p>
                                             <p className="font-bold text-[#5b4636]">{product.price.toLocaleString()}원</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#e9dec7] rounded-xl border border-[#bfa06a]">
+                                    <div className="flex items-center gap-3 p-3 bg-[#e3f6f5] rounded-xl border border-[#bfa06a]">
                                         <Layers className="w-5 h-5 text-[#bfa06a]" />
                                         <div>
                                             <p className="text-sm text-[#5b4636]">재고</p>
                                             <p className="font-bold text-[#5b4636]">{product.stock}개</p>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#e9dec7] rounded-xl border border-[#bfa06a]">
+                                    <div className="flex items-center gap-3 p-3 bg-[#e3f6f5] rounded-xl border border-[#bfa06a]">
                                         <Tag className="w-5 h-5 text-[#bfa06a]" />
                                         <div>
                                             <p className="text-sm text-[#5b4636]">상태</p>
@@ -172,7 +172,7 @@ export default function ProductDetailPage() {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#e9dec7] rounded-xl border border-[#bfa06a]">
+                                    <div className="flex items-center gap-3 p-3 bg-[#e3f6f5] rounded-xl border border-[#bfa06a]">
                                         <Eye className="w-5 h-5 text-[#bfa06a]" />
                                         <div>
                                             <p className="text-sm text-[#5b4636]">활성화</p>
@@ -211,7 +211,7 @@ export default function ProductDetailPage() {
                     {/* 상품 상세 정보 */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* 상품 정보 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <Package className="w-5 h-5 text-[#bfa06a]" />
                                 상품 정보
@@ -238,7 +238,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* 판매자 정보 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4">판매자 정보</h3>
                             <div className="space-y-4">
                                 <div>

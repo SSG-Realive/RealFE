@@ -165,7 +165,7 @@ export default function SellerSettlementPage() {
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 정산 건수</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#5b4636]">
@@ -174,7 +174,7 @@ export default function SellerSettlementPage() {
                             </div>
                             <CreditCard className="w-8 h-8 text-[#bfa06a]" />
                         </section>
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 매출</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#388e3c]">
@@ -183,7 +183,7 @@ export default function SellerSettlementPage() {
                             </div>
                             <TrendingUp className="w-8 h-8 text-[#bfa06a]" />
                         </section>
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 수수료</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#b94a48]">
@@ -192,7 +192,7 @@ export default function SellerSettlementPage() {
                             </div>
                             <Percent className="w-8 h-8 text-[#bfa06a]" />
                         </section>
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 지급액</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#bfa06a]">
@@ -204,7 +204,7 @@ export default function SellerSettlementPage() {
                     </div>
 
                     {/* 필터 섹션 */}
-                    <div className="bg-[#e9dec7] p-4 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
+                    <div className="bg-[#e3f6f5] p-4 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <Filter className="w-5 h-5 text-[#bfa06a]" />
                             <h3 className="text-[#5b4636] font-semibold">필터 옵션</h3>
@@ -218,7 +218,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'all' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e9dec7] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     전체
@@ -228,7 +228,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'date' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e9dec7] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     날짜별
@@ -238,7 +238,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'period' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e9dec7] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     기간별
@@ -307,14 +307,14 @@ export default function SellerSettlementPage() {
                             <p className="text-[#b94a48]">{error}</p>
                         </div>
                     ) : payouts.length === 0 ? (
-                        <div className="bg-[#e9dec7] border border-[#bfa06a] rounded-lg p-8 text-center">
+                        <div className="bg-[#e3f6f5] border border-[#bfa06a] rounded-lg p-8 text-center">
                             <CreditCard className="w-12 h-12 text-[#bfa06a] mx-auto mb-4" />
                             <p className="text-[#bfa06a] text-lg">정산 내역이 없습니다.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto bg-[#e9dec7] rounded-lg shadow-sm border border-[#bfa06a]">
+                        <div className="overflow-x-auto bg-[#e3f6f5] rounded-lg shadow-sm border border-[#bfa06a]">
                             <table className="min-w-full divide-y divide-[#bfa06a]">
-                                <thead className="bg-[#e9dec7]">
+                                <thead className="bg-[#e3f6f5]">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">정산 기간</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">총 매출</th>
@@ -324,7 +324,7 @@ export default function SellerSettlementPage() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">상세보기</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[#e9dec7] divide-y divide-[#bfa06a]">
+                                <tbody className="bg-[#e3f6f5] divide-y divide-[#bfa06a]">
                                     {payouts.map((item) => (
                                         <tr key={item.id} className="hover:bg-[#bfa06a] transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#5b4636]">
@@ -361,7 +361,7 @@ export default function SellerSettlementPage() {
                     {/* 정산 상세 정보 모달 */}
                     {selectedPayout && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-[#e9dec7] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                            <div className="bg-[#e3f6f5] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-xl font-bold text-[#5b4636]">정산 상세 정보</h3>
                                     <button

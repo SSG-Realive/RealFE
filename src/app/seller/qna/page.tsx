@@ -103,21 +103,21 @@ export default function SellerQnaPage() {
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 문의 수</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalQna}건</p>
                             </div>
                             <MessageCircle className="w-8 h-8 text-[#bfa06a]" />
                         </section>
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">답변 완료</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#388e3c]">{answeredQna}건</p>
                             </div>
                             <CheckCircle className="w-8 h-8 text-[#bfa06a]" />
                         </section>
-                        <section className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
                             <div>
                                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">미답변</h2>
                                 <p className="text-xl md:text-2xl font-bold text-[#b94a48]">{unansweredQna}건</p>
@@ -127,7 +127,7 @@ export default function SellerQnaPage() {
                     </div>
 
                     {/* 검색 및 필터 */}
-                    <div className="bg-[#e9dec7] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
+                    <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#bfa06a] w-4 h-4" />
@@ -136,7 +136,7 @@ export default function SellerQnaPage() {
                                     placeholder="제목, 내용, 고객명, 상품명으로 검색..."
                             value={searchKeyword}
                             onChange={(e) => setSearchKeyword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-[#bfa06a] rounded-lg bg-[#f5f1eb] text-[#5b4636] placeholder-[#bfa06a] focus:outline-none focus:ring-2 focus:ring-[#bfa06a]"
+                                    className="w-full pl-10 pr-4 py-2 border border-[#bfa06a] rounded-lg bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a] focus:outline-none focus:ring-2 focus:ring-[#bfa06a]"
                         />
                             </div>
                             <div className="flex gap-2">
@@ -176,7 +176,7 @@ export default function SellerQnaPage() {
                                         <th className="px-6 py-3 text-center text-xs font-medium text-[#bfa06a] uppercase tracking-wider">액션</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-[#e9dec7] divide-y divide-[#bfa06a]">
+                                <tbody className="bg-[#e3f6f5] divide-y divide-[#bfa06a]">
                                     {filteredQnaList.map((item) => {
                                         const qna = item.qna || item;
                                         return (

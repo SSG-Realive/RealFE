@@ -142,7 +142,7 @@ export default function OrderListPage() {
                         </div>
                         <div className="order-card-content">
                             {order.orderItems.map((item) => (
-                                <div key={item.orderItemId} className="order-item">
+                                <div key={`${order.orderId}-${item.orderItemId}`} className="order-item">
                                     <div className="item-info">
                                         <p className="item-name">{item.productName}</p>
                                         <p className="item-details">

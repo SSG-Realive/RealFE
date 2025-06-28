@@ -247,7 +247,7 @@ function OrderListSkeleton(): React.ReactElement {
             <h1>주문 내역</h1>
             <div className="space-y-4">
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="skeleton-card">
+                    <div key={`skeleton-${i}`} className="skeleton-card">
                         <div className="skeleton-header">
                             <div className="skeleton-line" style={{ width: '50%', height: '24px' }}></div>
                         </div>

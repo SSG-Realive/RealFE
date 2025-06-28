@@ -98,26 +98,26 @@ export default function SellerMePage() {
           <SellerHeader toggleSidebar={toggleSidebar} />
         </div>
         <SellerLayout>
-          <div className="flex-1 w-full h-full px-4 py-8 bg-[#a89f91]">
+          <div className="flex-1 w-full h-full px-4 py-8">
             <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">마이페이지</h1>
 
             {/* 상단 정보 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
                 <Mail className="w-8 h-8 text-[#bfa06a]" />
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이메일</h2>
                   <p className="text-base font-bold text-[#5b4636]">{email}</p>
                 </div>
               </section>
-              <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
                 <User className="w-8 h-8 text-[#bfa06a]" />
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이름</h2>
                   <p className="text-base font-bold text-[#5b4636]">{name}</p>
                 </div>
               </section>
-              <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
                 <Phone className="w-8 h-8 text-[#bfa06a]" />
                 <div>
                   <h2 className="text-[#5b4636] text-sm font-semibold mb-1">전화번호</h2>

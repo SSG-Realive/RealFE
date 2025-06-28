@@ -1,153 +1,183 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { fetchPublicProducts, fetchPopularProducts } from '@/service/customer/productService';
+
+import { fetchPublicProducts } from '@/service/customer/productService';
+import { fetchAllCategories } from '@/service/categoryService';
+
 import { ProductListDTO } from '@/types/seller/product/product';
-import Navbar from '@/components/customer/Navbar';
-import ChatbotFloatingButton from '@/components/customer/ChatbotFloatingButton';
-import ProductCard from '@/components/customer/ProductCard';
+import { Category } from '@/types/common/category';
 
-const categories = [
-    { id: null, name: '전체' },
-    { id: 1, name: '가구' },
-    { id: 2, name: '수납/정리' },
-    { id: 3, name: '인테리어 소품' },
-    { id: 4, name: '유아/아동' },
-];
+import Navbar from '@/components/customer/common/Navbar';
+import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
+import ProductCard from '@/components/customer/product/ProductCard';
+import BannerCarousel from '@/components/main/BannerCarousel';
+import WeeklyAuctionSlider from '@/components/main/WeeklyAuctionSlider';
+import PopularProductsGrid from '@/components/main/PopularProductsGrid';
+import MiddleBannerCarousel from '@/components/main/MiddleBannerCarousel';
+import ExtraBanner from '@/components/main/ExtraBanner';
+import SectionWithSubCategoryButtons from "@/components/customer/product/SectionWithSubCategoryButtons";
+import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
+import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 10;
 
 export default function CustomerHomePage() {
+    const pathname = usePathname();
     const searchParams = useSearchParams();
-    const keywordFromUrl = searchParams.get('keyword') || '';
 
+    const categoryFromUrl = searchParams.get('category');
+    const keywordFromUrl = searchParams.get('keyword') || '';
     const [categoryId, setCategoryId] = useState<number | null>(null);
-    const [setSearchKeyword] = useState(keywordFromUrl);
+    const [keyword, setKeyword] = useState<string>('');
     const [products, setProducts] = useState<ProductListDTO[]>([]);
-    const [popularProducts, setPopularProducts] = useState<ProductListDTO[]>([]); // ✅ 인기 상품
     const [page, setPage] = useState(1);
-    const loader = useRef<HTMLDivElement | null>(null);
+    const [showLoadMore, setShowLoadMore] = useState(true);
+    const [categoryMap, setCategoryMap] = useState<Record<number, Category>>({});
+
+    const showMainTopBanners = pathname === '/main' && !categoryFromUrl && !keywordFromUrl;
+
+    useEffect(() => {
+        fetchAllCategories().then((categories) => {
+            const map = Object.fromEntries(categories.map((c) => [c.id, c]));
+            setCategoryMap(map);
+        });
+    }, []);
+
+    useEffect(() => {
+        setCategoryId(categoryFromUrl ? Number(categoryFromUrl) : null);
+        setKeyword(keywordFromUrl);
+    }, [categoryFromUrl, keywordFromUrl]);
+
+    useEffect(() => {
+        fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, keyword).then((initial) => {
+            setProducts(initial);
+            setShowLoadMore(initial.length === ITEMS_PER_PAGE);
+        });
+    }, [categoryId, keyword]);
 
     const loadMore = async () => {
-        const newProducts = await fetchPublicProducts(
-            categoryId,
-            page,
-            ITEMS_PER_PAGE,
-            keywordFromUrl
-        );
-        setProducts((prev) => {
-            // 중복 제거: 기존 상품의 고유 식별자 목록
-            const existingKeys = new Set(prev.map(p => `${p.id}-${p.imageThumbnailUrl}`));
-            // 새로운 상품 중 중복되지 않는 것만 필터링
-            const uniqueNewProducts = newProducts.filter(p => !existingKeys.has(`${p.id}-${p.imageThumbnailUrl}`));
-            return [...prev, ...uniqueNewProducts];
-        });
+        const nextPage = page + 1;
+        const newProducts = await fetchPublicProducts(categoryId, nextPage, ITEMS_PER_PAGE, keyword);
+        setProducts((prev) => [...prev, ...newProducts]);
+        setPage(nextPage);
+        setShowLoadMore(newProducts.length === ITEMS_PER_PAGE);
     };
 
-    // ✅ 인기 상품 초기 로딩
-    useEffect(() => {
-        fetchPopularProducts().then(setPopularProducts);
-    }, []);
-
-    // 무한 스크롤 감지
-    useEffect(() => {
-        if (!loader.current) return;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                setPage((prev) => prev + 1);
-            }
-        }, { rootMargin: '100px' });
-
-        observer.observe(loader.current);
-        return () => {
-            if (loader.current) observer.unobserve(loader.current);
-        };
-    }, []);
-
-    // 페이지 증가 시 더 불러오기
-    useEffect(() => {
-        loadMore();
-    }, [page]);
-
-    // 카테고리 or 검색어 변경 시 초기화
-    useEffect(() => {
-        setPage(1);
-        setProducts([]); // 기존 상품 목록 완전히 초기화
-        fetchPublicProducts(categoryId, 1, ITEMS_PER_PAGE, keywordFromUrl).then(setProducts);
-    }, [categoryId, keywordFromUrl]);
+    function getTopCategoryName(id: number | null): string {
+        if (!id || !categoryMap[id]) return '전체상품';
+        let current = categoryMap[id];
+        while (current.parentId && categoryMap[current.parentId]) {
+            current = categoryMap[current.parentId];
+        }
+        return current.name;
+    }
 
     return (
-        <div>
-            <Navbar />
+        <div className="flex flex-col min-h-screen w-full bg-[#a89f91]">
+            <main className="flex-1">
+                <Navbar
+                    onCategorySelect={(id) => {
+                        const query = new URLSearchParams();
+                        if (id !== null) query.set('category', String(id));
+                        if (keyword) query.set('keyword', keyword);
+                        window.location.href = `/main?${query.toString()}`;
+                    }}
+                    onSearch={(newKeyword) => {
+                        const query = new URLSearchParams();
+                        if (categoryId !== null) query.set('category', String(categoryId));
+                        if (newKeyword) query.set('keyword', newKeyword);
+                        window.location.href = `/main?${query.toString()}`;
+                    }}
+                />
 
-            {/* 🔥 인기 상품 */}
-            {popularProducts.length > 0 && (
-                <div className="px-4 mb-8">
-                    <h2 className="text-lg font-bold mb-3">인기 상품 🔥</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {popularProducts.map((p, index) => (
-                            <ProductCard key={`popular-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
+                {showMainTopBanners && (
+                    <div className="mb-6 sm:mb-8">
+                        <BannerCarousel />
+                    </div>
+                )}
+
+                {!categoryId && (
+                    <div className="mt-2 mb-4 sm:mt-10 sm:mb-8">
+                        <WeeklyAuctionSlider />
+                    </div>
+                )}
+
+                <PopularProductsGrid />
+
+                {showMainTopBanners && <ExtraBanner />}
+
+                {showMainTopBanners && (
+                    <div className="my-4 sm:my-8 md:my-12">
+                        <FeaturedSellersSection />
+                    </div>
+                )}
+
+                {/* ✅ 상품 리스트만 표시 */}
+                <section className="max-w-screen-xl mx-auto px-1 py-8 sm:py-16">
+                    <div className="flex justify-between items-center mb-2">
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            {getTopCategoryName(categoryId)}
+                        </h2>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">필터 예정</p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
+                        {products.map((p, index) => (
+                            <ProductCard key={`product-${p.id}-${index}`} {...p} />
                         ))}
                     </div>
-                </div>
-            )}
 
-            {/* 🎯 경매 섹션 */}
-            <div className="px-4 mb-8">
-                <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-lg font-bold">진행중인 경매 🎯</h2>
-                    <Link 
-                        href="/main/auctions" 
-                        className="text-green-600 hover:text-green-700 text-sm font-medium"
-                    >
-                        전체보기 →
-                    </Link>
-                </div>
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 text-center">
-                    <div className="text-2xl mb-2">🏆</div>
-                    <h3 className="text-lg font-semibold mb-2">실시간 경매에 참여하세요!</h3>
-                    <p className="text-gray-600 mb-4">중고 가구를 경매로 구매하고 특별한 가격을 만나보세요</p>
-                    <Link 
-                        href="/main/auctions"
-                        className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        경매 보러가기
-                    </Link>
-                </div>
+                    {showLoadMore && (
+                        <div className="text-center mt-6">
+                            <button
+                                onClick={loadMore}
+                                className="px-6 py-2 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg border border-gray-300"
+                            >
+                                더보기
+                            </button>
+                        </div>
+                    )}
+                </section>
+
+                {showMainTopBanners && (
+                    <div className="hidden md:block">
+                        <BottomInspirationSlider />
+                    </div>
+                )}
+
+                {showMainTopBanners && (
+                    <>
+                        {[10, 20, 30, 40, 50].map((id) => (
+                            <div key={id} className="mb-6 sm:mb-10">
+                                <SectionWithSubCategoryButtons
+                                    title={
+                                        id === 10 ? '거실 가구' :
+                                            id === 20 ? '침실 가구' :
+                                                id === 30 ? '주방·다이닝 가구' :
+                                                    id === 40 ? '서재·오피스 가구' :
+                                                        '기타 가구'
+                                    }
+                                    categoryId={id}
+                                    limit={5}
+                                />
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {showMainTopBanners && (
+                    <div className="hidden md:block">
+                        <MiddleBannerCarousel />
+                    </div>
+                )}
+            </main>
+            <div className="w-full bg-gray-100 py-8 mt-10 text-center text-sm text-gray-600">
+                <p className="mb-1 font-semibold">© 2025 Realive</p>
+                <p>중고 가구 거래 플랫폼 | 개인정보처리방침 | 이용약관</p>
             </div>
-
-            {/* 카테고리 필터 */}
-            <div className="flex gap-3 overflow-x-auto mb-6 px-4 py-2">
-                {categories.map(({ id, name }) => (
-                    <button
-                        key={id ?? 'all'}
-                        onClick={() => {
-                            setCategoryId(id);
-                            setProducts([]);
-                            setPage(1);
-                        }}
-                        className={`px-4 py-1 rounded-full border text-sm whitespace-nowrap ${
-                            categoryId === id
-                                ? 'bg-green-600 text-white border-green-600'
-                                : 'bg-white text-gray-700 border-gray-300'
-                        }`}
-                    >
-                        {name}
-                    </button>
-                ))}
-            </div>
-
-            {/* 전체 상품 목록 */}
-            <div className="px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                {products.map((p, index) => (
-                    <ProductCard key={`product-${p.id}-${p.imageThumbnailUrl}-${index}`} {...p} />
-                ))}
-                <div ref={loader} className="h-10 col-span-full" />
-            </div>
-
             <ChatbotFloatingButton />
         </div>
     );

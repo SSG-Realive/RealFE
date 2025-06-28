@@ -22,7 +22,8 @@ export interface ProductDetail {
     categoryName?: string;
     categoryId?: number;
     parentCategoryId?: number;
-    seller?: string;
+    sellerName: string;
+    sellerId: number;
 }
 
 export interface ProductListDTO {

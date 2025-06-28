@@ -3,7 +3,8 @@ export type DeliveryStatus =
     | "INIT"
     | 'DELIVERY_PREPARING'
     | 'DELIVERY_IN_PROGRESS'
-    | 'DELIVERY_COMPLETED';
+    | 'DELIVERY_COMPLETED'
+    | 'CANCELLED';
 
 // 🔹 주문 목록 응답
 export interface SellerOrderResponse {
@@ -20,21 +21,30 @@ export interface SellerOrderResponse {
     deliveryType: string | null;
 }
 
-// 🔹 주문 상세 응답
-export interface SellerOrderDetailResponse extends SellerOrderResponse {
-    deliveryStatus: DeliveryStatus;
+// 🔹 주문 상세 응답 (새로운 API에 맞게 업데이트)
+export interface SellerOrderDetailResponse {
+    orderId: number;
+    orderedAt: string;
+    customerName: string;
+    customerPhone: string;
     deliveryAddress: string;
     receiverName: string;
-    phone: string;
+    totalPrice: number;
     deliveryFee: number;
+    paymentType: string;
+    deliveryStatus: DeliveryStatus;
+    trackingNumber: string | null;
+    carrier: string | null;
+    startDate: string | null;
+    completeDate: string | null;
+    deliveryType: string | null;
     items: {
         productId: number;
         productName: string;
         quantity: number;
         price: number;
+        imageUrl: string | null;
     }[];
-
-    paymentType?: string;
 }
 
 // 🔹 배송 상태 변경 요청용

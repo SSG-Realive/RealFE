@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSellerOrders } from '@/service/seller/sellerOrderService';
 import { SellerOrderResponse } from '@/types/seller/sellerorder/sellerOrder';
@@ -8,17 +8,24 @@ import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { PageResponseForOrder } from '@/types/seller/page/pageResponseForOrder';
+import { Armchair, Truck, CheckCircle, Clock, Eye, Search, ShoppingCart } from 'lucide-react';
 
 export default function SellerOrderListPage() {
-  const checking = useSellerAuthGuard(); // ✅ 인증 확인
+  const checking = useSellerAuthGuard();
   const [orders, setOrders] = useState<SellerOrderResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    if (checking) return; // ✅ 인증 확인 중이면 아무것도 하지 않음
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
+  useEffect(() => {
+    if (checking) return;
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -32,53 +39,160 @@ export default function SellerOrderListPage() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [checking]);
 
+  const totalOrders = orders.length;
+  const preparingOrders = orders.filter(order => order.deliveryStatus === 'DELIVERY_PREPARING').length;
+  const inProgressOrders = orders.filter(order => order.deliveryStatus === 'DELIVERY_IN_PROGRESS').length;
+  const completedOrders = orders.filter(order => order.deliveryStatus === 'DELIVERY_COMPLETED').length;
+
+  const filteredOrders = orders.filter(order => {
+    const matchesKeyword = searchKeyword === '' || 
+      order.customerName.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      order.productName.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+      order.orderId.toString().includes(searchKeyword);
+    const matchesStatus = statusFilter === '' || order.deliveryStatus === statusFilter;
+    return matchesKeyword && matchesStatus;
+  });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'INIT':
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151]">주문 접수</span>;
+      case 'DELIVERY_PREPARING':
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151]">배송 준비</span>;
+      case 'DELIVERY_IN_PROGRESS':
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151]">배송 중</span>;
+      case 'DELIVERY_COMPLETED':
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151]">배송 완료</span>;
+      default:
+        return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151]">{status}</span>;
+    }
+  };
+
   if (checking || loading) {
     return (
-      <SellerLayout>
-        <SellerHeader />
-        <div className="p-6 max-w-4xl mx-auto">로딩 중...</div>
-      </SellerLayout>
+      <div className="min-h-screen w-full bg-[#f3f4f6] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
+          <p className="text-[#374151]">주문 정보를 불러오는 중...</p>
+        </div>
+      </div>
     );
   }
 
   return (
+    <div className="flex flex-col min-h-screen w-full">
+      <main className="flex-1">
     <SellerLayout>
-      <SellerHeader />
-      <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">판매자 주문 목록</h1>
-
+          <div className="w-full h-full px-4 py-8">
+        <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#374151]">주문 관리</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">총 주문</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">대기 중</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{preparingOrders}건</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Truck className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">배송 중</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{inProgressOrders}건</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <CheckCircle className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">완료</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{completedOrders}건</div>
+          </section>
+        </div>
+        <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <input
+              type="text"
+              placeholder="주문번호 또는 상품명으로 검색..."
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
+            >
+              <option value="">전체 상태</option>
+              <option value="INIT">주문 접수</option>
+              <option value="DELIVERY_PREPARING">배송 준비</option>
+              <option value="DELIVERY_IN_PROGRESS">배송 중</option>
+              <option value="DELIVERY_COMPLETED">배송 완료</option>
+            </select>
+          </div>
+        </div>
         {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : orders.length === 0 ? (
-          <p className="text-gray-400">등록된 주문이 없습니다.</p>
+          <div className="bg-[#fbeee0] border border-[#6b7280] rounded-lg p-4">
+            <p className="text-[#b94a48]">{error}</p>
+          </div>
+        ) : filteredOrders.length === 0 ? (
+              <div className="bg-[#f3f4f6] border border-[#6b7280] rounded-lg p-8 text-center">
+            <Armchair className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
+            <p className="text-[#6b7280] text-lg">주문이 없습니다.</p>
+          </div>
         ) : (
-          <ul className="space-y-4">
-            {orders.map((order) => (
-              <li key={order.orderId} className="bg-white shadow-md rounded-lg p-4">
-                <p>주문 ID: {order.orderId}</p>
-                <p>주문일자: {new Date(order.orderedAt).toLocaleString()}</p>
-                <p>고객명: {order.customerName}</p>
-                <p>상품명: {order.productName}</p>
-                <p>수량: {order.quantity}</p>
-
-                <p className="flex justify-between items-center">
-                  <span>배송 상태: {order.deliveryStatus}</span>
-                  <button
-                    onClick={() => router.push(`/seller/orders/${order.orderId}`)}
-                    className="ml-4 bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700"
-                  >
-                    배송 상세 정보 보기
-                  </button>
-                </p>
-              </li>
-            ))}
-          </ul>
+              <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
+            <table className="min-w-full divide-y divide-[#d1d5db]">
+                  <thead className="bg-[#f3f4f6]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문번호</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문일시</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">고객명</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">상품명</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">수량</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">배송상태</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-[#374151] uppercase tracking-wider">액션</th>
+                </tr>
+              </thead>
+                  <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
+                {filteredOrders.map((order) => (
+                  <tr key={order.orderId} className="hover:bg-[#b9f6ec] transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">#{order.orderId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                      {new Date(order.orderedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">{order.customerName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{order.productName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{order.quantity}개</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(order.deliveryStatus)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <button
+                        onClick={() => router.push(`/seller/orders/${order.orderId}`)}
+                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#b9f6ec] hover:text-[#374151] text-sm"
+                      >
+                        <Eye className="w-4 h-4" /> 상세 보기
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </SellerLayout>
+      </main>
+    </div>
   );
 }

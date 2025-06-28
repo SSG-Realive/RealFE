@@ -1,5 +1,7 @@
+'use client';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 function Accordion({ open, children }: { open: boolean; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -39,66 +41,134 @@ export default function AdminSidebar() {
   const [auctionOpen, setAuctionOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [customerOpen, setCustomerOpen] = useState(false);
+  const [productOpen, setProductOpen] = useState(false);
+  const pathname = usePathname();
+
+  const getLinkStyle = (path: string) => {
+    const isActive = pathname === path;
+    return {
+      padding: '8px 16px',
+      borderRadius: '4px',
+      color: isActive ? '#ffffff' : '#e5e7eb',
+      backgroundColor: isActive ? '#14b8a6' : 'transparent',
+      fontWeight: isActive ? 'bold' : 'normal',
+      textDecoration: 'none',
+    };
+  };
+
+  const getSubLinkStyle = (path: string) => {
+    const isActive = pathname.startsWith(path);
+    return {
+      display: 'block',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      color: isActive ? '#ffffff' : '#d1d5db',
+      backgroundColor: isActive ? '#14b8a6' : 'transparent',
+      textDecoration: 'none',
+      fontSize: '14px',
+    };
+  };
 
   return (
-    <aside style={{ width: 180, background: '#333', color: '#fff', minHeight: '100vh', padding: 24 }}>
-      <h2 style={{ fontWeight: 'bold', fontSize: 22, marginBottom: 32 }}>관리자</h2>
+    <aside
+      className="w-full md:w-[220px] bg-gray-900 text-gray-200 min-h-screen h-full p-6"
+    >
+      <h2 className="font-bold text-2xl mb-8 text-teal-500 px-4">관리자</h2>
       <nav>
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0, boxSizing: 'border-box', color: '#fff' }}>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/dashboard" style={{ color: '#fff' }}>대시보드</Link></li>
-          <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
-            <Link href="/admin/customers" style={{ flex: 1, color: '#fff' }}>회원</Link>
-            <button
-              aria-label="회원 하위 메뉴 열기"
-              onClick={e => { e.stopPropagation(); setCustomerOpen(v => !v); }}
-              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, marginLeft: 4 }}
-            >
-              {customerOpen ? '▴' : '▾'}
-            </button>
+        <ul className="list-none p-0 m-0 box-border">
+          <li className="my-2">
+            <Link href="/admin/dashboard" className="block px-4 py-3 rounded text-lg font-semibold hover:bg-teal-600 transition-colors" style={getLinkStyle('/admin/dashboard')}>
+              대시보드
+            </Link>
           </li>
-          <Accordion open={customerOpen}>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 16, boxSizing: 'border-box' }}>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '0 0 8px 0' }}><Link href="/admin/customers/list" style={{ color: '#fff' }}>고객 관리</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/sellers" style={{ color: '#fff' }}>판매자 관리</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/customers/penalty" style={{ color: '#fff' }}>사용자 패널티</Link></li>
+          <li className="my-2">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/customers')}>
+              <Link href="/admin/customers" className="flex-1 no-underline text-inherit">
+                회원
+              </Link>
+              <button
+                aria-label="회원 하위 메뉴 열기"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setCustomerOpen(v => !v); }}
+                className="bg-none border-none text-inherit cursor-pointer text-base"
+              >
+                {customerOpen ? '▴' : '▾'}
+              </button>
+            </div>
+            <Accordion open={customerOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="w-full"><Link href="/admin/customers/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/list')}>고객 관리</Link></li>
+                <li className="w-full"><Link href="/admin/sellers" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/sellers')}>판매자 관리</Link></li>
+                <li className="w-full"><Link href="/admin/customers/penalty" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/customers/penalty')}>사용자 패널티</Link></li>
+              </ul>
+            </Accordion>
+          </li>
+          <li className="my-2">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/products')}>
+              <Link href="/admin/products" className="flex-1 no-underline text-inherit">
+              상품
+            </Link>
+            <button
+                aria-label="상품 하위 메뉴 열기"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setProductOpen(v => !v); }}
+                style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: 16 }}
+            >
+              {productOpen ? '▴' : '▾'}
+            </button>
+            </div>
+          </li>
+          <Accordion open={productOpen}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 28, borderLeft: '1px solid #4b5563' }}>
+               <li className="w-full"><Link href="/admin/products/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/products/list')}>전체 상품 조회</Link></li>
+               <li className="w-full"><Link href="/admin/owned-products" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/owned-products')}>관리자 상품 조회</Link></li>
             </ul>
           </Accordion>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/products" style={{ color: '#fff' }}>상품관리</Link></li>
-          <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
-            <Link href="/admin/auction-management" style={{ flex: 1, color: '#fff' }}>경매</Link>
-            <button
-              aria-label="경매 하위 메뉴 열기"
-              onClick={e => { e.stopPropagation(); setAuctionOpen(v => !v); }}
-              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, marginLeft: 4 }}
-            >
-              {auctionOpen ? '▴' : '▾'}
-            </button>
+          <li className="my-2">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/auction-management')}>
+              <Link href="/admin/auction-management" className="flex-1 no-underline text-inherit">
+                경매
+              </Link>
+              <button
+                aria-label="경매 하위 메뉴 열기"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setAuctionOpen(v => !v); }}
+                className="bg-none border-none text-inherit cursor-pointer text-base"
+              >
+                {auctionOpen ? '▴' : '▾'}
+              </button>
+            </div>
+            <Accordion open={auctionOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/list" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/list')}>경매 목록</Link></li>
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/bid" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/bid')}>입찰 내역</Link></li>
+                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/register" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/register')}>경매 등록</Link></li>
+              </ul>
+            </Accordion>
           </li>
-          <Accordion open={auctionOpen}>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 16, boxSizing: 'border-box' }}>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '0 0 8px 0' }}><Link href="/admin/auction-management/list" style={{ color: '#fff' }}>경매 목록</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/auction-management/bid" style={{ color: '#fff' }}>입찰 내역</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/auction-management/register" style={{ color: '#fff' }}>경매 등록</Link></li>
-            </ul>
-          </Accordion>
-          <li style={{ margin: '18px 0' }}><Link href="/admin/settlement-management" style={{ color: '#fff' }}>정산관리</Link></li>
-          <li style={{ margin: '18px 0', display: 'flex', alignItems: 'center' }}>
-            <Link href="/admin/review-management" style={{ flex: 1, color: '#fff' }}>리뷰</Link>
-            <button
-              aria-label="리뷰 하위 메뉴 열기"
-              onClick={e => { e.stopPropagation(); setReviewOpen(v => !v); }}
-              style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 16, marginLeft: 4 }}
-            >
-              {reviewOpen ? '▴' : '▾'}
-            </button>
+          <li className="my-2">
+            <Link href="/admin/settlement-management" className="block px-4 py-3 rounded text-lg font-semibold hover:bg-teal-600 transition-colors" style={getLinkStyle('/admin/settlement-management')}>
+              정산관리
+            </Link>
           </li>
-          <Accordion open={reviewOpen}>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 16, boxSizing: 'border-box' }}>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '0 0 8px 0' }}><Link href="/admin/review-management/list" style={{ color: '#fff' }}>리뷰 목록</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/review-management/reported" style={{ color: '#fff' }}>리뷰 신고 관리</Link></li>
-              <li style={{ margin: 0, boxSizing: 'border-box', padding: '8px 0' }}><Link href="/admin/review-management/qna" style={{ color: '#fff' }}>Q&A 관리</Link></li>
-            </ul>
-          </Accordion>
+          <li className="my-2">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/review-management')}>
+              <Link href="/admin/review-management" className="flex-1 no-underline text-inherit">
+                리뷰
+              </Link>
+              <button
+                aria-label="리뷰 하위 메뉴 열기"
+                onClick={(e) => { e.stopPropagation(); e.preventDefault(); setReviewOpen(v => !v); }}
+                className="bg-none border-none text-inherit cursor-pointer text-base"
+              >
+                {reviewOpen ? '▴' : '▾'}
+              </button>
+            </div>
+            <Accordion open={reviewOpen}>
+              <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
+                <li className="w-full"><Link href="/admin/review-management/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/list')}>리뷰 목록</Link></li>
+                <li className="w-full"><Link href="/admin/review-management/reported" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/reported')}>리뷰 신고 관리</Link></li>
+                <li className="w-full"><Link href="/admin/review-management/qna" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/qna')}>Q&A 관리</Link></li>
+              </ul>
+            </Accordion>
+          </li>
         </ul>
       </nav>
     </aside>

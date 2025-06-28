@@ -3,14 +3,15 @@ import Link from 'next/link';
 
 // ✅ 페이지 컴포넌트가 searchParams를 props로 받도록 구조를 변경합니다.
 interface LoginPageProps {
-  searchParams: {
+  searchParams: Promise<{
     redirectTo?: string;
-  };
+  }>;
 }
 
-export default function IntegratedLoginPage({ searchParams }: LoginPageProps) {
+export default async function IntegratedLoginPage({ searchParams }: LoginPageProps) {
   // ✅ URL에서 redirectTo 값을 추출합니다.
-  const redirectTo = searchParams.redirectTo || '';
+  const params = await searchParams;
+  const redirectTo = params.redirectTo || '';
 
   // ✅ 각 로그인 링크에 redirectTo 파라미터를 추가할 URL을 생성합니다.
   const customerLoginUrl = `/customer/member/login${redirectTo ? `?redirectTo=${redirectTo}` : ''}`;
@@ -20,9 +21,6 @@ export default function IntegratedLoginPage({ searchParams }: LoginPageProps) {
     <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-2xl">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Realive 로그인
-          </h1>
           <p className="mt-2 text-gray-600">
             어떤 계정으로 로그인하시겠어요?
           </p>
@@ -38,11 +36,8 @@ export default function IntegratedLoginPage({ searchParams }: LoginPageProps) {
                 <User className="h-14 w-14 text-blue-600 group-hover:scale-110 transition-transform" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900">
-                고객으로 로그인
+                고객
               </h2>
-              <p className="mt-2 text-gray-500">
-                쇼핑 및 주문 내역을 확인하세요.
-              </p>
             </div>
           </Link>
 
@@ -54,20 +49,11 @@ export default function IntegratedLoginPage({ searchParams }: LoginPageProps) {
                 <Store className="h-14 w-14 text-green-600 group-hover:scale-110 transition-transform" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900">
-                판매자로 로그인
+                판매자
               </h2>
-              <p className="mt-2 text-gray-500">
-                상품을 등록하고 판매를 관리하세요.
-              </p>
             </div>
           </Link>
 
-        </div>
-        
-        <div className="text-center mt-12">
-            <p className="text-sm text-gray-500">
-                계정이 없으신가요? <Link href="/signup" className="font-semibold text-blue-600 hover:underline">회원가입</Link>
-            </p>
         </div>
       </div>
     </main>

@@ -106,12 +106,12 @@ export default function SellerQnaDetailPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             {qna.answered === true || qna.answered === 'true' ? (
-                                <span className="px-2 py-1 rounded text-xs font-bold bg-[#e9dec7] text-[#5b4636] flex items-center gap-1">
+                                <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#2d1b0f] flex items-center gap-1">
                                     <CheckCircle className="w-3 h-3" />
                                     답변 완료
                                 </span>
                             ) : (
-                                <span className="px-2 py-1 rounded text-xs font-bold bg-[#fbeee0] text-[#b94a48] flex items-center gap-1">
+                                <span className="px-2 py-1 rounded text-xs font-bold bg-[#d1f2eb] text-[#2d1b0f] flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
                                     미답변
                                 </span>
@@ -127,10 +127,10 @@ export default function SellerQnaDetailPage() {
                             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                                 <span className="text-sm font-medium text-[#bfa06a] min-w-[80px]">작성일:</span>
                                 <span className="text-[#5b4636]">{qna.createdAt}</span>
-                            </div>
                         </div>
+                    </div>
 
-                        <div className="bg-[#f5f1eb] rounded-lg p-4 border border-[#bfa06a]">
+                        <div className="bg-[#e3f6f5] rounded-lg p-4 border border-[#bfa06a]">
                             <h3 className="text-sm font-semibold text-[#bfa06a] mb-2">문의 내용</h3>
                             <p className="text-[#5b4636] whitespace-pre-wrap">{qna.content}</p>
                         </div>
@@ -139,7 +139,7 @@ export default function SellerQnaDetailPage() {
                     {/* 답변 영역 */}
                     {qna && (qna.answered === true || qna.answered === 'true') ? (
                         <div className="bg-[#e9dec7] rounded-lg shadow-sm border border-[#bfa06a] p-4 sm:p-6">
-                            <div className="bg-[#f5f1eb] rounded-lg p-4 border border-[#bfa06a]">
+                            <div className="bg-[#e3f6f5] rounded-lg p-4 border border-[#bfa06a]">
                                 <h3 className="text-sm font-semibold text-[#bfa06a] mb-2">답변 내용</h3>
                                 <p className="text-[#5b4636] whitespace-pre-wrap">{qna.answer ? qna.answer : '답변 내용이 없습니다.'}</p>
                                 <div className="mt-3 text-xs text-[#bfa06a]">

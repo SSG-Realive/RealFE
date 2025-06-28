@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator } from 'lucide-react';
+import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle } from 'lucide-react';
+import Link from 'next/link';
 
 import { getMyProducts } from '@/service/seller/productService';
 import { ProductListItem } from '@/types/seller/product/productList';
@@ -93,64 +94,58 @@ export default function ProductListPage() {
           <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">상품 관리</h1>
 
           {/* 상단 통계 카드 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center justify-between">
               <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
-                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalProductCount}개</p>
+                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 상품 수</h2>
+                <p className="text-2xl font-bold text-[#0f766e]">{totalProductCount}개</p>
               </div>
-              <Armchair className="w-8 h-8 text-[#bfa06a]" />
+              <Package className="w-8 h-8 text-[#4fd1c7]" />
             </section>
-            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center justify-between">
               <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">상품 평균 가격</h2>
-                <p className="text-xl md:text-2xl font-bold text-[#388e3c]">{avgPrice.toLocaleString()}원</p>
+                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">판매 중</h2>
+                <p className="text-2xl font-bold text-[#0f766e]">{products.filter(p => p.status === '상').length}개</p>
               </div>
-              <Calculator className="w-8 h-8 text-[#bfa06a]" />
+              <TrendingUp className="w-8 h-8 text-[#4fd1c7]" />
             </section>
-            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center justify-between">
               <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">최고가/최저가</h2>
-                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{maxPrice.toLocaleString()}원 / {minPrice.toLocaleString()}원</p>
+                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">품절</h2>
+                <p className="text-2xl font-bold text-[#0f766e]">{products.filter(p => p.status === '하').length}개</p>
               </div>
-              <TrendingUp className="w-8 h-8 text-[#bfa06a]" />
+              <XCircle className="w-8 h-8 text-[#4fd1c7]" />
             </section>
-            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center justify-between">
               <div>
-                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">상품 등록</h2>
-                <button onClick={handleRegisterClick} className="bg-[#bfa06a] text-[#4b3a2f] px-4 py-2 rounded-md hover:bg-[#5b4636] hover:text-[#e9dec7] flex items-center gap-2 transition-colors">
-                  <Plus className="w-4 h-4" /> 상품 등록
-                </button>
+                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">판매 중지</h2>
+                <p className="text-2xl font-bold text-[#0f766e]">{products.filter(p => p.status === '중').length}개</p>
               </div>
+              <PauseCircle className="w-8 h-8 text-[#4fd1c7]" />
             </section>
           </div>
 
           {/* 검색/필터 영역 */}
-          <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-6 items-center">
-            <input
-              type="text"
-              placeholder="상품명 검색"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              className="flex-1 border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
-            >
-              <option value="">전체 상태</option>
-              <option value="상">상</option>
-              <option value="중">중</option>
-              <option value="하">하</option>
-            </select>
-            <button 
-              onClick={handleSearch} 
-              className="bg-[#bfa06a] text-[#4b3a2f] px-4 py-2 rounded-md hover:bg-[#5b4636] hover:text-[#e9dec7] flex items-center gap-2 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-              검색
-            </button>
+          <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <input
+                type="text"
+                placeholder="상품명으로 검색..."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="flex-1 border-2 border-[#4fd1c7] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="border-2 border-[#4fd1c7] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+              >
+                <option value="">전체 상태</option>
+                <option value="상">상</option>
+                <option value="중">중</option>
+                <option value="하">하</option>
+              </select>
+            </div>
           </div>
 
           {/* 상품 리스트 (쇼피파이 스타일 테이블+카드) */}
@@ -204,7 +199,7 @@ export default function ProductListPage() {
                   className={`px-4 py-2 rounded-lg font-bold shadow-sm border text-sm transition-colors
                     ${currentPage === i + 1
                       ? 'bg-[#bfa06a] text-[#4b3a2f] border-[#bfa06a]'
-                      : 'bg-[#e3f6f5] text-[#5b4636] border-[#bfa06a] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'}
+                      : 'bg-[#e3f6f5] text-[#2d1b0f] border-[#bfa06a] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'}
                   `}
                 >
                   {i + 1}

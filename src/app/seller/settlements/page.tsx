@@ -23,7 +23,10 @@ import {
     RefreshCw, 
     Eye,
     Filter,
-    BarChart3
+    BarChart3,
+    Clock,
+    CheckCircle,
+    Calculator
 } from 'lucide-react';
 
 export default function SellerSettlementPage() {
@@ -164,47 +167,39 @@ export default function SellerSettlementPage() {
                     <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">정산 관리</h1>
 
                     {/* 상단 통계 카드 */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 정산 건수</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">
-                                    {summary ? summary.payoutCount : totalSettlements}건
-                                </p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 매출</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{summary ? summary.totalSales.toLocaleString() : totalSales.toLocaleString()}원</p>
                             </div>
-                            <CreditCard className="w-8 h-8 text-[#bfa06a]" />
+                            <DollarSign className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 매출</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#388e3c]">
-                                    {(summary ? summary.totalSales : totalSales).toLocaleString()}원
-                                </p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">정산 대기</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{summary ? summary.payoutCount : totalSettlements}건</p>
                             </div>
-                            <TrendingUp className="w-8 h-8 text-[#bfa06a]" />
+                            <Clock className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 수수료</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#b94a48]">
-                                    {(summary ? summary.totalCommission : totalCommission).toLocaleString()}원
-                                </p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">정산 완료</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</p>
                             </div>
-                            <Percent className="w-8 h-8 text-[#bfa06a]" />
+                            <CheckCircle className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 지급액</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#bfa06a]">
-                                    {(summary ? summary.totalPayoutAmount : totalPayout).toLocaleString()}원
-                                </p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">수수료</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{summary ? summary.totalCommission.toLocaleString() : totalCommission.toLocaleString()}원</p>
                             </div>
-                            <DollarSign className="w-8 h-8 text-[#bfa06a]" />
+                            <Calculator className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
                     </div>
 
                     {/* 필터 섹션 */}
-                    <div className="bg-[#e3f6f5] p-4 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
+                    <div className="bg-[#e3f6f5] p-4 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <Filter className="w-5 h-5 text-[#bfa06a]" />
                             <h3 className="text-[#5b4636] font-semibold">필터 옵션</h3>
@@ -218,7 +213,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'all' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#e3f6f5] text-[#2d1b0f] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     전체
@@ -228,7 +223,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'date' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#e3f6f5] text-[#2d1b0f] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     날짜별
@@ -238,7 +233,7 @@ export default function SellerSettlementPage() {
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
                                         filterType === 'period' 
                                             ? 'bg-[#bfa06a] text-[#4b3a2f]' 
-                                            : 'bg-[#5b4636] text-[#e3f6f5] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
+                                            : 'bg-[#e3f6f5] text-[#2d1b0f] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'
                                     }`}
                                 >
                                     기간별
@@ -248,11 +243,11 @@ export default function SellerSettlementPage() {
                             {/* 날짜별 필터 */}
                             {filterType === 'date' && (
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-[#bfa06a]" />
-                                    <input
-                                        type="date"
-                                        value={filterDate}
-                                        onChange={(e) => setFilterDate(e.target.value)}
+                            <Calendar className="w-5 h-5 text-[#bfa06a]" />
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
                                         className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-white text-[#5b4636]"
                                     />
                                 </div>
@@ -276,27 +271,27 @@ export default function SellerSettlementPage() {
                                         onChange={(e) => setFilterTo(e.target.value)}
                                         placeholder="종료일"
                                         className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-white text-[#5b4636]"
-                                    />
-                                </div>
+                            />
+                        </div>
                             )}
 
                             {/* 필터 버튼들 */}
                             <div className="flex gap-2">
-                                <button
+                        <button
                                     onClick={applyFilter}
                                     disabled={filterType === 'date' && !filterDate || filterType === 'period' && (!filterFrom || !filterTo)}
-                                    className="flex items-center gap-2 bg-[#bfa06a] text-[#4b3a2f] px-4 py-2 rounded-md hover:bg-[#5b4636] hover:text-[#e9dec7] disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Search className="w-4 h-4" />
+                            className="flex items-center gap-2 bg-[#bfa06a] text-[#4b3a2f] px-4 py-2 rounded-md hover:bg-[#5b4636] hover:text-[#e9dec7] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Search className="w-4 h-4" />
                                     조회
-                                </button>
-                                <button
+                        </button>
+                        <button
                                     onClick={resetFilter}
-                                    className="flex items-center gap-2 bg-[#5b4636] text-[#e9dec7] px-4 py-2 rounded-md hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
+                            className="flex items-center gap-2 bg-[#5b4636] text-[#e9dec7] px-4 py-2 rounded-md hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
+                        >
+                            <RefreshCw className="w-4 h-4" />
                                     초기화
-                                </button>
+                        </button>
                             </div>
                         </div>
                     </div>

@@ -213,15 +213,15 @@ export default function SellerDashboardPage() {
     <SellerLayout>
       <main className="min-h-screen w-full px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <h1 className="text-2xl font-extrabold text-[#5b4636] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
+          <h1 className="text-2xl font-extrabold text-[#0f766e] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#5b4636] bg-[#e9dec7] rounded px-3 py-1 border border-[#bfa06a]">마지막 업데이트<br />{lastUpdated}</span>
+            <span className="text-xs text-[#0f766e] bg-[#e3f6f5] rounded px-3 py-1 border-2 border-[#4fd1c7]">마지막 업데이트<br />{lastUpdated}</span>
             <button
               onClick={() => setChartFilter('daily')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                 chartFilter === 'daily'
-                  ? 'bg-[#bfa06a] text-white'
-                  : 'bg-[#d4c4a8] text-[#5b4636] hover:bg-[#c4b498]'
+                  ? 'bg-[#4fd1c7] text-white'
+                  : 'bg-[#e3f6f5] text-[#0f766e] hover:bg-[#14b8a6] hover:text-white border-2 border-[#4fd1c7]'
               }`}
             >
               일간
@@ -230,8 +230,8 @@ export default function SellerDashboardPage() {
               onClick={() => setChartFilter('monthly')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                 chartFilter === 'monthly'
-                  ? 'bg-[#bfa06a] text-white'
-                  : 'bg-[#d4c4a8] text-[#5b4636] hover:bg-[#c4b498]'
+                  ? 'bg-[#4fd1c7] text-white'
+                  : 'bg-[#e3f6f5] text-[#0f766e] hover:bg-[#14b8a6] hover:text-white border-2 border-[#4fd1c7]'
               }`}
             >
               월간
@@ -252,40 +252,40 @@ export default function SellerDashboardPage() {
           {/* 우측: 나머지 카드들 */}
           <div className="flex-[2] grid grid-cols-1 md:grid-cols-2 gap-6">
           <section
-            className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center justify-between cursor-pointer transition hover:scale-[1.03] hover:shadow-lg hover:border-[#14b8a6]"
             onClick={() => router.push('/seller/products')}
           >
             <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
-              <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{dashboard?.totalProductCount ?? 0}개</p>
+              <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 등록 상품</h2>
+              <p className="text-xl md:text-2xl font-bold text-[#0f766e]">{dashboard?.totalProductCount ?? 0}개</p>
             </div>
-            <Armchair className="w-8 h-8 text-[#bfa06a]" />
+            <Armchair className="w-8 h-8 text-[#4fd1c7]" />
           </section>
-          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-            <DollarSign className="w-10 h-10 text-[#bfa06a]" />
+          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
+            <DollarSign className="w-10 h-10 text-[#4fd1c7]" />
             <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 매출</h2>
-              <p className="text-2xl font-extrabold text-[#388e3c]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
+              <h2 className="text-[#0f766e] text-sm font-semibold mb-1">총 매출</h2>
+              <p className="text-2xl font-extrabold text-[#0f766e]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
             </div>
           </section>
           <section
-            className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg hover:border-[#14b8a6]"
             onClick={() => router.push('/seller/orders')}
           >
-            <Gavel className="w-10 h-10 text-[#bfa06a]" />
+            <Gavel className="w-10 h-10 text-[#4fd1c7]" />
             <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">총 주문 수</h2>
-              <p className="text-2xl font-extrabold text-[#5b4636]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
+              <h2 className="text-[#0f766e] text-sm font-semibold mb-1">총 주문 수</h2>
+              <p className="text-2xl font-extrabold text-[#0f766e]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
             </div>
           </section>
           <section
-            className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg"
+            className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4 cursor-pointer transition hover:scale-[1.03] hover:shadow-lg hover:border-[#14b8a6]"
             onClick={() => router.push('/seller/qna')}
           >
-            <MessageCircle className="w-10 h-10 text-[#bfa06a]" />
+            <MessageCircle className="w-10 h-10 text-[#4fd1c7]" />
             <div>
-              <h2 className="text-[#5b4636] text-sm font-semibold mb-1">미답변 문의</h2>
-              <p className="text-2xl font-extrabold text-[#bfa06a]">{dashboard?.unansweredQnaCount ?? 0}건</p>
+              <h2 className="text-[#0f766e] text-sm font-semibold mb-1">미답변 문의</h2>
+              <p className="text-2xl font-extrabold text-[#4fd1c7]">{dashboard?.unansweredQnaCount ?? 0}건</p>
             </div>
           </section>
         </div>
@@ -293,32 +293,32 @@ export default function SellerDashboardPage() {
         
         {/* 차트 영역 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a]">
+          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#5b4636]">매출 추이</h3>
-              <BarChart3 className="w-7 h-7 text-[#bfa06a] hover:text-[#388e3c] transition-colors duration-150 cursor-pointer" />
+              <h3 className="text-lg font-bold text-[#0f766e]">매출 추이</h3>
+              <BarChart3 className="w-7 h-7 text-[#4fd1c7] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
             {chartFilter === 'daily' ? (
-            <Chart options={{...dailyChartOptions, colors: ['#bfa06a']}} series={dailyChartSeries} type="area" height={260} />
+            <Chart options={{...dailyChartOptions, colors: ['#4fd1c7']}} series={dailyChartSeries} type="area" height={260} />
             ) : (
-              <Chart options={{...monthlyChartOptions, colors: ['#bfa06a']}} series={monthlyChartSeries} type="bar" height={260} />
+              <Chart options={{...monthlyChartOptions, colors: ['#4fd1c7']}} series={monthlyChartSeries} type="bar" height={260} />
             )}
           </section>
-          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a]">
+          <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#5b4636]">주문 통계</h3>
-              <BarChart3 className="w-7 h-7 text-[#bfa06a] hover:text-[#388e3c] transition-colors duration-150 cursor-pointer" />
+              <h3 className="text-lg font-bold text-[#0f766e]">주문 통계</h3>
+              <BarChart3 className="w-7 h-7 text-[#4fd1c7] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-[#e3f6f5] rounded-lg">
-                <p className="text-sm text-[#5b4636] mb-1">오늘 주문</p>
-                <p className="text-xl font-bold text-[#388e3c]">
+              <div className="text-center p-4 bg-[#e3f6f5] rounded-lg border border-[#4fd1c7]">
+                <p className="text-sm text-[#0f766e] mb-1">오늘 주문</p>
+                <p className="text-xl font-bold text-[#0f766e]">
                   {dailyTrend.length > 0 ? dailyTrend[dailyTrend.length - 1]?.orderCount || 0 : 0}건
                 </p>
               </div>
-              <div className="text-center p-4 bg-[#e3f6f5] rounded-lg">
-                <p className="text-sm text-[#5b4636] mb-1">이번 달 주문</p>
-                <p className="text-xl font-bold text-[#388e3c]">
+              <div className="text-center p-4 bg-[#e3f6f5] rounded-lg border border-[#4fd1c7]">
+                <p className="text-sm text-[#0f766e] mb-1">이번 달 주문</p>
+                <p className="text-xl font-bold text-[#0f766e]">
                   {monthlyTrendFilled.length > 0 ? monthlyTrendFilled[monthlyTrendFilled.length - 1]?.orderCount || 0 : 0}건
                 </p>
               </div>

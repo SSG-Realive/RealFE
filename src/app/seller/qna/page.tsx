@@ -7,7 +7,7 @@ import { CustomerQnaResponse, CustomerQnaListResponse } from '@/types/seller/cus
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerHeader from '@/components/seller/SellerHeader';
-import { MessageCircle, CheckCircle, Clock, Plus, Eye, Search, Filter, User, Package } from 'lucide-react';
+import { MessageCircle, CheckCircle, Clock, Plus, Eye, Search, Filter, User, Package, Percent } from 'lucide-react';
 
 export default function SellerQnaPage() {
     const checking = useSellerAuthGuard();
@@ -69,12 +69,12 @@ export default function SellerQnaPage() {
 
     const getStatusBadge = (isAnswered: boolean) => {
         return isAnswered ? (
-            <span className="px-2 py-1 rounded text-xs font-bold bg-[#e9dec7] text-[#5b4636] flex items-center gap-1">
+            <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#2d1b0f] flex items-center gap-1">
                 <CheckCircle className="w-3 h-3" />
                 답변 완료
             </span>
         ) : (
-            <span className="px-2 py-1 rounded text-xs font-bold bg-[#fbeee0] text-[#b94a48] flex items-center gap-1">
+            <span className="px-2 py-1 rounded text-xs font-bold bg-[#d1f2eb] text-[#2d1b0f] flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 미답변
             </span>
@@ -102,54 +102,59 @@ export default function SellerQnaPage() {
                     <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">고객 문의 관리</h1>
 
                     {/* 상단 통계 카드 */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 문의 수</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalQna}건</p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 문의</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{totalQna}건</p>
                             </div>
-                            <MessageCircle className="w-8 h-8 text-[#bfa06a]" />
+                            <MessageCircle className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">답변 완료</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#388e3c]">{answeredQna}건</p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변 대기</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{unansweredQna}건</p>
                             </div>
-                            <CheckCircle className="w-8 h-8 text-[#bfa06a]" />
+                            <Clock className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] flex items-center justify-between">
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
                             <div>
-                                <h2 className="text-[#5b4636] text-sm font-semibold mb-2">미답변</h2>
-                                <p className="text-xl md:text-2xl font-bold text-[#b94a48]">{unansweredQna}건</p>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변 완료</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{answeredQna}건</p>
                             </div>
-                            <Clock className="w-8 h-8 text-[#bfa06a]" />
+                            <CheckCircle className="w-8 h-8 text-[#4fd1c7]" />
+                        </section>
+                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
+                            <div>
+                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변률</h2>
+                                <p className="text-2xl font-bold text-[#0f766e]">{((answeredQna / totalQna) * 100).toFixed(2)}%</p>
+                            </div>
+                            <Percent className="w-8 h-8 text-[#4fd1c7]" />
                         </section>
                     </div>
 
                     {/* 검색 및 필터 */}
-                    <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border border-[#bfa06a] mb-6">
+                    <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">
                         <div className="flex flex-col md:flex-row gap-4">
-                            <div className="flex-1 relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#bfa06a] w-4 h-4" />
-                        <input
-                            type="text"
-                                    placeholder="제목, 내용, 고객명, 상품명으로 검색..."
-                            value={searchKeyword}
-                            onChange={(e) => setSearchKeyword(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2 border border-[#bfa06a] rounded-lg bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a] focus:outline-none focus:ring-2 focus:ring-[#bfa06a]"
-                        />
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#4fd1c7]" />
+                                <input
+                                    type="text"
+                                    placeholder="제목 또는 내용으로 검색..."
+                                    value={searchKeyword}
+                                    onChange={(e) => setSearchKeyword(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 border-2 border-[#4fd1c7] rounded-lg bg-[#e3f6f5] text-[#0f766e] placeholder-[#4fd1c7] focus:outline-none focus:ring-2 focus:ring-[#4fd1c7]"
+                                />
                             </div>
-                            <div className="flex gap-2">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="px-4 py-2 border border-[#bfa06a] rounded-lg bg-[#f5f1eb] text-[#5b4636] focus:outline-none focus:ring-2 focus:ring-[#bfa06a]"
-                        >
-                            <option value="">전체 상태</option>
-                            <option value="answered">답변 완료</option>
-                            <option value="unanswered">미답변</option>
-                        </select>
-                            </div>
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="border-2 border-[#4fd1c7] rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                            >
+                                <option value="">전체 상태</option>
+                                <option value="answered">답변 완료</option>
+                                <option value="unanswered">미답변</option>
+                            </select>
                         </div>
                     </div>
 
@@ -159,14 +164,14 @@ export default function SellerQnaPage() {
                             <p className="text-[#b94a48]">{error}</p>
                         </div>
                     ) : filteredQnaList.length === 0 ? (
-                        <div className="bg-[#e9dec7] border border-[#bfa06a] rounded-lg p-8 text-center">
+                        <div className="bg-[#e3f6f5] border border-[#bfa06a] rounded-lg p-8 text-center">
                             <MessageCircle className="w-12 h-12 text-[#bfa06a] mx-auto mb-4" />
                             <p className="text-[#bfa06a] text-lg">고객 문의가 없습니다.</p>
                         </div>
                     ) : (
-                        <div className="overflow-x-auto bg-[#e9dec7] rounded-lg shadow-sm border border-[#bfa06a]">
+                        <div className="overflow-x-auto bg-[#e3f6f5] rounded-lg shadow-sm border border-[#bfa06a]">
                             <table className="min-w-full divide-y divide-[#bfa06a]">
-                                <thead className="bg-[#e9dec7]">
+                                <thead className="bg-[#e3f6f5]">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">고객/상품</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">제목</th>
@@ -198,12 +203,12 @@ export default function SellerQnaPage() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                     {(qna.answered === true || qna.answered === 'true') ? (
-                                                        <span className="px-2 py-1 rounded text-xs font-bold bg-[#e9dec7] text-[#5b4636] flex items-center gap-1">
+                                                        <span className="px-2 py-1 rounded text-xs font-bold bg-[#e3f6f5] text-[#2d1b0f] flex items-center gap-1">
                                                             <CheckCircle className="w-3 h-3" />
                                                             답변 완료
                                                         </span>
                                                     ) : (
-                                                        <span className="px-2 py-1 rounded text-xs font-bold bg-[#fbeee0] text-[#b94a48] flex items-center gap-1">
+                                                        <span className="px-2 py-1 rounded text-xs font-bold bg-[#d1f2eb] text-[#2d1b0f] flex items-center gap-1">
                                                             <Clock className="w-3 h-3" />
                                                             미답변
                                                         </span>
@@ -238,7 +243,7 @@ export default function SellerQnaPage() {
                             <button
                                     onClick={() => setPage(Math.max(0, page - 1))}
                                 disabled={page === 0}
-                                    className="px-3 py-2 border border-[#bfa06a] rounded bg-[#e9dec7] text-[#5b4636] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
+                                    className="px-3 py-2 border border-[#bfa06a] rounded bg-[#e3f6f5] text-[#2d1b0f] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
                             >
                                 이전
                             </button>
@@ -248,7 +253,7 @@ export default function SellerQnaPage() {
                             <button
                                     onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                                     disabled={page === totalPages - 1}
-                                    className="px-3 py-2 border border-[#bfa06a] rounded bg-[#e9dec7] text-[#5b4636] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
+                                    className="px-3 py-2 border border-[#bfa06a] rounded bg-[#e3f6f5] text-[#2d1b0f] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#bfa06a] hover:text-[#4b3a2f]"
                             >
                                 다음
                             </button>

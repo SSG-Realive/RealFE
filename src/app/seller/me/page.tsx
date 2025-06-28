@@ -102,26 +102,26 @@ export default function SellerMePage() {
             <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">마이페이지</h1>
 
             {/* 상단 정보 카드 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-                <Mail className="w-8 h-8 text-[#bfa06a]" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
+                <User className="w-10 h-10 text-[#4fd1c7]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이메일</h2>
-                  <p className="text-base font-bold text-[#5b4636]">{email}</p>
+                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">판매자명</h2>
+                  <p className="text-2xl font-extrabold text-[#0f766e]">{name}</p>
                 </div>
               </section>
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-                <User className="w-8 h-8 text-[#bfa06a]" />
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
+                <Mail className="w-10 h-10 text-[#4fd1c7]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이름</h2>
-                  <p className="text-base font-bold text-[#5b4636]">{name}</p>
+                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">이메일</h2>
+                  <p className="text-2xl font-extrabold text-[#0f766e]">{email}</p>
                 </div>
               </section>
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center gap-4">
-                <Phone className="w-8 h-8 text-[#bfa06a]" />
+              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
+                <Phone className="w-10 h-10 text-[#4fd1c7]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">전화번호</h2>
-                  <p className="text-base font-bold text-[#5b4636]">{phone}</p>
+                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">연락처</h2>
+                  <p className="text-2xl font-extrabold text-[#0f766e]">{phone}</p>
                 </div>
               </section>
             </div>

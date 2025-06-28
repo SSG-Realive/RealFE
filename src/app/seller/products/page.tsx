@@ -89,33 +89,33 @@ export default function ProductListPage() {
       <SellerHeader toggleSidebar={toggleSidebar} />
       </div>
       <SellerLayout>
-        <div className="flex-1 w-full h-full px-4 py-8 bg-[#a89f91]">
+        <div className="flex-1 w-full h-full px-4 py-8">
           <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">상품 관리</h1>
 
           {/* 상단 통계 카드 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
-            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
               <div>
                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">총 등록 상품</h2>
                 <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{totalProductCount}개</p>
               </div>
               <Armchair className="w-8 h-8 text-[#bfa06a]" />
             </section>
-            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
               <div>
                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">상품 평균 가격</h2>
                 <p className="text-xl md:text-2xl font-bold text-[#388e3c]">{avgPrice.toLocaleString()}원</p>
               </div>
               <Calculator className="w-8 h-8 text-[#bfa06a]" />
             </section>
-            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
               <div>
                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">최고가/최저가</h2>
                 <p className="text-xl md:text-2xl font-bold text-[#5b4636]">{maxPrice.toLocaleString()}원 / {minPrice.toLocaleString()}원</p>
               </div>
               <TrendingUp className="w-8 h-8 text-[#bfa06a]" />
             </section>
-            <section className="bg-[#e9dec7] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
+            <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border border-[#bfa06a] flex items-center justify-between">
               <div>
                 <h2 className="text-[#5b4636] text-sm font-semibold mb-2">상품 등록</h2>
                 <button onClick={handleRegisterClick} className="bg-[#bfa06a] text-[#4b3a2f] px-4 py-2 rounded-md hover:bg-[#5b4636] hover:text-[#e9dec7] flex items-center gap-2 transition-colors">
@@ -132,12 +132,12 @@ export default function ProductListPage() {
               placeholder="상품명 검색"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              className="flex-1 border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+              className="flex-1 border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
             />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+              className="border border-[#bfa06a] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636]"
             >
               <option value="">전체 상태</option>
               <option value="상">상</option>
@@ -154,9 +154,9 @@ export default function ProductListPage() {
           </div>
 
           {/* 상품 리스트 (쇼피파이 스타일 테이블+카드) */}
-          <div className="overflow-x-auto bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a]">
+          <div className="overflow-x-auto bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a]">
             <table className="min-w-full divide-y divide-[#bfa06a]">
-              <thead className="bg-[#e9dec7]">
+              <thead className="bg-[#e3f6f5]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">상품명</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#bfa06a] uppercase tracking-wider">가격</th>
@@ -165,7 +165,7 @@ export default function ProductListPage() {
                   <th className="px-6 py-3 text-center text-xs font-medium text-[#bfa06a] uppercase tracking-wider">액션</th>
                 </tr>
               </thead>
-              <tbody className="bg-[#e9dec7] divide-y divide-[#bfa06a]">
+              <tbody className="bg-[#e3f6f5] divide-y divide-[#bfa06a]">
                 {products.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="text-center py-8 text-[#bfa06a]">상품이 없습니다.</td>
@@ -204,7 +204,7 @@ export default function ProductListPage() {
                   className={`px-4 py-2 rounded-lg font-bold shadow-sm border text-sm transition-colors
                     ${currentPage === i + 1
                       ? 'bg-[#bfa06a] text-[#4b3a2f] border-[#bfa06a]'
-                      : 'bg-[#e9dec7] text-[#5b4636] border-[#bfa06a] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'}
+                      : 'bg-[#e3f6f5] text-[#5b4636] border-[#bfa06a] hover:bg-[#bfa06a] hover:text-[#4b3a2f]'}
                   `}
                 >
                   {i + 1}

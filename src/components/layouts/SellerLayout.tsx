@@ -15,7 +15,7 @@ export default function SellerLayout({ children }: SellerLayoutProps) {
   const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   return (
-    <div className="min-h-screen h-screen w-full bg-[#a89f91] flex flex-col">
+    <div className="min-h-screen h-screen w-full bg-white flex flex-col">
       {/* 헤더: 항상 상단 고정 (fixed 제거!) */}
       <div>
         <SellerHeader toggleSidebar={toggleSidebar} />

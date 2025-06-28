@@ -126,19 +126,19 @@ export default function ProductListPage() {
           </div>
 
           {/* 검색/필터 영역 */}
-          <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">
+          <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
             <div className="flex flex-col md:flex-row gap-4">
               <input
                 type="text"
                 placeholder="상품명으로 검색..."
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                className="flex-1 border-2 border-[#4fd1c7] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
               />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="border-2 border-[#4fd1c7] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
               >
                 <option value="">전체 상태</option>
                 <option value="상">상</option>
@@ -149,21 +149,21 @@ export default function ProductListPage() {
           </div>
 
           {/* 상품 리스트 (쇼피파이 스타일 테이블+카드) */}
-          <div className="overflow-x-auto bg-[#e3f6f5] rounded-xl shadow border border-[#4fd1c7]">
-            <table className="min-w-full divide-y divide-[#4fd1c7]">
-              <thead className="bg-[#e3f6f5]">
+          <div className="overflow-x-auto bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db]">
+            <table className="min-w-full divide-y divide-[#d1d5db]">
+              <thead className="bg-[#f3f4f6]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#4fd1c7] uppercase tracking-wider">상품명</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#4fd1c7] uppercase tracking-wider">가격</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#4fd1c7] uppercase tracking-wider">상태</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#4fd1c7] uppercase tracking-wider">재고</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-[#4fd1c7] uppercase tracking-wider">액션</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상품명</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">가격</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상태</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">재고</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-[#d1d5db] uppercase tracking-wider">액션</th>
                 </tr>
               </thead>
-              <tbody className="bg-[#e3f6f5] divide-y divide-[#4fd1c7]">
+              <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-[#4fd1c7]">상품이 없습니다.</td>
+                    <td colSpan={5} className="text-center py-8 text-[#d1d5db]">상품이 없습니다.</td>
                   </tr>
                 ) : (
                   products.map((product) => (
@@ -177,7 +177,7 @@ export default function ProductListPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
                           onClick={() => router.push(`/seller/products/${product.id}`)}
-                          className="inline-flex items-center gap-1 bg-[#4fd1c7] text-[#fff] px-3 py-1.5 rounded hover:bg-[#14b8a6] hover:text-[#fff] text-sm transition-colors"
+                          className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#b9f6ec] hover:text-[#0f766e] text-sm transition-colors"
                         >
                           <Eye className="w-4 h-4" /> 상세 보기
                         </button>
@@ -198,8 +198,8 @@ export default function ProductListPage() {
                   onClick={() => goToPage(i + 1)}
                   className={`px-4 py-2 rounded-lg font-bold shadow-sm border text-sm transition-colors
                     ${currentPage === i + 1
-                      ? 'bg-[#4fd1c7] text-[#fff] border-[#4fd1c7]'
-                      : 'bg-[#e3f6f5] text-[#0f766e] border-[#4fd1c7] hover:bg-[#4fd1c7] hover:text-[#fff]'}
+                      ? 'bg-[#d1d5db] text-[#374151] border-[#d1d5db]'
+                      : 'bg-[#f3f4f6] text-[#374151] border-[#d1d5db] hover:bg-[#d1d5db] hover:text-[#374151]'}
                   `}
                 >
                   {i + 1}

@@ -213,15 +213,15 @@ export default function SellerDashboardPage() {
     <SellerLayout>
       <main className="min-h-screen w-full px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <h1 className="text-2xl font-extrabold text-[#0f766e] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
+          <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#0f766e] bg-[#e3f6f5] rounded px-3 py-1 border-2 border-[#4fd1c7]">마지막 업데이트<br />{lastUpdated}</span>
+            <span className="text-xs text-[#374151] bg-[#f3f4f6] rounded px-3 py-1 border-2 border-[#d1d5db]">마지막 업데이트<br />{lastUpdated}</span>
             <button
               onClick={() => setChartFilter('daily')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                 chartFilter === 'daily'
-                  ? 'bg-[#4fd1c7] text-white'
-                  : 'bg-[#e3f6f5] text-[#0f766e] hover:bg-[#14b8a6] hover:text-white border-2 border-[#4fd1c7]'
+                  ? 'bg-[#d1d5db] text-[#374151]'
+                  : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#374151] border-2 border-[#d1d5db]'
               }`}
             >
               일간
@@ -230,8 +230,8 @@ export default function SellerDashboardPage() {
               onClick={() => setChartFilter('monthly')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                 chartFilter === 'monthly'
-                  ? 'bg-[#4fd1c7] text-white'
-                  : 'bg-[#e3f6f5] text-[#0f766e] hover:bg-[#14b8a6] hover:text-white border-2 border-[#4fd1c7]'
+                  ? 'bg-[#d1d5db] text-[#374151]'
+                  : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#374151] border-2 border-[#d1d5db]'
               }`}
             >
               월간
@@ -299,9 +299,9 @@ export default function SellerDashboardPage() {
               <BarChart3 className="w-7 h-7 text-[#6b7280] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
             {chartFilter === 'daily' ? (
-            <Chart options={{...dailyChartOptions, colors: ['#4fd1c7']}} series={dailyChartSeries} type="area" height={260} />
+            <Chart options={{...dailyChartOptions, colors: ['#a89f91']}} series={dailyChartSeries} type="area" height={260} />
             ) : (
-              <Chart options={{...monthlyChartOptions, colors: ['#4fd1c7']}} series={monthlyChartSeries} type="bar" height={260} />
+              <Chart options={{...monthlyChartOptions, colors: ['#a89f91']}} series={monthlyChartSeries} type="bar" height={260} />
             )}
           </section>
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">

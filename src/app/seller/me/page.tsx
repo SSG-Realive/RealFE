@@ -99,7 +99,7 @@ export default function SellerMePage() {
         </div>
         <SellerLayout>
           <div className="flex-1 w-full h-full px-4 py-8">
-            <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#0f766e]">마이페이지</h1>
+            <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#374151]">마이페이지</h1>
 
             {/* 상단 정보 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -128,26 +128,26 @@ export default function SellerMePage() {
 
             {/* 정보 수정 폼 */}
             <div className="max-w-2xl mx-auto">
-              <div className="bg-[#b9f6ec] rounded-xl shadow border border-[#4fd1c7] p-8">
-                <h2 className="text-lg font-bold mb-6 text-[#0f766e] flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-[#4fd1c7]" /> 정보 수정
+              <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                <h2 className="text-lg font-bold mb-6 text-[#374151] flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-[#6b7280]" /> 정보 수정
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
-                      <Mail className="w-4 h-4 text-[#4fd1c7]" /> 이메일 (수정 불가)
+                    <label htmlFor="email" className="block text-sm font-medium text-[#374151] mb-2 flex items-center gap-1">
+                      <Mail className="w-4 h-4 text-[#6b7280]" /> 이메일 (수정 불가)
                     </label>
                     <input 
                       id="email" 
                       type="email" 
                       value={email} 
                       disabled 
-                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md bg-[#e3f6f5] text-[#4fd1c7] cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-[#d1d5db] rounded-md bg-[#f3f4f6] text-[#374151] cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
-                      <User className="w-4 h-4 text-[#4fd1c7]" /> 이름
+                    <label htmlFor="name" className="block text-sm font-medium text-[#374151] mb-2 flex items-center gap-1">
+                      <User className="w-4 h-4 text-[#6b7280]" /> 이름
                     </label>
                     <input 
                       id="name" 
@@ -155,13 +155,13 @@ export default function SellerMePage() {
                       value={name} 
                       onChange={(e) => setName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                      className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#f3f4f6] text-[#374151]"
                       placeholder="이름을 입력하세요"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
-                      <Phone className="w-4 h-4 text-[#4fd1c7]" /> 전화번호
+                    <label htmlFor="phone" className="block text-sm font-medium text-[#374151] mb-2 flex items-center gap-1">
+                      <Phone className="w-4 h-4 text-[#6b7280]" /> 전화번호
                     </label>
                     <input 
                       id="phone" 
@@ -169,13 +169,13 @@ export default function SellerMePage() {
                       value={phone} 
                       onChange={(e) => setPhone(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                      className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#f3f4f6] text-[#374151]"
                       placeholder="전화번호를 입력하세요"
                     />
                   </div>
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
-                      <Key className="w-4 h-4 text-[#4fd1c7]" /> 새 비밀번호 (변경 시에만 입력)
+                    <label htmlFor="password" className="block text-sm font-medium text-[#374151] mb-2 flex items-center gap-1">
+                      <Key className="w-4 h-4 text-[#6b7280]" /> 새 비밀번호 (변경 시에만 입력)
                     </label>
                     <input 
                       id="password" 
@@ -183,7 +183,7 @@ export default function SellerMePage() {
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)} 
                       placeholder="비밀번호를 변경하려면 입력하세요" 
-                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
+                      className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#f3f4f6] text-[#374151]"
                     />
                   </div>
                   {error && (
@@ -193,9 +193,9 @@ export default function SellerMePage() {
                   )}
                   <button 
                     type="submit" 
-                    className="w-full bg-[#4fd1c7] hover:bg-[#14b8a6] text-[#fff] py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:ring-offset-2 flex items-center justify-center gap-2"
+                    className="w-full bg-[#d1d5db] hover:bg-[#bfc5cb] text-[#374151] py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#d1d5db] focus:ring-offset-2 flex items-center justify-center gap-2"
                   >
-                    <Edit3 className="w-4 h-4" /> 정보 수정
+                    <Edit3 className="w-4 h-4 text-[#6b7280]" /> 정보 수정
                   </button>
                 </form>
               </div>

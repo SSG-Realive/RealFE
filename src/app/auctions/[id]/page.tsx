@@ -10,6 +10,10 @@ import type { Auction, Bid } from '@/types/customer/auctions'
 
 // 하위 컴포넌트 임포트
 import AuctionCard from '@/components/customer/auctions/AuctionCard'
+import useDialog from '@/hooks/useDialog'
+import useConfirm from '@/hooks/useConfirm'
+import GlobalDialog from '@/components/ui/GlobalDialog'
+
 
 export default function AuctionDetailPage() {
   // 훅 및 상태 관리
@@ -22,14 +26,15 @@ export default function AuctionDetailPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [bidError, setBidError] = useState<string | null>(null)
-
+const { open, message, show, setOpen } = useDialog();
+const { confirm, dialog } = useConfirm();   // ✅
   // auctionId를 params로부터 안전하게 추출
   const auctionId = Number(Array.isArray(params.id) ? params.id[0] : params.id)
 
   // 데이터 페칭 로직을 useCallback으로 감싸 컴포넌트 전체에서 재사용
   const fetchData = useCallback(async () => {
     if (isNaN(auctionId) || auctionId <= 0) {
-      setError('유효하지 않은 경매 ID입니다.')
+    show('유효하지 않은 경매 ID입니다.')
       setIsLoading(false)
       return
     }
@@ -58,7 +63,7 @@ export default function AuctionDetailPage() {
       setOtherAuctions(filteredOtherAuctions)
 
     } catch (err: any) {
-      setError(err.response?.data?.message || '데이터를 불러오는 데 실패했습니다.');
+      show(err.response?.data?.message || '데이터를 불러오는 데 실패했습니다.');
     } finally {
       setIsLoading(false)
     }
@@ -76,26 +81,29 @@ export default function AuctionDetailPage() {
     setBidError(null)
 
     if (!auction || !bidAmount || !tickSize) {
-      setBidError('입찰 금액을 입력해주세요.')
+      show('입찰 금액을 입력해주세요.')
       return
     }
 
     const amount = Number(bidAmount);
+    const minBid = auction.currentPrice + tickSize;
 
     // 입찰 유효성 검사
     if (isNaN(amount) || amount <= 0) {
-      setBidError('유효한 금액을 입력해주세요.')
+       show(`최소 입찰가: ${minBid.toLocaleString()}원`);
       return
     }
     const minBidAmount = auction.currentPrice + tickSize;
     if (amount < minBidAmount) {
-        setBidError(`현재가보다 높은 금액을 입찰해야 합니다. (최소 입찰가: ${minBidAmount.toLocaleString()}원)`);
+        show(`현재가보다 높은 금액을 입찰해야 합니다. (최소 입찰가: ${minBidAmount.toLocaleString()}원)`);
         return;
     }
     if ((amount - auction.currentPrice) % tickSize !== 0) {
-        setBidError(`입찰은 현재가에서 ${tickSize.toLocaleString()}원 단위로 가능합니다.`);
+        show(`입찰은 현재가에서 ${tickSize.toLocaleString()}원 단위로 가능합니다.`);
         return;
     }
+    const ok = await confirm(`${amount.toLocaleString()}원에 입찰하시겠습니까?`);
+    if (!ok) return;
 
     try {
       // 로그인된 유저만 입찰 가능 (axios 인터셉터에 토큰 설정 필요)
@@ -104,7 +112,7 @@ export default function AuctionDetailPage() {
           bidPrice: amount
       });
 
-      alert(`${amount.toLocaleString()}원 입찰에 성공했습니다!`);
+      show(`${amount.toLocaleString()}원 입찰에 성공했습니다!`);
 
       // 입찰 성공 후 데이터 새로고침
       await fetchData(); 
@@ -113,7 +121,7 @@ export default function AuctionDetailPage() {
 
     } catch (err: any) {
       console.error("Failed to place bid:", err);
-      setBidError(err.response?.data?.message || "입찰 처리 중 오류가 발생했습니다.");
+      show(err.response?.data?.message || "입찰 처리 중 오류가 발생했습니다.");
     }
   }
 
@@ -132,6 +140,9 @@ export default function AuctionDetailPage() {
 
   // 메인 UI 렌더링
   return (
+    <>
+    {dialog}
+    <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
     <div className="container mx-auto p-4 md:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {/* 상품 이미지 섹션 */}
@@ -213,5 +224,6 @@ export default function AuctionDetailPage() {
         </div>
       )}
     </div>
+    </>
   )
 }

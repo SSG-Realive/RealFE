@@ -55,35 +55,35 @@ export default function SellerHeader({ toggleSidebar }: SellerHeaderProps) {
     };
 
     return (
-        <header className="flex items-center justify-between px-8 py-3 bg-[#5b4636] border-b border-[#bfa06a] shadow-sm">
+        <header className="flex items-center justify-between px-8 py-3 bg-[#b0a99f] border-b border-[#bfa06a] shadow-sm">
             <div className="flex items-center gap-3">
                 {toggleSidebar && (
                     <button
                         onClick={toggleSidebar}
-                        className="block lg:hidden text-2xl text-[#e9dec7] hover:text-[#bfa06a] transition-colors"
+                        className="block lg:hidden text-2xl text-[#5b4636] hover:text-[#bfa06a] transition-colors"
                         style={{ background: 'none', border: 'none' }}
                     >
                         ☰
                     </button>
                 )}
-                <Link href="/seller/dashboard" className="text-2xl font-extrabold text-[#e9dec7] tracking-tight hover:text-[#bfa06a] transition-colors">
+                <Link href="/seller/dashboard" className="text-2xl font-extrabold text-[#5b4636] tracking-tight hover:text-[#bfa06a] transition-colors">
                     Realive
                 </Link>
             </div>
             <div className="flex items-center gap-6">
                 {accessToken ? (
                     <>
-                        <span className="font-semibold text-[#e9dec7]">{name}님</span>
+                        <span className="font-semibold text-[#5b4636]">{name}님</span>
                         <button
                             onClick={handleLogout}
-                            className="text-[#bfa06a] hover:text-[#e9dec7] font-semibold transition-colors"
+                            className="text-[#bfa06a] hover:text-[#5b4636] font-semibold transition-colors"
                             style={{ background: 'none', border: 'none', fontSize: '1rem', cursor: 'pointer' }}
                         >
                             로그아웃
                         </button>
                     </>
                 ) : (
-                    <Link href="/seller/login" className="font-semibold text-[#bfa06a] hover:text-[#e9dec7] transition-colors">
+                    <Link href="/seller/login" className="font-semibold text-[#bfa06a] hover:text-[#5b4636] transition-colors">
                         로그인
                     </Link>
                 )}

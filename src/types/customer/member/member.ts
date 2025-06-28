@@ -8,6 +8,7 @@ export interface MemberReadDTO {
 }
 
 export interface MemberModifyDTO {
+  name?: string;
   phone?: string;
   address?: string;
   birth?: string;

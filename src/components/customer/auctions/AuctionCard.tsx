@@ -1,43 +1,37 @@
-import Link from "next/link";
+'use client'
 
-interface AuctionCardProps {
-  auction: Auction | null | undefined;
-  isLast: boolean;
-  refCallback: (node: HTMLLIElement | null) => void;
-  isLoggedIn?: boolean;
-}
+import { Auction } from '@/types/customer/auctions'
+import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 
-export default function AuctionCard({ auction, isLast, refCallback, isLoggedIn = false }: AuctionCardProps) {
-  if (!auction) {
-    // auction 자체가 없으면 빈 li 반환하거나 로딩/에러 UI 표시 가능
-    return (
-      <li className="border border-gray-300 rounded-md p-2 bg-white shadow flex flex-col h-full">
-        <p>경매 정보가 없습니다.</p>
-      </li>
-    );
-  }
 
-  const { id, startPrice, currentPrice, endTime, status, adminProduct } = auction;
-  const productName = adminProduct?.productName ?? '상품 없음';
-  const imageUrl = adminProduct?.imageUrl ?? '/images/placeholder.png';
+/* ────────────────────────────────────────── */
+/* ① “카드 한 장” – Export 이름을 붙여서 제공   */
+/* ────────────────────────────────────────── */
+export function AuctionItemCard({ auction }: { auction: Auction }) {
+  const {
+    id,
+    startPrice,
+    currentPrice,
+    endTime,
+    adminProduct,
+  } = auction
 
   // 경매 종료까지 남은 시간 계산
   const timeRemaining = endTime ? new Date(endTime).getTime() - new Date().getTime() : 0;
   const isEnding = timeRemaining > 0 && timeRemaining < 24 * 60 * 60 * 1000; // 24시간 미만
 
   return (
-    <li
-      ref={isLast ? refCallback : null}
-      className="border border-gray-300 rounded-md p-3 bg-white shadow hover:shadow-lg transition-shadow flex flex-col h-full"
-    >
-      <Link href={`/main/auctions/${id}`} className="flex flex-col flex-grow text-inherit no-underline">
-        {/* 이미지 영역 */}
-        <div className="h-36 mb-3 bg-gray-200 rounded overflow-hidden relative">
+    <li className="shrink-0 w-52 sm:w-60 px-2">
+      <Link
+        href={`/auctions/${id}`}
+        className="block rounded-md bg-white shadow hover:shadow-lg transition"
+      >
+        <div className="h-32 sm:h-40 bg-gray-100 rounded-t-md overflow-hidden">
           <img
-            src={imageUrl}
-            alt={productName}
-            className="w-full h-full object-cover"
-            onError={(e) => ((e.target as HTMLImageElement).src = '/placeholder.png')}
+            src={adminProduct?.imageUrl || '/images/placeholder.png'}
+            alt={adminProduct?.productName || '상품'}
+            className="w-full h-full object-contain"
           />
           {/* 상태 배지 */}
           <div className="absolute top-2 right-2">
@@ -50,16 +44,17 @@ export default function AuctionCard({ auction, isLast, refCallback, isLoggedIn =
             </span>
           </div>
         </div>
-
-        {/* 상품 정보 */}
-        <div className="flex-grow">
-          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{productName}</h3>
-          
-          <div className="space-y-1 text-sm text-gray-600 mb-3">
-            <p>시작가: <span className="font-medium text-gray-900">{startPrice?.toLocaleString() ?? '-'}원</span></p>
-            <p>현재가: <span className="font-bold text-blue-600">{currentPrice?.toLocaleString() ?? '-'}원</span></p>
-            <p>종료일: {endTime ? new Date(endTime).toLocaleDateString() : '-'}</p>
-          </div>
+        <div className="p-2 text-xs sm:text-sm space-y-0.5">
+          <h3 className="font-semibold truncate">
+            {adminProduct?.productName ?? '상품 없음'}
+          </h3>
+          <p>시작가 {startPrice?.toLocaleString() ?? '-'}</p>
+          <p className="font-bold text-amber-600">
+            현재가 {currentPrice?.toLocaleString() ?? '-'}
+          </p>
+          <p className="text-[11px] text-gray-500">
+            종료 {endTime ? new Date(endTime).toLocaleString() : '-'}
+          </p>
         </div>
       </Link>
 
@@ -89,5 +84,55 @@ export default function AuctionCard({ auction, isLast, refCallback, isLoggedIn =
         )}
       </div>
     </li>
-  );
+  )
+}
+
+/* ────────────────────────────────────────── */
+/* ② “마퀴 래퍼” – default export              */
+/* ────────────────────────────────────────── */
+export default function AuctionCard({ auctions }: { auctions: Auction[] }) {
+  const trackRef = useRef<HTMLUListElement>(null)
+
+  /* 트랙 길이 계산 → keyframes에서 사용 */
+  useEffect(() => {
+    const calc = () => {
+      if (!trackRef.current) return
+      const len =
+        Array.from(trackRef.current.children).reduce(
+          (s, el) => s + (el as HTMLElement).offsetWidth,
+          0,
+        ) || 1
+      trackRef.current.style.setProperty('--track-len', `${len}px`)
+    }
+    calc()
+    window.addEventListener('resize', calc)
+    return () => window.removeEventListener('resize', calc)
+  }, [auctions])
+
+  return (
+    <div className="relative overflow-x-auto">
+      <ul ref={trackRef} className="auction-track flex gap-2 py-2 select-none">
+        {[...auctions, ...auctions].map((a, i) => (
+          <AuctionItemCard key={`${a.id}-${i}`} auction={a} />
+        ))}
+      </ul>
+
+      <style jsx>{`
+        .auction-track {
+          animation: scroll var(--scroll-time, 30s) linear infinite;
+        }
+        .auction-track:hover {
+          animation-play-state: paused;
+        }
+        @keyframes scroll {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(calc(var(--track-len) / -2));
+          }
+        }
+      `}</style>
+    </div>
+  )
 }

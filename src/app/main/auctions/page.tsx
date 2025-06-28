@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuctionStore } from '@/store/customer/auctionStore';
-import { useAuthStore } from '@/store/customer/authStore';
-import AuctionCard from '@/components/customer/auctions/AuctionCard';
+import AuctionCard, { AuctionItemCard } from '@/components/customer/auctions/AuctionCard';
 import CategoryFilter from '@/components/customer/auctions/CategoryFilter';
 import Link from 'next/link';
 
@@ -111,13 +110,10 @@ export default function MainAuctionsPage() {
           </div>
         ) : (
           <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {auctions.map((auction, index) => (
-              <AuctionCard
+            {auctions.map((auction) => (
+              <AuctionItemCard
                 key={auction.id}
                 auction={auction}
-                isLast={index === auctions.length - 1}
-                refCallback={() => {}}
-                isLoggedIn={loggedIn}
               />
             ))}
           </ul>

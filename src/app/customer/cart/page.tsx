@@ -11,6 +11,9 @@ import {
 import { useCartStore } from '@/store/customer/useCartStore';
 import CartItemCard from '@/components/customer/cart/CartItemCard';
 import Navbar from '@/components/customer/common/Navbar';
+import useDialog from '@/hooks/useDialog';
+import GlobalDialog from '@/components/ui/GlobalDialog';
+import useConfirm from '@/hooks/useConfirm';
 
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -18,6 +21,8 @@ export default function CartPage() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const router = useRouter();
+     const { open, message, setOpen, show } = useDialog();
+     const { confirm, dialog } = useConfirm() 
 
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
 
@@ -27,7 +32,7 @@ export default function CartPage() {
                 setCartItems(items);
                 setSelectedItemIds(new Set(items.map(item => item.cartItemId)));
             })
-            .catch(() => alert('장바구니 불러오기 실패'))
+            .catch(() => show('장바구니 불러오기 실패'))
             .finally(() => setLoading(false));
     }, []);
 
@@ -46,12 +51,12 @@ export default function CartPage() {
                 )
             );
         } catch (error) {
-            alert('수량 변경에 실패했습니다.');
+            show('수량 변경에 실패했습니다.');
         }
     };
 
     const handleDelete = async (cartItemId: number) => {
-        if (!confirm('이 상품을 장바구니에서 삭제하시겠습니까?')) return;
+        if (!(await confirm('이 상품을 장바구니에서 삭제하시겠습니까?'))) return;
 
         try {
             await deleteCartItem({ cartItemId }); // service 수정 반영
@@ -61,9 +66,9 @@ export default function CartPage() {
                 newSet.delete(cartItemId);
                 return newSet;
             });
-            alert('상품이 장바구니에서 제거되었습니다.');
+            show('상품이 장바구니에서 제거되었습니다.');
         } catch (error) {
-            alert('상품 삭제에 실패했습니다.');
+            show('상품 삭제에 실패했습니다.');
         }
     };
 
@@ -89,10 +94,10 @@ export default function CartPage() {
 
     const handleDeleteSelected = async () => {
         if (selectedItemIds.size === 0) {
-            alert('삭제할 상품을 선택해주세요.');
+            show('삭제할 상품을 선택해주세요.');
             return;
         }
-        if (!confirm(`선택된 ${selectedItemIds.size}개의 상품을 장바구니에서 삭제하시겠습니까?`)) return;
+        if (!(await confirm(`선택된 ${selectedItemIds.size}개의 상품을 장바구니에서 삭제하시겠습니까?`))) return;
 
         try {
             const deletePromises = Array.from(selectedItemIds).map(id => deleteCartItem({ cartItemId: id })); // service 수정 반영
@@ -100,16 +105,16 @@ export default function CartPage() {
 
             setCartItems((prev) => prev.filter((item) => !selectedItemIds.has(item.cartItemId)));
             setSelectedItemIds(new Set());
-            alert(`${selectedItemIds.size}개의 상품이 삭제되었습니다.`);
+            show(`${selectedItemIds.size}개의 상품이 삭제되었습니다.`);
             setIsEditMode(false);
         } catch (err) {
-            alert('선택 삭제 중 오류가 발생했습니다.');
+            show('선택 삭제 중 오류가 발생했습니다.');
         }
     };
 
     // ✨ 장바구니 비우기 핸들러 추가
     const handleClearCart = async () => {
-        if (!confirm('장바구니의 모든 상품을 삭제하시겠습니까?')) return;
+        if (!(await confirm('장바구니의 모든 상품을 삭제하시겠습니까?'))) return;
 
         try {
             // 모든 cartItem.cartItemId를 가져와서 일괄 삭제
@@ -119,10 +124,10 @@ export default function CartPage() {
 
             setCartItems([]); // 장바구니 비우기
             setSelectedItemIds(new Set()); // 선택 초기화
-            alert('장바구니의 모든 상품이 삭제되었습니다.');
+            show('장바구니의 모든 상품이 삭제되었습니다.');
             setIsEditMode(false); // 편집 모드 해제
         } catch (err) {
-            alert('장바구니 비우기 중 오류가 발생했습니다.');
+            show('장바구니 비우기 중 오류가 발생했습니다.');
         }
     };
 
@@ -130,7 +135,7 @@ export default function CartPage() {
         const itemsToCheckout = cartItems.filter(item => selectedItemIds.has(item.cartItemId));
 
         if (itemsToCheckout.length === 0) {
-            alert("결제할 상품을 선택해주세요.");
+            show("결제할 상품을 선택해주세요.");
             return;
         }
         setItemsForCheckout(itemsToCheckout);
@@ -141,6 +146,8 @@ export default function CartPage() {
 
     return (
         <>
+        {dialog}
+        <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
             <Navbar />
             <main className="max-w-4xl mx-auto p-6">
                 <div className="flex justify-between items-center mb-6">

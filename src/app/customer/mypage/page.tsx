@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
-import Navbar from '@/components/customer/common/Navbar';
+import Footer from '@/components/customer/common/Footer';
 import {
     Heart,
     ShoppingCart,
@@ -34,7 +34,6 @@ export default function MyPage() {
 
     return (
         <>
-            <Navbar />
             <main className="min-h-screen py-5">
                 <div className="max-w-6xl mx-auto bg-white rounded-xl px-6 pt-6 pb-0">
                     <div className="relative mb-6">
@@ -129,10 +128,7 @@ export default function MyPage() {
                     </section>
                 </div>
             </main>
-            <div className="w-full bg-gray-100 py-8 mt-10 text-center text-sm text-gray-600">
-                <p className="mb-1 font-semibold">© 2025 Realive</p>
-                <p>중고 가구 거래 플랫폼 | 개인정보처리방침 | 이용약관</p>
-            </div>
+            <Footer />
         </>
     );
 }

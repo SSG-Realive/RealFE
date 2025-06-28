@@ -1,20 +1,20 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
+
 
 const config: Config = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx}',
-    './src/components/**/*.{js,ts,jsx,tsx}',
-    './src/app/**/*.{js,ts,jsx,tsx}', // Next.js 앱 라우팅 구조를 사용하는 경우
-  ],
   theme: {
     extend: {
       fontFamily: {
-        minhye: ['"Minhye"', 'serif'],
+        hakgyo: ['HakgyoansimWoojuR', 'sans-serif'],
       },
     },
   },
+  content: [
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './pages/**/*.{ts,tsx}',
+  ],
   plugins: [],
-};
-
-export default config;
+}
+export default config

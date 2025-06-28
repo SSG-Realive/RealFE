@@ -103,25 +103,25 @@ export default function SellerMePage() {
 
             {/* 상단 정보 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <User className="w-10 h-10 text-[#a89f91]" />
+              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <User className="w-10 h-10 text-[#6b7280]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">판매자명</h2>
-                  <p className="text-2xl font-extrabold text-[#5b4636]">{name}</p>
+                  <h2 className="text-[#374151] text-sm font-semibold mb-1">판매자명</h2>
+                  <p className="text-2xl font-extrabold text-[#374151]">{name}</p>
                 </div>
               </section>
-              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <Mail className="w-10 h-10 text-[#a89f91]" />
+              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <Mail className="w-10 h-10 text-[#6b7280]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이메일</h2>
-                  <p className="text-2xl font-extrabold text-[#5b4636]">{email}</p>
+                  <h2 className="text-[#374151] text-sm font-semibold mb-1">이메일</h2>
+                  <p className="text-2xl font-extrabold text-[#374151]">{email}</p>
                 </div>
               </section>
-              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <Phone className="w-10 h-10 text-[#a89f91]" />
+              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <Phone className="w-10 h-10 text-[#6b7280]" />
                 <div>
-                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">연락처</h2>
-                  <p className="text-2xl font-extrabold text-[#5b4636]">{phone}</p>
+                  <h2 className="text-[#374151] text-sm font-semibold mb-1">연락처</h2>
+                  <p className="text-2xl font-extrabold text-[#374151]">{phone}</p>
                 </div>
               </section>
             </div>

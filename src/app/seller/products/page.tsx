@@ -95,33 +95,33 @@ export default function ProductListPage() {
 
           {/* 상단 통계 카드 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
               <div className="flex items-center gap-3 mb-2">
-                <Package className="w-8 h-8 text-[#a89f91]" />
-                <span className="text-[#5b4636] text-sm font-semibold">총 상품 수</span>
+                <Package className="w-8 h-8 text-[#6b7280]" />
+                <span className="text-[#374151] text-sm font-semibold">총 상품 수</span>
               </div>
-              <div className="text-2xl font-bold text-[#5b4636]">{totalProductCount}개</div>
+              <div className="text-2xl font-bold text-[#374151]">{totalProductCount}개</div>
             </section>
-            <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
               <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-8 h-8 text-[#a89f91]" />
-                <span className="text-[#5b4636] text-sm font-semibold">판매 중</span>
+                <TrendingUp className="w-8 h-8 text-[#6b7280]" />
+                <span className="text-[#374151] text-sm font-semibold">판매 중</span>
               </div>
-              <div className="text-2xl font-bold text-[#5b4636]">{products.filter(p => p.status === '상').length}개</div>
+              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '상').length}개</div>
             </section>
-            <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
               <div className="flex items-center gap-3 mb-2">
-                <XCircle className="w-8 h-8 text-[#a89f91]" />
-                <span className="text-[#5b4636] text-sm font-semibold">품절</span>
+                <XCircle className="w-8 h-8 text-[#6b7280]" />
+                <span className="text-[#374151] text-sm font-semibold">품절</span>
               </div>
-              <div className="text-2xl font-bold text-[#5b4636]">{products.filter(p => p.status === '하').length}개</div>
+              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '하').length}개</div>
             </section>
-            <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
               <div className="flex items-center gap-3 mb-2">
-                <PauseCircle className="w-8 h-8 text-[#a89f91]" />
-                <span className="text-[#5b4636] text-sm font-semibold">판매 중지</span>
+                <PauseCircle className="w-8 h-8 text-[#6b7280]" />
+                <span className="text-[#374151] text-sm font-semibold">판매 중지</span>
               </div>
-              <div className="text-2xl font-bold text-[#5b4636]">{products.filter(p => p.status === '중').length}개</div>
+              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '중').length}개</div>
             </section>
           </div>
 

@@ -168,33 +168,33 @@ export default function SellerSettlementPage() {
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <DollarSign className="w-8 h-8 text-[#a89f91]" />
-                                <span className="text-[#5b4636] text-sm font-semibold">총 매출</span>
+                                <DollarSign className="w-8 h-8 text-[#6b7280]" />
+                                <span className="text-[#374151] text-sm font-semibold">총 매출</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#5b4636]">{summary ? summary.totalSales.toLocaleString() : totalSales.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalSales.toLocaleString() : totalSales.toLocaleString()}원</div>
                         </section>
-                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <Clock className="w-8 h-8 text-[#a89f91]" />
-                                <span className="text-[#5b4636] text-sm font-semibold">정산 대기</span>
+                                <Clock className="w-8 h-8 text-[#6b7280]" />
+                                <span className="text-[#374151] text-sm font-semibold">정산 대기</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#5b4636]">{summary ? summary.payoutCount : totalSettlements}건</div>
+                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.payoutCount : totalSettlements}건</div>
                         </section>
-                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <CheckCircle className="w-8 h-8 text-[#a89f91]" />
-                                <span className="text-[#5b4636] text-sm font-semibold">정산 완료</span>
+                                <CheckCircle className="w-8 h-8 text-[#6b7280]" />
+                                <span className="text-[#374151] text-sm font-semibold">정산 완료</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#5b4636]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
                         </section>
-                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <Calculator className="w-8 h-8 text-[#a89f91]" />
-                                <span className="text-[#5b4636] text-sm font-semibold">수수료</span>
+                                <Calculator className="w-8 h-8 text-[#6b7280]" />
+                                <span className="text-[#374151] text-sm font-semibold">수수료</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#5b4636]">{summary ? summary.totalCommission.toLocaleString() : totalCommission.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalCommission.toLocaleString() : totalCommission.toLocaleString()}원</div>
                         </section>
                     </div>
 

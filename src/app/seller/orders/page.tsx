@@ -89,33 +89,33 @@ export default function SellerOrderListPage() {
           <div className="w-full h-full px-4 py-8">
         <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">주문 관리</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
-              <ShoppingCart className="w-8 h-8 text-[#a89f91]" />
-              <span className="text-[#5b4636] text-sm font-semibold">총 주문</span>
+              <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">총 주문</span>
             </div>
-            <div className="text-2xl font-bold text-[#5b4636]">{totalOrders}건</div>
+            <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
           </section>
-          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-8 h-8 text-[#a89f91]" />
-              <span className="text-[#5b4636] text-sm font-semibold">대기 중</span>
+              <Clock className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">대기 중</span>
             </div>
-            <div className="text-2xl font-bold text-[#5b4636]">{preparingOrders}건</div>
+            <div className="text-2xl font-bold text-[#374151]">{preparingOrders}건</div>
           </section>
-          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
-              <Truck className="w-8 h-8 text-[#a89f91]" />
-              <span className="text-[#5b4636] text-sm font-semibold">배송 중</span>
+              <Truck className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">배송 중</span>
             </div>
-            <div className="text-2xl font-bold text-[#5b4636]">{inProgressOrders}건</div>
+            <div className="text-2xl font-bold text-[#374151]">{inProgressOrders}건</div>
           </section>
-          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
-              <CheckCircle className="w-8 h-8 text-[#a89f91]" />
-              <span className="text-[#5b4636] text-sm font-semibold">완료</span>
+              <CheckCircle className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">완료</span>
             </div>
-            <div className="text-2xl font-bold text-[#5b4636]">{completedOrders}건</div>
+            <div className="text-2xl font-bold text-[#374151]">{completedOrders}건</div>
           </section>
         </div>
         <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">

@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Navbar from '@/components/customer/common/Navbar';
 import { fetchProductDetail, fetchRelatedProducts } from '@/service/customer/productService';
 import { toggleWishlist } from '@/service/customer/wishlistService';
 import { addToCart } from '@/service/customer/cartService';
@@ -11,6 +10,7 @@ import ReviewList from '@/components/customer/review/ReviewList';
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import Footer from '@/components/customer/common/Footer';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -85,7 +85,6 @@ export default function ProductDetailPage() {
 
     return (
         <div>
-            <Navbar />
             <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <img
@@ -228,6 +227,8 @@ export default function ProductDetailPage() {
                     </button>
                 </div>
             </div>
+
+            <Footer />
         </div>
     );
 }

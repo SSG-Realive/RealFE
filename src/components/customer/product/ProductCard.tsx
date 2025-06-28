@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ProductListDTO } from '@/types/seller/product/product';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { toggleWishlist } from '@/service/customer/wishlistService';
-import type { WishlistToggleRequest } from '@/types/customer/wishlist/wishlist';
 import ProductImage from '@/components/ProductImage';
+import { Heart, HeartIcon } from 'lucide-react'; // Lucide 하트 아이콘
 
 export default function ProductCard({
                                         id,
@@ -39,11 +38,11 @@ export default function ProductCard({
                         </div>
                     )}
 
-                    {/* ✅ 하트 버튼 - 모바일 항상 보임, PC는 hover */}
+                    {/* ✅ 반응형 찜(하트) 버튼 */}
                     <button
-                        className="absolute top-2 right-2
-             bg-white/70 backdrop-blur-sm p-1.5 sm:p-2 rounded-full shadow-lg
-             hover:bg-white transition z-10 flex"
+                        className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2
+              bg-white/70 backdrop-blur-sm p-1 sm:p-2 rounded-full shadow-md
+              hover:bg-white transition z-10 flex"
                         onClick={async (e) => {
                             e.preventDefault();
                             const newLiked = !liked;
@@ -58,14 +57,20 @@ export default function ProductCard({
                             }
                         }}
                         type="button"
+                        title={liked ? '찜 취소' : '찜하기'}
                     >
                         {liked ? (
-                            <FaHeart className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                            <Heart
+                                size={16}
+                                className="text-red-500 fill-red-500 sm:size-5"
+                            />
                         ) : (
-                            <FaRegHeart className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+                            <HeartIcon
+                                size={16}
+                                className="text-gray-400 sm:size-5"
+                            />
                         )}
                     </button>
-
                 </div>
 
                 {/* 텍스트 영역 */}

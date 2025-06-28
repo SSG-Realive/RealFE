@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Head from "next/head"; // ✅ Viewport 대응용 meta 태그 삽입용
+import Head from "next/head";
+import Navbar from "@/components/customer/common/Navbar";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -34,10 +35,11 @@ export default function RootLayout({
           ${geistMono.variable}
           antialiased
           min-h-screen
-          overflow-x-hidden
-          overflow-y-auto
+          overflow-visible
+          bg-white
         `}
         >
+        <Navbar />
         {children}
         </body>
         </html>

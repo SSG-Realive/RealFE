@@ -103,33 +103,33 @@ export default function SellerQnaPage() {
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-                            <div>
-                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 문의</h2>
-                                <p className="text-2xl font-bold text-[#0f766e]">{totalQna}건</p>
+                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                                <MessageCircle className="w-8 h-8 text-[#a89f91]" />
+                                <span className="text-[#5b4636] text-sm font-semibold">총 문의</span>
                             </div>
-                            <MessageCircle className="w-8 h-8 text-[#4fd1c7]" />
+                            <div className="text-2xl font-bold text-[#5b4636]">{totalQna}건</div>
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-                            <div>
-                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변 대기</h2>
-                                <p className="text-2xl font-bold text-[#0f766e]">{unansweredQna}건</p>
+                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Clock className="w-8 h-8 text-[#a89f91]" />
+                                <span className="text-[#5b4636] text-sm font-semibold">답변 대기</span>
                             </div>
-                            <Clock className="w-8 h-8 text-[#4fd1c7]" />
+                            <div className="text-2xl font-bold text-[#5b4636]">{unansweredQna}건</div>
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-                            <div>
-                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변 완료</h2>
-                                <p className="text-2xl font-bold text-[#0f766e]">{answeredQna}건</p>
+                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                                <CheckCircle className="w-8 h-8 text-[#a89f91]" />
+                                <span className="text-[#5b4636] text-sm font-semibold">답변 완료</span>
                             </div>
-                            <CheckCircle className="w-8 h-8 text-[#4fd1c7]" />
+                            <div className="text-2xl font-bold text-[#5b4636]">{answeredQna}건</div>
                         </section>
-                        <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-                            <div>
-                                <h2 className="text-[#0f766e] text-sm font-semibold mb-2">답변률</h2>
-                                <p className="text-2xl font-bold text-[#0f766e]">{((answeredQna / totalQna) * 100).toFixed(2)}%</p>
+                        <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                                <Percent className="w-8 h-8 text-[#a89f91]" />
+                                <span className="text-[#5b4636] text-sm font-semibold">답변률</span>
                             </div>
-                            <Percent className="w-8 h-8 text-[#4fd1c7]" />
+                            <div className="text-2xl font-bold text-[#5b4636]">{((answeredQna / totalQna) * 100).toFixed(2)}%</div>
                         </section>
                     </div>
 
@@ -185,20 +185,20 @@ export default function SellerQnaPage() {
                                     {filteredQnaList.map((item) => {
                                         const qna = item.qna || item;
                                         return (
-                                        <tr key={qna.id} className="hover:bg-[#bfa06a] transition-colors">
+                                        <tr key={qna.id} className="bg-[#b9f6ec] hover:bg-[#b9f6ec] transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex flex-col">
-                                                        <div className="flex items-center gap-1 text-sm text-[#5b4636]">
+                                                        <div className="flex items-center gap-1 text-sm text-[#0f766e]">
                                                             <User className="w-3 h-3" />
                                                             <span className="font-medium">{qna.customerName}</span>
                                                         </div>
-                                                        <div className="flex items-center gap-1 text-xs text-[#bfa06a]">
+                                                        <div className="flex items-center gap-1 text-xs text-[#4fd1c7]">
                                                             <Package className="w-3 h-3" />
                                                             <span className="truncate max-w-32">{qna.productName}</span>
                                                         </div>
                                                     </div>
                                                 </td>
-                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-[#5b4636] max-w-xs truncate">
+                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-[#0f766e] max-w-xs truncate">
                                                 {qna.title}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -214,16 +214,16 @@ export default function SellerQnaPage() {
                                                         </span>
                                                     )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5b4636]">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[#0f766e]">
                                                 {qna.createdAt}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5b4636]">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-[#0f766e]">
                                                 {qna.answeredAt || '-'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <button
                                                     onClick={() => router.push(`/seller/qna/${qna.id}`)}
-                                                    className="inline-flex items-center gap-1 bg-[#bfa06a] text-[#4b3a2f] px-3 py-1.5 rounded hover:bg-[#5b4636] hover:text-[#e9dec7] text-sm"
+                                                    className="inline-flex items-center gap-1 bg-[#4fd1c7] text-[#fff] px-3 py-1.5 rounded hover:bg-[#14b8a6] hover:text-[#fff] text-sm"
                                                 >
                                                     <Eye className="w-4 h-4" /> 상세 보기
                                                 </button>

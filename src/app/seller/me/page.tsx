@@ -99,55 +99,55 @@ export default function SellerMePage() {
         </div>
         <SellerLayout>
           <div className="flex-1 w-full h-full px-4 py-8">
-            <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">마이페이지</h1>
+            <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#0f766e]">마이페이지</h1>
 
             {/* 상단 정보 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
-                <User className="w-10 h-10 text-[#4fd1c7]" />
+              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <User className="w-10 h-10 text-[#a89f91]" />
                 <div>
-                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">판매자명</h2>
-                  <p className="text-2xl font-extrabold text-[#0f766e]">{name}</p>
+                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">판매자명</h2>
+                  <p className="text-2xl font-extrabold text-[#5b4636]">{name}</p>
                 </div>
               </section>
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
-                <Mail className="w-10 h-10 text-[#4fd1c7]" />
+              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <Mail className="w-10 h-10 text-[#a89f91]" />
                 <div>
-                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">이메일</h2>
-                  <p className="text-2xl font-extrabold text-[#0f766e]">{email}</p>
+                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">이메일</h2>
+                  <p className="text-2xl font-extrabold text-[#5b4636]">{email}</p>
                 </div>
               </section>
-              <section className="bg-[#e3f6f5] p-6 rounded-xl shadow border-2 border-[#4fd1c7] flex items-center gap-4">
-                <Phone className="w-10 h-10 text-[#4fd1c7]" />
+              <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                <Phone className="w-10 h-10 text-[#a89f91]" />
                 <div>
-                  <h2 className="text-[#0f766e] text-sm font-semibold mb-1">연락처</h2>
-                  <p className="text-2xl font-extrabold text-[#0f766e]">{phone}</p>
+                  <h2 className="text-[#5b4636] text-sm font-semibold mb-1">연락처</h2>
+                  <p className="text-2xl font-extrabold text-[#5b4636]">{phone}</p>
                 </div>
               </section>
             </div>
 
             {/* 정보 수정 폼 */}
             <div className="max-w-2xl mx-auto">
-              <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
-                <h2 className="text-lg font-bold mb-6 text-[#5b4636] flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-[#bfa06a]" /> 정보 수정
+              <div className="bg-[#b9f6ec] rounded-xl shadow border border-[#4fd1c7] p-8">
+                <h2 className="text-lg font-bold mb-6 text-[#0f766e] flex items-center gap-2">
+                  <Edit3 className="w-5 h-5 text-[#4fd1c7]" /> 정보 수정
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-[#5b4636] mb-2 flex items-center gap-1">
-                      <Mail className="w-4 h-4 text-[#bfa06a]" /> 이메일 (수정 불가)
+                    <label htmlFor="email" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
+                      <Mail className="w-4 h-4 text-[#4fd1c7]" /> 이메일 (수정 불가)
                     </label>
                     <input 
                       id="email" 
                       type="email" 
                       value={email} 
                       disabled 
-                      className="w-full px-3 py-2 border border-[#bfa06a] rounded-md bg-[#e9dec7] text-[#bfa06a] cursor-not-allowed"
+                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md bg-[#e3f6f5] text-[#4fd1c7] cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-[#5b4636] mb-2 flex items-center gap-1">
-                      <User className="w-4 h-4 text-[#bfa06a]" /> 이름
+                    <label htmlFor="name" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
+                      <User className="w-4 h-4 text-[#4fd1c7]" /> 이름
                     </label>
                     <input 
                       id="name" 
@@ -155,13 +155,13 @@ export default function SellerMePage() {
                       value={name} 
                       onChange={(e) => setName(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
                       placeholder="이름을 입력하세요"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-[#5b4636] mb-2 flex items-center gap-1">
-                      <Phone className="w-4 h-4 text-[#bfa06a]" /> 전화번호
+                    <label htmlFor="phone" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
+                      <Phone className="w-4 h-4 text-[#4fd1c7]" /> 전화번호
                     </label>
                     <input 
                       id="phone" 
@@ -169,13 +169,13 @@ export default function SellerMePage() {
                       value={phone} 
                       onChange={(e) => setPhone(e.target.value)} 
                       required 
-                      className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
                       placeholder="전화번호를 입력하세요"
                     />
                   </div>
                   <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-[#5b4636] mb-2 flex items-center gap-1">
-                      <Key className="w-4 h-4 text-[#bfa06a]" /> 새 비밀번호 (변경 시에만 입력)
+                    <label htmlFor="password" className="block text-sm font-medium text-[#0f766e] mb-2 flex items-center gap-1">
+                      <Key className="w-4 h-4 text-[#4fd1c7]" /> 새 비밀번호 (변경 시에만 입력)
                     </label>
                     <input 
                       id="password" 
@@ -183,7 +183,7 @@ export default function SellerMePage() {
                       value={password} 
                       onChange={(e) => setPassword(e.target.value)} 
                       placeholder="비밀번호를 변경하려면 입력하세요" 
-                      className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636]"
+                      className="w-full px-3 py-2 border border-[#4fd1c7] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:border-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e]"
                     />
                   </div>
                   {error && (
@@ -193,7 +193,7 @@ export default function SellerMePage() {
                   )}
                   <button 
                     type="submit" 
-                    className="w-full bg-[#bfa06a] hover:bg-[#5b4636] text-[#4b3a2f] py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:ring-offset-2 flex items-center justify-center gap-2"
+                    className="w-full bg-[#4fd1c7] hover:bg-[#14b8a6] text-[#fff] py-3 px-4 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:ring-offset-2 flex items-center justify-center gap-2"
                   >
                     <Edit3 className="w-4 h-4" /> 정보 수정
                   </button>

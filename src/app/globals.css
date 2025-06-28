@@ -159,7 +159,7 @@
 /* 로그인/회원가입 전용 스타일 */
 body.seller-login,
 body.seller-signup {
-  background: #a89f91 !important;
+  background: #ffffff !important;
   min-height: 100vh;
   color: #5b4636 !important;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;

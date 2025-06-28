@@ -24,7 +24,7 @@ export default function TrafficLightStatusCard({
 }: TrafficLightStatusCardProps) {
   const isNoReview = !count || rating === 0;
   return (
-    <div className={`bg-[#e3f6f5] rounded-2xl shadow-xl border-2 border-[#4fd1c7] flex flex-col items-center justify-center py-8 px-6 min-h-[180px] min-w-[220px] transition-all hover:border-[#14b8a6] hover:shadow-2xl ${className}`}>
+    <div className={`bg-[#f5f1eb] rounded-2xl shadow-xl border-2 border-[#d6ccc2] flex flex-col items-center justify-center py-8 px-6 min-h-[180px] min-w-[220px] transition-all hover:border-[#a89f91] hover:shadow-2xl ${className}`}>
       <div className="flex flex-col items-center justify-center w-full">
         <span className="mb-2 animate-pulse" style={{ display: 'inline-block' }}>
           <svg width="56" height="56" viewBox="0 0 56 56">
@@ -33,15 +33,15 @@ export default function TrafficLightStatusCard({
               cy="28"
               r="24"
               fill={getCircleColor(rating)}
-              stroke="#4fd1c7"
+              stroke="#d6ccc2"
               strokeWidth="4"
               style={{ filter: isNoReview ? 'grayscale(1)' : 'drop-shadow(0 0 8px #fff)' }}
             />
           </svg>
         </span>
-        <div className="text-lg font-bold text-[#0f766e] mb-1">{title}</div>
-        <div className="text-xl font-extrabold text-[#0f766e] mb-1">{isNoReview ? '평가 없음' : getTrafficLightText(rating)}</div>
-        <div className="text-sm text-[#374151] mt-1">리뷰 {count ?? 0}건</div>
+        <div className="text-lg font-bold text-[#5b4636] mb-1">{title}</div>
+        <div className="text-xl font-extrabold text-[#5b4636] mb-1">{isNoReview ? '평가 없음' : getTrafficLightText(rating)}</div>
+        <div className="text-sm text-[#a89f91] mt-1">리뷰 {count ?? 0}건</div>
       </div>
     </div>
   );

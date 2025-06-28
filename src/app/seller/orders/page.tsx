@@ -89,33 +89,33 @@ export default function SellerOrderListPage() {
           <div className="w-full h-full px-4 py-8">
         <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">주문 관리</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-            <div>
-              <h2 className="text-[#0f766e] text-sm font-semibold mb-2">총 주문</h2>
-              <p className="text-2xl font-bold text-[#0f766e]">{totalOrders}건</p>
+          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <ShoppingCart className="w-8 h-8 text-[#a89f91]" />
+              <span className="text-[#5b4636] text-sm font-semibold">총 주문</span>
             </div>
-            <ShoppingCart className="w-8 h-8 text-[#4fd1c7]" />
+            <div className="text-2xl font-bold text-[#5b4636]">{totalOrders}건</div>
           </section>
-          <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-            <div>
-              <h2 className="text-[#0f766e] text-sm font-semibold mb-2">대기 중</h2>
-              <p className="text-2xl font-bold text-[#0f766e]">{preparingOrders}건</p>
+          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-8 h-8 text-[#a89f91]" />
+              <span className="text-[#5b4636] text-sm font-semibold">대기 중</span>
             </div>
-            <Clock className="w-8 h-8 text-[#4fd1c7]" />
+            <div className="text-2xl font-bold text-[#5b4636]">{preparingOrders}건</div>
           </section>
-          <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-            <div>
-              <h2 className="text-[#0f766e] text-sm font-semibold mb-2">배송 중</h2>
-              <p className="text-2xl font-bold text-[#0f766e]">{inProgressOrders}건</p>
+          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Truck className="w-8 h-8 text-[#a89f91]" />
+              <span className="text-[#5b4636] text-sm font-semibold">배송 중</span>
             </div>
-            <Truck className="w-8 h-8 text-[#4fd1c7]" />
+            <div className="text-2xl font-bold text-[#5b4636]">{inProgressOrders}건</div>
           </section>
-          <section className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] flex items-center justify-between">
-            <div>
-              <h2 className="text-[#0f766e] text-sm font-semibold mb-2">완료</h2>
-              <p className="text-2xl font-bold text-[#0f766e]">{completedOrders}건</p>
+          <section className="bg-[#f5f1eb] rounded-xl shadow-xl border-2 border-[#d6ccc2] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <CheckCircle className="w-8 h-8 text-[#a89f91]" />
+              <span className="text-[#5b4636] text-sm font-semibold">완료</span>
             </div>
-            <CheckCircle className="w-8 h-8 text-[#4fd1c7]" />
+            <div className="text-2xl font-bold text-[#5b4636]">{completedOrders}건</div>
           </section>
         </div>
         <div className="bg-[#e3f6f5] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#4fd1c7] mb-6">
@@ -165,21 +165,21 @@ export default function SellerOrderListPage() {
               </thead>
                   <tbody className="bg-[#e3f6f5] divide-y divide-[#bfa06a]">
                 {filteredOrders.map((order) => (
-                  <tr key={order.orderId} className="hover:bg-[#bfa06a] transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#5b4636]">#{order.orderId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5b4636]">
+                  <tr key={order.orderId} className="hover:bg-[#b9f6ec] transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#0f766e]">#{order.orderId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#0f766e]">
                       {new Date(order.orderedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-[#5b4636]">{order.customerName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[#5b4636]">{order.productName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[#5b4636]">{order.quantity}개</td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-[#0f766e]">{order.customerName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[#0f766e]">{order.productName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-[#0f766e]">{order.quantity}개</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(order.deliveryStatus)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => router.push(`/seller/orders/${order.orderId}`)}
-                        className="inline-flex items-center gap-1 bg-[#bfa06a] text-[#4b3a2f] px-3 py-1.5 rounded hover:bg-[#5b4636] hover:text-[#e9dec7] text-sm"
+                        className="inline-flex items-center gap-1 bg-[#4fd1c7] text-[#fff] px-3 py-1.5 rounded hover:bg-[#14b8a6] hover:text-[#fff] text-sm"
                       >
                         <Eye className="w-4 h-4" /> 상세 보기
                       </button>

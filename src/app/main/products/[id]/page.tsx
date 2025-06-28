@@ -10,6 +10,8 @@ import ReviewList from '@/components/customer/review/ReviewList';
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import useDialog from '@/hooks/useDialog';
+import GlobalDialog from '@/components/ui/GlobalDialog';
 import Footer from '@/components/customer/common/Footer';
 
 export default function ProductDetailPage() {
@@ -24,6 +26,7 @@ export default function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1);
     const triggerRef = useRef<HTMLDivElement>(null);
     const [isFooterSticky, setIsFooterSticky] = useState(false);
+    const { open, message, setOpen, show } = useDialog()
 
     useEffect(() => {
         if (!id) return;
@@ -66,9 +69,9 @@ export default function ProductDetailPage() {
         if (!product || quantity <= 0) return;
         try {
             await addToCart({ productId: product.id, quantity });
-            alert('장바구니에 추가되었습니다.');
+            show('장바구니에 추가되었습니다.');
         } catch {
-            alert('장바구니 추가 실패');
+            show('장바구니 추가 실패');
         }
     };
 
@@ -84,6 +87,8 @@ export default function ProductDetailPage() {
     const totalDisplayPrice = (product.price * quantity).toLocaleString();
 
     return (
+        <>
+        <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
         <div>
             <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
@@ -230,5 +235,6 @@ export default function ProductDetailPage() {
 
             <Footer />
         </div>
+        </>
     );
 }

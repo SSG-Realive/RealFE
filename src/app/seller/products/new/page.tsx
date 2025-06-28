@@ -133,7 +133,7 @@ export default function ProductNewPage() {
 
     return (
         <SellerLayout>
-            <main className="bg-[#a89f91] min-h-screen w-full px-4 py-8">
+            <main className="min-h-screen w-full px-4 py-8">
                 <h1 className="text-2xl font-extrabold mb-8 text-[#5b4636] tracking-wide text-center">상품 등록</h1>
                 <div className="max-w-2xl mx-auto">
                     <form onSubmit={handleSubmit} encType="multipart/form-data" className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-6 md:p-8">

@@ -98,7 +98,7 @@ export default function SellerMePage() {
           <SellerHeader toggleSidebar={toggleSidebar} />
         </div>
         <SellerLayout>
-          <div className="flex-1 w-full h-full px-4 py-8 bg-[#a89f91]">
+          <div className="flex-1 w-full h-full px-4 py-8">
             <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">마이페이지</h1>
 
             {/* 상단 정보 카드 */}

@@ -107,7 +107,7 @@ export default function ProductDetailPage() {
                 <SellerHeader />
             </div>
             <SellerLayout>
-                <div className="flex-1 w-full h-full px-4 py-8 bg-[#a89f91]">
+                <div className="flex-1 w-full h-full px-4 py-8">
                     {/* 헤더 */}
                     <div className="flex items-center gap-4 mb-6">
                         <button

@@ -83,7 +83,7 @@ export default function SellerOrderListPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#a89f91]">
+    <div className="flex flex-col min-h-screen w-full">
       <main className="flex-1">
         <SellerLayout>
           <div className="w-full h-full px-4 py-8">

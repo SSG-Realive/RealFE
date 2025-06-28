@@ -211,7 +211,7 @@ export default function SellerDashboardPage() {
 
   return (
     <SellerLayout>
-      <main className="bg-[#a89f91] min-h-screen w-full px-4 py-8">
+      <main className="min-h-screen w-full px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <h1 className="text-2xl font-extrabold text-[#5b4636] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
           <div className="flex items-center gap-3">

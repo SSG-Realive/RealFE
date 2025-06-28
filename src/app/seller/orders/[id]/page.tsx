@@ -112,7 +112,7 @@ export default function OrderDetailPage() {
         order.deliveryStatus === 'DELIVERY_COMPLETED' || order.deliveryStatus === 'CANCELLED';
 
     return (
-        <div className="flex flex-col min-h-screen w-full bg-[#a89f91]">
+        <div className="flex flex-col min-h-screen w-full">
             <main className="flex-1">
                 <SellerLayout>
                     <div className="max-w-4xl mx-auto p-4 sm:p-6">

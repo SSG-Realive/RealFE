@@ -27,6 +27,7 @@ export interface FeaturedProductSummary {
   name: string;
   price: number;
   imageThumbnailUrl: string;
+  isWished?: boolean;
 }
 
 export interface FeaturedSellerWithProducts {

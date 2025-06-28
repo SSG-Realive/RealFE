@@ -1,63 +1,89 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Slider from 'react-slick';
+
 import { Category } from '@/types/common/category';
 import { ProductListDTO } from '@/types/seller/product/product';
 import { fetchPublicProducts } from '@/service/customer/productService';
 import { fetchAllCategories } from '@/service/categoryService';
 import ProductCard from './ProductCard';
 
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
 interface Props {
     title: string;
-    categoryId: number; // 1차 카테고리 ID
+    categoryId: number;
     limit: number;
 }
+
+// 🔽 커스텀 화살표
+const Arrow = ({
+                   className,
+                   onClick,
+                   direction,
+               }: {
+    className?: string;
+    onClick?: () => void;
+    direction: 'left' | 'right';
+}) => (
+    <div
+        className={`${className} z-10 bg-black bg-opacity-40 text-white rounded-full w-8 h-8 flex items-center justify-center cursor-pointer hover:bg-opacity-70 ${
+            direction === 'left' ? 'left-1' : 'right-1'
+        }`}
+        onClick={onClick}
+    >
+        {direction === 'left' ? '<' : '>'}
+    </div>
+);
 
 export default function SectionWithSubCategoryButtons({ title, categoryId, limit }: Props) {
     const [subCategories, setSubCategories] = useState<Category[]>([]);
     const [selectedSubId, setSelectedSubId] = useState<number | null>(null);
     const [products, setProducts] = useState<ProductListDTO[]>([]);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
 
-    // 서브 카테고리 로딩
     useEffect(() => {
         fetchAllCategories().then((all) => {
             const filtered = all.filter((c) => c.parentId === categoryId);
             setSubCategories(filtered);
-            setSelectedSubId(null); // 전체 보기
+            setSelectedSubId(null);
         });
     }, [categoryId]);
 
-    // 카테고리 or 필터 바뀌면 초기 상품 로딩
     useEffect(() => {
         const targetId = selectedSubId ?? categoryId;
         fetchPublicProducts(targetId, 1, limit).then((data) => {
             setProducts(data);
-            setPage(1);
-            setHasMore(data.length === limit);
         });
     }, [selectedSubId, categoryId, limit]);
 
-    // 더 보기
-    const loadMore = async () => {
-        const targetId = selectedSubId ?? categoryId;
-        const nextPage = page + 1;
-        const newProducts = await fetchPublicProducts(targetId, nextPage, limit);
-        setProducts((prev) => [...prev, ...newProducts]);
-        setPage(nextPage);
-        setHasMore(newProducts.length === limit);
+    const sliderSettings = {
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        infinite: true,
+        autoplay: true,
+        autoplaySpeed: 4000,
+        arrows: true,
+        nextArrow: <Arrow direction="right" />,
+        prevArrow: <Arrow direction="left" />,
+        responsive: [
+            { breakpoint: 640, settings: { slidesToShow: 2 } },
+            { breakpoint: 768, settings: { slidesToShow: 3 } },
+            { breakpoint: 1024, settings: { slidesToShow: 4 } },
+            { breakpoint: 1280, settings: { slidesToShow: 5 } },
+        ],
     };
 
     return (
         <div className="w-full max-w-screen-xl mx-auto px-4 mb-12">
-            {/* 🔹 제목 + 카테고리 버튼 */}
-            <div className="mb-4">
-                <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-xl font-bold text-gray-800 mr-2 whitespace-nowrap">{title}</h2>
+            {/* 🔹 타이틀 + 서브 카테고리 버튼 줄 */}
+            <div className="w-full overflow-x-auto no-scrollbar">
+                <div className="inline-flex items-center gap-2 px-2 py-1">
+                    <h2 className="text-xl font-bold text-gray-800 mr-2 shrink-0">{title}</h2>
                     <button
                         onClick={() => setSelectedSubId(null)}
-                        className={`text-sm transition whitespace-nowrap ${
+                        className={`text-sm transition whitespace-nowrap shrink-0 ${
                             selectedSubId === null
                                 ? 'text-black font-semibold underline'
                                 : 'text-gray-500 hover:text-black'
@@ -69,7 +95,7 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
                         <button
                             key={cat.id}
                             onClick={() => setSelectedSubId(cat.id)}
-                            className={`text-sm transition whitespace-nowrap ${
+                            className={`text-sm transition whitespace-nowrap shrink-0 ${
                                 selectedSubId === cat.id
                                     ? 'text-black font-semibold underline'
                                     : 'text-gray-500 hover:text-black'
@@ -81,24 +107,14 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
                 </div>
             </div>
 
-            {/* 🔹 상품 리스트 */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+            {/* 🔹 상품 슬라이더 */}
+            <Slider {...sliderSettings}>
                 {products.map((p) => (
-                    <ProductCard key={p.id} {...p} />
+                    <div key={p.id} className="px-2">
+                        <ProductCard {...p} />
+                    </div>
                 ))}
-            </div>
-
-            {/* 🔹 더 보기 버튼 */}
-            {hasMore && (
-                <div className="mt-6 text-center">
-                    <button
-                        onClick={loadMore}
-                        className="px-6 py-2 text-sm bg-white text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-100"
-                    >
-                        더 보기
-                    </button>
-                </div>
-            )}
+            </Slider>
         </div>
     );
 }

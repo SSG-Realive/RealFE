@@ -1,15 +1,21 @@
 'use client';
 
-import { fetchFeaturedSellersWithProducts } from "@/service/customer/productService";
-import { FeaturedSellerWithProducts } from "@/types/product";
-import { useEffect, useState } from "react";
-import Slider from "react-slick";
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Slider from 'react-slick';
+import { Heart, HeartIcon } from 'lucide-react';
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
+import { fetchFeaturedSellersWithProducts} from "@/service/customer/productService";
+import { toggleWishlist } from "@/service/customer/wishlistService";
+import { FeaturedSellerWithProducts } from "@/types/product";
 import ProductImage from "@/components/ProductImage";
 
 export default function FeaturedSellersSection() {
     const [featured, setFeatured] = useState<FeaturedSellerWithProducts[]>([]);
+    const [likedMap, setLikedMap] = useState<Record<number, boolean>>({});
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,6 +26,16 @@ export default function FeaturedSellersSection() {
                 const shuffled = valid.sort(() => 0.5 - Math.random());
                 const picked = shuffled.slice(0, 3);
                 setFeatured(picked);
+
+                // 찜 상태 초기화
+                const map: Record<number, boolean> = {};
+                picked.forEach(seller => {
+                    seller.products.forEach(p => {
+                        map[p.productId] = p.isWished ?? false;
+                    });
+                });
+                setLikedMap(map);
+
                 setLoading(false);
             })
             .catch(err => {
@@ -28,6 +44,19 @@ export default function FeaturedSellersSection() {
                 setLoading(false);
             });
     }, []);
+
+    const handleToggleWishlist = async (productId: number) => {
+        const current = likedMap[productId] ?? false;
+        setLikedMap(prev => ({ ...prev, [productId]: !current }));
+        try {
+            const result = await toggleWishlist({ productId });
+            setLikedMap(prev => ({ ...prev, [productId]: result }));
+        } catch (error) {
+            console.error('찜 실패:', error);
+            setLikedMap(prev => ({ ...prev, [productId]: current }));
+            alert('찜 처리 중 오류가 발생했습니다.');
+        }
+    };
 
     if (loading) {
         return <div className="text-center py-8">로딩 중...</div>;
@@ -39,7 +68,6 @@ export default function FeaturedSellersSection() {
 
     return (
         <section className="my-10 px-4">
-            {/* 🔧 슬라이더 dot 스타일 */}
             <style>{`
         .slick-dots {
           display: flex !important;
@@ -60,7 +88,7 @@ export default function FeaturedSellersSection() {
 
             <div className="max-w-7xl mx-auto p-6">
                 <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-                    Today’s Seller Picks
+                    오늘의 판매자 상품
                 </h2>
 
                 <div className="space-y-10">
@@ -71,7 +99,7 @@ export default function FeaturedSellersSection() {
                             </h3>
 
                             <Slider
-                                dots={true} // ✅ 하단 점 추가
+                                dots={true}
                                 infinite={true}
                                 speed={500}
                                 slidesToShow={3}
@@ -86,26 +114,44 @@ export default function FeaturedSellersSection() {
                             >
                                 {seller.products.map((product) => (
                                     <div key={product.productId} className="px-2">
-                                        <div className="w-full max-w-xs mx-auto text-left">
-                                            {/* ✅ 이미지 비율 고정 */}
-                                            <div className="relative aspect-[4/3] mb-2">
-                                                <ProductImage
-                                                    src={product.imageThumbnailUrl}
-                                                    alt={product.name}
-                                                    className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow"
-                                                />
-                                            </div>
+                                        <Link href={`/main/products/${product.productId}`}>
+                                            <div className="w-full max-w-xs mx-auto text-left cursor-pointer group">
+                                                {/* 이미지 */}
+                                                <div className="relative aspect-[4/3] mb-2">
+                                                    <ProductImage
+                                                        src={product.imageThumbnailUrl}
+                                                        alt={product.name}
+                                                        className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow"
+                                                    />
 
-                                            <div className="mt-4 text-black">
-                                                <p className="text-base font-medium truncate">
-                                                    {product.name}
-                                                </p>
-                                                <p className="text-sm font-semibold text-gray-800 mt-1">
-                                                    {product.price.toLocaleString()}
-                                                    <span className="text-xs align-middle ml-1">원</span>
-                                                </p>
+                                                    {/* 찜 하트 버튼 */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault(); // 링크 이동 방지
+                                                            handleToggleWishlist(product.productId);
+                                                        }}
+                                                        className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow hover:bg-white z-10"
+                                                        type="button"
+                                                        title={likedMap[product.productId] ? '찜 취소' : '찜하기'}
+                                                    >
+                                                        {likedMap[product.productId] ? (
+                                                            <Heart size={18} className="text-red-500 fill-red-500" />
+                                                        ) : (
+                                                            <HeartIcon size={18} className="text-gray-400" />
+                                                        )}
+                                                    </button>
+                                                </div>
+
+                                                {/* 텍스트 */}
+                                                <div className="mt-4 text-black">
+                                                    <p className="text-base font-medium truncate">{product.name}</p>
+                                                    <p className="text-sm font-semibold text-gray-800 mt-1">
+                                                        {product.price.toLocaleString()}
+                                                        <span className="text-xs align-middle ml-1">원</span>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </div>
                                 ))}
                             </Slider>

@@ -1,11 +1,10 @@
-
 import { sellerApi } from '@/lib/apiClient';
 import { PageResponse } from '@/types/seller/page/pageResponse';
 import { PageResponseForOrder } from '@/types/seller/page/pageResponseForOrder';
 import {
     SellerOrderResponse,
     SellerOrderDetailResponse,
-    DeliveryStatusUpdateRequest, // 🔹 추가된 타입
+    DeliveryStatusUpdateRequest,
 } from '@/types/seller/sellerorder/sellerOrder';
 
 /**
@@ -16,8 +15,9 @@ export async function getSellerOrders(): Promise<PageResponseForOrder<SellerOrde
     const res = await sellerApi.get('/seller/orders');
     return res.data;
 }
+
 /**
- * 주문 상세 조회
+ * 주문 상세 조회 (새로운 API 사용)
  */
 export async function getOrderDetail(orderId: number): Promise<SellerOrderDetailResponse> {
     const res = await sellerApi.get(`/seller/orders/${orderId}`);
@@ -34,4 +34,12 @@ export async function updateDeliveryStatus(
     updateData: DeliveryStatusUpdateRequest
 ): Promise<void> {
     await sellerApi.patch(`/seller/orders/${orderId}/delivery`, updateData);
+}
+
+/**
+ * 배송 취소
+ * @param orderId - 주문 ID
+ */
+export async function cancelOrderDelivery(orderId: number): Promise<void> {
+    await sellerApi.patch(`/seller/orders/${orderId}/cancel`);
 }

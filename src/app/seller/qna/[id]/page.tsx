@@ -26,7 +26,7 @@ export default function SellerQnaDetailPage() {
             try {
                 setLoading(true);
                 const res = await getCustomerQnaDetail(id);
-                setQna(res);
+                setQna(res.qna);
                 setError(null);
             } catch (err) {
                 console.error('고객 QnA 상세 조회 실패:', err);
@@ -59,9 +59,10 @@ export default function SellerQnaDetailPage() {
             await answerCustomerQna(id, answer);
             // 답변 등록 후 상세 데이터 재조회
             const res = await getCustomerQnaDetail(id);
-            setQna(res);
+            setQna(res.qna);
             setAnswer('');
             alert('답변이 등록되었습니다.');
+            router.replace('/seller/qna');
         } catch (err) {
             console.error('답변 등록 실패:', err);
             alert('답변 등록에 실패했습니다.');

@@ -141,9 +141,10 @@
   }
 
   body {
-    @apply bg-background text-foreground font-minhye;
+    background: #fff !important;
+    color: #222;
     font-family: 'Minhye', serif;
-    line-height: 1.6; /* ✅ 글자 커지면 줄간격도 넉넉하게 */
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5 {

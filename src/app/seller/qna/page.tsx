@@ -83,7 +83,7 @@ export default function SellerQnaPage() {
 
     if (checking || loading) {
         return (
-            <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-[#a89f91] flex items-center justify-center">
+            <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#bfa06a] mx-auto mb-4"></div>
                     <p className="text-[#5b4636]">고객 문의 정보를 불러오는 중...</p>

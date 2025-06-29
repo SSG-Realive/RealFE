@@ -182,10 +182,10 @@ export default function SellerQnaPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                                    {filteredQnaList.map((item) => {
-                                        const qna = item;
+                                    {filteredQnaList.map((item: any, idx) => {
+                                        const qna = item.qna;
                                         return (
-                                        <tr key={qna.id} className="hover:bg-[#e5e7eb] transition-colors">
+                                        <tr key={qna.id || idx} className="hover:bg-[#e5e7eb] transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.customerName}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.productName}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.title}</td>

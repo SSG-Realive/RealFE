@@ -55,13 +55,13 @@ export default function SellerLoginPage() {
               <label htmlFor="email" className="block text-sm font-medium text-[#0f766e] mb-2">
                 이메일
               </label>
-              <input
+              <input 
                 type="email"
-                id="email"
+                id="email" 
                 name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
                 className="w-full px-3 py-2 border-2 border-[#4fd1c7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e] placeholder-[#4fd1c7]"
                 placeholder="이메일을 입력하세요"
               />
@@ -71,13 +71,13 @@ export default function SellerLoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-[#0f766e] mb-2">
                 비밀번호
               </label>
-              <input
+              <input 
                 type="password"
-                id="password"
+                id="password" 
                 name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
                 className="w-full px-3 py-2 border-2 border-[#4fd1c7] rounded-md focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-[#e3f6f5] text-[#0f766e] placeholder-[#4fd1c7]"
                 placeholder="비밀번호를 입력하세요"
               />
@@ -89,8 +89,8 @@ export default function SellerLoginPage() {
               </p>
             )}
             
-            <button
-              type="submit"
+            <button 
+              type="submit" 
               className="w-full bg-[#4fd1c7] text-white py-2 px-4 rounded-md hover:bg-[#14b8a6] focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               로그인

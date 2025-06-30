@@ -47,7 +47,7 @@ export default function SellerLoginPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f3f4f6] px-4">
-      <div className="w-full max-w-md mx-auto">
+      <div className="w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
         <div className="bg-[#f3f4f6] rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
           <h1 className="text-2xl font-bold text-center mb-6 text-[#374151]">판매자 로그인</h1>
           <form onSubmit={handleSubmit} className="space-y-4">

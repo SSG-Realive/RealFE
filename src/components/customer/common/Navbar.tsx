@@ -60,13 +60,12 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         }
     };
 
-    if (
-        pathname === '/login' ||
-        pathname === '/customer/member/login' ||
-        pathname === '/seller/login'
-    ) {
+    const hideNavbarPaths = ['/autions', '/login', '/seller', '/admin'];
+
+    if (hideNavbarPaths.some((path) => pathname.startsWith(path))) {
         return null;
     }
+
 
     return (
         <nav className="sticky top-0 z-[9999] w-full bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm">

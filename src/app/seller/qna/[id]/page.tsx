@@ -26,7 +26,7 @@ export default function SellerQnaDetailPage() {
             try {
                 setLoading(true);
                 const res = await getCustomerQnaDetail(id);
-                setQna(res.qna);
+                setQna((res as any).qna);
                 setError(null);
             } catch (err) {
                 console.error('고객 QnA 상세 조회 실패:', err);
@@ -59,10 +59,10 @@ export default function SellerQnaDetailPage() {
             await answerCustomerQna(id, answer);
             // 답변 등록 후 상세 데이터 재조회
             const res = await getCustomerQnaDetail(id);
-            setQna(res.qna);
+            setQna((res as any).qna);
             setAnswer('');
             alert('답변이 등록되었습니다.');
-            router.replace('/seller/qna');
+            // router.replace('/seller/qna'); // 이 줄을 제거하여 상세 페이지에 머물도록 함
         } catch (err) {
             console.error('답변 등록 실패:', err);
             alert('답변 등록에 실패했습니다.');
@@ -106,7 +106,7 @@ export default function SellerQnaDetailPage() {
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            {qna.isAnswered ? (
+                            {qna.isAnswered || qna.answer ? (
                                 <span className="px-2 py-1 rounded text-xs font-bold bg-[#f3f4f6] text-[#374151] flex items-center gap-1">
                                     <CheckCircle className="w-3 h-3" />
                                     답변 완료
@@ -138,7 +138,7 @@ export default function SellerQnaDetailPage() {
                     </div>
 
                     {/* 답변 영역 */}
-                    {qna && qna.isAnswered ? (
+                    {qna && (qna.isAnswered || qna.answer) ? (
                         <div className="bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db] p-4 sm:p-6">
                             <div className="bg-[#f3f4f6] rounded-lg p-4 border border-[#d1d5db]">
                                 <h3 className="text-sm font-semibold text-[#6b7280] mb-2">답변 내용</h3>

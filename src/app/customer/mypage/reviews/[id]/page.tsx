@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getReviewDetail, deleteReview } from '@/service/customer/reviewService';
+import { fetchReviewDetail, deleteReview } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Navbar from '@/components/customer/common/Navbar';
 
@@ -14,7 +14,7 @@ export default function ReviewDetailPage() {
 
     useEffect(() => {
         if (!id) return;
-        getReviewDetail(Number(id))
+        fetchReviewDetail(Number(id))
             .then(setReview)
             .catch(() => setError('리뷰 정보를 불러오지 못했습니다.'));
     }, [id]);

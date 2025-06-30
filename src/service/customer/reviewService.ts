@@ -5,7 +5,7 @@ import { ReviewCreateRequestDTO, ReviewResponseDTO } from '@/types/customer/revi
 
 // 판매자별 리뷰 리스트 조회
 export async function fetchReviewsBySeller(sellerId: number): Promise<ReviewResponseDTO[]> {
-    const res = await apiClient.get(`/customer/reviews/seller/${sellerId}`);
+    const res = await apiClient.get(`/public/items/reviews/seller/${sellerId}`);
     return res.data.reviews ?? [];
 }
 

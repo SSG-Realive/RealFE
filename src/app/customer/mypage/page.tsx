@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import Footer from '@/components/customer/common/Footer';
 import {
@@ -16,11 +16,15 @@ import {
 } from 'lucide-react';
 
 export default function MyPage() {
-    const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const categoryFromUrl = searchParams.get('category');
+    const keywordFromUrl = searchParams.get('keyword') || '';
+    const router = useRouter();
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const userName = useAuthStore((state) => state.userName);
     const [mounted, setMounted] = useState(false);
+    const showMainTopBanners = pathname === '/main' && !categoryFromUrl && !keywordFromUrl;
 
     useEffect(() => setMounted(true), []);
 

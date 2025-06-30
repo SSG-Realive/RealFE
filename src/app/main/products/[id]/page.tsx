@@ -13,6 +13,7 @@ import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import Footer from '@/components/customer/common/Footer';
+import Link from 'next/link';
 
 export default function ProductDetailPage() {
     const { id } = useParams();
@@ -110,7 +111,16 @@ export default function ProductDetailPage() {
                             <p><span className="font-semibold">사이즈:</span> {product.width} x {product.depth} x {product.height} cm</p>
                         )}
                         {product.categoryName && <p><span className="font-semibold">카테고리:</span> {product.categoryName}</p>}
-                        {product.sellerName && <p><span className="font-semibold">판매자:</span> {product.sellerName}</p>}
+                        {product.sellerName && product.sellerId && (
+                            <p>
+                                <span className="font-semibold">판매자: </span>
+                                <Link href={`/main/seller/${product.sellerId}`}>
+                                <span className="text-blue-600 hover:underline cursor-pointer">
+                                    {product.sellerName}
+                                </span>
+                                </Link>
+                            </p>
+                        )}
                     </div>
 
                     <div className="border-t border-b py-6 mb-8">

@@ -1,4 +1,6 @@
-interface Auction {
+//types/customer/auctions.ts
+
+export interface Auction {
   id: number;
   productId: number;
   startPrice: number;
@@ -10,23 +12,23 @@ interface Auction {
   adminProduct: {
     productName: string | null;
     imageUrl?: string | null;
-  };
+  } | null;
 }
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   status: number;
   message: string;
   data: T;
 }
 
-interface PaginatedAuctionResponse {
+export interface PaginatedAuctionResponse {
   content: Auction[];
   totalPages: number;
   number: number;
   last: boolean;
 }
 
-interface AuctionState {
+export interface AuctionState {
   auctions: Auction[];
   category: string;
   page: number;
@@ -37,4 +39,26 @@ interface AuctionState {
   setCategory: (category: string) => void;
   reset: () => void;
   fetchAuctions: () => Promise<void>;
+}
+
+export interface Bid {
+  id: number;
+  auctionId: number;
+  customerId: number;
+  customerName: string; // DTO에 따라 추가될 수 있습니다.
+  bidPrice: number;
+  bidTime: string;
+  isWinning: boolean;
+}
+
+export interface PaginatedBidResponse {
+  content: Bid[];
+  totalPages: number;
+  number: number;
+  last: boolean;
+}
+
+export interface PlaceBidRequest {
+  auctionId: number;
+  bidPrice: number;
 }

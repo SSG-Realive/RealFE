@@ -1,5 +1,6 @@
 // src/types/product.ts
 
+
 export interface DeliveryPolicy {
     type: '무료배송' | '유료배송';
     cost: number;
@@ -26,6 +27,7 @@ export interface FeaturedProductSummary {
   name: string;
   price: number;
   imageThumbnailUrl: string;
+  isWished?: boolean;
 }
 
 export interface FeaturedSellerWithProducts {

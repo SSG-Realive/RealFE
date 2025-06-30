@@ -48,7 +48,7 @@ export default function SellerLoginPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#a89f91] px-4">
       <div className="w-full max-w-md mx-auto">
-        <div className="bg-[#e9dec7] rounded-lg shadow-md p-6 md:p-8 border border-[#bfa06a]">
+        <div className="bg-[#e3f6f5] rounded-lg shadow-md p-6 md:p-8 border border-[#bfa06a]">
           <h1 className="text-2xl font-bold text-center mb-6 text-[#5b4636]">판매자 로그인</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -61,7 +61,7 @@ export default function SellerLoginPage() {
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636] placeholder-[#bfa06a]"
+                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a]"
                 placeholder="이메일을 입력하세요"
               />
             </div>
@@ -75,7 +75,7 @@ export default function SellerLoginPage() {
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e9dec7] text-[#5b4636] placeholder-[#bfa06a]"
+                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a]"
                 placeholder="비밀번호를 입력하세요"
               />
             </div>

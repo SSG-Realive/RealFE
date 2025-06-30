@@ -3,6 +3,7 @@
 import React from 'react';
 import Slider from 'react-slick';
 import Link from 'next/link';
+import Image from 'next/image';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -64,21 +65,16 @@ export default function MiddleBannerCarousel({
                         {images.map((item, index) => (
                             <div key={index}>
                                 <Link href={item.link}>
-                                    <img
-                                        src={item.src}
-                                        alt={`하단 배너 ${index + 1}`}
-                                        className="
-                                            w-full
-                                            h-[180px]        // 모바일
-                                            sm:h-[260px]     // 태블릿
-                                            md:h-[320px]     // 일반 태블릿 이상
-                                            lg:h-[380px]     // 데스크탑
-                                            xl:h-[420px]     // 큰 데스크탑
-                                            object-cover
-                                            rounded-lg
-                                            cursor-pointer
-                                        "
-                                    />
+                                    <div className="relative w-full aspect-[4/2] sm:aspect-[4/1]">
+                                        <Image
+                                            src={item.src}
+                                            alt={`하단 배너 ${index + 1}`}
+                                            fill
+                                            className="object-cover rounded-lg cursor-pointer"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
+                                            priority={index === 0}
+                                        />
+                                    </div>
                                 </Link>
                             </div>
                         ))}

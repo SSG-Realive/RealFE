@@ -71,259 +71,261 @@ export default function AdminFAQPage() {
   }
 
   return (
-    <div className="w-full max-w-full min-h-screen bg-gray-50 p-2 sm:p-6 overflow-x-auto">
-      <div className="w-full max-w-full">
-        {/* 헤더 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">FAQ 관리</h1>
-              <p className="text-sm text-gray-600 mt-1">자주 묻는 질문을 관리하고 답변을 처리할 수 있습니다.</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">{filtered.length}</div>
-                <div className="text-sm text-gray-500">총 FAQ</div>
+    <div className="flex flex-col min-h-screen w-full bg-[#a89f91] p-2 sm:p-6 overflow-x-auto">
+      <main className="flex-1">
+        <div className="w-full max-w-full min-w-0">
+          {/* 헤더 */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">FAQ 관리</h1>
+                <p className="text-sm text-gray-600 mt-1">자주 묻는 질문을 관리하고 답변을 처리할 수 있습니다.</p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 필터 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-                검색
-              </label>
-              <input
-                id="search"
-                type="text"
-                placeholder="질문 또는 작성자로 검색"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            <div>
-              <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">
-                상태
-              </label>
-              <select
-                id="statusFilter"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">전체</option>
-                <option value="answered">답변완료</option>
-                <option value="unanswered">미답변</option>
-              </select>
-            </div>
-    <div>
-              <label htmlFor="categoryFilter" className="block text-sm font-medium text-gray-700 mb-2">
-                카테고리
-              </label>
-              <select
-                id="categoryFilter"
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">전체</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-      </div>
-
-        {/* 데스크탑 표 */}
-        <div className="hidden md:block">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      번호
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      질문
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      작성자
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      카테고리
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      등록일
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      상태
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
-                      액션
-                    </th>
-          </tr>
-        </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedFAQ.map((faq, idx) => (
-                    <tr key={faq.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {(currentPage - 1) * pageSize + idx + 1}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="max-w-xs truncate" title={faq.question}>
-                          {faq.question}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {faq.author}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                          {faq.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {faq.created}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          faq.status === 'answered' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {faq.status === 'answered' ? "답변완료" : "미답변"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex space-x-2">
-                          <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
-                            답변
-                          </button>
-                          <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
-                            삭제
-                          </button>
-                        </div>
-                      </td>
-          </tr>
-                  ))}
-        </tbody>
-      </table>
-            </div>
-          </div>
-        </div>
-
-        {/* 모바일 카드형 리스트 */}
-        <div className="block md:hidden space-y-4">
-          {paginatedFAQ.map((faq, idx) => (
-            <div key={faq.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm font-medium text-gray-900">
-                      {(currentPage - 1) * pageSize + idx + 1}
-                    </span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-600">{faq.author}</span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                      {faq.category}
-                    </span>
-                  </div>
-                  <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">
-                    {faq.question}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{faq.created}</span>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      faq.status === 'answered' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {faq.status === 'answered' ? "답변완료" : "미답변"}
-                    </span>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-600">{filtered.length}</div>
+                  <div className="text-sm text-gray-500">총 FAQ</div>
                 </div>
               </div>
-              
-              <div className="flex gap-2">
-                <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm">
-                  답변
+            </div>
+          </div>
+
+          {/* 필터 */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+                  검색
+                </label>
+                <input
+                  id="search"
+                  type="text"
+                  placeholder="질문 또는 작성자로 검색"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">
+                  상태
+                </label>
+                <select
+                  id="statusFilter"
+                  value={statusFilter}
+                  onChange={e => setStatusFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">전체</option>
+                  <option value="answered">답변완료</option>
+                  <option value="unanswered">미답변</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="categoryFilter" className="block text-sm font-medium text-gray-700 mb-2">
+                  카테고리
+                </label>
+                <select
+                  id="categoryFilter"
+                  value={categoryFilter}
+                  onChange={e => setCategoryFilter(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">전체</option>
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* 데스크탑 표 */}
+          <div className="hidden md:block">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        번호
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        질문
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        작성자
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        카테고리
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        등록일
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        상태
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">
+                        액션
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedFAQ.map((faq, idx) => (
+                      <tr key={faq.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {(currentPage - 1) * pageSize + idx + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="max-w-xs truncate" title={faq.question}>
+                            {faq.question}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {faq.author}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            {faq.category}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {faq.created}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            faq.status === 'answered' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {faq.status === 'answered' ? "답변완료" : "미답변"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                              답변
+                            </button>
+                            <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                              삭제
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          {/* 모바일 카드형 리스트 */}
+          <div className="block md:hidden space-y-4">
+            {paginatedFAQ.map((faq, idx) => (
+              <div key={faq.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium text-gray-900">
+                        {(currentPage - 1) * pageSize + idx + 1}
+                      </span>
+                      <span className="text-sm text-gray-500">•</span>
+                      <span className="text-sm text-gray-600">{faq.author}</span>
+                      <span className="text-sm text-gray-500">•</span>
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                        {faq.category}
+                      </span>
+                    </div>
+                    <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">
+                      {faq.question}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{faq.created}</span>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        faq.status === 'answered' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {faq.status === 'answered' ? "답변완료" : "미답변"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-md text-sm">
+                    답변
+                  </button>
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm">
+                    삭제
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 페이징 */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex justify-center">
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  이전
                 </button>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm">
-                  삭제
+                
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 border rounded ${
+                        currentPage === pageNum 
+                          ? 'bg-blue-500 text-white' 
+                          : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  다음
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          )}
 
-        {/* 페이징 */}
-        {totalPages > 1 && (
-          <div className="mt-6 flex justify-center">
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+          {/* 결과가 없을 때 */}
+          {filtered.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-400 text-6xl mb-4">❓</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">FAQ를 찾을 수 없습니다</h3>
+              <p className="text-gray-600 mb-4">
+                검색 조건을 변경하거나 필터를 초기화해보세요.
+              </p>
+              <button 
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("");
+                  setCategoryFilter("");
+                }}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
               >
-                이전
-              </button>
-              
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 border rounded ${
-                      currentPage === pageNum 
-                        ? 'bg-blue-500 text-white' 
-                        : 'hover:bg-gray-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-              >
-                다음
+                필터 초기화
               </button>
             </div>
-          </div>
-        )}
-
-        {/* 결과가 없을 때 */}
-        {filtered.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">❓</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">FAQ를 찾을 수 없습니다</h3>
-            <p className="text-gray-600 mb-4">
-              검색 조건을 변경하거나 필터를 초기화해보세요.
-            </p>
-            <button 
-              onClick={() => {
-                setSearch("");
-                setStatusFilter("");
-                setCategoryFilter("");
-              }}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-            >
-              필터 초기화
-            </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 } 

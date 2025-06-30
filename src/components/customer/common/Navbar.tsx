@@ -13,8 +13,8 @@ import { requestLogout } from '@/service/customer/logoutService';
 
 import SearchBar from './SearchBar';
 import CategoryDropdown from './CategoryDropdown';
-import { UserCircle, ShoppingCart } from 'lucide-react';
-import { FaRegHeart } from 'react-icons/fa'; // ✅ 통일
+
+import { UserCircle, ShoppingCart, LogOut, Heart, LogIn } from 'lucide-react';
 
 interface NavbarProps {
     onSearch?: (keyword: string) => void;
@@ -27,7 +27,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const searchParams = useSearchParams();
     const { logout: clearAuthState } = useAuthStore();
 
-    const { isAuthenticated, logout, userName, setUserName } = useAuthStore();
+    const { isAuthenticated, userName, setUserName } = useAuthStore();
     const { itemCount } = useCartStore();
     const [mounted, setMounted] = useState(false);
 
@@ -60,7 +60,6 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         }
     };
 
-    // 로그인/회원가입 페이지에서는 Navbar 숨김
     if (
         pathname === '/login' ||
         pathname === '/customer/member/login' ||
@@ -70,8 +69,9 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     }
 
     return (
-        <nav className="w-full sticky top-0 z-50 bg-white/85 backdrop-blur-sm">
+        <nav className="sticky top-0 z-[9999] w-full bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm">
             <div className="w-full px-4 py-3 space-y-4">
+
                 {/* ✅ PC 헤더 */}
                 <div className="hidden md:grid grid-cols-[auto_1fr_auto] items-center w-full">
                     <Link href="/main" className="flex-shrink-0">
@@ -99,7 +99,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                     </Link>
 
                                     <Link href="/customer/mypage/wishlist" className="hover:text-gray-800" title="찜한 상품">
-                                        <FaRegHeart className="w-5 h-5 text-gray-500" />
+                                        <Heart size={20} className="text-gray-500" />
                                     </Link>
 
                                     <Link href="/customer/cart" className="relative hover:text-gray-800" title="Cart">
@@ -111,25 +111,52 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                         )}
                                     </Link>
 
-                                    <button onClick={handleLogout} className="hover:text-red-500 text-xs">
+                                    {/* ✅ PC에서는 LOGOUT 텍스트 */}
+                                    <button
+                                        onClick={handleLogout}
+                                        className="hidden md:block text-xs hover:text-red-500"
+                                    >
                                         LOGOUT
+                                    </button>
+
+                                    {/* ✅ 모바일에서는 아이콘 */}
+                                    <button
+                                        onClick={handleLogout}
+                                        title="로그아웃"
+                                        className="block md:hidden hover:text-red-500 min-w-[24px]"
+                                    >
+                                        <LogOut size={20} />
                                     </button>
                                 </>
                             ) : (
-                                <Link
-                                    href={`/login?redirectTo=${encodeURIComponent(
-                                        pathname + (searchParams?.toString() ? `?${searchParams}` : '')
-                                    )}`}
-                                    className="hover:text-blue-500 text-xs"
-                                >
-                                    LOGIN
-                                </Link>
+                                <>
+                                    {/* ✅ PC: 텍스트 LOGIN */}
+                                    <Link
+                                        href={`/login?redirectTo=${encodeURIComponent(
+                                            pathname + (searchParams?.toString() ? `?${searchParams}` : '')
+                                        )}`}
+                                        className="hidden md:block text-xs hover:text-blue-500"
+                                    >
+                                        LOGIN
+                                    </Link>
+
+                                    {/* ✅ 모바일: 아이콘 LOGIN */}
+                                    <Link
+                                        href={`/login?redirectTo=${encodeURIComponent(
+                                            pathname + (searchParams?.toString() ? `?${searchParams}` : '')
+                                        )}`}
+                                        title="Login"
+                                        className="block md:hidden hover:text-blue-500"
+                                    >
+                                        <LogIn size={20} />
+                                    </Link>
+                                </>
                             )}
                         </div>
                     )}
                 </div>
 
-                {/* ✅ PC 카테고리 (메인 페이지에서만) */}
+                {/* ✅ PC 카테고리 */}
                 {pathname.startsWith('/main') && (
                     <div className="hidden md:block mt-4">
                         <CategoryDropdown onCategorySelect={onCategorySelect} />
@@ -158,7 +185,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                     </Link>
 
                                     <Link href="/customer/mypage/wishlist" title="찜한 상품">
-                                        <FaRegHeart className="w-5 h-5 text-gray-500" />
+                                        <Heart size={20} className="text-gray-500" />
                                     </Link>
 
                                     <Link href="/customer/cart" className="relative" title="Cart">
@@ -170,8 +197,12 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                         )}
                                     </Link>
 
-                                    <button onClick={handleLogout} className="hover:text-red-500 text-xs">
-                                        LOGOUT
+                                    <button
+                                        onClick={handleLogout}
+                                        title="로그아웃"
+                                        className="block md:hidden hover:text-red-500 min-w-[24px]"
+                                    >
+                                        <LogOut size={20} />
                                     </button>
                                 </>
                             ) : (
@@ -179,9 +210,10 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                     href={`/login?redirectTo=${encodeURIComponent(
                                         pathname + (searchParams?.toString() ? `?${searchParams}` : '')
                                     )}`}
-                                    className="hover:text-blue-500 text-xs"
+                                    title="Login"
+                                    className="hover:text-blue-500"
                                 >
-                                    LOGIN
+                                    <LogIn size={20} />
                                 </Link>
                             )}
                         </div>
@@ -193,7 +225,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     <SearchBar onSearch={onSearch} />
                 </div>
 
-                {/* ✅ 모바일 카테고리 (메인 페이지에서만) */}
+                {/* ✅ 모바일 카테고리 */}
                 {pathname.startsWith('/main') && (
                     <div className="block md:hidden mt-4">
                         <CategoryDropdown onCategorySelect={onCategorySelect} />

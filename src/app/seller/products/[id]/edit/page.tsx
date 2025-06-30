@@ -173,7 +173,7 @@ export default function ProductEditPage() {
                 <SellerHeader />
             </div>
             <SellerLayout>
-                <div className="flex-1 w-full h-full px-4 py-8 bg-[#a89f91]">
+                <div className="flex-1 w-full h-full px-4 py-8">
                     {/* 헤더 */}
                     <div className="flex items-center gap-4 mb-6">
                         <button
@@ -188,7 +188,7 @@ export default function ProductEditPage() {
 
                     <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
                         {/* 기본 정보 섹션 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <Package className="w-5 h-5 text-[#bfa06a]" />
                                 기본 정보
@@ -264,7 +264,7 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 가격 및 재고 섹션 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <DollarSign className="w-5 h-5" />
                                 가격 및 재고
@@ -304,7 +304,7 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 상품 상태 섹션 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <Tag className="w-5 h-5" />
                                 상품 상태
@@ -351,7 +351,7 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 크기 정보 섹션 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <Ruler className="w-5 h-5" />
                                 크기 정보
@@ -406,7 +406,7 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 미디어 섹션 */}
-                        <div className="bg-[#e9dec7] rounded-xl shadow border border-[#bfa06a] p-8">
+                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
                             <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
                                 <Image className="w-5 h-5" />
                                 미디어
@@ -427,7 +427,7 @@ export default function ProductEditPage() {
                                         accept="image/*" 
                                         onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} 
                                         required={form?.imageThumbnailUrl ? false : true} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e9dec7]"
+                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
                                     />
                                 </div>
 
@@ -440,7 +440,7 @@ export default function ProductEditPage() {
                                         type="file" 
                                         accept="video/*" 
                                         onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e9dec7]"
+                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
                                     />
                                 </div>
 
@@ -453,7 +453,7 @@ export default function ProductEditPage() {
                                         accept="image/*" 
                                         multiple 
                                         onChange={(e) => setSubImages(e.target.files)} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e9dec7] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e9dec7]"
+                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
                                     />
                                 </div>
                             </div>

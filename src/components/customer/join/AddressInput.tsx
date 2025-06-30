@@ -3,38 +3,62 @@ import DaumPostcode, { Address, DaumPostcodeEmbedProps } from 'react-daum-postco
 
 interface AddressInputProps {
   onAddressChange?: (fullAddress: string) => void;
+  defaultAddress?:{
+  zonecode : string;
+  address: string;
+  detail : string;
+};
 }
 
-const AddressInput: React.FC<AddressInputProps> = ({ onAddressChange }) => {
-  const [zonecode, setZonecode] = useState('');
-  const [address, setAddress] = useState('');
-  const [detailedAddress, setDetailedAddress] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+/* ------------ 주소 문자열 <-> 객체 헬퍼 ------------- */
+const SEP = '|';                           // 구분자
+
+/**  "48060|도로명주소|상세"  →  { zonecode, address, detail }  */
+function parseAddress(str = '') {
+  const [zonecode = '', addr = '', detail = ''] = str.split(SEP);
+  return { zonecode, address: addr, detail };
+}
+
+/**  { zonecode, address, detail } → "48060|도로명주소|상세"  */
+function joinAddress(obj: { zonecode: string; address: string; detail: string }) {
+  return [obj.zonecode, obj.address, obj.detail].join(SEP);
+}
+
+
+const AddressInput: React.FC<AddressInputProps> = ({ onAddressChange, defaultAddress }) => {
+ /* ───────── state ───────── */
+  const [zonecode,         setZonecode]       = useState(defaultAddress?.zonecode ?? "");
+  const [address,          setAddress]        = useState(defaultAddress?.address  ?? "");
+  const [detailedAddress,  setDetailedAddress]= useState(defaultAddress?.detail   ?? "");
+  const [isOpen,           setIsOpen]         = useState(false);
 
   const postCodeStyle: React.CSSProperties = {
     width: '360px',
     height: '480px',
   };
 
+  /* ───────── 주소 문자열 합치기 ───────── */
   const updateFullAddress = (base: string, detail: string) => {
-    const full = `${base} ${detail}`.trim();
-    if (onAddressChange) onAddressChange(full);
+    const full = joinAddress({ zonecode, address: base, detail });
+    onAddressChange?.(full);          // 부모(form) 로 전파
   };
 
+  /* ───────── 다음주소 완료 핸들러 ───────── */
   const completeHandler = (data: Address) => {
-    const { address, zonecode } = data;
+    const { address: roadAddr, zonecode } = data;
     setZonecode(zonecode);
-    setAddress(address);
-
-    updateFullAddress(address, detailedAddress);
+    setAddress(roadAddr);
+    updateFullAddress(roadAddr, detailedAddress);
     setIsOpen(false);
   };
 
-  const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+  /* ───────── 상세주소 입력 핸들러 ───────── */
+  const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
     setDetailedAddress(value);
     updateFullAddress(address, value);
   };
+
   
 
   return (

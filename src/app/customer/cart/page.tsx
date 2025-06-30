@@ -21,7 +21,7 @@ export default function CartPage() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const router = useRouter();
-     const { open, message, setOpen, show } = useDialog();
+     const { open, message, handleClose, show } = useDialog();
      const { confirm, dialog } = useConfirm() 
 
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
@@ -147,7 +147,7 @@ export default function CartPage() {
     return (
         <>
         {dialog}
-        <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
             <Navbar />
             <main className="max-w-4xl mx-auto p-6">
                 <div className="flex justify-between items-center mb-6">

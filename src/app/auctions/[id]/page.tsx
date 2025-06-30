@@ -10,16 +10,17 @@ import type { Auction, Bid } from '@/types/customer/auctions'
 
 // 하위 컴포넌트 임포트
 import AuctionCard from '@/components/customer/auctions/AuctionCard'
-import useDialog from '@/hooks/useDialog'
+
 import useConfirm from '@/hooks/useConfirm'
 import GlobalDialog from '@/components/ui/GlobalDialog'
 import useRequireAuth from '@/hooks/useRequireAuth'
+import useDialog from '@/hooks/useDialog'
+import { useGlobalDialog } from '@/app/context/dialogContext'
 
 
 export default function AuctionDetailPage() {
 
-  useRequireAuth()
-  // 훅 및 상태 관리
+  const accessToken = useRequireAuth()
   const params = useParams()
   const [auction, setAuction] = useState<Auction | null>(null)
   const [bids, setBids] = useState<Bid[]>([])
@@ -29,7 +30,7 @@ export default function AuctionDetailPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [bidError, setBidError] = useState<string | null>(null)
-const { open, message, show, setOpen } = useDialog();
+const { open, message, show,  handleClose} = useGlobalDialog();
 const { confirm, dialog } = useConfirm();   // ✅
   // auctionId를 params로부터 안전하게 추출
   const auctionId = Number(Array.isArray(params.id) ? params.id[0] : params.id)
@@ -74,8 +75,11 @@ const { confirm, dialog } = useConfirm();   // ✅
 
   // 컴포넌트 마운트 시 데이터 페칭 함수 호출
   useEffect(() => {
+    if (!accessToken) return;
     fetchData()
-  }, [fetchData])
+  }, [accessToken,fetchData])
+
+  if (!accessToken) return null;
 
 
   // 입찰 제출 처리 함수
@@ -145,7 +149,7 @@ const { confirm, dialog } = useConfirm();   // ✅
   return (
     <>
     {dialog}
-    <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
+    <GlobalDialog open={open} message={message} onClose={handleClose} />
     <div className="container mx-auto p-4 md:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {/* 상품 이미지 섹션 */}

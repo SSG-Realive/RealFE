@@ -77,7 +77,7 @@ function EditableCard(props: {
 export default function EditProfilePage() {
   const router = useRouter();
 
-  const { open, message, setOpen, show } = useDialog();
+  const { open, message, handleClose, show } = useDialog();
 
   /* ---------------- data ---------------- */
   const [profile, setProfile] = useState<MemberReadDTO | null>(null);
@@ -136,7 +136,7 @@ export default function EditProfilePage() {
 
   return (
   <>
-    <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
+    <GlobalDialog open={open} message={message} onClose={handleClose} />
     <Navbar />
 
     <main className="mx-auto w-full max-w-xl px-4 py-10 space-y-6">

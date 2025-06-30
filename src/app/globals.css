@@ -1,17 +1,15 @@
+@import "tailwindcss/preflight";   /* 초기화 */
+@import "tailwindcss/utilities";   /* Tailwind 유틸리티 */
+@import "tw-animate-css";          /* 애니메이션 라이브러리 */
+@import "tailwindcss";
+
 @font-face {
-  font-family: 'HakgyoansimWoojuR';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimWoojuR.woff2') format('woff2');
+  font-family: 'Minhye';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Minhye.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
-/* Tailwind 초기화 및 유틸리티 */
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
-@import "tw-animate-css";
-@import "tailwindcss";
-
-/* 스크롤바 관련 */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -20,25 +18,13 @@
   scrollbar-width: none;
 }
 
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
 @custom-variant dark (&:is(.dark *));
 
-/* Theme Color 변수 정의 */
 @theme inline {
+  --font-sans: 'GmarketSansMedium', sans-serif;
+  --font-title: 'AritaBuri-SemiBold', serif;
+  --font-minhye: 'Minhye', serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -76,7 +62,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Light 모드 */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -112,7 +97,6 @@
   --sidebar-ring: oklch(0.707 0.022 261.325);
 }
 
-/* 다크 모드 */
 .dark {
   --background: oklch(0.13 0.028 261.692);
   --foreground: oklch(0.985 0.002 247.839);
@@ -147,11 +131,9 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
-/* ✅ 폰트 전역 적용 설정 */
 @layer base {
   html {
-    font-size: 18px;
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
+    font-size: 20px; /* ✅ 기본 크기 키우기 (기본은 보통 16px) */
   }
 
   * {
@@ -159,63 +141,58 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
+    background: #fff !important;
+    color: #222;
+    font-family: 'Minhye', serif;
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5 {
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
-    line-height: 1.4;
+    font-family: 'Minhye', serif;
+    line-height: 1.2;
   }
 
-  input,
-  textarea,
-  select {
-    font-family: ui-sans-serif, system-ui, sans-serif !important;
+  input, textarea, select, button {
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif !important;
   }
 }
 
 /* 로그인/회원가입 전용 스타일 */
 body.seller-login,
 body.seller-signup {
-  background: #a89f91 !important;
+  background: #f3f4f6 !important;
   min-height: 100vh;
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
-
 body.seller-login > div,
 body.seller-signup > div {
-  background: #e9dec7 !important;
+  background: #f3f4f6 !important;
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(91,70,54,0.08);
   padding: 2.5rem 2rem !important;
-  max-width: 420px;
   margin: 4rem auto !important;
 }
-
 body.seller-login h1,
 body.seller-signup h1 {
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
   text-align: center;
 }
-
 body.seller-login label,
 body.seller-signup label {
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-weight: 600;
   margin-bottom: 0.25rem;
   display: block;
 }
-
 body.seller-login input,
 body.seller-signup input {
-  background: #e9dec7 !important;
-  color: #5b4636 !important;
-  border: 1.5px solid #bfa06a !important;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1.5px solid #d1d5db !important;
   border-radius: 8px;
   padding: 0.75rem 1rem !important;
   margin-bottom: 1.25rem !important;
@@ -223,40 +200,51 @@ body.seller-signup input {
   font-size: 1rem;
   transition: border 0.2s;
 }
-
 body.seller-login input:focus,
 body.seller-signup input:focus {
   border: 1.5px solid #2563eb !important;
   outline: none;
 }
-
 body.seller-login button,
 body.seller-signup button {
-  background: #bfa06a !important;
-  color: #4b3a2f !important;
-  border: none !important;
+  background: #d1d5db !important;
+  color: #374151 !important;
+  border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.1rem;
   padding: 0.75rem 1rem !important;
-  margin-top: 1rem;
-  width: 100%;
+  margin-top: 1.5rem;
   transition: background 0.2s, color 0.2s;
 }
-
 body.seller-login button:hover,
 body.seller-signup button:hover {
-  background: #5b4636 !important;
-  color: #e9dec7 !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
 }
 
-/* 기타 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
 html, body, #__next {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  overflow-x: visible;
-  position: relative;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 img {

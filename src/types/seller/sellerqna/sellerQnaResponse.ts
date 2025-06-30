@@ -1,6 +1,7 @@
 // QnA 목록 조회 응답 DTO
 export interface SellerQnaResponse {
   id: number;
+  sellerId: number;
   title: string;
   content: string;
   answer: string | null;
@@ -9,11 +10,11 @@ export interface SellerQnaResponse {
   updatedAt: string;
   answeredAt: string | null;
   isActive: boolean;
+  deleted: boolean;
 }
 
 // QnA 상세 조회 응답 DTO
 export interface SellerQnaDetailResponse extends SellerQnaResponse {
-  sellerId: number;
   sellerName: string;
   sellerEmail: string;
 }

@@ -5,6 +5,8 @@ import Sidebar from "@/components/seller/SellerSidebar";
 import { ReviewResponseDTO } from "@/types/reviews/reviewResponseDTO";
 import { useRouter } from 'next/navigation';
 
+//
+
 // params 객체는 Next.js의 Dynamic Routes에서 경로 변수를 받습니다.
 async function ReviewIdPage({ params }: { params: { reviewId: string } }) {
     const router = useRouter(); // useRouter 훅은 클라이언트 컴포넌트에서만 사용 가능하지만,

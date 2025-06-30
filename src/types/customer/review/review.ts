@@ -10,3 +10,11 @@ export interface ReviewResponseDTO {
     createdAt: string;
     isHidden: boolean;
 }
+
+export interface ReviewCreateRequestDTO {
+  orderId: number;
+  sellerId: number;
+  rating: number;
+  content: string;
+  imageUrls: string[];
+}

@@ -10,16 +10,21 @@ import { useCartStore } from '@/store/customer/useCartStore';
 import { fetchCartList } from '@/service/customer/cartService';
 import { fetchMyProfile } from '@/service/customer/customerService';
 import { requestLogout } from '@/service/customer/logoutService';
-
 import SearchBar from './SearchBar';
 import CategoryDropdown from './CategoryDropdown';
-
 import { UserCircle, ShoppingCart, LogOut, Heart, LogIn } from 'lucide-react';
+import useDialog from '@/hooks/useDialog';
+import GlobalDialog from '@/components/ui/GlobalDialog';
+
+
+
 
 interface NavbarProps {
     onSearch?: (keyword: string) => void;
     onCategorySelect?: (id: number) => void;
 }
+
+
 
 export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const router = useRouter();
@@ -30,6 +35,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const { isAuthenticated, userName, setUserName } = useAuthStore();
     const { itemCount } = useCartStore();
     const [mounted, setMounted] = useState(false);
+    const { show, open, message, handleClose } = useDialog();
 
     useEffect(() => setMounted(true), []);
 
@@ -50,10 +56,10 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
     const handleLogout = async () => {
         try {
             await requestLogout();
-            alert('You have been safely logged out.');
+            show('로그아웃 되었습니다.');
         } catch (error) {
             console.error('Logout request failed:', error);
-            alert('Logout error occurred. Client will logout anyway.');
+            show('Logout error occurred. Client will logout anyway.');
         } finally {
             clearAuthState();
             router.push('/main');
@@ -68,6 +74,8 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
 
 
     return (
+        <>
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
         <nav className="sticky top-0 z-[9999] w-full bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm">
             <div className="w-full px-4 py-3 space-y-4">
 
@@ -232,5 +240,6 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                 )}
             </div>
         </nav>
+        </>
     );
 }

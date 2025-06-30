@@ -3,18 +3,13 @@
 import { User, Store } from 'lucide-react';
 import Link  from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation'
 
-/* ✅ Promise 제거 ― 그냥 객체 */
-interface LoginPageProps {
-  searchParams: {
-    redirectTo?: string;
-  };
-}
 
-export default function IntegratedLoginPage({ searchParams }: LoginPageProps) {
+export default function IntegratedLoginPage() {
   /* ✅ 바로 사용 */
-  const redirectTo = searchParams.redirectTo ?? '';
-
+  const params = useSearchParams();
+  const redirectTo = params.get('redirectTo') ?? '';
   const customerLoginUrl =
     `/customer/member/login${redirectTo ? `?redirectTo=${redirectTo}` : ''}`;
   const sellerLoginUrl =

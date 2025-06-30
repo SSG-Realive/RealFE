@@ -9,6 +9,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
        <DialogProvider>
+        
       {children}
       </DialogProvider>
       <ReactQueryDevtools initialIsOpen={false} />

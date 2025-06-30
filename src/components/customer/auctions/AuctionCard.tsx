@@ -19,34 +19,45 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
   } = auction
 
   return (
-    <li className="shrink-0 w-52 sm:w-60 px-2">
-      <Link
-        href={`/auctions/${id}`}
-        className="block rounded-md bg-white shadow hover:shadow-lg transition"
-      >
-        <div className="h-32 sm:h-40 bg-gray-100 rounded-t-md overflow-hidden">
-          <img
-            src={adminProduct?.imageUrl || '/images/placeholder.png'}
-            alt={adminProduct?.productName || '상품'}
-            className="w-full h-full object-contain"
-          />
-          
-        </div>
-        <div className="p-2 text-xs sm:text-sm space-y-0.5">
-          <h3 className="font-semibold truncate">
-            {adminProduct?.productName ?? '상품 없음'}
-          </h3>
-          <p>시작가 {startPrice?.toLocaleString() ?? '-'}</p>
-          <p className="font-bold text-amber-600">
-            현재가 {currentPrice?.toLocaleString() ?? '-'}
-          </p>
-          <p className="text-[11px] text-gray-500">
-            종료 {endTime ? new Date(endTime).toLocaleString() : '-'}
-          </p>
-        </div>
-      </Link>
-    </li>
-  )
+      <li className="shrink-0 w-52 sm:w-60 px-2">
+        <Link
+            href={`/auctions/${id}`}
+            className="block rounded-2xl bg-white shadow hover:shadow-md transition"
+        >
+          {/* 이미지 영역 */}
+          <div className="h-32 sm:h-40 bg-gray-100 rounded-t-2xl overflow-hidden">
+            <img
+                src={adminProduct?.imageUrl || '/images/placeholder.png'}
+                alt={adminProduct?.productName || '상품'}
+                className="w-full h-full object-contain"
+            />
+          </div>
+          {/* 텍스트 영역 */}
+            <div className="p-3 text-left">
+                {/* 상품명 */}
+                <p className="text-base font-medium truncate">
+                    {adminProduct?.productName ?? '상품 없음'}
+                </p>
+                {/* 시작가 */}
+                <p className="text-sm font-semibold text-gray-900 mt-1">
+                    시작가 {startPrice?.toLocaleString()}
+                    <span className="ml-1 text-xs">원</span>
+                </p>
+
+                {/* 현재가 */}
+                <p className="text-sm font-semibold text-red-500 mt-0.5">
+                    현재가 {currentPrice?.toLocaleString()}
+                    <span className="ml-1 text-xs">원</span>
+                </p>
+
+                {/* 종료 시간 */}
+                <p className="text-sm font-semibold text-gray-500 mt-0.5">
+                    종료 {endTime ? new Date(endTime).toLocaleString() : '-'}
+                </p>
+            </div>
+        </Link>
+      </li>
+  );
 }
 
 /* ────────────────────────────────────────── */

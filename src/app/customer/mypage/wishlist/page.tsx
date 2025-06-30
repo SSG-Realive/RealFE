@@ -17,7 +17,7 @@ export default function WishlistPage() {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [selectedParentCategory, setSelectedParentCategory] = useState<string | null>(null);
     const router = useRouter();
-    const { open, message, setOpen, show } = useDialog()
+    const { open, message, handleClose, show } = useDialog()
     const { confirm, dialog } = useConfirm()
 
     useEffect(() => {
@@ -84,8 +84,7 @@ export default function WishlistPage() {
     return (
         <>
         {dialog}
-        <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
-            <Navbar />
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
             <div className="bg-gray-100 min-h-screen py-8">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">
 

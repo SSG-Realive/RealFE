@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { fetchMyReviews } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-import Navbar from '@/components/customer/common/Navbar';
 import Link from 'next/link';
 
 export default function MyReviewPage() {
@@ -23,7 +22,6 @@ export default function MyReviewPage() {
 
     return (
         <div>
-            <Navbar />
             <div className="max-w-3xl mx-auto px-4 py-10">
                 <h1 className="text-2xl font-bold mb-6">내가 작성한 리뷰</h1>
 

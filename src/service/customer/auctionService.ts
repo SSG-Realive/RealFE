@@ -6,6 +6,11 @@ import { Auction, Bid, PaginatedAuctionResponse, PaginatedBidResponse, PlaceBidR
 
 const BASE_URL = '/customer';
 
+export async function getCurrentPrice(auctionId: number): Promise<number> {
+  const res = await apiClient.get(`/public/auctions/${auctionId}`);
+  return res.data.data.currentPrice as number;   
+}
+
 // 경매 정보 관련 서비스
 export const customerAuctionService = {
   /**
@@ -78,23 +83,48 @@ export const customerBidService = {
     const response = await apiClient.get(`${BASE_URL}/bids/auction/${auctionId}/tick-size`);
     return response.data.data;
   },
+  
 
   /**
    * 나의 입찰 내역을 조회 (로그인 필요)
    * GET /api/customer/bids/my-bids
    */
-  async getMyBids(params?: { page?: number; size?: number }): Promise<PaginatedBidResponse> {
-    const searchParams = new URLSearchParams();
-    if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.size) searchParams.append('size', params.size.toString());
+  async getMyBids(
+  params?: { page?: number; size?: number },
+): Promise<PaginatedBidResponse> {
+  const searchParams = new URLSearchParams();
+  if (params?.page) searchParams.append('page', params.page.toString());
+  if (params?.size) searchParams.append('size', params.size.toString());
 
-    const response = await apiClient.get(`${BASE_URL}/bids/my-bids?${searchParams.toString()}`);
-    const pageData = response.data.data;
-    return {
-        content: pageData.content,
-        totalPages: pageData.totalPages,
-        number: pageData.number,
-        last: pageData.last,
-      };
-  },
-};
+  const response = await apiClient.get(
+    `${BASE_URL}/bids/my-bids?${searchParams.toString()}`,
+  );
+  const pageData = response.data.data;
+
+  /* ───────── leading 계산 추가 ───────── */
+  const bids: Bid[] = pageData.content;
+  const uniqueIds = [...new Set(bids.map((b) => b.auctionId))];
+
+  // 경매별 현재가 동시 조회
+  const priceMap: Record<number, number> = {};
+  await Promise.all(
+    uniqueIds.map(async (id) => {
+      priceMap[id] = await getCurrentPrice(id);
+    }),
+  );
+
+  // 각 Bid 에 leading 속성 주입
+  const enriched = bids.map((b) => ({
+    ...b,
+    leading: b.bidPrice >= priceMap[b.auctionId],
+  }));
+
+  /* ──────── 기존 반환 형태 유지 ──────── */
+  return {
+    content: enriched,
+    totalPages: pageData.totalPages,
+    number: pageData.number,
+    last: pageData.last,
+  };
+},
+}

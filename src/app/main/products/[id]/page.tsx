@@ -22,8 +22,10 @@ import Footer from '@/components/customer/common/Footer';
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useAuthStore } from '@/store/customer/authStore';
 import { useGlobalDialog } from '@/app/context/dialogContext';
+
 
 /* ------------------------------------------------------------------ */
 

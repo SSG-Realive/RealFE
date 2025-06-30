@@ -10,7 +10,7 @@ import type { PayRequestDTO } from '@/types/customer/order/order';
 export default function PaymentSuccessPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { id: customerId } = useAuthStore();
+    const { id: customerId, accessToken, hydrated } = useAuthStore();
     
     const [orderId, setOrderId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -20,6 +20,16 @@ export default function PaymentSuccessPage() {
         const processPayment = async () => {
             try {
                 setLoading(true);
+                
+                // hydrated 상태 확인 - 데이터 로딩이 완료되지 않았으면 대기
+                if (!hydrated) {
+                    return;
+                }
+                
+                // 인증 확인
+                if (!customerId || !accessToken) {
+                    throw new Error('로그인이 필요합니다.');
+                }
                 
                 // URL 파라미터에서 결제 정보 가져오기
                 const paymentKey = searchParams.get('paymentKey');
@@ -38,16 +48,14 @@ export default function PaymentSuccessPage() {
 
                 const checkoutInfo = JSON.parse(checkoutInfoStr);
                 
-                // 결제 승인 요청
+                // 결제 승인 요청 (amount 제거 - 서버에서 계산)
                 const payRequest: PayRequestDTO = {
                     paymentKey,
                     tossOrderId: orderId,
-                    amount: parseInt(amount),
                     receiverName: checkoutInfo.shippingInfo.receiverName,
                     phone: checkoutInfo.shippingInfo.phone,
                     deliveryAddress: checkoutInfo.shippingInfo.address,
                     paymentMethod: 'CARD', // 기본값
-                    customerId: customerId,
                     ...(checkoutInfo.orderItems ? { orderItems: checkoutInfo.orderItems } : {}),
                     ...(checkoutInfo.productId ? { productId: checkoutInfo.productId, quantity: checkoutInfo.quantity } : {})
                 };
@@ -67,7 +75,7 @@ export default function PaymentSuccessPage() {
         };
 
         processPayment();
-    }, [searchParams, customerId]);
+    }, [searchParams, customerId, accessToken, hydrated]);
 
     if (loading) {
         return (

@@ -1,12 +1,20 @@
 // src/app/customer/orders/direct/page.tsx (DirectOrderPage)
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { fetchMyProfile } from '@/service/customer/customerService';
 import { getDirectPaymentInfo, processDirectPaymentApi } from '@/service/order/orderService';
-import { DirectPaymentInfoDTO, PayRequestDTO } from '@/types/customer/order/order'; // DTOs 임포트
-import './DirectOrderPage.css'; // 이 페이지를 위한 CSS 파일
+import { DirectPaymentInfoDTO, PayRequestDTO } from '@/types/customer/order/order';
+import { useAuthStore } from '@/store/customer/authStore';
+import { 
+  loadTossPayments, 
+  requestPayment,
+  DEFAULT_CONFIG,
+  PaymentRequestOptions
+} from '@/service/order/tossPaymentService';
+import './DirectOrderPage.css';
 
 // UserProfile 타입은 그대로 유지
 interface UserProfile {
@@ -18,23 +26,31 @@ interface UserProfile {
 
 export default function DirectOrderPage() {
     const router = useRouter();
+    const { id: customerId } = useAuthStore();
+    const tossPaymentsRef = useRef<any>(null);
+    const [scriptLoaded, setScriptLoaded] = useState(false);
 
     // --- 상태 관리 ---
     const [productInfo, setProductInfo] = useState<DirectPaymentInfoDTO | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageError, setPageError] = useState<string | null>(null);
-
+    const [error, setError] = useState<string | null>(null);
 
     // 배송지 폼 상태
     const [shippingInfo, setShippingInfo] = useState({
         receiverName: '',
         phone: '',
-        address: '', // PayRequestDTO의 deliveryAddress에 매핑될 값
+        address: '',
     });
 
-    // 결제 수단 상태 (PayRequestDTO의 유니온 타입에 맞춰 초기값 설정)
+    // 결제 수단 상태
     const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CELL_PHONE' | 'ACCOUNT'>('CARD');
+
+    // 계산된 금액들
+    const totalProductPrice = productInfo ? productInfo.price * productInfo.quantity : 0;
+    const deliveryFee = 3000; // 고정 배송비
+    const finalAmount = totalProductPrice + deliveryFee;
 
     // --- 데이터 로딩 ---
     useEffect(() => {
@@ -85,7 +101,6 @@ export default function DirectOrderPage() {
                 } else {
                     setPageError('주문 정보를 불러오는 데 실패했습니다.');
                 }
-
             } finally {
                 setLoading(false);
             }
@@ -94,27 +109,35 @@ export default function DirectOrderPage() {
         loadOrderData();
     }, []);
 
-
-    // --- 토스페이먼츠 위젯 렌더링 ---
+    // --- 토스페이먼츠 SDK 초기화 ---
     useEffect(() => {
-        if (!userProfile || !customerId || finalAmount === 0) return;
+        if (!userProfile || !customerId || finalAmount === 0 || !scriptLoaded) return;
 
-        const initializeWidget = async () => {
+        const initializeTossPayments = async () => {
             try {
-                const tossPayments = await loadPaymentWidget(TOSS_CLIENT_KEY, customerId.toString());
+                console.log('토스페이먼츠 SDK 초기화 시작...', { customerId, finalAmount });
+                setError(null);
                 
-                tossPayments.renderPaymentMethods('#payment-widget', { value: finalAmount }, { variantKey: 'DEFAULT' });
-                tossPayments.renderAgreement('#agreement', { variantKey: 'DEFAULT' });
-
-                paymentWidgetRef.current = tossPayments;
-            } catch (error) {
-                console.error("토스페이먼츠 위젯 렌더링 실패:", error);
-                setError('결제 위젯을 불러오는데 실패했습니다.');
+                // DOM 엘리먼트가 준비될 때까지 대기
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // 토스페이먼츠 객체 생성
+                if (!(window as any).TossPayments) {
+                    throw new Error('토스페이먼츠 SDK가 로드되지 않았습니다');
+                }
+                
+                const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+                tossPaymentsRef.current = tossPayments;
+                console.log('토스페이먼츠 SDK 초기화 완료');
+                
+            } catch (error: any) {
+                console.error("토스페이먼츠 SDK 초기화 실패:", error);
+                setError(`토스페이먼츠 SDK 초기화에 실패했습니다: ${error.message}`);
             }
         };
 
-        initializeWidget();
-    }, [userProfile, customerId, finalAmount]);
+        initializeTossPayments();
+    }, [userProfile, customerId, finalAmount, scriptLoaded]);
 
     // --- 이벤트 핸들러 ---
     const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,14 +145,15 @@ export default function DirectOrderPage() {
         setShippingInfo(prev => ({ ...prev, [name]: value }));
     };
 
-    // ✨ 결제 수단 변경 핸들러
     const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // `as 'CARD' | 'CELL_PHONE' | 'ACCOUNT'`를 사용하여 타입을 강제 변환
         setPaymentMethod(e.target.value as 'CARD' | 'CELL_PHONE' | 'ACCOUNT');
     };
 
-
     const handlePayment = async () => {
+        console.log('결제하기 버튼 클릭됨');
+        console.log('tossPaymentsRef.current:', tossPaymentsRef.current);
+        console.log('scriptLoaded:', scriptLoaded);
+        console.log('window.TossPayments:', (window as any).TossPayments);
 
         if (!productInfo || !userProfile) {
             alert("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
@@ -141,7 +165,7 @@ export default function DirectOrderPage() {
             return;
         }
 
-        const totalPaymentAmount = productInfo.price * productInfo.quantity + 3000; // 배송비 3000원 고정 예시
+        const totalPaymentAmount = productInfo.price * productInfo.quantity + 3000;
         const confirmPayment = window.confirm(
             `총 ${totalPaymentAmount.toLocaleString()}원에 대해 결제를 진행하시겠습니까?`
         );
@@ -150,35 +174,74 @@ export default function DirectOrderPage() {
             return;
         }
 
-        // 토스페이먼츠 결제 위젯에서 결제 요청
-        if (paymentWidgetRef.current) {
+        // 토스페이먼츠 객체가 없으면 다시 초기화 시도
+        if (!tossPaymentsRef.current) {
+            console.log('토스페이먼츠 객체가 없음, 재초기화 시도...');
             try {
-                const orderId = `direct_${productInfo.productId}_${Date.now()}`;
-                
-                await paymentWidgetRef.current.requestPayment({
-                    orderId: orderId,
-                    orderName: `${productInfo.name} ${productInfo.quantity}개`,
-                    customerName: shippingInfo.receiverName,
-                    customerEmail: userProfile.email || 'customer@example.com',
-                    successUrl: process.env.NEXT_PUBLIC_TOSS_SUCCESS_URL || `${window.location.origin}/customer/orders/success`,
-                    failUrl: process.env.NEXT_PUBLIC_TOSS_FAIL_URL || `${window.location.origin}/customer/orders/fail`,
-                });
-            } catch (error: any) {
-                console.error('결제 요청 오류:', error);
-                
-                // 결제 승인 처리
-                if (error.paymentKey && error.orderId && error.amount) {
-                    await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
+                if ((window as any).TossPayments) {
+                    const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+                    tossPaymentsRef.current = tossPayments;
+                    console.log('토스페이먼츠 객체 재초기화 완료');
                 } else {
-                    alert('결제 처리 중 오류가 발생했습니다.');
+                    alert('토스페이먼츠 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+                    return;
                 }
+            } catch (error) {
+                console.error('토스페이먼츠 객체 재초기화 실패:', error);
+                alert('결제 시스템 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+                return;
+            }
+        }
+
+        try {
+            const orderId = `direct_${productInfo.productId}_${Date.now()}`;
+            
+            console.log('결제 요청 준비 중...');
+            
+            // 결제 성공 페이지에서 사용할 주문 정보를 sessionStorage에 저장
+            const checkoutInfo = {
+                productId: productInfo.productId,
+                quantity: productInfo.quantity,
+                shippingInfo: {
+                    receiverName: shippingInfo.receiverName,
+                    phone: shippingInfo.phone,
+                    address: shippingInfo.address,
+                },
+                paymentMethod: paymentMethod,
+                customerId: customerId,
+            };
+            sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
+            
+            // 블로그 방식에 맞는 결제 요청 옵션
+            const paymentOptions: PaymentRequestOptions = {
+                orderId: orderId,
+                orderName: `${productInfo.productName} ${productInfo.quantity}개`,
+                amount: finalAmount,
+                successUrl: `${window.location.origin}/customer/orders/success`,
+                failUrl: `${window.location.origin}/customer/orders/fail`,
+                customerEmail: userProfile.email || 'customer@example.com',
+                customerName: shippingInfo.receiverName,
+                customerMobilePhone: shippingInfo.phone,
+            };
+
+            console.log('결제 옵션:', paymentOptions);
+
+            // 블로그 방식으로 결제 요청
+            console.log('토스페이먼츠 결제창 호출 중...');
+            await requestPayment(tossPaymentsRef.current, paymentOptions);
+        } catch (error: any) {
+            console.error('결제 요청 오류:', error);
+            
+            if (error.paymentKey && error.orderId && error.amount) {
+                await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
+            } else {
+                alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
             }
         }
     };
 
     const processPaymentApproval = async (paymentKey: string, orderId: string, amount: number) => {
         try {
-            // PayRequestDTO의 새로운 구조에 맞춰 데이터 구성
             const payRequestDTO: PayRequestDTO = {
                 receiverName: shippingInfo.receiverName,
                 phone: shippingInfo.phone,
@@ -187,8 +250,8 @@ export default function DirectOrderPage() {
                 paymentKey: paymentKey,
                 tossOrderId: orderId,
                 amount: amount,
-                productId: productInfo.productId,
-                quantity: productInfo.quantity,
+                productId: productInfo!.productId,
+                quantity: productInfo!.quantity,
             };
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/orders/direct-payment`, {
@@ -226,9 +289,22 @@ export default function DirectOrderPage() {
         return <div className="error-container text-red-500">알 수 없는 오류가 발생했습니다.</div>;
     }
 
-    // --- UI 렌더링 ---
     return (
         <div className="order-page-container">
+            {/* 토스페이먼츠 기본 SDK 로드 */}
+            <Script
+                src="https://js.tosspayments.com/v1/payment"
+                strategy="afterInteractive"
+                onLoad={() => {
+                    console.log('토스페이먼츠 SDK 로드 완료');
+                    setScriptLoaded(true);
+                }}
+                onError={() => {
+                    console.error('토스페이먼츠 SDK 로드 실패');
+                    setError('토스페이먼츠 SDK를 불러올 수 없습니다.');
+                }}
+            />
+
             <h1 className="page-title">주문/결제</h1>
 
             {/* 1. 주문 상품 정보 */}
@@ -265,52 +341,19 @@ export default function DirectOrderPage() {
 
                     <label htmlFor="address">주소</label>
                     <input id="address" name="address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
-                    {/* TODO: 주소 검색 버튼 및 기능 추가 */}
-
                 </div>
             </section>
 
-            {/* 4. 결제 수단 */}
+            {/* 4. 토스페이먼츠 결제 */}
             <section className="order-section">
                 <h2>결제 수단</h2>
-                <div className="payment-selector">
-                    <label className={paymentMethod === 'CARD' ? 'active' : ''}>
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="CARD"
-                            checked={paymentMethod === 'CARD'}
-                            onChange={handlePaymentMethodChange} // ✨ 변경된 핸들러 사용
-                        />
-                        신용/체크카드
-                    </label>
-                    <label className={paymentMethod === 'CELL_PHONE' ? 'active' : ''}>
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="CELL_PHONE"
-                            checked={paymentMethod === 'CELL_PHONE'}
-                            onChange={handlePaymentMethodChange}
-                        />
-                        휴대폰
-                    </label>
-                    <label className={paymentMethod === 'ACCOUNT' ? 'active' : ''}>
-                        <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="ACCOUNT"
-                            checked={paymentMethod === 'ACCOUNT'}
-                            onChange={handlePaymentMethodChange}
-                        />
-                        계좌이체
-                    </label>
-                </div>
-
+                <p>결제하기 버튼을 클릭하면 토스페이먼츠 결제창이 열립니다.</p>
+                {error && <div className="error-message">{error}</div>}
             </section>
 
             {/* 5. 결제 동의 및 금액 요약 */}
             <aside className="order-summary">
-                <div id="agreement" />
+                <div id="agreement"></div>
                 <h3>결제 금액</h3>
                 <div className="summary-row">
                     <span>총 상품금액</span>
@@ -324,12 +367,11 @@ export default function DirectOrderPage() {
                     <span>최종 결제 금액</span>
                     <span>{finalAmount.toLocaleString()}원</span>
                 </div>
-            </section>
+            </aside>
 
             <button className="payment-button" onClick={handlePayment}>
                 결제하기
             </button>
-
         </div>
     );
 }

@@ -106,11 +106,33 @@ export default function SellerSettlementPage() {
     // 정산 상세 정보 조회
     const fetchPayoutDetail = async (payoutLogId: number) => {
         try {
+            console.log('정산 상세 조회 시도:', payoutLogId);
             const res = await getSellerSettlementDetail(payoutLogId);
+            console.log('정산 상세 조회 성공:', res);
             setSelectedPayout(res);
-        } catch (err) {
+        } catch (err: any) {
             console.error('정산 상세 조회 실패:', err);
-            setError('정산 상세 정보를 불러오지 못했습니다.');
+            console.error('에러 상세:', {
+                message: err.message,
+                status: err.response?.status,
+                statusText: err.response?.statusText,
+                data: err.response?.data
+            });
+            
+            let errorMessage = '정산 상세 정보를 불러오지 못했습니다.';
+            
+            if (err.response?.status === 500) {
+                errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            } else if (err.response?.status === 404) {
+                errorMessage = '해당 정산 정보를 찾을 수 없습니다.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            setError(errorMessage);
+            
+            // 에러 발생 시 알림 표시
+            alert(errorMessage);
         }
     };
 
@@ -211,7 +233,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('all')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'all'
+                                        filterType === 'all' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -221,7 +243,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('date')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'date'
+                                        filterType === 'date' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -231,7 +253,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('period')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'period'
+                                        filterType === 'period' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -244,10 +266,10 @@ export default function SellerSettlementPage() {
                             {filterType === 'date' && (
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-5 h-5 text-[#6b7280]" />
-                                    <input
-                                        type="date"
-                                        value={filterDate}
-                                        onChange={(e) => setFilterDate(e.target.value)}
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
                                     />
                                 </div>
@@ -271,27 +293,27 @@ export default function SellerSettlementPage() {
                                         onChange={(e) => setFilterTo(e.target.value)}
                                         placeholder="종료일"
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
-                                    />
-                                </div>
+                            />
+                        </div>
                             )}
 
                             {/* 필터 버튼들 */}
                             <div className="flex gap-2">
-                                <button
+                        <button
                                     onClick={applyFilter}
                                     disabled={filterType === 'date' && !filterDate || filterType === 'period' && (!filterFrom || !filterTo)}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Search className="w-4 h-4" />
+                        >
+                            <Search className="w-4 h-4" />
                                     조회
-                                </button>
-                                <button
+                        </button>
+                        <button
                                     onClick={resetFilter}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151]"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
+                        >
+                            <RefreshCw className="w-4 h-4" />
                                     초기화
-                                </button>
+                        </button>
                             </div>
                         </div>
                     </div>

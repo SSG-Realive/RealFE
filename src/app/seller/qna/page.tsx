@@ -191,15 +191,15 @@ export default function SellerQnaPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.title}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.isAnswered ? "답변 완료" : "미답변"}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{qna.createdAt}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <button
-                                                        onClick={() => router.push(`/seller/qna/${qna.id}`)}
+                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                <button
+                                                    onClick={() => router.push(`/seller/qna/${qna.id}`)}
                                                         className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
-                                                    >
-                                                        <Eye className="w-4 h-4" /> 상세 보기
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                                >
+                                                    <Eye className="w-4 h-4" /> 상세 보기
+                                                </button>
+                                            </td>
+                                        </tr>
                                         );
                                     })}
                                 </tbody>

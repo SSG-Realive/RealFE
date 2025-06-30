@@ -60,7 +60,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         }
     };
 
-    const hideNavbarPaths = ['/autions', '/login', '/seller', '/admin'];
+    const hideNavbarPaths = ['/autions', '/login', '/seller', '/admin', '/customer/signup', '/customer/member/login'];
 
     if (hideNavbarPaths.some((path) => pathname.startsWith(path))) {
         return null;

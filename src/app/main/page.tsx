@@ -113,7 +113,7 @@ export default function CustomerHomePage() {
             {/* ✅ 주간 경매 */}
             {!categoryId && (
                 <section className="max-w-screen-xl mx-auto px-4 mt-1 mb-4 sm:mt-6 sm:mb-8">
-                    <h2 className="text-2xl font-bold mb-4">주간 경매</h2>
+                    <h2 className="text-xl font-bold mb-4">주간 경매</h2>
                     {auctionLoading ? (
                         <p>로딩 중...</p>
                     ) : auctionError ? (

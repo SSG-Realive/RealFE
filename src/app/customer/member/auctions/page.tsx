@@ -10,7 +10,6 @@ import useRequireAuth from '@/hooks/useRequireAuth';
 import { useAuctionStore } from '@/store/customer/auctionStore';
 
 import { useCallback, useEffect, useRef } from 'react';
-import Footer from "@/components/customer/common/Footer";
 
 export default function AuctionsPage() {
   const token = useRequireAuth();

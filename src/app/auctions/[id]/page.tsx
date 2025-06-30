@@ -16,6 +16,7 @@ import useConfirm       from '@/hooks/useConfirm';
 import useRequireAuth   from '@/hooks/useRequireAuth';
 import { useGlobalDialog } from '@/app/context/dialogContext';
 import { useAuthStore } from '@/store/customer/authStore';
+import Footer from "@/components/customer/common/Footer";
 
 /* ───────────────────────────────── */
 
@@ -253,6 +254,7 @@ export default function AuctionDetailPage() {
           </section>
         )}
       </div>
+      <Footer />
     </>
   );
 }

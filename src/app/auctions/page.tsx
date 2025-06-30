@@ -13,6 +13,7 @@ import ProductImage from '@/components/ProductImage';
    // ⬅️ 전역 다이얼로그
 import { publicAuctionService } from '@/service/customer/publicAcutionService';
 import { useGlobalDialog } from '../context/dialogContext';
+import Footer from "@/components/customer/common/Footer";
 
 const PAGE_SIZE = 10; // 백엔드 size 고정
 
@@ -62,7 +63,7 @@ export default function AuctionListPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-extrabold mb-8">🔨 실시간 경매</h1>
+        <h1 className="text-3xl font-extrabold mb-8">실시간 경매</h1>
 
         {/* 경매 카드 그리드 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
@@ -116,6 +117,7 @@ export default function AuctionListPage() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

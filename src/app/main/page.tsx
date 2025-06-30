@@ -21,6 +21,9 @@ import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
 import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 import ScrollToTopButton from '@/components/customer/common/ScrollToTopButton';
 import Footer from '@/components/customer/common/Footer';
+import AuctionCard from '@/components/customer/auctions/AuctionCard';
+import { Auction } from '@/types/customer/auctions';
+import { publicAuctionService } from '@/service/customer/publicAcutionService';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -37,7 +40,9 @@ export default function CustomerHomePage() {
     const [showLoadMore, setShowLoadMore] = useState(true);
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoryMap, setCategoryMap] = useState<Record<number, Category>>({});
-
+    const [auctions, setAuctions] = useState<Auction[]>([]);
+    const [auctionLoading, setAuctionLoading] = useState(true);
+    const [auctionError, setAuctionError] = useState<string | null>(null);
     const isMainDefaultView = pathname === '/main' && !categoryFromUrl && !keywordFromUrl;
 
     useEffect(() => {
@@ -59,6 +64,27 @@ export default function CustomerHomePage() {
             setShowLoadMore(initial.length === ITEMS_PER_PAGE);
         });
     }, [categoryId, keyword]);
+
+    useEffect(() => {
+        // 이 로직은 오직 메인 페이지의 기본 뷰에서만 실행되도록 조건 추가
+        if (isMainDefaultView) {
+            const loadAuctions = async () => {
+                setAuctionLoading(true);
+                try {
+                    // 실제 API 서비스 함수를 호출합니다.
+                    const paginatedData = await publicAuctionService.fetchPublicActiveAuctions();
+                    setAuctions(paginatedData.content);
+                } catch (error: any) {
+                    console.error("경매 데이터 로딩 실패:", error);
+                    setAuctionError("경매 상품을 불러올 수 없습니다.");
+                } finally {
+                    setAuctionLoading(false);
+                }
+            };
+
+            loadAuctions();
+        }
+    }, [isMainDefaultView]); // isMainDefaultView가 바뀔 때마다 재실행
 
     const loadMore = async () => {
         const nextPage = page + 1;
@@ -84,10 +110,26 @@ export default function CustomerHomePage() {
         return categories.filter((c) => c.parentId === parentId);
     };
 
+    
+
     return (
         <div className="min-h-screen overflow-x-auto">
             {isMainDefaultView && <div className="mb-6 sm:mb-8"><BannerCarousel /></div>}
-            {!categoryId && <div className="mt-2 mb-4 sm:mt-10 sm:mb-8"><WeeklyAuctionSlider /></div>}
+            {!categoryId && (
+    <div className="mt-2 mb-4 sm:mt-10 sm:mb-8">
+        <h2 className="text-2xl font-bold mb-4 px-4 sm:px-0">주간 경매</h2>
+        {auctionLoading ? (
+            <p>로딩 중...</p>
+        ) : auctionError ? (
+            <p>{auctionError}</p>
+        ) : auctions.length > 0 ? (
+            <AuctionCard auctions={auctions} />
+        ) : (
+            <p>진행중인 경매 없음</p>
+        )}
+    </div>
+)}
+
             <PopularProductsGrid />
             {isMainDefaultView && <ExtraBanner />}
             {isMainDefaultView && <div className="my-4 sm:my-8 md:my-12"><FeaturedSellersSection /></div>}

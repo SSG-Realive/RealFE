@@ -120,24 +120,24 @@ export default function SellerOrderListPage() {
         </div>
         <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
+          <input
+            type="text"
               placeholder="주문번호 또는 상품명으로 검색..."
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
               className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
               className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            >
-              <option value="">전체 상태</option>
-              <option value="INIT">주문 접수</option>
-              <option value="DELIVERY_PREPARING">배송 준비</option>
-              <option value="DELIVERY_IN_PROGRESS">배송 중</option>
-              <option value="DELIVERY_COMPLETED">배송 완료</option>
-            </select>
+          >
+            <option value="">전체 상태</option>
+            <option value="INIT">주문 접수</option>
+            <option value="DELIVERY_PREPARING">배송 준비</option>
+            <option value="DELIVERY_IN_PROGRESS">배송 중</option>
+            <option value="DELIVERY_COMPLETED">배송 완료</option>
+          </select>
           </div>
         </div>
         {error ? (
@@ -165,7 +165,7 @@ export default function SellerOrderListPage() {
               </thead>
                   <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                 {filteredOrders.map((order) => (
-                  <tr key={order.orderId} className="hover:bg-[#b9f6ec] transition-colors">
+                  <tr key={order.orderId} className="hover:bg-[#e5e7eb] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">#{order.orderId}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                       {new Date(order.orderedAt).toLocaleDateString()}
@@ -179,7 +179,7 @@ export default function SellerOrderListPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => router.push(`/seller/orders/${order.orderId}`)}
-                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#b9f6ec] hover:text-[#374151] text-sm"
+                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm"
                       >
                         <Eye className="w-4 h-4" /> 상세 보기
                       </button>

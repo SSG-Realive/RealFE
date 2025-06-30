@@ -128,23 +128,23 @@ export default function ProductListPage() {
           {/* 검색/필터 영역 */}
           <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
             <div className="flex flex-col md:flex-row gap-4">
-              <input
-                type="text"
+            <input
+              type="text"
                 placeholder="상품명으로 검색..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
                 className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-              />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
                 className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-              >
-                <option value="">전체 상태</option>
-                <option value="상">상</option>
-                <option value="중">중</option>
-                <option value="하">하</option>
-              </select>
+            >
+              <option value="">전체 상태</option>
+              <option value="상">상</option>
+              <option value="중">중</option>
+              <option value="하">하</option>
+            </select>
             </div>
           </div>
 
@@ -167,17 +167,17 @@ export default function ProductListPage() {
                   </tr>
                 ) : (
                   products.map((product) => (
-                    <tr key={product.id} className="hover:bg-[#b9f6ec] transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#0f766e]">{product.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#0f766e]">{product.price.toLocaleString()}원</td>
+                    <tr key={product.id} className="hover:bg-[#e5e7eb] transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">{product.name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.price.toLocaleString()}원</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 rounded text-xs font-bold ${product.status === '상' ? 'bg-[#b9f6ec] text-[#0f766e]' : product.status === '중' ? 'bg-[#b9f6ec] text-[#0f766e]' : 'bg-[#b9f6ec] text-[#0f766e]'}`}>{product.status}</span>
+                        <span className={`px-2 py-1 rounded text-xs font-bold bg-[#e5e7eb] text-[#374151]`}>{product.status}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#0f766e]">{product.stock ?? 0}개</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.stock ?? 0}개</td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
                           onClick={() => router.push(`/seller/products/${product.id}`)}
-                          className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#b9f6ec] hover:text-[#0f766e] text-sm transition-colors"
+                          className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
                         >
                           <Eye className="w-4 h-4" /> 상세 보기
                         </button>

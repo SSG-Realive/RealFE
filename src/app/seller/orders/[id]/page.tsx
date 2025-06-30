@@ -301,14 +301,14 @@ export default function OrderDetailPage() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={handleStatusChange}
-                                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            className="w-full py-3 rounded-lg font-bold bg-[#d1d5db] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151] transition-colors"
                                         >
                                             상태 변경
                                         </button>
                                         {!isFinalState && (
                                             <button
                                                 onClick={handleCancel}
-                                                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                className="w-full py-3 rounded-lg font-bold bg-[#d1d5db] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151] transition-colors"
                                             >
                                                 배송 취소
                                             </button>

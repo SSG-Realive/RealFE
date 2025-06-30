@@ -198,7 +198,7 @@ export default function SellerDashboardPage() {
   if (checking || loading) {
     return (
       <SellerLayout>
-        <main className="bg-[#a89f91] min-h-screen w-full">
+        <main className="bg-white min-h-screen w-full">
           <h1 className="text-2xl font-extrabold mb-6 text-[#5b4636] tracking-wide">판매자 대시보드</h1>
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#bfa06a]"></div>

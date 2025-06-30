@@ -141,9 +141,10 @@
   }
 
   body {
-    @apply bg-background text-foreground font-minhye;
+    background: #fff !important;
+    color: #222;
     font-family: 'Minhye', serif;
-    line-height: 1.6; /* ✅ 글자 커지면 줄간격도 넉넉하게 */
+    line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5 {
@@ -159,14 +160,14 @@
 /* 로그인/회원가입 전용 스타일 */
 body.seller-login,
 body.seller-signup {
-  background: #ffffff !important;
+  background: #f3f4f6 !important;
   min-height: 100vh;
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 body.seller-login > div,
 body.seller-signup > div {
-  background: #e9dec7 !important;
+  background: #f3f4f6 !important;
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(91,70,54,0.08);
   padding: 2.5rem 2rem !important;
@@ -175,7 +176,7 @@ body.seller-signup > div {
 }
 body.seller-login h1,
 body.seller-signup h1 {
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -183,16 +184,16 @@ body.seller-signup h1 {
 }
 body.seller-login label,
 body.seller-signup label {
-  color: #5b4636 !important;
+  color: #374151 !important;
   font-weight: 600;
   margin-bottom: 0.25rem;
   display: block;
 }
 body.seller-login input,
 body.seller-signup input {
-  background: #e9dec7 !important;
-  color: #5b4636 !important;
-  border: 1.5px solid #bfa06a !important;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1.5px solid #d1d5db !important;
   border-radius: 8px;
   padding: 0.75rem 1rem !important;
   margin-bottom: 1.25rem !important;
@@ -207,21 +208,20 @@ body.seller-signup input:focus {
 }
 body.seller-login button,
 body.seller-signup button {
-  background: #bfa06a !important;
-  color: #4b3a2f !important;
-  border: none !important;
+  background: #d1d5db !important;
+  color: #374151 !important;
+  border: none;
   border-radius: 8px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.1rem;
   padding: 0.75rem 1rem !important;
-  margin-top: 1rem;
-  width: 100%;
+  margin-top: 1.5rem;
   transition: background 0.2s, color 0.2s;
 }
 body.seller-login button:hover,
 body.seller-signup button:hover {
-  background: #5b4636 !important;
-  color: #e9dec7 !important;
+  background: #e5e7eb !important;
+  color: #374151 !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

@@ -11,7 +11,7 @@ export async function getCustomerQnaList(
 }
 
 // 고객 Q&A 상세 조회
-export async function getCustomerQnaDetail(id: number): Promise<CustomerQnaDetailResponse> {
+export async function getCustomerQnaDetail(id: number): Promise<{qna: CustomerQnaDetailResponse}> {
     const res = await sellerApi.get(`/seller/customer-qna/${id}`);
     return res.data;
 }

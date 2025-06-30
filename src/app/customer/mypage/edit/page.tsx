@@ -15,7 +15,7 @@ import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import { parseAddress } from '@/lib/address-utils';
 import { Pencil } from 'lucide-react';
-import Navbar from '@/components/customer/common/Navbar';
+
 
 function ReadOnlyCard({ label, value }: { label: string; value?: string | null }) {
   return (
@@ -136,7 +136,7 @@ export default function EditProfilePage() {
   return (
   <>
     <GlobalDialog open={open} message={message} onClose={handleClose} />
-    <Navbar />
+    
 
     <main className="mx-auto w-full max-w-xl px-4 py-10 space-y-6">
 

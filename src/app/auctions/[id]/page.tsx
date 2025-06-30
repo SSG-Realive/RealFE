@@ -13,9 +13,12 @@ import AuctionCard from '@/components/customer/auctions/AuctionCard'
 import useDialog from '@/hooks/useDialog'
 import useConfirm from '@/hooks/useConfirm'
 import GlobalDialog from '@/components/ui/GlobalDialog'
+import useRequireAuth from '@/hooks/useRequireAuth'
 
 
 export default function AuctionDetailPage() {
+
+  useRequireAuth()
   // 훅 및 상태 관리
   const params = useParams()
   const [auction, setAuction] = useState<Auction | null>(null)

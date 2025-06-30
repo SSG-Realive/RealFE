@@ -21,6 +21,9 @@ import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
 import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 import ScrollToTopButton from '@/components/customer/common/ScrollToTopButton';
 import Footer from '@/components/customer/common/Footer';
+import AuctionCard from '@/components/customer/auctions/AuctionCard';
+import { Auction } from '@/types/customer/auctions';
+import { publicAuctionService } from '@/service/customer/publicAcutionService';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -37,7 +40,9 @@ export default function CustomerHomePage() {
     const [showLoadMore, setShowLoadMore] = useState(true);
     const [categories, setCategories] = useState<Category[]>([]);
     const [categoryMap, setCategoryMap] = useState<Record<number, Category>>({});
-
+    const [auctions, setAuctions] = useState<Auction[]>([]);
+    const [auctionLoading, setAuctionLoading] = useState(true);
+    const [auctionError, setAuctionError] = useState<string | null>(null);
     const isMainDefaultView = pathname === '/main' && !categoryFromUrl && !keywordFromUrl;
 
     useEffect(() => {
@@ -59,6 +64,27 @@ export default function CustomerHomePage() {
             setShowLoadMore(initial.length === ITEMS_PER_PAGE);
         });
     }, [categoryId, keyword]);
+
+    useEffect(() => {
+        // 이 로직은 오직 메인 페이지의 기본 뷰에서만 실행되도록 조건 추가
+        if (isMainDefaultView) {
+            const loadAuctions = async () => {
+                setAuctionLoading(true);
+                try {
+                    // 실제 API 서비스 함수를 호출합니다.
+                    const paginatedData = await publicAuctionService.fetchPublicActiveAuctions();
+                    setAuctions(paginatedData.content);
+                } catch (error: any) {
+                    console.error("경매 데이터 로딩 실패:", error);
+                    setAuctionError("경매 상품을 불러올 수 없습니다.");
+                } finally {
+                    setAuctionLoading(false);
+                }
+            };
+
+            loadAuctions();
+        }
+    }, [isMainDefaultView]); // isMainDefaultView가 바뀔 때마다 재실행
 
     const loadMore = async () => {
         const nextPage = page + 1;
@@ -84,89 +110,109 @@ export default function CustomerHomePage() {
         return categories.filter((c) => c.parentId === parentId);
     };
 
+    
+
     return (
-        <div className="flex flex-col min-h-screen relative overflow-x-visible">
-            <main className="flex-1">
-                {isMainDefaultView && <div className="mb-6 sm:mb-8"><BannerCarousel /></div>}
-                {!categoryId && <div className="mt-2 mb-4 sm:mt-10 sm:mb-8"><WeeklyAuctionSlider /></div>}
-                <PopularProductsGrid />
-                {isMainDefaultView && <ExtraBanner />}
-                {isMainDefaultView && <div className="my-4 sm:my-8 md:my-12"><FeaturedSellersSection /></div>}
-                {isMainDefaultView && <MiddleBannerCarousel />}
+        <div className="min-h-screen overflow-x-auto">
+            {isMainDefaultView && <div className="mb-6 sm:mb-8"><BannerCarousel /></div>}
+            {!categoryId && (
+    <div className="mt-2 mb-4 sm:mt-10 sm:mb-8">
+        <h2 className="text-2xl font-bold mb-4 px-4 sm:px-0">주간 경매</h2>
+        {auctionLoading ? (
+            <p>로딩 중...</p>
+        ) : auctionError ? (
+            <p>{auctionError}</p>
+        ) : auctions.length > 0 ? (
+            <AuctionCard auctions={auctions} />
+        ) : (
+            <p>진행중인 경매 없음</p>
+        )}
+    </div>
+)}
 
-                {/* ✅ 제목 + 카테고리 필터 */}
-                <section className="max-w-screen-xl mx-auto px-2 sm:px-4 mt-4 mb-2">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{getCategoryTitle()}</h2>
-                    <div className="overflow-x-auto no-scrollbar whitespace-nowrap -mx-2 px-2">
-                        {isMainDefaultView && (
-                            <button
-                                onClick={() => {
-                                    setCategoryId(null);
-                                    setKeyword('');
-                                    setPage(1);
-                                }}
-                                className={`shrink-0 inline-block text-sm px-3 py-1 mr-2 rounded-full whitespace-nowrap ${categoryId === null ? 'bg-black text-white' : 'bg-white text-gray-600'}`}
-                            >
-                                전체
-                            </button>
-                        )}
-                        {getSiblingCategories().map((cat) => (
-                            <button
-                                key={cat.id}
-                                onClick={() => {
-                                    setCategoryId(cat.id);
-                                    setKeyword('');
-                                    setPage(1);
-                                }}
-                                className={`shrink-0 inline-block text-sm px-3 py-1 mr-2 rounded-full whitespace-nowrap ${categoryId === cat.id ? 'bg-black text-white' : 'bg-white text-gray-600'}`}
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
-                    </div>
-                </section>
+            <PopularProductsGrid />
+            {isMainDefaultView && <ExtraBanner />}
+            {isMainDefaultView && <div className="my-4 sm:my-8 md:my-12"><FeaturedSellersSection /></div>}
+            {isMainDefaultView && <MiddleBannerCarousel />}
 
-                {/* ✅ 상품 리스트 */}
-                <section className="max-w-screen-xl mx-auto px-1 py-4 sm:py-8">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
-                        {products.map((p, index) => (
-                            <ProductCard key={`product-${p.id}-${index}`} {...p} />
-                        ))}
-                    </div>
-                    {showLoadMore && (
-                        <div className="text-center mt-6">
-                            <button
-                                onClick={loadMore}
-                                className="px-6 py-2 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg border border-gray-300"
-                            >
-                                더보기
-                            </button>
-                        </div>
+            {/* ✅ 제목 + 카테고리 필터 */}
+            <section className="max-w-screen-xl mx-auto px-2 sm:px-4 mt-4 mb-2">
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">{getCategoryTitle()}</h2>
+                <div className="overflow-x-auto no-scrollbar whitespace-nowrap -mx-2 px-2">
+                    {isMainDefaultView && (
+                        <button
+                            onClick={() => {
+                                setCategoryId(null);
+                                setKeyword('');
+                                setPage(1);
+                            }}
+                            className={`shrink-0 inline-block text-sm px-3 py-1 mr-2 rounded-full whitespace-nowrap ${
+                                categoryId === null ? 'bg-black text-white' : 'bg-white text-gray-600'
+                            }`}
+                        >
+                            전체
+                        </button>
                     )}
-                </section>
 
-                {isMainDefaultView && <BottomInspirationSlider />}
-                {isMainDefaultView && (
-                    <>
-                        {(() => {
-                            const titleMap: Record<number, string> = {
-                                10: '거실 가구',
-                                20: '침실 가구',
-                                30: '주방·다이닝 가구',
-                                40: '서재·오피스 가구',
-                                50: '기타 가구',
-                            };
-                            return [10, 20, 30, 40, 50].map((id) => (
-                                <div key={id} className="mb-6 sm:mb-10">
-                                    <SectionWithSubCategoryButtons title={titleMap[id] ?? '기타'} categoryId={id} limit={5} />
-                                </div>
-                            ));
-                        })()}
-                    </>
+                    {getSiblingCategories().map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => {
+                                setCategoryId(cat.id);
+                                setKeyword('');
+                                setPage(1);
+                            }}
+                            className={`shrink-0 inline-block text-sm px-3 py-1 mr-2 rounded-full whitespace-nowrap ${
+                                categoryId === cat.id ? 'bg-black text-white' : 'bg-white text-gray-600'
+                            }`}
+                        >
+                            {cat.name}
+                        </button>
+                    ))}
+                </div>
+            </section>
+
+            {/* ✅ 상품 리스트 */}
+            <section className="max-w-screen-xl mx-auto px-1 py-4 sm:py-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 px-2 sm:px-0">
+                    {products.map((p, index) => (
+                        <ProductCard key={`product-${p.id}-${index}`} {...p} />
+                    ))}
+                </div>
+                {showLoadMore && (
+                    <div className="text-center mt-6">
+                        <button
+                            onClick={loadMore}
+                            className="px-6 py-2 text-sm bg-white hover:bg-gray-100 text-gray-800 rounded-lg border border-gray-300"
+                        >
+                            더보기
+                        </button>
+                    </div>
                 )}
-            </main>
+            </section>
+
+            {isMainDefaultView && <BottomInspirationSlider />}
+            {isMainDefaultView && (
+                <>
+                    {(() => {
+                        const titleMap: Record<number, string> = {
+                            10: '거실 가구',
+                            20: '침실 가구',
+                            30: '주방·다이닝 가구',
+                            40: '서재·오피스 가구',
+                            50: '기타 가구',
+                        };
+                        return [10, 20, 30, 40, 50].map((id) => (
+                            <div key={id} className="mb-6 sm:mb-10">
+                                <SectionWithSubCategoryButtons title={titleMap[id] ?? '기타'} categoryId={id} limit={5} />
+                            </div>
+                        ));
+                    })()}
+                </>
+            )}
 
             <Footer />
+
 
             <ChatbotFloatingButton />
             <ScrollToTopButton />

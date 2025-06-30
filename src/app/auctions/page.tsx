@@ -1,123 +1,159 @@
-// app/auctions/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
+import { Flame, Clock, Sparkles } from 'lucide-react';
 
 import type { Auction, PaginatedAuctionResponse } from '@/types/customer/auctions';
-
 import ProductImage from '@/components/ProductImage';
-   // ⬅️ 전역 다이얼로그
 import { publicAuctionService } from '@/service/customer/publicAcutionService';
 import { useGlobalDialog } from '../context/dialogContext';
 import Footer from "@/components/customer/common/Footer";
 
-const PAGE_SIZE = 10; // 백엔드 size 고정
-
 export default function AuctionListPage() {
   const router = useRouter();
-  const { show } = useGlobalDialog();          // ⬅️ 모달 호출 함수
+  const { show } = useGlobalDialog();
 
-  /* ───────── state ───────── */
   const [auctions, setAuctions] = useState<Auction[]>([]);
-  const [page, setPage] = useState(0);
-  const [lastPage, setLastPage] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const trackRef1 = useRef<HTMLUListElement>(null);
+  const trackRef2 = useRef<HTMLUListElement>(null);
+  const trackRef3 = useRef<HTMLUListElement>(null);
+  const trackRef4 = useRef<HTMLUListElement>(null);
 
-  /* ───────── fetch ───────── */
-  const fetchPage = async (pageNumber: number) => {
-    setLoading(true);
+  const fetchAuctions = async () => {
     try {
-      // ※ 현재 백엔드 API는 page 파라미터를 지원하지 않는다고 가정
       const res: PaginatedAuctionResponse =
-        await publicAuctionService.fetchPublicActiveAuctions();
+          await publicAuctionService.fetchPublicActiveAuctions();
 
-      setAuctions(prev =>
-        pageNumber === 0 ? res.content : [...prev, ...res.content],
-      );
-      setPage(res.number);
-      setLastPage(res.last);
+      setAuctions(res.content);
 
       if (res.content.length === 0) {
         await show('진행 중인 경매가 없습니다.');
       }
     } catch {
       await show('경매 목록을 가져오지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPage(0);
+    fetchAuctions();
   }, []);
 
-  /* ───────── util ───────── */
   const timeLeft = (end: string) =>
-    formatDistanceToNowStrict(new Date(end), { addSuffix: true });
+      formatDistanceToNowStrict(new Date(end), { addSuffix: true });
 
-  /* ───────── render ───────── */
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <h1 className="text-3xl font-extrabold mb-8">실시간 경매</h1>
+  const setupTrack = (ref: React.RefObject<HTMLUListElement>) => {
+    if (!ref.current) return;
+    const len =
+        Array.from(ref.current.children).reduce(
+            (sum, el) => sum + (el as HTMLElement).offsetWidth,
+            0
+        ) || 1;
+    ref.current.style.setProperty('--track-len', `${len}px`);
+  };
 
-        {/* 경매 카드 그리드 */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
-          {auctions.map(a => (
-            <div
-              key={a.id}
-              onClick={() => router.push(`/auctions/${a.id}`)}
-              className="cursor-pointer rounded-2xl overflow-hidden bg-white
-                         shadow-lg hover:shadow-xl transition-shadow group"
-            >
-              <div className="relative w-full aspect-square bg-gray-100">
-                <ProductImage
-                  src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
-                  alt={a.adminProduct?.productName ?? '경매 상품'}
-                  className="w-full h-full object-cover"
-                />
-                <span className="absolute top-2 right-2 bg-black/80 text-white
-                                 text-xs px-2 py-1 rounded-full">
-                  {timeLeft(a.endTime)}
-                </span>
-              </div>
+  useEffect(() => {
+    const resizeHandler = () => {
+      setupTrack(trackRef1);
+      setupTrack(trackRef2);
+      setupTrack(trackRef3);
+      setupTrack(trackRef4);
+    };
+    resizeHandler();
+    window.addEventListener('resize', resizeHandler);
+    return () => window.removeEventListener('resize', resizeHandler);
+  }, [auctions]);
 
-              <div className="p-4">
-                <p className="font-semibold truncate">
-                  {a.adminProduct?.productName}
-                </p>
-                <p className="text-sm text-gray-500">
-                  시작 {a.startPrice.toLocaleString()}원
-                </p>
-                <p className="text-lg font-bold text-indigo-600">
-                  현재 {a.currentPrice.toLocaleString()}원
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+  const renderSlider = (title: string, trackRef: React.RefObject<HTMLUListElement>) => {
+    const iconMap: Record<string, JSX.Element> = {
+      '실시간 경매': <Flame className="text-indigo-500" size={20} />,
+      '인기 경매': <Flame className="text-red-500" size={20} />,
+      '마감 임박 경매': <Clock className="text-yellow-500" size={20} />,
+      '신규 경매': <Sparkles className="text-green-500" size={20} />,
+    };
 
-        {/* 더보기 */}
-        {!lastPage && (
-          <div className="text-center mt-10">
-            <button
-              onClick={() => fetchPage(page + 1)}
-              disabled={loading}
-              className="inline-flex items-center gap-1 px-6 py-3 rounded-full
-                         border border-gray-300 bg-white hover:bg-gray-100
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? '불러오는 중…' : '더보기'}
-              {!loading && <ArrowRight size={16} />}
-            </button>
+    return (
+        <section className="mb-10">
+          <h2 className="text-xl font-extrabold mb-4 flex items-center gap-2">
+            {iconMap[title] ?? null}
+            {title}
+          </h2>
+          <div className="relative overflow-x-auto no-scrollbar">
+            <ul ref={trackRef} className="auction-track flex gap-4 py-2 select-none">
+              {[...auctions, ...auctions].map((a, i) => (
+                  <li
+                      key={`${title}-${a.id}-${i}`}
+                      className="w-60 flex-shrink-0"
+                      onClick={() => router.push(`/auctions/${a.id}`)}
+                  >
+                    <div className="rounded-2xl overflow-hidden bg-white shadow hover:shadow-xl transition cursor-pointer">
+                      {/* 이미지 */}
+                      <div className="relative w-full aspect-square bg-gray-100">
+                        <ProductImage
+                            src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
+                            alt={a.adminProduct?.productName ?? '경매 상품'}
+                            className="w-full h-full object-cover"
+                        />
+                        <span className="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded-full">
+                      {timeLeft(a.endTime)}
+                    </span>
+                      </div>
+
+                      {/* 텍스트 */}
+                      <div className="p-4 text-left">
+                        <p className="text-base font-medium truncate">
+                          {a.adminProduct?.productName}
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                          시작 {a.startPrice.toLocaleString()}
+                          <span className="ml-1 text-xs">원</span>
+                        </p>
+                        <p className="text-sm font-semibold text-red-500 mt-0.5">
+                          현재 {a.currentPrice.toLocaleString()}
+                          <span className="ml-1 text-xs">원</span>
+                        </p>
+                        <p className="text-sm font-semibold text-gray-500 mt-0.5">
+                          종료 {new Date(a.endTime).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+              ))}
+            </ul>
+
+            {/* 슬라이드 애니메이션 */}
+            <style jsx>{`
+            .auction-track {
+              animation: scroll var(--scroll-time, 30s) linear infinite;
+            }
+            .auction-track:hover {
+              animation-play-state: paused;
+            }
+            @keyframes scroll {
+              from {
+                transform: translateX(0);
+              }
+              to {
+                transform: translateX(calc(var(--track-len) / -2));
+              }
+            }
+          `}</style>
           </div>
-        )}
+        </section>
+    );
+  };
+
+  return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          {renderSlider('실시간 경매', trackRef1)}
+          {renderSlider('인기 경매', trackRef2)}
+          {renderSlider('마감 임박 경매', trackRef3)}
+          {renderSlider('신규 경매', trackRef4)}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
   );
 }

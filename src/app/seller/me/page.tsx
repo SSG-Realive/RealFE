@@ -59,10 +59,20 @@ export default function SellerMePage() {
     }
     const payload: SellerUpdateRequest = { name: name.trim(), phone: phone.trim() };
     if (password.trim().length > 0) {
-      payload.password = password.trim();
+      payload.newPassword = password.trim();
     }
     try {
+      console.log('수정 요청 데이터:', payload); // 디버깅용
       await updateProfile(payload);
+      console.log('수정 요청 완료'); // 디버깅용
+      
+      // 최신 프로필 정보 다시 가져와서 카드 업데이트
+      const updatedData = await getProfile();
+      console.log('최신 데이터:', updatedData); // 디버깅용
+      setEmail(updatedData.email);
+      setName(updatedData.name);
+      setPhone(updatedData.phone);
+      
       alert('프로필이 성공적으로 수정되었습니다.');
       router.push('/seller/dashboard');
     } catch (err: any) {

@@ -34,7 +34,7 @@ export async function getProfile(): Promise<SellerProfile> {
 export interface SellerUpdateRequest {
   name: string;
   phone: string;
-  password?: string;
+  newPassword?: string;
 }
 // 백엔드가 PUT 으로 받으니 여기서도 PUT으로 바꿔야 합니다.
 export async function updateProfile(data: SellerUpdateRequest): Promise<void> {

@@ -76,7 +76,7 @@ export default function CustomerHomePage() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen w-full bg-white">
+        <div className="flex flex-col min-h-screen w-full bg-[#a89f91]">
             <main className="flex-1">
                 <Navbar
                     onCategorySelect={(id) => {

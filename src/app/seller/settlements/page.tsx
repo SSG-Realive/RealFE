@@ -211,9 +211,9 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('all')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'all'
-                                            ? 'bg-[#d1d5db] text-[#374151]'
-                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
+                                        filterType === 'all' 
+                                            ? 'bg-[#4fd1c7] text-[#fff]' 
+                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#4fd1c7] hover:text-[#fff]'
                                     }`}
                                 >
                                     전체
@@ -221,9 +221,9 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('date')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'date'
-                                            ? 'bg-[#d1d5db] text-[#374151]'
-                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
+                                        filterType === 'date' 
+                                            ? 'bg-[#4fd1c7] text-[#fff]' 
+                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#4fd1c7] hover:text-[#fff]'
                                     }`}
                                 >
                                     날짜별
@@ -231,9 +231,9 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('period')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'period'
-                                            ? 'bg-[#d1d5db] text-[#374151]'
-                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
+                                        filterType === 'period' 
+                                            ? 'bg-[#4fd1c7] text-[#fff]' 
+                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#4fd1c7] hover:text-[#fff]'
                                     }`}
                                 >
                                     기간별
@@ -243,11 +243,11 @@ export default function SellerSettlementPage() {
                             {/* 날짜별 필터 */}
                             {filterType === 'date' && (
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-[#6b7280]" />
-                                    <input
-                                        type="date"
-                                        value={filterDate}
-                                        onChange={(e) => setFilterDate(e.target.value)}
+                            <Calendar className="w-5 h-5 text-[#6b7280]" />
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
                                     />
                                 </div>
@@ -271,40 +271,40 @@ export default function SellerSettlementPage() {
                                         onChange={(e) => setFilterTo(e.target.value)}
                                         placeholder="종료일"
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
-                                    />
-                                </div>
+                            />
+                        </div>
                             )}
 
                             {/* 필터 버튼들 */}
                             <div className="flex gap-2">
-                                <button
+                        <button
                                     onClick={applyFilter}
                                     disabled={filterType === 'date' && !filterDate || filterType === 'period' && (!filterFrom || !filterTo)}
-                                    className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Search className="w-4 h-4" />
+                            className="flex items-center gap-2 bg-[#4fd1c7] text-[#fff] px-4 py-2 rounded-md hover:bg-[#14b8a6] hover:text-[#fff] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Search className="w-4 h-4" />
                                     조회
-                                </button>
-                                <button
+                        </button>
+                        <button
                                     onClick={resetFilter}
-                                    className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151]"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
+                            className="flex items-center gap-2 bg-[#0f766e] text-[#fff] px-4 py-2 rounded-md hover:bg-[#4fd1c7] hover:text-[#fff]"
+                        >
+                            <RefreshCw className="w-4 h-4" />
                                     초기화
-                                </button>
+                        </button>
                             </div>
                         </div>
                     </div>
 
                     {/* 정산 리스트 */}
                     {error ? (
-                        <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-4">
-                            <p className="text-[#374151]">{error}</p>
+                        <div className="bg-[#b9f6ec] border border-[#4fd1c7] rounded-lg p-4">
+                            <p className="text-[#0f766e]">{error}</p>
                         </div>
                     ) : payouts.length === 0 ? (
-                        <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
-                            <CreditCard className="w-12 h-12 text-[#d1d5db] mx-auto mb-4" />
-                            <p className="text-[#d1d5db] text-lg">정산 내역이 없습니다.</p>
+                        <div className="bg-[#e3f6f5] border border-[#4fd1c7] rounded-lg p-8 text-center">
+                            <CreditCard className="w-12 h-12 text-[#4fd1c7] mx-auto mb-4" />
+                            <p className="text-[#4fd1c7] text-lg">정산 내역이 없습니다.</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
@@ -321,7 +321,7 @@ export default function SellerSettlementPage() {
                                 </thead>
                                 <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                                     {payouts.map((item) => (
-                                        <tr key={item.id} className="hover:bg-[#e5e7eb] transition-colors">
+                                        <tr key={item.id} className="hover:bg-[#4fd1c7] transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
                                                 {item.periodStart} ~ {item.periodEnd}
                                             </td>
@@ -331,18 +331,19 @@ export default function SellerSettlementPage() {
                                             <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
                                                 {item.totalCommission.toLocaleString()}원
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
+                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#388e3c]">
                                                 {item.payoutAmount.toLocaleString()}원
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                                                 {item.processedAt}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <button
                                                     onClick={() => fetchPayoutDetail(item.id)}
-                                                    className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
+                                                    className="flex items-center gap-1 bg-[#0f766e] text-[#fff] px-3 py-1 rounded-md hover:bg-[#4fd1c7] hover:text-[#fff] text-sm"
                                                 >
-                                                    <Eye className="w-4 h-4" /> 상세 보기
+                                                    <Eye className="w-4 h-4" />
+                                                    상세
                                                 </button>
                                             </td>
                                         </tr>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getReviewDetail, updateReview } from '@/service/customer/reviewService';
+import { fetchReviewDetail, updateReview } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Navbar from '@/components/customer/common/Navbar';
 
@@ -18,7 +18,7 @@ export default function EditReviewPage() {
 
     useEffect(() => {
         if (!id) return;
-        getReviewDetail(Number(id))
+        fetchReviewDetail(Number(id))
             .then((data) => {
                 setReview(data);
                 setContent(data.content);

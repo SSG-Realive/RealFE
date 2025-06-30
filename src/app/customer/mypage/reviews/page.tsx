@@ -5,6 +5,8 @@ import { fetchMyReviews } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Link from 'next/link';
 
+// 내 리뷰 목록 조회 페이지
+
 export default function MyReviewPage() {
     const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
     const [loading, setLoading] = useState(true);
@@ -19,6 +21,7 @@ export default function MyReviewPage() {
             })
             .finally(() => setLoading(false));
     }, []);
+    
 
     return (
         <div>
@@ -42,7 +45,15 @@ export default function MyReviewPage() {
                                 <p className="font-semibold">{review.productName}</p>
                                 <p className="text-yellow-500">⭐ {review.rating}</p>
                                 <p className="text-gray-700 text-sm mt-1 line-clamp-2">{review.content}</p>
-                                <p className="text-xs text-gray-400 mt-1">{review.createdAt}</p>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {new Date(review.createdAt).toLocaleString('ko-KR', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
+                                </p>
                             </Link>
                         ))}
                     </div>

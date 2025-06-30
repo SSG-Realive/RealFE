@@ -15,7 +15,7 @@ export default function LoginPage() {
           <a href="/customer/signup" className="text-blue-600 hover:underline">
             회원가입
           </a>
-          <a href="/customer/member/find-password" className="text-blue-600 hover:underline">
+          <a href="/customer/member/findPassword" className="text-blue-600 hover:underline">
             비밀번호 찾기
           </a>
         </div>

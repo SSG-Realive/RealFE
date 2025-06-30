@@ -49,6 +49,7 @@ export interface Bid {
   bidPrice: number;
   bidTime: string;
   isWinning: boolean;
+  leading?: boolean;
 }
 
 export interface PaginatedBidResponse {

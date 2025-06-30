@@ -1,15 +1,13 @@
 // app/customer/reviews/my/page.tsx
 import React from 'react';
-
+import Navbar from "@/components/customer/Navbar";
+import Sidebar from "@/components/Sidebar";
 import Link from 'next/link';
 // ReviewResponseDTO는 MyReviewListResponse 안에 포함되므로 직접 임포트할 필요 없을 수도 있음.
 // 하지만 renderStars, formatDateTime 등에서 ReviewResponseDTO 필드를 직접 참조한다면 임포트.
 import { ReviewResponseDTO } from "@/types/reviews/reviewResponseDTO";
 import {MyReviewListResponse} from "@/types/reviews/myReviewListResponseDTO";
-import Navbar from '@/components/customer/common/Navbar';
-import { Sidebar } from 'lucide-react';
 
-//
 
 async function MyReviewsPage({
                                  searchParams

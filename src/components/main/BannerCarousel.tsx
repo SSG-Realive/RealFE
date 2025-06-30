@@ -13,9 +13,9 @@ const defaultImages = [
 ];
 
 const CustomArrow = ({
-    onClick,
-    direction,
-}: {
+                         onClick,
+                         direction,
+                     }: {
     onClick?: () => void;
     direction: 'left' | 'right';
 }) => {
@@ -105,9 +105,7 @@ export default function BannerCarousel({
           }
         }
       `}</style>
-
-            <div className="w-full aspect-[3/1] relative overflow-hidden">
-
+            <div className="w-full relative overflow-hidden h-[180px] sm:h-[600px] mb-4 sm:mb-6">
                 <Slider {...settings}>
                     {images.map((item, index) => (
                         <div key={index}>
@@ -115,13 +113,14 @@ export default function BannerCarousel({
                                 <img
                                     src={item.src}
                                     alt={`배너 ${index + 1}`}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain"
                                 />
                             </Link>
                         </div>
                     ))}
                 </Slider>
             </div>
+
         </>
     );
 }

@@ -32,10 +32,10 @@ const SellerSidebar: FC<SellerSidebarProps & { className?: string }> = ({ onClos
     }
   };
   return (
-    <aside className={className + " bg-[#8d8773] min-h-screen border-r border-[#bfa06a] shadow-lg"}>
+    <aside className={className + " bg-[#23272a] min-h-screen border-r border-[#23272a] shadow-lg"}>
       <div className="px-6 pt-8 pb-10">
         <Link href="/seller/dashboard">
-          <span className="text-2xl font-extrabold mb-10 text-[#f5f1eb] tracking-tight block hover:text-[#bfa06a] transition-colors">Realive</span>
+          <span className="text-2xl font-extrabold mb-10 text-[#fff] tracking-tight block hover:text-[#a89f91] transition-colors">Realive</span>
         </Link>
         <nav>
           <ul className="space-y-1">
@@ -47,12 +47,12 @@ const SellerSidebar: FC<SellerSidebarProps & { className?: string }> = ({ onClos
                     <div
                       className={`flex items-center px-5 py-3 rounded-lg font-medium transition-colors duration-200 text-base ${
                         isActive
-                          ? "bg-[#b0a99f] border-l-4 border-[#bfa06a] text-[#4b3a2f] font-semibold shadow-sm sidebar-active"
-                          : "text-[#f5f1eb] hover:bg-[#b0a99f] hover:text-[#4b3a2f] sidebar-hover"
+                          ? "bg-[#393e46] border-l-4 border-[#a89f91] text-[#fff] font-semibold shadow-sm sidebar-active"
+                          : "text-[#fff] hover:bg-[#393e46] hover:text-[#a89f91] sidebar-hover"
                       }`}
                       style={
                         isActive
-                          ? { boxShadow: '4px 0 12px -4px #b0a99f' }
+                          ? { boxShadow: '4px 0 12px -4px #ede9e3' }
                           : undefined
                       }
                     >

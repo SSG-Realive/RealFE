@@ -21,16 +21,21 @@ export default function OrderDetailPage() {
     const [trackingNumber, setTrackingNumber] = useState<string>('');
     const [carrier, setCarrier] = useState<string>('');
 
-    const getNextStatusOptionsFor = (currentStatus: string): string[] => {
+    const getValidStatusOptions = (currentStatus: string): string[] => {
+        // 백엔드 규칙에 맞춰 유효한 전이만 허용
         switch (currentStatus) {
             case 'INIT':
-                return ['DELIVERY_PREPARING'];
+                return ['INIT', 'DELIVERY_PREPARING', 'DELIVERY_IN_PROGRESS', 'DELIVERY_COMPLETED'];
             case 'DELIVERY_PREPARING':
-                return ['DELIVERY_IN_PROGRESS'];
+                return ['DELIVERY_PREPARING', 'DELIVERY_IN_PROGRESS', 'DELIVERY_COMPLETED'];
             case 'DELIVERY_IN_PROGRESS':
-                return ['DELIVERY_COMPLETED'];
+                return ['DELIVERY_IN_PROGRESS', 'DELIVERY_COMPLETED'];
+            case 'DELIVERY_COMPLETED':
+                return ['DELIVERY_COMPLETED']; // 완료된 주문은 상태 변경 불가
+            case 'CANCELLED':
+                return ['CANCELLED']; // 취소된 주문은 상태 변경 불가
             default:
-                return [];
+                return ['INIT', 'DELIVERY_PREPARING', 'DELIVERY_IN_PROGRESS', 'DELIVERY_COMPLETED'];
         }
     };
 
@@ -41,8 +46,8 @@ export default function OrderDetailPage() {
             try {
                 const data = await getOrderDetail(Number(orderId));
                 setOrder(data);
-                const nextOptions = getNextStatusOptionsFor(data.deliveryStatus);
-                setNewStatus(nextOptions.length > 0 ? nextOptions[0] : data.deliveryStatus);
+                    const validOptions = getValidStatusOptions(data.deliveryStatus);
+                    setNewStatus(validOptions.length > 0 ? validOptions[0] : data.deliveryStatus);
                 setTrackingNumber(data.trackingNumber ?? '');
                 setCarrier(data.carrier ?? '');
                 setError(null);
@@ -69,12 +74,18 @@ export default function OrderDetailPage() {
             return;
         }
 
-        try {
-            await updateDeliveryStatus(Number(orderId), {
+        const updateData = {
                 deliveryStatus: newStatus as DeliveryStatus,
                 trackingNumber: isTrackingChanged ? trackingNumber : undefined,
                 carrier: isCarrierChanged ? carrier : undefined,
-            });
+        };
+
+        console.log('Sending update request:', updateData);
+        console.log('Current order status:', order.deliveryStatus);
+        console.log('New status:', newStatus);
+
+        try {
+            await updateDeliveryStatus(Number(orderId), updateData);
 
             alert('배송 상태가 변경되었습니다.');
             const updatedData = await getOrderDetail(Number(orderId));
@@ -84,7 +95,8 @@ export default function OrderDetailPage() {
             setCarrier(updatedData.carrier ?? '');
         } catch (err) {
             console.error('배송 상태 변경 실패', err);
-            alert('배송 상태 변경 중 오류 발생');
+            console.error('Error details:', err);
+            alert('배송 상태 변경 중 오류 발생: ' + (err as any)?.response?.data?.message || err);
         }
     };
 
@@ -107,7 +119,7 @@ export default function OrderDetailPage() {
     if (error) return <div className="p-4 text-red-600">{error}</div>;
     if (!order) return <div className="p-4">주문 정보를 불러올 수 없습니다.</div>;
 
-    const nextStatusOptions = getNextStatusOptionsFor(order.deliveryStatus);
+    const nextStatusOptions = getValidStatusOptions(order.deliveryStatus);
     const isFinalState =
         order.deliveryStatus === 'DELIVERY_COMPLETED' || order.deliveryStatus === 'CANCELLED';
 
@@ -261,7 +273,7 @@ export default function OrderDetailPage() {
                                             onChange={(e) => setNewStatus(e.target.value)}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         >
-                                            {nextStatusOptions.map((status) => (
+                                            {nextStatusOptions.map((status: string) => (
                                                 <option key={status} value={status}>
                                                     {status}
                                                 </option>
@@ -301,14 +313,14 @@ export default function OrderDetailPage() {
                                     <div className="flex gap-3">
                                         <button
                                             onClick={handleStatusChange}
-                                            className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                            className="w-full py-3 rounded-lg font-bold bg-[#d1d5db] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151] transition-colors"
                                         >
                                             상태 변경
                                         </button>
                                         {!isFinalState && (
                                             <button
                                                 onClick={handleCancel}
-                                                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                                className="w-full py-3 rounded-lg font-bold bg-[#d1d5db] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151] transition-colors"
                                             >
                                                 배송 취소
                                             </button>

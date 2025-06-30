@@ -106,11 +106,35 @@ export default function SellerSettlementPage() {
     // 정산 상세 정보 조회
     const fetchPayoutDetail = async (payoutLogId: number) => {
         try {
+            console.log('정산 상세 조회 시도:', payoutLogId);
             const res = await getSellerSettlementDetail(payoutLogId);
+            console.log('정산 상세 조회 성공:', res);
             setSelectedPayout(res);
-        } catch (err) {
+        } catch (err: any) {
             console.error('정산 상세 조회 실패:', err);
-            setError('정산 상세 정보를 불러오지 못했습니다.');
+            console.error('에러 상세:', {
+                message: err.message,
+                status: err.response?.status,
+                statusText: err.response?.statusText,
+                data: err.response?.data
+            });
+            
+            let errorMessage = '정산 상세 정보를 불러오지 못했습니다.';
+            
+            if (err.response?.status === 500) {
+                errorMessage = '서버에서 오류가 발생했습니다. 백엔드 팀에 문의해주세요.';
+            } else if (err.response?.status === 404) {
+                errorMessage = '해당 정산 정보를 찾을 수 없습니다.';
+            } else if (err.response?.status === 403) {
+                errorMessage = '정산 정보에 접근할 권한이 없습니다.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            setError(errorMessage);
+            
+            // 에러 발생 시 알림 표시
+            alert(errorMessage);
         }
     };
 
@@ -148,10 +172,10 @@ export default function SellerSettlementPage() {
 
     if (checking || loading) {
         return (
-            <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-[#e3f6f5] flex items-center justify-center">
+            <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4fd1c7] mx-auto mb-4"></div>
-                    <p className="text-[#0f766e]">정산 정보를 불러오는 중...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a89f91] mx-auto mb-4"></div>
+                    <p className="text-[#5b4636]">정산 정보를 불러오는 중...</p>
                 </div>
             </div>
         );
@@ -164,7 +188,7 @@ export default function SellerSettlementPage() {
             </div>
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
-                    <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#0f766e]">정산 관리</h1>
+                    <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#374151]">정산 관리</h1>
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -211,7 +235,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('all')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'all'
+                                        filterType === 'all' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -221,7 +245,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('date')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'date'
+                                        filterType === 'date' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -231,7 +255,7 @@ export default function SellerSettlementPage() {
                                 <button
                                     onClick={() => setFilterType('period')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                        filterType === 'period'
+                                        filterType === 'period' 
                                             ? 'bg-[#d1d5db] text-[#374151]'
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
@@ -244,11 +268,11 @@ export default function SellerSettlementPage() {
                             {filterType === 'date' && (
                                 <div className="flex items-center gap-2">
                                     <Calendar className="w-5 h-5 text-[#6b7280]" />
-                                    <input
-                                        type="date"
-                                        value={filterDate}
-                                        onChange={(e) => setFilterDate(e.target.value)}
-                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={(e) => setFilterDate(e.target.value)}
+                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-white text-[#374151]"
                                     />
                                 </div>
                             )}
@@ -262,7 +286,7 @@ export default function SellerSettlementPage() {
                                         value={filterFrom}
                                         onChange={(e) => setFilterFrom(e.target.value)}
                                         placeholder="시작일"
-                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
+                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-white text-[#374151]"
                                     />
                                     <span className="text-[#374151]">~</span>
                                     <input
@@ -270,28 +294,28 @@ export default function SellerSettlementPage() {
                                         value={filterTo}
                                         onChange={(e) => setFilterTo(e.target.value)}
                                         placeholder="종료일"
-                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4fd1c7] bg-white text-[#374151]"
-                                    />
-                                </div>
+                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-white text-[#374151]"
+                            />
+                        </div>
                             )}
 
                             {/* 필터 버튼들 */}
                             <div className="flex gap-2">
-                                <button
+                        <button
                                     onClick={applyFilter}
                                     disabled={filterType === 'date' && !filterDate || filterType === 'period' && (!filterFrom || !filterTo)}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <Search className="w-4 h-4" />
+                        >
+                            <Search className="w-4 h-4" />
                                     조회
-                                </button>
-                                <button
+                        </button>
+                        <button
                                     onClick={resetFilter}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151]"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
+                        >
+                            <RefreshCw className="w-4 h-4" />
                                     초기화
-                                </button>
+                        </button>
                             </div>
                         </div>
                     </div>
@@ -303,20 +327,20 @@ export default function SellerSettlementPage() {
                         </div>
                     ) : payouts.length === 0 ? (
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
-                            <CreditCard className="w-12 h-12 text-[#d1d5db] mx-auto mb-4" />
-                            <p className="text-[#d1d5db] text-lg">정산 내역이 없습니다.</p>
+                            <CreditCard className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
+                            <p className="text-[#6b7280] text-lg">정산 내역이 없습니다.</p>
                         </div>
                     ) : (
                         <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
                             <table className="min-w-full divide-y divide-[#d1d5db]">
                                 <thead className="bg-[#f3f4f6]">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">정산 기간</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">총 매출</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">수수료</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">지급액</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">처리일시</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">상세보기</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">정산 기간</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">총 매출</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수수료</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">지급액</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">처리일시</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상세보기</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
@@ -355,7 +379,7 @@ export default function SellerSettlementPage() {
                     {/* 정산 상세 정보 모달 */}
                     {selectedPayout && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div className="bg-[#f3f4f6] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                            <div className="bg-[#f3f4f6] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto border-2 border-[#d1d5db]">
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-xl font-bold text-[#374151]">정산 상세 정보</h3>
                                     <button
@@ -368,34 +392,34 @@ export default function SellerSettlementPage() {
                                 
                                 {/* 정산 기본 정보 */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div className="bg-white p-4 rounded-lg">
+                                    <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">정산 기간</h4>
                                         <p className="text-[#374151]">
                                             {selectedPayout.payoutInfo.periodStart} ~ {selectedPayout.payoutInfo.periodEnd}
                                         </p>
                                     </div>
-                                    <div className="bg-white p-4 rounded-lg">
+                                    <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">총 매출</h4>
                                         <p className="text-[#388e3c] font-bold">
                                             {selectedPayout.payoutInfo.totalSales.toLocaleString()}원
                                         </p>
                                     </div>
-                                    <div className="bg-white p-4 rounded-lg">
+                                    <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">수수료</h4>
                                         <p className="text-[#374151] font-bold">
                                             {selectedPayout.payoutInfo.totalCommission.toLocaleString()}원
                                         </p>
                                     </div>
-                                    <div className="bg-white p-4 rounded-lg">
+                                    <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">지급액</h4>
-                                        <p className="text-[#4fd1c7] font-bold">
+                                        <p className="text-[#6b7280] font-bold">
                                             {selectedPayout.payoutInfo.payoutAmount.toLocaleString()}원
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* 판매 상세 내역 */}
-                                <div className="bg-white rounded-lg p-4">
+                                <div className="bg-white rounded-lg p-4 border border-[#d1d5db]">
                                     <h4 className="font-semibold text-[#374151] mb-4 flex items-center gap-2">
                                         <BarChart3 className="w-5 h-5" />
                                         판매 상세 내역 ({selectedPayout.salesDetails.length}건)

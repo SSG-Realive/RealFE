@@ -107,7 +107,7 @@ export default function SellerDashboardPage() {
       curve: 'smooth' as const,
       width: 2
     },
-    colors: ['#bfa06a'],
+    colors: ['#a89f91'],
     fill: {
       type: 'gradient' as const,
       gradient: {
@@ -155,7 +155,7 @@ export default function SellerDashboardPage() {
         show: false
       }
     },
-    colors: ['#bfa06a'],
+    colors: ['#a89f91'],
     plotOptions: {
       bar: {
         borderRadius: 4,
@@ -298,11 +298,25 @@ export default function SellerDashboardPage() {
               <h3 className="text-lg font-bold text-[#374151]">매출 추이</h3>
               <BarChart3 className="w-7 h-7 text-[#6b7280] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
+            <div className="w-full h-80 min-h-[320px]">
             {chartFilter === 'daily' ? (
-            <Chart options={{...dailyChartOptions, colors: ['#a89f91']}} series={dailyChartSeries} type="area" height={260} />
+                <Chart 
+                  options={dailyChartOptions} 
+                  series={dailyChartSeries} 
+                  type="area" 
+                  height="100%" 
+                  width="100%"
+                />
             ) : (
-              <Chart options={{...monthlyChartOptions, colors: ['#a89f91']}} series={monthlyChartSeries} type="bar" height={260} />
+                <Chart 
+                  options={monthlyChartOptions} 
+                  series={monthlyChartSeries} 
+                  type="bar" 
+                  height="100%" 
+                  width="100%"
+                />
             )}
+            </div>
           </section>
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between mb-4">

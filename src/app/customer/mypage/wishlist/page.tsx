@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import Navbar from '@/components/customer/common/Navbar';
+import useDialog from '@/hooks/useDialog';
+import GlobalDialog from '@/components/ui/GlobalDialog';
+import useConfirm from '@/hooks/useConfirm';
 
 export default function WishlistPage() {
     const [products, setProducts] = useState<ProductListDTO[]>([]);
@@ -14,11 +17,13 @@ export default function WishlistPage() {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [selectedParentCategory, setSelectedParentCategory] = useState<string | null>(null);
     const router = useRouter();
+    const { open, message, setOpen, show } = useDialog()
+    const { confirm, dialog } = useConfirm()
 
     useEffect(() => {
         fetchWishlist()
             .then(setProducts)
-            .catch(() => alert('찜 목록을 불러오는데 실패했습니다.'))
+            .catch(() => show('찜 목록을 불러오는데 실패했습니다.'))
             .finally(() => setLoading(false));
     }, []);
 
@@ -41,26 +46,26 @@ export default function WishlistPage() {
 
     const handleDeleteOne = async (e: React.MouseEvent, productId: number) => {
         e.stopPropagation();
-        if (!confirm('이 상품을 찜 목록에서 삭제하시겠습니까?')) return;
+        if (! (await confirm('이 상품을 찜 목록에서 삭제하시겠습니까?'))) return;
         try {
             await toggleWishlist({ productId });
             setProducts((prev) => prev.filter((p) => p.id !== productId));
-            alert('찜 목록에서 제거되었습니다.');
+            show('찜 목록에서 제거되었습니다.');
         } catch {
-            alert('삭제 중 오류가 발생했습니다.');
+            show('삭제 중 오류가 발생했습니다.');
         }
     };
 
     const handleDeleteSelected = async () => {
-        if (selectedIds.size === 0) return alert('삭제할 상품을 선택해주세요.');
-        if (!confirm(`${selectedIds.size}개의 상품을 삭제하시겠습니까?`)) return;
+        if (selectedIds.size === 0) return show('삭제할 상품을 선택해주세요.');
+        if (! (await confirm(`${selectedIds.size}개의 상품을 삭제하시겠습니까?`))) return;
         try {
             await Promise.all(Array.from(selectedIds).map((id) => toggleWishlist({ productId: id })));
             setProducts((prev) => prev.filter((p) => !selectedIds.has(p.id)));
-            alert(`${selectedIds.size}개의 상품이 삭제되었습니다.`);
+            show(`${selectedIds.size}개의 상품이 삭제되었습니다.`);
             toggleEditMode();
         } catch {
-            alert('선택 삭제 중 오류가 발생했습니다.');
+            show('선택 삭제 중 오류가 발생했습니다.');
         }
     };
 
@@ -78,6 +83,8 @@ export default function WishlistPage() {
 
     return (
         <>
+        {dialog}
+        <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
             <Navbar />
             <div className="bg-gray-100 min-h-screen py-8">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">

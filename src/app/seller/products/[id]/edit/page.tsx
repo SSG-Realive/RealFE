@@ -88,6 +88,10 @@ export default function ProductEditPage() {
             return;
         }
 
+        console.log('=== 상품 수정 시작 ===');
+        console.log('수정할 상품 ID:', productId);
+        console.log('폼 데이터:', form);
+
         const formData = new FormData();
         formData.append('name', form.name);
         formData.append('description', form.description);
@@ -101,19 +105,64 @@ export default function ProductEditPage() {
         formData.append('categoryId', String(form.categoryId)); // ✅ categoryId 만 서버 전송
 
         // 이미지
-        if (imageThumbnail) formData.append('imageThumbnail', imageThumbnail);
-        if (videoThumbnail) formData.append('videoThumbnail', videoThumbnail);
+        if (imageThumbnail) {
+            console.log('대표 이미지 추가:', imageThumbnail.name);
+            formData.append('imageThumbnail', imageThumbnail);
+        }
+        if (videoThumbnail) {
+            console.log('대표 영상 추가:', videoThumbnail.name);
+            formData.append('videoThumbnail', videoThumbnail);
+        }
         if (subImages) {
-            Array.from(subImages).forEach((file) => formData.append('subImages', file));
+            console.log('서브 이미지 개수:', subImages.length);
+            Array.from(subImages).forEach((file, index) => {
+                console.log(`서브 이미지 ${index + 1}:`, file.name);
+                formData.append('subImages', file);
+            });
+        }
+
+        // FormData 내용 로깅
+        console.log('=== FormData 내용 ===');
+        for (let [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(`${key}: [파일] ${value.name} (${value.size} bytes)`);
+            } else {
+                console.log(`${key}: ${value}`);
+            }
         }
 
         try {
+            console.log('API 호출 시작...');
             await updateProduct(Number(productId), formData);
+            console.log('상품 수정 성공!');
             alert('상품이 수정되었습니다.');
             router.push('/seller/products');
-        } catch (err) {
-            console.error('수정 실패', err);
-            setError('상품 수정 중 오류가 발생했습니다.');
+        } catch (err: any) {
+            console.error('=== 상품 수정 실패 ===');
+            console.error('에러 객체:', err);
+            console.error('에러 메시지:', err.message);
+            console.error('응답 상태:', err.response?.status);
+            console.error('응답 데이터:', err.response?.data);
+            console.error('응답 헤더:', err.response?.headers);
+            
+            let errorMessage = '상품 수정 중 오류가 발생했습니다.';
+            
+            if (err.response?.status === 400) {
+                errorMessage = '입력 데이터가 올바르지 않습니다. 필수 항목을 확인해주세요.';
+            } else if (err.response?.status === 401) {
+                errorMessage = '로그인이 필요합니다.';
+            } else if (err.response?.status === 403) {
+                errorMessage = '해당 상품을 수정할 권한이 없습니다.';
+            } else if (err.response?.status === 404) {
+                errorMessage = '상품을 찾을 수 없습니다.';
+            } else if (err.response?.status >= 500) {
+                errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            setError(errorMessage);
+            alert(`수정 실패: ${errorMessage}`);
         }
     };
 

@@ -1,4 +1,3 @@
-
 import { sellerApi } from '@/lib/apiClient';
 import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
 import { PageResponse } from '@/types/seller/page/pageResponse';
@@ -26,9 +25,24 @@ export async function createProduct(formData: FormData): Promise<number> {
  * 상품 수정 API
  */
 export async function updateProduct(id: number, formData: FormData): Promise<void> {
-    await sellerApi.put(`/seller/products/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    console.log('=== updateProduct API 호출 ===');
+    console.log('상품 ID:', id);
+    console.log('요청 URL:', `/seller/products/${id}`);
+    
+    try {
+        const res = await sellerApi.put(`/seller/products/${id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        console.log('API 응답 성공:', res.status, res.statusText);
+        console.log('응답 데이터:', res.data);
+    } catch (error: any) {
+        console.error('=== updateProduct API 에러 ===');
+        console.error('에러 상태:', error.response?.status);
+        console.error('에러 메시지:', error.response?.statusText);
+        console.error('에러 데이터:', error.response?.data);
+        console.error('전체 에러:', error);
+        throw error;
+    }
 }
 
 /**

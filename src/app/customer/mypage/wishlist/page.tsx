@@ -85,7 +85,6 @@ export default function WishlistPage() {
         <>
         {dialog}
         <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
-            <Navbar />
             <div className="bg-gray-100 min-h-screen py-8">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">
 

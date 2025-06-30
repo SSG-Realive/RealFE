@@ -10,7 +10,6 @@ import {
   MemberModifyDTO,
   MemberReadDTO,
 } from '@/types/customer/member/member';
-import Navbar from '@/components/customer/common/Navbar';
 import AddressInput from '@/components/customer/join/AddressInput';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
@@ -125,7 +124,6 @@ export default function EditProfilePage() {
   if (!profile) {
     return (
       <>
-        <Navbar />
         <p className="p-6 text-center text-gray-500">로딩 중…</p>
       </>
     );

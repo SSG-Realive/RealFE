@@ -10,7 +10,6 @@ import {
 } from '@/service/customer/cartService';
 import { useCartStore } from '@/store/customer/useCartStore';
 import CartItemCard from '@/components/customer/cart/CartItemCard';
-import Navbar from '@/components/customer/common/Navbar';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import useConfirm from '@/hooks/useConfirm';
@@ -148,7 +147,6 @@ export default function CartPage() {
         <>
         {dialog}
         <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
-            <Navbar />
             <main className="max-w-4xl mx-auto p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">장바구니</h1>

@@ -72,29 +72,30 @@ export default function AuctionCard({ auctions }: { auctions: Auction[] }) {
   }, [auctions])
 
   return (
-    <div className="relative overflow-x-auto">
-      <ul ref={trackRef} className="auction-track flex gap-2 py-2 select-none">
-        {[...auctions, ...auctions].map((a, i) => (
-          <AuctionItemCard key={`${a.id}-${i}`} auction={a} />
-        ))}
-      </ul>
+      <div className="relative overflow-x-auto no-scrollbar">
+        <ul ref={trackRef} className="auction-track flex gap-2 py-2 select-none">
+          {[...auctions, ...auctions].map((a, i) => (
+              <AuctionItemCard key={`${a.id}-${i}`} auction={a} />
+          ))}
+        </ul>
 
-      <style jsx>{`
-        .auction-track {
-          animation: scroll var(--scroll-time, 30s) linear infinite;
+        <style jsx>{`
+      .auction-track {
+        animation: scroll var(--scroll-time, 30s) linear infinite;
+      }
+      .auction-track:hover {
+        animation-play-state: paused;
+      }
+      @keyframes scroll {
+        from {
+          transform: translateX(0);
         }
-        .auction-track:hover {
-          animation-play-state: paused;
+        to {
+          transform: translateX(calc(var(--track-len) / -2));
         }
-        @keyframes scroll {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(calc(var(--track-len) / -2));
-          }
-        }
-      `}</style>
-    </div>
+      }
+    `}</style>
+      </div>
   )
+
 }

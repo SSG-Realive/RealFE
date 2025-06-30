@@ -2,86 +2,117 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
+import { Heart, HeartIcon, ShoppingCart } from 'lucide-react';
+
+import ProductImage from '@/components/ProductImage';
 import { ProductListDTO } from '@/types/seller/product/product';
 import { toggleWishlist } from '@/service/customer/wishlistService';
-import ProductImage from '@/components/ProductImage';
-import { Heart, HeartIcon } from 'lucide-react'; // Lucide 하트 아이콘
+import { addToCart } from '@/service/customer/cartService';
+import { useAuthStore } from '@/store/customer/authStore';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ProductCard({
-                                        id,
-                                        name,
-                                        price,
-                                        imageThumbnailUrl,
-                                        isWished = false,
-                                    }: ProductListDTO) {
-    const [hovered, setHovered] = useState(false);
-    const [liked, setLiked] = useState(isWished);
+  id,
+  name,
+  price,
+  imageThumbnailUrl,
+  isWished = false,
+}: ProductListDTO) {
+  /* 상태 */
+  const [liked, setLiked]   = useState(isWished);
+  const [loading, setLoading] = useState(false);
 
-    return (
-        <Link href={`/main/products/${id}`}>
-            <div
-                className="group relative bg-white rounded-2xl overflow-hidden p-4 hover:shadow-md transition cursor-pointer w-full"
-                onMouseEnter={() => setHovered(true)}
-                onMouseLeave={() => setHovered(false)}
-            >
-                {/* 이미지 영역 */}
-                <div className="relative w-full aspect-[1/1] rounded-xl overflow-hidden bg-gray-100">
-                    {imageThumbnailUrl ? (
-                        <ProductImage
-                            src={imageThumbnailUrl}
-                            alt={name}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-500 text-sm">
-                            이미지 없음
-                        </div>
-                    )}
+  /* 공통 도구 */
+  const router   = useRouter();
+  const pathname = usePathname();
+  const { show } = useGlobalDialog();
 
-                    {/* ✅ 반응형 찜(하트) 버튼 */}
-                    <button
-                        className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2
-              bg-white/70 backdrop-blur-sm p-1 sm:p-2 rounded-full shadow-md
-              hover:bg-white transition z-10 flex"
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            const newLiked = !liked;
-                            setLiked(newLiked);
-                            try {
-                                const result = await toggleWishlist({ productId: id });
-                                setLiked(result);
-                            } catch (error) {
-                                console.error('찜 토글 실패:', error);
-                                alert('찜 처리 중 오류가 발생했습니다.');
-                                setLiked(!newLiked);
-                            }
-                        }}
-                        type="button"
-                        title={liked ? '찜 취소' : '찜하기'}
-                    >
-                        {liked ? (
-                            <Heart
-                                size={16}
-                                className="text-red-500 fill-red-500 sm:size-5"
-                            />
-                        ) : (
-                            <HeartIcon
-                                size={16}
-                                className="text-gray-400 sm:size-5"
-                            />
-                        )}
-                    </button>
-                </div>
+  /* 가드 */
+  const withAuth = async (action: () => Promise<void>) => {
+    if (!useAuthStore.getState().accessToken) {
+      await show('로그인이 필요한 서비스입니다.');
+      router.push(
+        `/customer/member/login?redirectTo=${encodeURIComponent(pathname)}`,
+      );
+      return;
+    }
+    await action();
+  };
 
-                {/* 텍스트 영역 */}
-                <div className="mt-4 text-black">
-                    <p className="text-base font-medium truncate text-left">{name}</p>
-                    <p className="text-sm font-semibold text-left text-gray-800 mt-1">
-                        {price.toLocaleString()}
-                        <span className="text-xs align-middle ml-1">원</span>
-                    </p>
-                </div>
-            </div>
-        </Link>
+  /* 버튼 핸들러 */
+  const handleWishClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    withAuth(async () => {
+      setLoading(true);
+      try {
+        const newState = await toggleWishlist({ productId: id });
+        setLiked(newState);
+      } finally {
+        setLoading(false);
+      }
+    });
+  };
+
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    withAuth(() =>
+      addToCart({ productId: id, quantity: 1 }).then(() =>
+        show('장바구니에 담았습니다.'),
+      ),
     );
+  };
+
+  /* UI */
+  return (
+    <Link href={`/main/products/${id}`} prefetch={false}>
+      <div className="group relative bg-white rounded-2xl p-4 hover:shadow-md transition">
+
+        {/* --- 이미지 --- */}
+        <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-100">
+          {imageThumbnailUrl ? (
+            <ProductImage src={imageThumbnailUrl} alt={name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full text-sm text-gray-500">
+              이미지 없음
+            </div>
+          )}
+
+          {/* 장바구니 버튼 — ⬅️ 좌측 상단 */}
+          <button
+            onClick={handleCartClick}
+            title="장바구니 담기"
+            className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm
+                       p-2 rounded-full shadow hover:bg-white transition"
+          >
+            <ShoppingCart size={18} className="text-gray-600" />
+          </button>
+
+          {/* 찜 버튼 — ➡️ 우측 상단 */}
+          <button
+            onClick={handleWishClick}
+            disabled={loading}
+            title={liked ? '찜 취소' : '찜하기'}
+            className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm
+                       p-2 rounded-full shadow hover:bg-white transition"
+          >
+            {liked ? (
+              <Heart size={18} className="fill-red-500 text-red-500" />
+            ) : (
+              <HeartIcon size={18} className="text-gray-400" />
+            )}
+          </button>
+        </div>
+
+        {/* 이름 · 가격 */}
+        <div className="mt-4 text-left">
+          <p className="text-base font-medium truncate">{name}</p>
+          <p className="text-sm font-semibold mt-1">
+            {price.toLocaleString()}
+            <span className="ml-1 text-xs">원</span>
+          </p>
+        </div>
+      </div>
+    </Link>
+  );
 }

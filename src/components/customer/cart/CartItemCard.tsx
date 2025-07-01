@@ -34,8 +34,8 @@ export default function CartItemCard({
                     className="w-24 h-24 object-cover rounded-md flex-shrink-0"
                 />
                 <div className="flex-grow ml-4">
-                    <h3 className="font-medium hover:underline leading-tight">{item.productName}</h3>
-                    <p className="font-bold mt-1">
+                    <h3 className="font-light hover:underline leading-tight">{item.productName}</h3>
+                    <p className="font-light mt-1">
                         {item.productPrice.toLocaleString()}
                         <span className="text-sm ml-1">원</span>
                     </p>

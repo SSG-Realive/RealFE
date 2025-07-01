@@ -96,7 +96,7 @@ export default function WonAuctionsPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">낙찰한 경매</h1>
+          <h1 className="text-3xl font-light text-gray-900 mb-2">낙찰한 경매</h1>
           <p className="text-gray-600">성공적으로 낙찰한 경매 상품들을 확인하세요.</p>
         </div>
 
@@ -154,7 +154,7 @@ export default function WonAuctionsPage() {
                   {/* 낙찰 알림 표시 */}
                   {auction.isNewWin && (
                     <div className="mb-3 p-2 bg-green-50 border border-green-200 rounded-md">
-                      <p className="text-sm text-green-800 font-medium">
+                      <p className="text-sm text-green-800 font-light">
                         {auction.winMessage}
                       </p>
                     </div>
@@ -163,7 +163,7 @@ export default function WonAuctionsPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">낙찰가</span>
-                      <span className="text-lg font-bold text-blue-600">
+                      <span className="text-lg font-light text-blue-600">
                         {formatPrice(auction.winningBidPrice)}
                       </span>
                     </div>
@@ -218,7 +218,7 @@ export default function WonAuctionsPage() {
               <button
                 onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                 disabled={currentPage === 0}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-light text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 이전
               </button>
@@ -227,7 +227,7 @@ export default function WonAuctionsPage() {
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i)}
-                  className={`px-3 py-2 text-sm font-medium rounded-md ${
+                  className={`px-3 py-2 text-sm font-light rounded-md ${
                     currentPage === i
                       ? 'bg-blue-600 text-white'
                       : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
@@ -240,7 +240,7 @@ export default function WonAuctionsPage() {
               <button
                 onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                 disabled={currentPage === totalPages - 1}
-                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-2 text-sm font-light text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 다음
               </button>

@@ -106,8 +106,8 @@ export default function ProductCard({
 
         {/* 이름 · 가격 */}
         <div className="mt-4 text-left">
-          <p className="text-base font-medium truncate">{name}</p>
-          <p className="text-sm font-semibold mt-1">
+          <p className="text-base font-light truncate">{name}</p>
+          <p className="text-sm font-light mt-1">
             {price.toLocaleString()}
             <span className="ml-1 text-xs">원</span>
           </p>

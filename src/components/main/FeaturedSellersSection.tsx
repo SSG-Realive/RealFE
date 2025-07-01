@@ -111,14 +111,14 @@ export default function FeaturedSellersSection() {
       `}</style>
 
             <div className="max-w-7xl mx-auto p-6">
-                <h2 className="text-xl font-semibold text-gray-800 text-center mb-6">
+                <h2 className="text-xl font-light text-gray-800 text-center mb-6">
                     오늘의 판매자 상품
                 </h2>
 
                 <div className="space-y-10">
                     {featured.map((seller) => (
                         <div key={seller.sellerId}>
-                            <h3 className="text-lg font-bold text-gray-700 mb-4 text-center">
+                            <h3 className="text-lg font-light text-gray-700 mb-4 text-center">
                                 {seller.sellerName}
                             </h3>
 
@@ -181,8 +181,8 @@ export default function FeaturedSellersSection() {
 
                                                 {/* 텍스트 */}
                                                 <div className="mt-4 text-black">
-                                                    <p className="text-base font-medium truncate">{product.name}</p>
-                                                    <p className="text-sm font-semibold text-gray-800 mt-1">
+                                                    <p className="text-base font-light truncate">{product.name}</p>
+                                                    <p className="text-sm font-light text-gray-800 mt-1">
                                                         {product.price.toLocaleString()}
                                                         <span className="text-xs align-middle ml-1">원</span>
                                                     </p>

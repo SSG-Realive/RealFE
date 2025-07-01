@@ -185,7 +185,7 @@ const NewReviewPage = () => {
                     <form onSubmit={handleSubmit} className="w-full max-w-2xl flex flex-col gap-5">
                         {/* 별점 입력 UI */}
                         <div className="flex items-center gap-2 mb-4">
-                            <label htmlFor="reviewRating" className="text-lg font-medium text-gray-700">별점:</label>
+                            <label htmlFor="reviewRating" className="text-lg font-light text-gray-700">별점:</label>
                             <select
                                 id="reviewRating"
                                 className="p-2 border border-gray-300 rounded-md bg-white text-gray-800"
@@ -218,7 +218,7 @@ const NewReviewPage = () => {
 
                         <button
                             type="submit"
-                            className="self-end px-8 py-4 bg-blue-600 text-white font-bold rounded-lg text-lg cursor-pointer hover:bg-blue-700 transition-colors mt-5 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                            className="self-end px-8 py-4 bg-blue-600 text-white font-light rounded-lg text-lg cursor-pointer hover:bg-blue-700 transition-colors mt-5 disabled:bg-blue-300 disabled:cursor-not-allowed"
                             disabled={isLoading}
                         >
                             {isLoading ? '등록 중...' : '등록'}

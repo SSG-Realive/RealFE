@@ -128,14 +128,14 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <Navbar/>
                 <div className="container mx-auto p-4 font-inter">
 
-                    <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+                    <h1 className="text-3xl font-light mb-6 text-center text-gray-800">
                         주문 상세
                     </h1>
                     <div
                         className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
                         role="alert"
                     >
-                        <strong className="font-bold">오류: </strong>
+                        <strong className="font-light">오류: </strong>
                         <span className="block sm:inline">{error}</span>
                     </div>
                 </div>
@@ -150,7 +150,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
                 <div className="container mx-auto p-4 text-center text-gray-700 font-inter">
 
-                    <h1 className="text-3xl font-bold mb-6">주문 상세</h1>
+                    <h1 className="text-3xl font-light mb-6">주문 상세</h1>
                     <p>주문 정보를 찾을 수 없습니다.</p>
                 </div>
             </div>
@@ -163,31 +163,31 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
             <Navbar/>
             <div className="container mx-auto p-4 bg-gray-50 min-h-screen font-inter">
 
-                <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-900 leading-tight">
+                <h1 className="text-4xl font-light mb-8 text-center text-gray-900 leading-tight">
                     주문 상세 정보
                 </h1>
 
                 <div className="bg-white shadow-xl rounded-lg p-8 mb-8 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 번호: <span className="font-normal text-blue-600">{orderData.orderId}</span></p>
-                            <p className="text-lg font-semibold mb-2">고객 ID: <span className="font-normal">{orderData.customerId}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송 주소: <span className="font-normal">{orderData.deliveryAddress}</span></p>
-                            <p className="text-lg font-semibold mb-2">총 주문 가격: <span className="font-normal text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
+                            <p className="text-lg font-semibold mb-2">주문 번호: <span className="font-light text-blue-600">{orderData.orderId}</span></p>
+                            <p className="text-lg font-semibold mb-2">고객 ID: <span className="font-light">{orderData.customerId}</span></p>
+                            <p className="text-lg font-semibold mb-2">배송 주소: <span className="font-light">{orderData.deliveryAddress}</span></p>
+                            <p className="text-lg font-semibold mb-2">총 주문 가격: <span className="font-light text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
                         </div>
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 일시: <span className="font-normal">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">최종 업데이트: <span className="font-normal">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">결제 방식: <span className="font-normal">{orderData.paymentType}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송비: <span className="font-normal">{orderData.deliveryFee.toLocaleString()}원</span></p>
-                            <p className="text-lg font-semibold mb-2">수령인: <span className="font-normal">{orderData.receiverName}</span></p>
-                            <p className="text-lg font-semibold mb-2">연락처: <span className="font-normal">{orderData.phone}</span></p>
+                            <p className="text-lg font-semibold mb-2">주문 일시: <span className="font-light">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-semibold mb-2">최종 업데이트: <span className="font-light">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-semibold mb-2">결제 방식: <span className="font-light">{orderData.paymentType}</span></p>
+                            <p className="text-lg font-semibold mb-2">배송비: <span className="font-light">{orderData.deliveryFee.toLocaleString()}원</span></p>
+                            <p className="text-lg font-semibold mb-2">수령인: <span className="font-light">{orderData.receiverName}</span></p>
+                            <p className="text-lg font-semibold mb-2">연락처: <span className="font-light">{orderData.phone}</span></p>
                         </div>
                     </div>
                     <p className="text-lg font-semibold mt-4">
                         주문 상태:{" "}
                         <span
-                            className={`relative inline-block px-4 py-1 font-bold leading-tight rounded-full ${
+                            className={`relative inline-block px-4 py-1 font-light leading-tight rounded-full ${
                                 orderData.orderStatus === "ORDER"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-red-100 text-red-800"
@@ -200,7 +200,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 </div>
 
                 <div className="bg-white shadow-xl rounded-lg p-8 border border-gray-200">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-3">주문 상품 목록</h2>
+                    <h2 className="text-3xl font-light mb-6 text-gray-800 border-b pb-3">주문 상품 목록</h2>
                     {orderData.orderItems.length === 0 ? (
                         <p className="text-lg text-gray-600 text-center py-4">주문된 상품이 없습니다.</p>
                     ) : (
@@ -228,7 +228,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                     <div className="flex-grow text-center md:text-left">
                                         <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>
                                         <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
-                                        <p className="text-xl font-bold text-blue-700">{item.price.toLocaleString()}원</p>
+                                        <p className="text-xl font-light text-blue-700">{item.price.toLocaleString()}원</p>
                                         <button
                                             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
                                             onClick={() =>

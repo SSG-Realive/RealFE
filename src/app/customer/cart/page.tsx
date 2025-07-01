@@ -151,7 +151,7 @@ export default function CartPage() {
             <GlobalDialog open={open} message={message} onClose={handleClose} />
             <main className="max-w-4xl mx-auto p-6 pb-40">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">장바구니</h1>
+                    <h1 className="text-2xl font-light">장바구니</h1>
                     {cartItems.length > 0 && (
                         <div className="flex gap-2">
                             <button
@@ -206,7 +206,7 @@ export default function CartPage() {
             {cartItems.length > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
                     <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-                        <div className="text-lg font-bold">
+                        <div className="text-lg font-light">
                             총 금액: {totalPrice.toLocaleString()}
                             <span className="text-sm ml-1">원</span>
                         </div>
@@ -215,7 +215,7 @@ export default function CartPage() {
                                 <button
                                     onClick={handleDeleteSelected}
                                     disabled={selectedItemIds.size === 0}
-                                    className="py-3 px-4 bg-red-500 text-white font-bold rounded-md disabled:bg-gray-300"
+                                    className="py-3 px-4 bg-red-500 text-white font-light rounded-md disabled:bg-gray-300"
                                     title="선택 상품 삭제"
                                 >
                                     <FiTrash2 className="text-lg" />

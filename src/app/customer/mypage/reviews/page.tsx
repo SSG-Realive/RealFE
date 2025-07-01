@@ -26,7 +26,7 @@ export default function MyReviewPage() {
     return (
         <div>
             <div className="max-w-3xl mx-auto px-4 py-10">
-                <h1 className="text-2xl font-bold mb-6">내가 작성한 리뷰</h1>
+                <h1 className="text-2xl font-light mb-6">내가 작성한 리뷰</h1>
 
                 {loading ? (
                     <p>로딩 중...</p>

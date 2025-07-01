@@ -123,30 +123,30 @@ export default function ProductDetailPage() {
           />
 
           <div>
-            <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+            <h1 className="text-2xl font-light mb-2">{product.name}</h1>
             <p className="text-sm text-gray-700 mb-4">{product.description}</p>
-            <p className="text-xl font-bold mb-6">
+            <p className="text-xl font-light mb-6">
               {product.price.toLocaleString()}
               <span className="text-sm ml-1">원</span>
             </p>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
-              <p><span className="font-semibold">상품상태:</span> {product.status}</p>
-              <p><span className="font-semibold">재고:</span> {product.stock}개</p>
+              <p><span className="font-light">상품상태:</span> {product.status}</p>
+              <p><span className="font-light">재고:</span> {product.stock}개</p>
               {product.width && product.depth && product.height && (
-                  <p><span className="font-semibold">사이즈:</span> {product.width}×{product.depth}×{product.height} cm</p>
+                  <p><span className="font-light">사이즈:</span> {product.width}×{product.depth}×{product.height} cm</p>
               )}
               {product.categoryName && (
-                  <p><span className="font-semibold">카테고리:</span> {product.categoryName}</p>
+                  <p><span className="font-light">카테고리:</span> {product.categoryName}</p>
               )}
               {product.sellerName && (
-                  <p><span className="font-semibold">판매자:</span> {product.sellerName}</p>
+                  <p><span className="font-light">판매자:</span> {product.sellerName}</p>
               )}
             </div>
 
             <div className="border-t border-b py-6 mb-8">
               <div className="flex items-center justify-between mb-4">
-                <span className="font-semibold text-sm">수량</span>
+                <span className="font-light text-sm">수량</span>
                 <div className="flex items-center gap-2">
                   <button
                       onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
@@ -160,7 +160,7 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-base font-bold mb-6">
+              <div className="flex items-center justify-between text-base font-light mb-6">
                 <span>총 상품금액</span>
                 <span>
                 {(product.price * quantity).toLocaleString()}
@@ -183,12 +183,12 @@ export default function ProductDetailPage() {
 
                 <button
                     onClick={handleAddToCart}
-                    className="flex-1 px-5 py-3 border bg-white hover:bg-gray-100 text-sm font-semibold"
+                    className="flex-1 px-5 py-3 border bg-white hover:bg-gray-100 text-sm font-light"
                 >장바구니</button>
 
                 <button
                     onClick={handleBuyNow}
-                    className="flex-1 px-5 py-3 bg-black text-white hover:bg-gray-900 text-sm font-semibold"
+                    className="flex-1 px-5 py-3 bg-black text-white hover:bg-gray-900 text-sm font-light"
                 >바로 구매</button>
               </div>
             </div>
@@ -196,7 +196,7 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-lg font-bold mb-4">판매자 리뷰</h2>
+          <h2 className="text-lg font-light mb-4">판매자 리뷰</h2>
           {reviews.length > 0 ? (
               <ReviewList reviews={reviews} />
           ) : (
@@ -206,7 +206,7 @@ export default function ProductDetailPage() {
 
         {related.length > 0 && (
             <div className="max-w-6xl mx-auto px-4 mt-8">
-              <h2 className="text-lg font-bold mb-4">추천상품</h2>
+              <h2 className="text-lg font-light mb-4">추천상품</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
                 {related.map((item) => (
                     <div
@@ -220,8 +220,8 @@ export default function ProductDetailPage() {
                           className="w-full aspect-[4/3] object-cover"
                       />
                       <div className="p-3">
-                        <p className="text-sm font-medium truncate text-black">{item.name}</p>
-                        <p className="text-sm font-bold mt-1 text-black">{item.price.toLocaleString()}원</p>
+                        <p className="text-sm font-light truncate text-black">{item.name}</p>
+                        <p className="text-sm font-light mt-1 text-black">{item.price.toLocaleString()}원</p>
                       </div>
                     </div>
                 ))}
@@ -236,12 +236,12 @@ export default function ProductDetailPage() {
         >
           <div className="max-w-4xl mx-auto flex justify-between items-center">
             <div>
-              <p className="text-sm font-semibold truncate">{product.name}</p>
-              <p className="text-base font-bold">{product.price.toLocaleString()}<span className="text-sm ml-1">원</span></p>
+              <p className="text-sm font-light truncate">{product.name}</p>
+              <p className="text-base font-light">{product.price.toLocaleString()}<span className="text-sm ml-1">원</span></p>
             </div>
             <button
                 onClick={handleBuyNow}
-                className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-sm font-bold"
+                className="bg-red-500 text-white px-8 py-3 rounded-md hover:bg-red-600 text-sm font-light"
             >
               바로 주문
             </button>

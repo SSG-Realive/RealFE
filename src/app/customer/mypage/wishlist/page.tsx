@@ -207,8 +207,8 @@ export default function WishlistPage() {
                                             />
                                             <div className="flex-grow ml-4">
                                                 <p className="text-sm text-gray-500">{p.sellerName}</p>
-                                                <h3 className="font-medium hover:underline leading-tight">{p.name}</h3>
-                                                <p className="font-bold mt-1">{p.price.toLocaleString()}원</p>
+                                                <h3 className="font-light hover:underline leading-tight">{p.name}</h3>
+                                                <p className="font-light mt-1">{p.price.toLocaleString()}원</p>
                                             </div>
                                         </Link>
                                         <button
@@ -232,7 +232,7 @@ export default function WishlistPage() {
                         <button
                             onClick={handleDeleteSelected}
                             disabled={selectedIds.size === 0}
-                            className="w-full py-3 bg-red-500 text-white font-bold rounded-md disabled:bg-gray-300"
+                            className="w-full py-3 bg-red-500 text-white font-light rounded-md disabled:bg-gray-300"
                         >
                             선택 삭제 ({selectedIds.size})
                         </button>

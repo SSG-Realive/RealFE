@@ -99,7 +99,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">이메일</label>
+        <label htmlFor="email" className="block text-sm font-light text-gray-700">이메일</label>
         <input
           id="email"
           name="email"
@@ -112,7 +112,7 @@ export default function LoginForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호</label>
+        <label htmlFor="password" className="block text-sm font-light text-gray-700">비밀번호</label>
         <input
           id="password"
           name="password"

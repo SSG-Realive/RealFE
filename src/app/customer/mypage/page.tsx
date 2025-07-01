@@ -86,7 +86,7 @@ export default function MyPage() {
                 <div className="max-w-6xl mx-auto bg-white rounded-xl px-6 pt-6">
                     {/* ===== 타이틀 ===== */}
                     <div className="relative mb-6">
-                        <h1 className="text-xl font-bold">마이페이지</h1>
+                        <h1 className="text-xl font-light">마이페이지</h1>
                         {userName && (
                             <span className="absolute right-0 top-7 text-sm text-gray-500">
                                 {userName}님, 환영합니다.
@@ -173,7 +173,7 @@ export default function MyPage() {
                                                         </div>
 
                                                         {/* 가운데: 내 입찰가 */}
-                                                        <p className="text-sm font-medium">
+                                                        <p className="text-sm font-light">
                                                             {b.bidPrice.toLocaleString()}원
                                                         </p>
 

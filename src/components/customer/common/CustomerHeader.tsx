@@ -7,7 +7,7 @@ export default function CustomerHeader() {
         <header className="bg-white border-b border-gray-200">
             <div className="max-w-screen-xl mx-auto px-4 py-3 flex justify-between items-center">
                 {/* 로고 */}
-                <Link href="/" className="text-lg font-bold text-gray-800 hover:text-green-600">
+                <Link href="/" className="text-lg font-light text-gray-800 hover:text-green-600">
                     realize
                 </Link>
 

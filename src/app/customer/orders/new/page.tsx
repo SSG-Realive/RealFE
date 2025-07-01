@@ -135,15 +135,15 @@ export default function NewOrderPage() {
         <div className="bg-gray-50 min-h-screen pb-24 lg:pb-0">
             
             <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-                <h1 className="text-2xl lg:text-3xl font-bold mb-6">주문 / 결제</h1>
+                <h1 className="text-2xl lg:text-3xl font-light mb-6">주문 / 결제</h1>
 
                 <div className="space-y-6">
                     <section className="bg-white p-6 rounded-lg shadow-sm">
                         <h2 className="text-lg font-semibold mb-4">배송지</h2>
                         <div className="space-y-3">
-                            <div><label className="text-sm font-medium text-gray-700">받는 분</label><input type="text" name="receiverName" value={shippingInfo.receiverName} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                            <div><label className="text-sm font-medium text-gray-700">연락처</label><input type="text" name="phone" value={shippingInfo.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                            <div><label className="text-sm font-medium text-gray-700">주소</label><input type="text" name="address" value={shippingInfo.address} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                            <div><label className="text-sm font-light text-gray-700">받는 분</label><input type="text" name="receiverName" value={shippingInfo.receiverName} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                            <div><label className="text-sm font-light text-gray-700">연락처</label><input type="text" name="phone" value={shippingInfo.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                            <div><label className="text-sm font-light text-gray-700">주소</label><input type="text" name="address" value={shippingInfo.address} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
                         </div>
                     </section>
                     
@@ -153,7 +153,7 @@ export default function NewOrderPage() {
                             {cartItems.map(item => (
                                 <div key={item.cartItemId} className="flex items-start space-x-4">
                                     <img src={item.imageThumbnailUrl || '/default-image.png'} alt={item.productName} className="w-20 h-20 object-cover rounded-md flex-shrink-0" />
-                                    <div className="flex-grow"><p className="font-medium">{item.productName}</p><p className="text-sm text-gray-500">수량: {item.quantity}개</p></div>
+                                    <div className="flex-grow"><p className="font-light">{item.productName}</p><p className="text-sm text-gray-500">수량: {item.quantity}개</p></div>
                                     <p className="font-semibold whitespace-nowrap">{(item.productPrice * item.quantity).toLocaleString()}원</p>
                                 </div>
                             ))}
@@ -166,9 +166,9 @@ export default function NewOrderPage() {
                             <div className="flex justify-between text-sm"><span>총 상품금액</span><span>{totalProductPrice.toLocaleString()}원</span></div>
                             <div className="flex justify-between text-sm"><span>배송비</span><span>+ {deliveryFee.toLocaleString()}원</span></div>
                             <div className="border-t my-2"></div>
-                            <div className="flex justify-between font-bold text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
+                            <div className="flex justify-between font-light text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
                         </div>
-                        <button className="w-full bg-green-500 text-white font-bold py-3 mt-4 rounded-md hover:bg-green-600 transition-colors" onClick={handlePayment} disabled={cartItems.length === 0}>
+                        <button className="w-full bg-green-500 text-white font-light py-3 mt-4 rounded-md hover:bg-green-600 transition-colors" onClick={handlePayment} disabled={cartItems.length === 0}>
                             {finalAmount.toLocaleString()}원 결제하기
                         </button>
                     </section>

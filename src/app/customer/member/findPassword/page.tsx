@@ -99,7 +99,7 @@ export default function FindPasswordMultiStep() {
 
           {step === 'enterEmail' && (
             <form onSubmit={onEmailSubmit}>
-              <h1 className="text-2xl font-bold mb-4">비밀번호 찾기</h1>
+              <h1 className="text-2xl font-light mb-4">비밀번호 찾기</h1>
               <input
                 type="email"
                 placeholder="이메일"
@@ -120,7 +120,7 @@ export default function FindPasswordMultiStep() {
 
           {step === 'verifyCode' && (
             <form onSubmit={onCodeSubmit}>
-              <h1 className="text-2xl font-bold mb-4">인증번호 확인</h1>
+              <h1 className="text-2xl font-light mb-4">인증번호 확인</h1>
               <p className="mb-2 text-sm text-gray-600">{email}로 발송된 코드를 입력</p>
               <input
                 type="text"
@@ -149,7 +149,7 @@ export default function FindPasswordMultiStep() {
 
           {step === 'newPassword' && (
             <form onSubmit={onPasswordSubmit}>
-              <h1 className="text-2xl font-bold mb-4">새 비밀번호 설정</h1>
+              <h1 className="text-2xl font-light mb-4">새 비밀번호 설정</h1>
               <input
                 type="password"
                 placeholder="새 비밀번호"

@@ -110,15 +110,15 @@ export default function PaymentSuccessPage() {
                     <div className="space-y-3">
                         <button 
                             onClick={() => router.back()}
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-semibold transition-colors duration-200"
                         >
-                            이전 페이지로 돌아가기
+                            ⬅️ 이전 페이지로 돌아가기
                         </button>
                         <Link 
                             href="/customer/orders"
-                            className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
+                            className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
                         >
-                            주문 목록으로 가기
+                            📜 주문 목록으로 가기
                         </Link>
                     </div>
                 </div>
@@ -138,21 +138,21 @@ export default function PaymentSuccessPage() {
                 <div className="space-y-3">
                     <Link 
                         href={`/customer/orders/${orderId}`}
-                        className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
+                        className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 text-center font-semibold transition-colors duration-200"
                     >
-                        주문 상세보기
+                        📋 주문 상세보기
                     </Link>
                     <Link 
                         href="/customer/orders"
-                        className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
+                        className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
                     >
-                        주문 목록으로 가기
+                        📜 주문 목록으로 가기
                     </Link>
                     <Link 
                         href="/main"
-                        className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 text-center"
+                        className="block w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 text-center font-semibold transition-colors duration-200"
                     >
-                        쇼핑 계속하기
+                        🛍️ 쇼핑 계속하기
                     </Link>
                 </div>
             </div>

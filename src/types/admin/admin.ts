@@ -8,6 +8,7 @@ export interface AdminDashboardDTO {
   salesSummaryStats: SalesSummaryStatsDTO;
   auctionSummaryStats: AuctionSummaryStatsDTO;
   reviewSummaryStats: ReviewSummaryStatsDTO;
+  dailyRevenueTrend: DateBasedValueDTO<number>[];
 }
 
 export interface ProductLogDTO {
@@ -89,6 +90,11 @@ export interface ReviewSummaryStatsDTO {
   newReviewsInPeriod: number;
   averageRatingInPeriod: number;
   deletionRate: number;
+}
+
+export interface DateBasedValueDTO<T> {
+  date: string;
+  value: T;
 }
 
 export interface AdminReview {

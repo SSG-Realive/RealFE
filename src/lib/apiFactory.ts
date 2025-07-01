@@ -1,4 +1,4 @@
-// src/lib/apiFactory.ts (새 파일)
+// src/lib/apiFactory.ts
 
 import axios, { type AxiosInstance } from 'axios';
 
@@ -31,16 +31,33 @@ export function createApiClient(store: AuthStore): AxiosInstance {
     (error) => Promise.reject(error)
   );
 
-  // 응답 인터셉터: 401 Unauthorized 에러 발생 시 자동으로 로그아웃 처리합니다.
+  // 응답 인터셉터: 401/403 에러 발생 시 자동으로 로그아웃 처리합니다.
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response?.status === 401) {
+      const status = error.response?.status;
+      if (status === 401 || status === 403) {
         // 토큰이 만료되었거나 유효하지 않으므로 스토어에서 로그아웃 처리합니다.
+        console.warn('🔒 인증 토큰이 만료되었습니다. 다시 로그인해주세요.');
         store.getState().logout();
-        if (window.location.pathname !== '/login') {
+        
+        // 현재 경로에 따라 적절한 로그인 페이지로 리다이렉트
+        const currentPath = window.location.pathname;
+        if (currentPath.startsWith('/admin')) {
+          if (currentPath !== '/admin/login') {
+            alert('관리자 세션이 만료되었습니다. 다시 로그인해주세요.');
+            window.location.href = '/admin/login';
+          }
+        } else if (currentPath.startsWith('/seller')) {
+          if (currentPath !== '/seller/login') {
+            alert('판매자 세션이 만료되었습니다. 다시 로그인해주세요.');
+            window.location.href = '/seller/login';
+          }
+        } else {
+          if (currentPath !== '/login') {
+            alert('세션이 만료되었습니다. 다시 로그인해주세요.');
           window.location.href = '/login';
-
+          }
         }
       }
       return Promise.reject(error);

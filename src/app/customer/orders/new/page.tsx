@@ -137,7 +137,7 @@ export default function NewOrderPage() {
 
     return (
         <div className="bg-gray-50 min-h-screen pb-24 lg:pb-0">
-            <Navbar />
+            
             <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
                 <h1 className="text-2xl lg:text-3xl font-bold mb-6">주문 / 결제</h1>
 

@@ -14,10 +14,8 @@ function isApiError(error: unknown): error is { response?: { status?: number, da
 
 export async function getAdminDashboard(date: string, periodType: string): Promise<AdminDashboardDTO> {
   try {
-    // adminApi가 자동으로 토큰을 zustand에서 읽어옵니다.
-    const response = await adminApi.get<ApiResponse<AdminDashboardDTO>>(
-        `/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`
-    );
+    const url = `/admin/stats/main-dashboard?date=${date}&periodType=${periodType}`;
+    const response = await adminApi.get<ApiResponse<AdminDashboardDTO>>(url);
 
     if (!response.data || !response.data.data) {
       throw new Error('데이터를 불러오는데 실패했습니다.');
@@ -26,7 +24,6 @@ export async function getAdminDashboard(date: string, periodType: string): Promi
     return response.data.data;
   } catch (error) {
     console.error('Failed to fetch admin dashboard:', error);
-    // 타입 가드 사용
     if (isApiError(error) && error.response?.status === 403) {
       throw new Error('관리자 인증이 필요합니다.');
     }
@@ -140,7 +137,7 @@ export async function getProductQualityStats() {
     
     return stats;
   } catch (error) {
-    console.error('상품 품질별 통계 조회 실패:', error);
+    console.error('Failed to fetch product quality stats:', error);
     throw error;
   }
 }
@@ -151,7 +148,7 @@ export async function getMonthlyProductRegistrationStats(months: number = 6) {
     const response = await adminApi.get(`/admin/products/monthly-stats?months=${months}`);
     return response.data;
   } catch (error) {
-    console.error('월별 상품 등록 통계 조회 실패:', error);
+    console.error('Failed to fetch monthly product registration stats:', error);
     throw error;
   }
 }
@@ -162,7 +159,7 @@ export async function getDailyProductRegistrationStats(days: number = 30) {
     const response = await adminApi.get(`/admin/products/daily-stats?days=${days}`);
     return response.data;
   } catch (error) {
-    console.error('일별 상품 등록 통계 조회 실패:', error);
+    console.error('Failed to fetch daily product registration stats:', error);
     throw error;
   }
 }

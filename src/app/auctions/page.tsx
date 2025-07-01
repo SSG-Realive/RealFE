@@ -12,6 +12,7 @@ import { publicAuctionService } from '@/service/customer/publicAuctionService';
 import { useGlobalDialog } from '../context/dialogContext';
 
 export default function AuctionListPage() {
+  
   const router = useRouter();
   const { show } = useGlobalDialog();
 

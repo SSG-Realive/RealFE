@@ -15,7 +15,6 @@ import {
     ChevronRight,
 } from 'lucide-react';
 
-import Footer from '@/components/customer/common/Footer';
 import { useAuthStore } from '@/store/customer/authStore';
 import { customerBidService } from '@/service/customer/auctionService';
 import type { Bid } from '@/types/customer/auctions';
@@ -203,7 +202,6 @@ export default function MyPage() {
                     </section>
                 </div>
             </main>
-            <Footer />
         </>
     );
 }

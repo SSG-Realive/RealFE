@@ -9,7 +9,6 @@ import { fetchAllCategories } from '@/service/categoryService';
 import { ProductListDTO } from '@/types/seller/product/product';
 import { Category } from '@/types/common/category';
 
-import ChatbotFloatingButton from '@/components/customer/common/ChatbotFloatingButton';
 import ProductCard from '@/components/customer/product/ProductCard';
 import BannerCarousel from '@/components/main/BannerCarousel';
 import PopularProductsGrid from '@/components/main/PopularProductsGrid';
@@ -19,7 +18,6 @@ import SectionWithSubCategoryButtons from '@/components/customer/product/Section
 import FeaturedSellersSection from '@/components/main/FeaturedSellersSection';
 import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 import ScrollToTopButton from '@/components/customer/common/ScrollToTopButton';
-import Footer from '@/components/customer/common/Footer';
 import AuctionCard from '@/components/customer/auctions/AuctionCard';
 import { Auction } from '@/types/customer/auctions';
 import { publicAuctionService } from '@/service/customer/publicAcutionService';
@@ -211,9 +209,6 @@ export default function CustomerHomePage() {
                     })}
                 </>
             )}
-
-            <Footer />
-            <ChatbotFloatingButton />
             <ScrollToTopButton />
         </div>
     );

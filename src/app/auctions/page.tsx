@@ -4,23 +4,18 @@ import { useEffect, useRef, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'next/navigation';
 
-import { Flame, Clock, Sparkles } from 'lucide-react';
-
 import type { Auction, PaginatedAuctionResponse } from '@/types/customer/auctions';
+
 import ProductImage from '@/components/ProductImage';
 import { publicAuctionService } from '@/service/customer/publicAcutionService';
 import { useGlobalDialog } from '../context/dialogContext';
-import Footer from "@/components/customer/common/Footer";
 
 export default function AuctionListPage() {
   const router = useRouter();
   const { show } = useGlobalDialog();
 
   const [auctions, setAuctions] = useState<Auction[]>([]);
-  const trackRef1 = useRef<HTMLUListElement>(null);
-  const trackRef2 = useRef<HTMLUListElement>(null);
-  const trackRef3 = useRef<HTMLUListElement>(null);
-  const trackRef4 = useRef<HTMLUListElement>(null);
+  const trackRef = useRef<HTMLUListElement>(null);
 
   const fetchAuctions = async () => {
     try {
@@ -41,50 +36,36 @@ export default function AuctionListPage() {
     fetchAuctions();
   }, []);
 
+  // 트랙 길이 계산
+  useEffect(() => {
+    const calc = () => {
+      if (!trackRef.current) return;
+      const len =
+          Array.from(trackRef.current.children).reduce(
+              (sum, el) => sum + (el as HTMLElement).offsetWidth,
+              0
+          ) || 1;
+      trackRef.current.style.setProperty('--track-len', `${len}px`);
+    };
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, [auctions]);
+
   const timeLeft = (end: string) =>
       formatDistanceToNowStrict(new Date(end), { addSuffix: true });
 
-  const setupTrack = (ref: React.RefObject<HTMLUListElement>) => {
-    if (!ref.current) return;
-    const len =
-        Array.from(ref.current.children).reduce(
-            (sum, el) => sum + (el as HTMLElement).offsetWidth,
-            0
-        ) || 1;
-    ref.current.style.setProperty('--track-len', `${len}px`);
-  };
+  return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <h1 className="text-xl font-extrabold mb-6">실시간 경매</h1>
 
-  useEffect(() => {
-    const resizeHandler = () => {
-      setupTrack(trackRef1);
-      setupTrack(trackRef2);
-      setupTrack(trackRef3);
-      setupTrack(trackRef4);
-    };
-    resizeHandler();
-    window.addEventListener('resize', resizeHandler);
-    return () => window.removeEventListener('resize', resizeHandler);
-  }, [auctions]);
-
-  const renderSlider = (title: string, trackRef: React.RefObject<HTMLUListElement>) => {
-    const iconMap: Record<string, JSX.Element> = {
-      '실시간 경매': <Flame className="text-indigo-500" size={20} />,
-      '인기 경매': <Flame className="text-red-500" size={20} />,
-      '마감 임박 경매': <Clock className="text-yellow-500" size={20} />,
-      '신규 경매': <Sparkles className="text-green-500" size={20} />,
-    };
-
-    return (
-        <section className="mb-10">
-          <h2 className="text-xl font-extrabold mb-4 flex items-center gap-2">
-            {iconMap[title] ?? null}
-            {title}
-          </h2>
+          {/* 슬라이더 트랙 */}
           <div className="relative overflow-x-auto no-scrollbar">
             <ul ref={trackRef} className="auction-track flex gap-4 py-2 select-none">
               {[...auctions, ...auctions].map((a, i) => (
                   <li
-                      key={`${title}-${a.id}-${i}`}
+                      key={`${a.id}-${i}`}
                       className="w-60 flex-shrink-0"
                       onClick={() => router.push(`/auctions/${a.id}`)}
                   >
@@ -123,7 +104,7 @@ export default function AuctionListPage() {
               ))}
             </ul>
 
-            {/* 슬라이드 애니메이션 */}
+            {/* 마퀴 애니메이션 정의 */}
             <style jsx>{`
             .auction-track {
               animation: scroll var(--scroll-time, 30s) linear infinite;
@@ -141,19 +122,7 @@ export default function AuctionListPage() {
             }
           `}</style>
           </div>
-        </section>
-    );
-  };
-
-  return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-10">
-          {renderSlider('실시간 경매', trackRef1)}
-          {renderSlider('인기 경매', trackRef2)}
-          {renderSlider('마감 임박 경매', trackRef3)}
-          {renderSlider('신규 경매', trackRef4)}
         </div>
-        <Footer />
       </div>
   );
 }

@@ -20,7 +20,7 @@ import { Pencil } from 'lucide-react';
 function ReadOnlyCard({ label, value }: { label: string; value?: string | null }) {
   return (
     <section className="rounded-2xl bg-white/90 p-5 shadow ring-1 ring-gray-100">
-      <h2 className="mb-2 text-sm font-medium text-gray-500">{label}</h2>
+      <h2 className="mb-2 text-sm font-light text-gray-500">{label}</h2>
       <p className="text-[17px] sm:text-base text-gray-800 break-words">
         {value || '-'}
       </p>
@@ -42,7 +42,7 @@ function EditableCard(props: {
   return (
     <section className="rounded-2xl bg-white/90 p-5 shadow ring-1 ring-gray-100 space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-500">{label}</h2>
+        <h2 className="text-sm font-light text-gray-500">{label}</h2>
         {!editing && (
           <button
             type="button"
@@ -216,7 +216,7 @@ export default function EditProfilePage() {
             type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="rounded-md bg-amber-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 disabled:opacity-50"
+            className="rounded-md bg-amber-500 px-5 py-2 text-sm font-light text-white shadow hover:bg-amber-600 disabled:opacity-50"
           >
             {saving ? '저장 중…' : '저장'}
           </button>

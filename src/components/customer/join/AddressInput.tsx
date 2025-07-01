@@ -14,7 +14,7 @@ interface AddressInputProps {
 const SEP = '|';                           // 구분자
 
 /**  "48060|도로명주소|상세"  →  { zonecode, address, detail }  */
-function parseAddress(str = '') {
+export function parseAddress(str = '') {
   const [zonecode = '', addr = '', detail = ''] = str.split(SEP);
   return { zonecode, address: addr, detail };
 }

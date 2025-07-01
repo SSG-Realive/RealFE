@@ -6,7 +6,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        hakgyo: ['HakgyoansimWoojuR', 'sans-serif'],
+        scdLight: ['S-CoreDream-3Light', 'sans-serif'],
       },
     },
   },

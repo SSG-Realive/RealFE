@@ -35,23 +35,23 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
           {/* 텍스트 영역 */}
             <div className="p-3 text-left">
                 {/* 상품명 */}
-                <p className="text-base font-medium truncate">
+                <p className="text-base font-light truncate">
                     {adminProduct?.productName ?? '상품 없음'}
                 </p>
                 {/* 시작가 */}
-                <p className="text-sm font-semibold text-gray-900 mt-1">
+                <p className="text-sm font-light text-gray-900 mt-1">
                     시작가 {startPrice?.toLocaleString()}
                     <span className="ml-1 text-xs">원</span>
                 </p>
 
                 {/* 현재가 */}
-                <p className="text-sm font-semibold text-red-500 mt-0.5">
+                <p className="text-sm font-light text-red-500 mt-0.5">
                     현재가 {currentPrice?.toLocaleString()}
                     <span className="ml-1 text-xs">원</span>
                 </p>
 
                 {/* 종료 시간 */}
-                <p className="text-sm font-semibold text-gray-500 mt-0.5">
+                <p className="text-sm font-light text-gray-500 mt-0.5">
                     종료 {endTime ? new Date(endTime).toLocaleString() : '-'}
                 </p>
             </div>

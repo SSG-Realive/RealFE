@@ -14,6 +14,7 @@ import CartItemCard from '@/components/customer/cart/CartItemCard';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import useConfirm from '@/hooks/useConfirm';
+import { FiTrash2 } from 'react-icons/fi';
 
 export default function CartPage() {
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -21,8 +22,8 @@ export default function CartPage() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const router = useRouter();
-     const { open, message, handleClose, show } = useDialog();
-     const { confirm, dialog } = useConfirm() 
+    const { open, message, handleClose, show } = useDialog();
+    const { confirm, dialog } = useConfirm();
 
     const { hydrated, isAuthenticated } = useAuthStore();
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
@@ -41,116 +42,99 @@ export default function CartPage() {
         }
 
         fetchCartList()
-            .then(items => {
+            .then((items) => {
                 setCartItems(items);
-                setSelectedItemIds(new Set(items.map(item => item.cartItemId)));
+                setSelectedItemIds(new Set(items.map((item) => item.cartItemId)));
             })
             .catch(() => show('장바구니 불러오기 실패'))
             .finally(() => setLoading(false));
     }, [hydrated, isAuthenticated, router]);
 
     const totalPrice = cartItems
-        .filter(item => selectedItemIds.has(item.cartItemId))
+        .filter((item) => selectedItemIds.has(item.cartItemId))
         .reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
 
     const handleQuantityChange = async (cartItemId: number, newQty: number) => {
         if (newQty < 1) return;
-
         try {
-            await updateCartItemQuantity({ cartItemId, quantity: newQty }); // service 수정 반영
-            setCartItems((prevItems) =>
-                prevItems.map((item) =>
+            await updateCartItemQuantity({ cartItemId, quantity: newQty });
+            setCartItems((prev) =>
+                prev.map((item) =>
                     item.cartItemId === cartItemId ? { ...item, quantity: newQty } : item
                 )
             );
-        } catch (error) {
+        } catch {
             show('수량 변경에 실패했습니다.');
         }
     };
 
     const handleDelete = async (cartItemId: number) => {
         if (!(await confirm('이 상품을 장바구니에서 삭제하시겠습니까?'))) return;
-
         try {
-            await deleteCartItem({ cartItemId }); // service 수정 반영
-            setCartItems((prevItems) => prevItems.filter((item) => item.cartItemId !== cartItemId));
-            setSelectedItemIds(prev => {
+            await deleteCartItem({ cartItemId });
+            setCartItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId));
+            setSelectedItemIds((prev) => {
                 const newSet = new Set(prev);
                 newSet.delete(cartItemId);
                 return newSet;
             });
             show('상품이 장바구니에서 제거되었습니다.');
-        } catch (error) {
+        } catch {
             show('상품 삭제에 실패했습니다.');
         }
     };
 
     const handleToggleSelect = (cartItemId: number) => {
-        setSelectedItemIds(prev => {
+        setSelectedItemIds((prev) => {
             const newSet = new Set(prev);
-            if (newSet.has(cartItemId)) {
-                newSet.delete(cartItemId);
-            } else {
-                newSet.add(cartItemId);
-            }
+            if (newSet.has(cartItemId)) newSet.delete(cartItemId);
+            else newSet.add(cartItemId);
             return newSet;
         });
     };
 
     const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.checked) {
-            setSelectedItemIds(new Set(cartItems.map(item => item.cartItemId)));
+            setSelectedItemIds(new Set(cartItems.map((item) => item.cartItemId)));
         } else {
             setSelectedItemIds(new Set());
         }
     };
 
     const handleDeleteSelected = async () => {
-        if (selectedItemIds.size === 0) {
-            show('삭제할 상품을 선택해주세요.');
-            return;
-        }
-        if (!(await confirm(`선택된 ${selectedItemIds.size}개의 상품을 장바구니에서 삭제하시겠습니까?`))) return;
+        if (selectedItemIds.size === 0) return show('삭제할 상품을 선택해주세요.');
+        if (!(await confirm(`선택된 ${selectedItemIds.size}개의 상품을 삭제하시겠습니까?`))) return;
 
         try {
-            const deletePromises = Array.from(selectedItemIds).map(id => deleteCartItem({ cartItemId: id })); // service 수정 반영
-            await Promise.all(deletePromises);
-
+            await Promise.all(
+                Array.from(selectedItemIds).map((id) => deleteCartItem({ cartItemId: id }))
+            );
             setCartItems((prev) => prev.filter((item) => !selectedItemIds.has(item.cartItemId)));
             setSelectedItemIds(new Set());
             show(`${selectedItemIds.size}개의 상품이 삭제되었습니다.`);
             setIsEditMode(false);
-        } catch (err) {
+        } catch {
             show('선택 삭제 중 오류가 발생했습니다.');
         }
     };
 
-    // ✨ 장바구니 비우기 핸들러 추가
     const handleClearCart = async () => {
         if (!(await confirm('장바구니의 모든 상품을 삭제하시겠습니까?'))) return;
 
         try {
-            // 모든 cartItem.cartItemId를 가져와서 일괄 삭제
-            const allCartItemIds = cartItems.map(item => item.cartItemId);
-            const deletePromises = allCartItemIds.map(id => deleteCartItem({ cartItemId: id }));
-            await Promise.all(deletePromises);
-
-            setCartItems([]); // 장바구니 비우기
-            setSelectedItemIds(new Set()); // 선택 초기화
+            await Promise.all(cartItems.map((item) => deleteCartItem({ cartItemId: item.cartItemId })));
+            setCartItems([]);
+            setSelectedItemIds(new Set());
             show('장바구니의 모든 상품이 삭제되었습니다.');
-            setIsEditMode(false); // 편집 모드 해제
-        } catch (err) {
+            setIsEditMode(false);
+        } catch {
             show('장바구니 비우기 중 오류가 발생했습니다.');
         }
     };
 
     const handleCheckout = () => {
-        const itemsToCheckout = cartItems.filter(item => selectedItemIds.has(item.cartItemId));
-
-        if (itemsToCheckout.length === 0) {
-            show("결제할 상품을 선택해주세요.");
-            return;
-        }
+        const itemsToCheckout = cartItems.filter((item) => selectedItemIds.has(item.cartItemId));
+        if (itemsToCheckout.length === 0) return show('결제할 상품을 선택해주세요.');
         setItemsForCheckout(itemsToCheckout);
         router.push('/customer/orders/new');
     };
@@ -163,19 +147,24 @@ export default function CartPage() {
 
     return (
         <>
-        {dialog}
-        <GlobalDialog open={open} message={message} onClose={handleClose} />
-            <main className="max-w-4xl mx-auto p-6">
+            {dialog}
+            <GlobalDialog open={open} message={message} onClose={handleClose} />
+            <main className="max-w-4xl mx-auto p-6 pb-40">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">장바구니</h1>
+                    <h1 className="text-2xl font-light">장바구니</h1>
                     {cartItems.length > 0 && (
                         <div className="flex gap-2">
-                            {/* ✨ 장바구니 비우기 버튼 추가 (편집 모드와 무관하게 항상 보일 수 있음) */}
-                            <button onClick={handleClearCart} className="text-sm text-red-600 px-3 py-1 border border-red-600 rounded hover:bg-red-50">
+                            <button
+                                onClick={handleClearCart}
+                                className="text-sm text-red-600 px-3 py-1 border border-red-600 rounded hover:bg-red-50"
+                            >
                                 장바구니 비우기
                             </button>
-                            <button onClick={() => setIsEditMode(prev => !prev)} className="text-sm text-gray-600 px-3 py-1 border rounded hover:bg-gray-100">
-                                {isEditMode ? '편집 취소' : '상품 편집'}
+                            <button
+                                onClick={() => setIsEditMode((prev) => !prev)}
+                                className="text-sm text-gray-600 px-3 py-1 border rounded hover:bg-gray-100"
+                            >
+                                상품 편집
                             </button>
                         </div>
                     )}
@@ -185,11 +174,11 @@ export default function CartPage() {
                     <p className="text-gray-500 text-center py-20">장바구니가 비어있습니다.</p>
                 ) : (
                     <>
-                        <div className="mb-4 border-b pb-4">
+                        <div className="mb-4 pb-4">
                             <label className="flex items-center space-x-3 cursor-pointer">
                                 <input
                                     type="checkbox"
-                                    className="h-5 w-5"
+                                    className="h-5 w-5 accent-black"
                                     onChange={handleSelectAll}
                                     checked={selectedItemIds.size > 0 && selectedItemIds.size === cartItems.length}
                                 />
@@ -197,7 +186,7 @@ export default function CartPage() {
                             </label>
                         </div>
 
-                        <ul className="space-y-6"> {/* ✨ 각 리스트 아이템 사이 간격 증가 */}
+                        <ul className="space-y-6">
                             {cartItems.map((item) => (
                                 <CartItemCard
                                     key={item.cartItemId}
@@ -213,32 +202,35 @@ export default function CartPage() {
                 )}
             </main>
 
-            {(cartItems.length > 0) && (
-                <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-                    <div className="max-w-4xl mx-auto p-4 flex justify-between items-center">
-                        <div className="text-lg font-bold">
-                            총 금액: {totalPrice.toLocaleString()}원
+            {/* ✅ 하단 고정 영역: 흰 배경 + 총 금액 + 결제 버튼 */}
+            {cartItems.length > 0 && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
+                    <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+                        <div className="text-lg font-light">
+                            총 금액: {totalPrice.toLocaleString()}
+                            <span className="text-sm ml-1">원</span>
                         </div>
                         <div className="flex gap-2">
                             {isEditMode && (
                                 <button
                                     onClick={handleDeleteSelected}
                                     disabled={selectedItemIds.size === 0}
-                                    className="py-3 px-4 bg-red-500 text-white font-bold rounded-md disabled:bg-gray-300"
+                                    className="py-3 px-4 bg-red-500 text-white font-light rounded-md disabled:bg-gray-300"
+                                    title="선택 상품 삭제"
                                 >
-                                    선택 상품 삭제 ({selectedItemIds.size})
+                                    <FiTrash2 className="text-lg" />
                                 </button>
                             )}
                             <button
                                 onClick={handleCheckout}
                                 disabled={selectedItemIds.size === 0}
-                                className="py-3 px-6 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300"
+                                className="py-3 px-6 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-300"
                             >
-                                선택 상품 결제하기
+                                결제
                             </button>
                         </div>
                     </div>
-                </footer>
+                </div>
             )}
         </>
     );

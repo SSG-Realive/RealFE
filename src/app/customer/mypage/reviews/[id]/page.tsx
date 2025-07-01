@@ -36,7 +36,7 @@ export default function ReviewDetailPage() {
     return (
         <div>
             <div className="max-w-2xl mx-auto px-6 py-10">
-                <h1 className="text-2xl font-bold mb-2">{review.productName}</h1>
+                <h1 className="text-2xl font-light mb-2">{review.productName}</h1>
                 <p className="text-yellow-500">⭐ {review.rating}</p>
                 <p className="text-gray-700 whitespace-pre-line mt-4">{review.content}</p>
                 <p className="text-xs text-gray-400 mt-2">{review.createdAt}</p>

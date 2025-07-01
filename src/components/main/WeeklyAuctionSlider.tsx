@@ -69,7 +69,7 @@ export default function WeeklyAuctionSlider() {
 
     return (
         <section className="relative px-4 sm:mt-14 mt-1 weekly-auction-container">
-            <h2 className="text-xl font-bold text-center mb-6">금주의 옥션상품</h2>
+            <h2 className="text-xl font-light text-center mb-6">금주의 옥션상품</h2>
 
             <div className="relative">
                 <Slider ref={sliderRef} {...settings}>

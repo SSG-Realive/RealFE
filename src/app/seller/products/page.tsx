@@ -31,6 +31,30 @@ export default function ProductListPage() {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // 상품 상태 매핑 함수 - 실제 판매 상태 기반으로 수정
+  const getProductSalesStatus = (product: ProductListItem) => {
+    if (product.stock === 0) return { text: '품절', color: 'bg-red-100 text-red-800' };
+    if (!product.active) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
+    return { text: '판매중', color: 'bg-green-100 text-green-800' };
+  };
+
+  // 품질등급 색상 지정 함수 (기존 status는 품질등급)
+  const getQualityGradeColor = (status: string) => {
+    switch (status) {
+      case '상': return 'bg-green-100 text-green-800';
+      case '중': return 'bg-yellow-100 text-yellow-800';
+      case '하': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // 통계 계산 - 실제 판매 상태 기반
+  const salesStatusStats = {
+    selling: products.filter(p => p.active && p.stock > 0).length,
+    suspended: products.filter(p => !p.active).length,
+    outOfStock: products.filter(p => p.stock === 0).length
+  };
+
   useEffect(() => {
     if (checking) return;
 
@@ -69,13 +93,6 @@ export default function ProductListPage() {
     router.push('/seller/products/new');
   };
 
-  // 통계 계산
-  const avgPrice = products.length > 0 ? Math.round(products.reduce((sum, p) => sum + (p.price || 0), 0) / products.length) : 0;
-  const maxPrice = products.length > 0 ? Math.max(...products.map(p => p.price)) : 0;
-  const minPrice = products.length > 0 ? Math.min(...products.map(p => p.price)) : 0;
-  const pendingCount = products.filter(p => p.status === '승인대기').length;
-  const rejectedCount = products.filter(p => p.status === '반려').length;
-
   if (checking) return (
     <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
       <div className="text-center">
@@ -111,26 +128,26 @@ export default function ProductListPage() {
               </div>
               <div className="text-2xl font-bold text-[#374151]">{totalProductCount}개</div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
               <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-8 h-8 text-[#6b7280]" />
-                <span className="text-[#374151] text-sm font-semibold">판매 중</span>
+                <TrendingUp className="w-8 h-8 text-green-600" />
+                <span className="text-[#374151] text-sm font-semibold">판매중</span>
               </div>
-              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '상').length}개</div>
+              <div className="text-2xl font-bold text-green-700">{salesStatusStats.selling}개</div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
               <div className="flex items-center gap-3 mb-2">
-                <XCircle className="w-8 h-8 text-[#6b7280]" />
+                <XCircle className="w-8 h-8 text-red-600" />
                 <span className="text-[#374151] text-sm font-semibold">품절</span>
               </div>
-              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '하').length}개</div>
+              <div className="text-2xl font-bold text-red-700">{salesStatusStats.outOfStock}개</div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
               <div className="flex items-center gap-3 mb-2">
-                <PauseCircle className="w-8 h-8 text-[#6b7280]" />
-                <span className="text-[#374151] text-sm font-semibold">판매 중지</span>
+                <PauseCircle className="w-8 h-8 text-yellow-600" />
+                <span className="text-[#374151] text-sm font-semibold">판매중지</span>
               </div>
-              <div className="text-2xl font-bold text-[#374151]">{products.filter(p => p.status === '중').length}개</div>
+              <div className="text-2xl font-bold text-yellow-700">{salesStatusStats.suspended}개</div>
             </section>
           </div>
 
@@ -149,11 +166,17 @@ export default function ProductListPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
                 className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
             >
-              <option value="">전체 상태</option>
+              <option value="">전체 품질등급</option>
               <option value="상">상</option>
               <option value="중">중</option>
               <option value="하">하</option>
             </select>
+            <button
+              onClick={handleSearch}
+              className="bg-[#d1d5db] text-[#374151] px-6 py-2 rounded-md hover:bg-[#e5e7eb] transition-colors font-medium"
+            >
+              검색
+            </button>
             </div>
           </div>
 
@@ -164,7 +187,8 @@ export default function ProductListPage() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상품명</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">가격</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상태</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">품질등급</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">판매상태</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">재고</th>
                   <th className="px-6 py-3 text-center text-xs font-medium text-[#d1d5db] uppercase tracking-wider">액션</th>
                 </tr>
@@ -172,15 +196,24 @@ export default function ProductListPage() {
               <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-[#d1d5db]">상품이 없습니다.</td>
+                    <td colSpan={6} className="text-center py-8 text-[#d1d5db]">상품이 없습니다.</td>
                   </tr>
                 ) : (
-                  products.map((product) => (
+                  products.map((product) => {
+                    const salesStatus = getProductSalesStatus(product);
+                    return (
                     <tr key={product.id} className="hover:bg-[#e5e7eb] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">{product.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.price.toLocaleString()}원</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 rounded text-xs font-bold bg-[#e5e7eb] text-[#374151]`}>{product.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getQualityGradeColor(product.status)}`}>
+                          {product.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${salesStatus.color}`}>
+                          {salesStatus.text}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.stock ?? 0}개</td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -192,7 +225,7 @@ export default function ProductListPage() {
                         </button>
                       </td>
                     </tr>
-                  ))
+                  )})
                 )}
               </tbody>
             </table>

@@ -1,335 +1,372 @@
-// // src/app/customer/orders/direct/page.tsx (DirectOrderPage)
-// 'use client';
+// src/app/customer/orders/direct/page.tsx (DirectOrderPage)
+'use client';
 
-// import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import { fetchMyProfile } from '@/service/customer/customerService';
-// import { getDirectPaymentInfo, processDirectPaymentApi } from '@/service/order/orderService';
-// import { DirectPaymentInfoDTO, PayRequestDTO } from '@/types/customer/order/order'; // DTOs 임포트
-// import './DirectOrderPage.css'; // 이 페이지를 위한 CSS 파일
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Script from 'next/script';
+import { fetchMyProfile } from '@/service/customer/customerService';
+import { getDirectPaymentInfo, processDirectPaymentApi } from '@/service/order/orderService';
+import { DirectPaymentInfoDTO, PayRequestDTO } from '@/types/customer/order/order';
+import { useAuthStore } from '@/store/customer/authStore';
+import { 
+  loadTossPayments, 
+  requestPayment,
+  DEFAULT_CONFIG,
+  PaymentRequestOptions
+} from '@/service/order/tossPaymentService';
+import './DirectOrderPage.css';
 
-// // UserProfile 타입은 그대로 유지
-// interface UserProfile {
-//     name: string;
-//     email: string;
-//     phone: string;
-//     address: string;
-// }
+// UserProfile 타입은 그대로 유지
+interface UserProfile {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+}
 
-// export default function DirectOrderPage() {
-//     const router = useRouter();
+export default function DirectOrderPage() {
+    const router = useRouter();
+    const { id: customerId } = useAuthStore();
+    const tossPaymentsRef = useRef<any>(null);
+    const [scriptLoaded, setScriptLoaded] = useState(false);
 
-//     // --- 상태 관리 ---
-//     const [productInfo, setProductInfo] = useState<DirectPaymentInfoDTO | null>(null);
-//     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-//     const [loading, setLoading] = useState(true);
-//     const [pageError, setPageError] = useState<string | null>(null);
+    // --- 상태 관리 ---
+    const [productInfo, setProductInfo] = useState<DirectPaymentInfoDTO | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [pageError, setPageError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
+    // 배송지 폼 상태
+    const [shippingInfo, setShippingInfo] = useState({
+        receiverName: '',
+        phone: '',
+        address: '',
+    });
 
-//     // 배송지 폼 상태
-//     const [shippingInfo, setShippingInfo] = useState({
-//         receiverName: '',
-//         phone: '',
-//         address: '', // PayRequestDTO의 deliveryAddress에 매핑될 값
-//     });
+    // 결제 수단 상태
+    const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CELL_PHONE' | 'ACCOUNT'>('CARD');
 
-//     // 결제 수단 상태 (PayRequestDTO의 유니온 타입에 맞춰 초기값 설정)
-//     const [paymentMethod, setPaymentMethod] = useState<'CARD' | 'CELL_PHONE' | 'ACCOUNT'>('CARD');
+    // 계산된 금액들
+    const totalProductPrice = productInfo ? productInfo.price * productInfo.quantity : 0;
+    const deliveryFee = 3000; // 고정 배송비
+    const finalAmount = totalProductPrice + deliveryFee;
 
-//     // --- 데이터 로딩 ---
-//     useEffect(() => {
-//         const loadOrderData = async () => {
-//             setLoading(true);
-//             setPageError(null);
+    // --- 데이터 로딩 ---
+    useEffect(() => {
+        const loadOrderData = async () => {
+            setLoading(true);
+            setPageError(null);
 
-//             const storedProductId = sessionStorage.getItem('directBuyProductId');
-//             const storedQuantity = sessionStorage.getItem('directBuyQuantity');
+            const storedProductId = sessionStorage.getItem('directBuyProductId');
+            const storedQuantity = sessionStorage.getItem('directBuyQuantity');
 
-//             if (!storedProductId || !storedQuantity) {
-//                 setPageError('바로 구매할 상품 정보가 없습니다. 상품 상세 페이지에서 다시 시도해주세요.');
-//                 setLoading(false);
-//                 return;
-//             }
+            if (!storedProductId || !storedQuantity) {
+                setPageError('바로 구매할 상품 정보가 없습니다. 상품 상세 페이지에서 다시 시도해주세요.');
+                setLoading(false);
+                return;
+            }
 
-//             const productIdNum = Number(storedProductId);
-//             const quantityNum = Number(storedQuantity);
+            const productIdNum = Number(storedProductId);
+            const quantityNum = Number(storedQuantity);
 
-//             if (isNaN(productIdNum) || productIdNum <= 0 || isNaN(quantityNum) || quantityNum <= 0) {
-//                 setPageError('잘못된 상품 정보 또는 수량입니다.');
-//                 setLoading(false);
-//                 return;
-//             }
+            if (isNaN(productIdNum) || productIdNum <= 0 || isNaN(quantityNum) || quantityNum <= 0) {
+                setPageError('잘못된 상품 정보 또는 수량입니다.');
+                setLoading(false);
+                return;
+            }
 
-//             try {
-//                 const productData = await getDirectPaymentInfo(productIdNum, quantityNum);
-//                 setProductInfo(productData);
+            try {
+                const productData = await getDirectPaymentInfo(productIdNum, quantityNum);
+                setProductInfo(productData);
 
-//                 const profileData = await fetchMyProfile();
-//                 setUserProfile(profileData);
+                const profileData = await fetchMyProfile();
+                setUserProfile(profileData);
 
-//                 setShippingInfo({
-//                     receiverName: profileData.name,
-//                     phone: profileData.phone,
-//                     address: profileData.address,
-//                 });
+                setShippingInfo({
+                    receiverName: profileData.name,
+                    phone: profileData.phone,
+                    address: profileData.address,
+                });
 
-//                 sessionStorage.removeItem('directBuyProductId');
-//                 sessionStorage.removeItem('directBuyQuantity');
+                sessionStorage.removeItem('directBuyProductId');
+                sessionStorage.removeItem('directBuyQuantity');
 
-//             } catch (err: any) {
-//                 console.error("주문 정보 로딩 실패:", err);
-//                 if (err.response && err.response.status === 403) {
-//                     setPageError('로그인이 필요하거나, 주문 정보를 조회할 권한이 없습니다.');
-//                 } else if (err.response && err.response.data && err.response.data.message) {
-//                     setPageError(`오류: ${err.response.data.message}`);
-//                 } else {
-//                     setPageError('주문 정보를 불러오는 데 실패했습니다.');
-//                 }
+            } catch (err: any) {
+                console.error("주문 정보 로딩 실패:", err);
+                if (err.response && err.response.status === 403) {
+                    setPageError('로그인이 필요하거나, 주문 정보를 조회할 권한이 없습니다.');
+                } else if (err.response && err.response.data && err.response.data.message) {
+                    setPageError(`오류: ${err.response.data.message}`);
+                } else {
+                    setPageError('주문 정보를 불러오는 데 실패했습니다.');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
 
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
+        loadOrderData();
+    }, []);
 
-//         loadOrderData();
-//     }, []);
+    // --- 토스페이먼츠 SDK 초기화 ---
+    useEffect(() => {
+        if (!userProfile || !customerId || finalAmount === 0 || !scriptLoaded) return;
 
-
-//     // --- 토스페이먼츠 위젯 렌더링 ---
-//     useEffect(() => {
-//         if (!userProfile || !customerId || finalAmount === 0) return;
-
-//         const initializeWidget = async () => {
-//             try {
-//                 const tossPayments = await loadPaymentWidget(TOSS_CLIENT_KEY, customerId.toString());
+        const initializeTossPayments = async () => {
+            try {
+                console.log('토스페이먼츠 SDK 초기화 시작...', { customerId, finalAmount });
+                setError(null);
                 
-//                 tossPayments.renderPaymentMethods('#payment-widget', { value: finalAmount }, { variantKey: 'DEFAULT' });
-//                 tossPayments.renderAgreement('#agreement', { variantKey: 'DEFAULT' });
-
-//                 paymentWidgetRef.current = tossPayments;
-//             } catch (error) {
-//                 console.error("토스페이먼츠 위젯 렌더링 실패:", error);
-//                 setError('결제 위젯을 불러오는데 실패했습니다.');
-//             }
-//         };
-
-//         initializeWidget();
-//     }, [userProfile, customerId, finalAmount]);
-
-//     // --- 이벤트 핸들러 ---
-//     const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//         const { name, value } = e.target;
-//         setShippingInfo(prev => ({ ...prev, [name]: value }));
-//     };
-
-//     // ✨ 결제 수단 변경 핸들러
-//     const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//         // `as 'CARD' | 'CELL_PHONE' | 'ACCOUNT'`를 사용하여 타입을 강제 변환
-//         setPaymentMethod(e.target.value as 'CARD' | 'CELL_PHONE' | 'ACCOUNT');
-//     };
-
-
-//     const handlePayment = async () => {
-
-//         if (!productInfo || !userProfile) {
-//             alert("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
-//             return;
-//         }
-
-//         if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
-//             alert("배송지 정보를 모두 입력해주세요.");
-//             return;
-//         }
-
-//         const totalPaymentAmount = productInfo.price * productInfo.quantity + 3000; // 배송비 3000원 고정 예시
-//         const confirmPayment = window.confirm(
-//             `총 ${totalPaymentAmount.toLocaleString()}원에 대해 결제를 진행하시겠습니까?`
-//         );
-
-//         if (!confirmPayment) {
-//             return;
-//         }
-
-//         // 토스페이먼츠 결제 위젯에서 결제 요청
-//         if (paymentWidgetRef.current) {
-//             try {
-//                 const orderId = `direct_${productInfo.productId}_${Date.now()}`;
+                // DOM 엘리먼트가 준비될 때까지 대기
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
-//                 await paymentWidgetRef.current.requestPayment({
-//                     orderId: orderId,
-//                     orderName: `${productInfo.name} ${productInfo.quantity}개`,
-//                     customerName: shippingInfo.receiverName,
-//                     customerEmail: userProfile.email || 'customer@example.com',
-//                     successUrl: process.env.NEXT_PUBLIC_TOSS_SUCCESS_URL || `${window.location.origin}/customer/orders/success`,
-//                     failUrl: process.env.NEXT_PUBLIC_TOSS_FAIL_URL || `${window.location.origin}/customer/orders/fail`,
-//                 });
-//             } catch (error: any) {
-//                 console.error('결제 요청 오류:', error);
+                // 토스페이먼츠 객체 생성
+                if (!(window as any).TossPayments) {
+                    throw new Error('토스페이먼츠 SDK가 로드되지 않았습니다');
+                }
                 
-//                 // 결제 승인 처리
-//                 if (error.paymentKey && error.orderId && error.amount) {
-//                     await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
-//                 } else {
-//                     alert('결제 처리 중 오류가 발생했습니다.');
-//                 }
-//             }
-//         }
-//     };
+                const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+                tossPaymentsRef.current = tossPayments;
+                console.log('토스페이먼츠 SDK 초기화 완료');
+                
+            } catch (error: any) {
+                console.error("토스페이먼츠 SDK 초기화 실패:", error);
+                setError(`토스페이먼츠 SDK 초기화에 실패했습니다: ${error.message}`);
+            }
+        };
 
-//     const processPaymentApproval = async (paymentKey: string, orderId: string, amount: number) => {
-//         try {
-//             // PayRequestDTO의 새로운 구조에 맞춰 데이터 구성
-//             const payRequestDTO: PayRequestDTO = {
-//                 receiverName: shippingInfo.receiverName,
-//                 phone: shippingInfo.phone,
-//                 deliveryAddress: shippingInfo.address,
-//                 paymentMethod: paymentMethod,
-//                 paymentKey: paymentKey,
-//                 tossOrderId: orderId,
-//                 amount: amount,
-//                 productId: productInfo.productId,
-//                 quantity: productInfo.quantity,
-//             };
+        initializeTossPayments();
+    }, [userProfile, customerId, finalAmount, scriptLoaded]);
 
-//             const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/orders/direct-payment`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json',
-//                     'Authorization': `Bearer ${localStorage.getItem('customerToken')}`
-//                 },
-//                 body: JSON.stringify(payRequestDTO),
-//             });
+    // --- 이벤트 핸들러 ---
+    const handleShippingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setShippingInfo(prev => ({ ...prev, [name]: value }));
+    };
 
-//             if (!response.ok) {
-//                 throw new Error('결제 승인 처리에 실패했습니다.');
-//             }
+    const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPaymentMethod(e.target.value as 'CARD' | 'CELL_PHONE' | 'ACCOUNT');
+    };
 
-//             const result = await response.json();
-//             alert('결제가 성공적으로 완료되었습니다!');
-//             router.push('/customer/orders');
+    const handlePayment = async () => {
+        console.log('결제하기 버튼 클릭됨');
+        console.log('tossPaymentsRef.current:', tossPaymentsRef.current);
+        console.log('scriptLoaded:', scriptLoaded);
+        console.log('window.TossPayments:', (window as any).TossPayments);
+
+        if (!productInfo || !userProfile) {
+            alert("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
+            return;
+        }
+
+        if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
+            alert("배송지 정보를 모두 입력해주세요.");
+            return;
+        }
+
+        const totalPaymentAmount = productInfo.price * productInfo.quantity + 3000;
+        const confirmPayment = window.confirm(
+            `총 ${totalPaymentAmount.toLocaleString()}원에 대해 결제를 진행하시겠습니까?`
+        );
+
+        if (!confirmPayment) {
+            return;
+        }
+
+        // 토스페이먼츠 객체가 없으면 다시 초기화 시도
+        if (!tossPaymentsRef.current) {
+            console.log('토스페이먼츠 객체가 없음, 재초기화 시도...');
+            try {
+                if ((window as any).TossPayments) {
+                    const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+                    tossPaymentsRef.current = tossPayments;
+                    console.log('토스페이먼츠 객체 재초기화 완료');
+                } else {
+                    alert('토스페이먼츠 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+                    return;
+                }
+            } catch (error) {
+                console.error('토스페이먼츠 객체 재초기화 실패:', error);
+                alert('결제 시스템 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+                return;
+            }
+        }
+
+        try {
+            const orderId = `direct_${productInfo.productId}_${Date.now()}`;
             
-//         } catch (error) {
-//             console.error('결제 승인 처리 오류:', error);
-//             alert('결제 승인 처리 중 오류가 발생했습니다.');
-//         }
-//     };
+            console.log('결제 요청 준비 중...');
+            
+            // 결제 성공 페이지에서 사용할 주문 정보를 sessionStorage에 저장
+            const checkoutInfo = {
+                productId: productInfo.productId,
+                quantity: productInfo.quantity,
+                shippingInfo: {
+                    receiverName: shippingInfo.receiverName,
+                    phone: shippingInfo.phone,
+                    address: shippingInfo.address,
+                },
+                paymentMethod: paymentMethod,
+                customerId: customerId,
+            };
+            sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
 
-//     if (loading) {
-//         return <div className="loading-container">주문 정보를 불러오는 중입니다...</div>;
-//     }
+            const paymentOptions: PaymentRequestOptions = {
+                orderId: orderId,
+                orderName: `${productInfo.productName} ${productInfo.quantity}개`,
+                amount: finalAmount,
+                successUrl: `${window.location.origin}/customer/orders/success`,
+                failUrl: `${window.location.origin}/customer/orders/fail`,
+                customerEmail: userProfile.email || 'customer@example.com',
+                customerName: shippingInfo.receiverName,
+                customerMobilePhone: shippingInfo.phone,
+            };
 
-//     if (pageError) {
-//         return <div className="error-container text-red-500 text-center py-20">{pageError}</div>;
-//     }
+            console.log('결제 옵션:', paymentOptions);
 
-//     if (!productInfo || !userProfile) {
-//         return <div className="error-container text-red-500">알 수 없는 오류가 발생했습니다.</div>;
-//     }
+            console.log('토스페이먼츠 결제창 호출 중...');
+            await requestPayment(tossPaymentsRef.current, paymentOptions);
+        } catch (error: any) {
+            console.error('결제 요청 오류:', error);
+            
+            if (error.paymentKey && error.orderId && error.amount) {
+                await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
+            } else {
+                alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
+            }
+        }
+    };
 
-//     // --- UI 렌더링 ---
-//     return (
-//         <div className="order-page-container">
-//             <h1 className="page-title">주문/결제</h1>
+    const processPaymentApproval = async (paymentKey: string, orderId: string, amount: number) => {
+        try {
+            const payRequestDTO: PayRequestDTO = {
+                receiverName: shippingInfo.receiverName,
+                phone: shippingInfo.phone,
+                deliveryAddress: shippingInfo.address,
+                paymentMethod: 'CARD', // 토스페이먼츠로 고정
+                paymentKey: paymentKey,
+                tossOrderId: orderId,
+                productId: productInfo!.productId,
+                quantity: productInfo!.quantity,
+            };
 
-//             {/* 1. 주문 상품 정보 */}
-//             <section className="order-section">
-//                 <h2>주문 상품</h2>
-//                 <div className="product-summary-card">
-//                     <img src={productInfo.imageUrl || '/images/placeholder.png'} alt={productInfo.productName} />
-//                     <div className="product-details">
-//                         <p className="product-name">{productInfo.productName}</p>
-//                         <p className="product-quantity">수량: {productInfo.quantity}개</p>
-//                     </div>
-//                     <p className="product-price">{(productInfo.price * productInfo.quantity).toLocaleString()}원</p>
-//                 </div>
-//             </section>
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/orders/direct-payment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('customerToken')}`
+                },
+                body: JSON.stringify(payRequestDTO),
+            });
 
-//             {/* 2. 주문자 정보 */}
-//             <section className="order-section">
-//                 <h2>주문자 정보</h2>
-//                 <div className="info-box">
-//                     <p><strong>이름:</strong> {userProfile.name}</p>
-//                     <p><strong>이메일:</strong> {userProfile.email}</p>
-//                 </div>
-//             </section>
+            if (!response.ok) {
+                throw new Error('결제 승인 처리에 실패했습니다.');
+            }
 
-//             {/* 3. 배송 정보 입력 */}
-//             <section className="order-section">
-//                 <h2>배송지 정보</h2>
-//                 <div className="shipping-form">
-//                     <label htmlFor="receiverName">받는 사람</label>
-//                     <input id="receiverName" name="receiverName" value={shippingInfo.receiverName} onChange={handleShippingInfoChange} />
+            const result = await response.json();
+            alert('결제가 성공적으로 완료되었습니다!');
+            router.push('/customer/orders');
+            
+        } catch (error) {
+            console.error('결제 승인 처리 오류:', error);
+            alert('결제 승인 처리 중 오류가 발생했습니다.');
+        }
+    };
 
-//                     <label htmlFor="phone">연락처</label>
-//                     <input id="phone" name="phone" type="tel" value={shippingInfo.phone} onChange={handleShippingInfoChange} />
+    if (loading) {
+        return <div className="loading-container">주문 정보를 불러오는 중입니다...</div>;
+    }
 
-//                     <label htmlFor="address">주소</label>
-//                     <input id="address" name="address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
-//                     {/* TODO: 주소 검색 버튼 및 기능 추가 */}
+    if (pageError) {
+        return <div className="error-container text-red-500 text-center py-20">{pageError}</div>;
+    }
 
-//                 </div>
-//             </section>
+    if (!productInfo || !userProfile) {
+        return <div className="error-container text-red-500">알 수 없는 오류가 발생했습니다.</div>;
+    }
 
-//             {/* 4. 결제 수단 */}
-//             <section className="order-section">
-//                 <h2>결제 수단</h2>
-//                 <div className="payment-selector">
-//                     <label className={paymentMethod === 'CARD' ? 'active' : ''}>
-//                         <input
-//                             type="radio"
-//                             name="paymentMethod"
-//                             value="CARD"
-//                             checked={paymentMethod === 'CARD'}
-//                             onChange={handlePaymentMethodChange} // ✨ 변경된 핸들러 사용
-//                         />
-//                         신용/체크카드
-//                     </label>
-//                     <label className={paymentMethod === 'CELL_PHONE' ? 'active' : ''}>
-//                         <input
-//                             type="radio"
-//                             name="paymentMethod"
-//                             value="CELL_PHONE"
-//                             checked={paymentMethod === 'CELL_PHONE'}
-//                             onChange={handlePaymentMethodChange}
-//                         />
-//                         휴대폰
-//                     </label>
-//                     <label className={paymentMethod === 'ACCOUNT' ? 'active' : ''}>
-//                         <input
-//                             type="radio"
-//                             name="paymentMethod"
-//                             value="ACCOUNT"
-//                             checked={paymentMethod === 'ACCOUNT'}
-//                             onChange={handlePaymentMethodChange}
-//                         />
-//                         계좌이체
-//                     </label>
-//                 </div>
+    return (
+        <div className="order-page-container">
+            {/* 토스페이먼츠 기본 SDK 로드 */}
+            <Script
+                src="https://js.tosspayments.com/v1/payment"
+                strategy="afterInteractive"
+                onLoad={() => {
+                    console.log('토스페이먼츠 SDK 로드 완료');
+                    setScriptLoaded(true);
+                }}
+                onError={() => {
+                    console.error('토스페이먼츠 SDK 로드 실패');
+                    setError('토스페이먼츠 SDK를 불러올 수 없습니다.');
+                }}
+            />
 
-//             </section>
+            <h1 className="page-title">주문/결제</h1>
 
-//             {/* 5. 결제 동의 및 금액 요약 */}
-//             <aside className="order-summary">
-//                 <div id="agreement" />
-//                 <h3>결제 금액</h3>
-//                 <div className="summary-row">
-//                     <span>총 상품금액</span>
-//                     <span>{totalProductPrice.toLocaleString()}원</span>
-//                 </div>
-//                 <div className="summary-row">
-//                     <span>배송비</span>
-//                     <span>+ {deliveryFee.toLocaleString()}원</span>
-//                 </div>
-//                 <div className="summary-row total">
-//                     <span>최종 결제 금액</span>
-//                     <span>{finalAmount.toLocaleString()}원</span>
-//                 </div>
-//             </section>
+            {/* 1. 주문 상품 정보 */}
+            <section className="order-section">
+                <h2>주문 상품</h2>
+                <div className="product-summary-card">
+                    <img src={productInfo.imageUrl || '/images/placeholder.png'} alt={productInfo.productName} />
+                    <div className="product-details">
+                        <p className="product-name">{productInfo.productName}</p>
+                        <p className="product-quantity">수량: {productInfo.quantity}개</p>
+                    </div>
+                    <p className="product-price">{(productInfo.price * productInfo.quantity).toLocaleString()}원</p>
+                </div>
+            </section>
 
-//             <button className="payment-button" onClick={handlePayment}>
-//                 결제하기
-//             </button>
+            {/* 2. 주문자 정보 */}
+            <section className="order-section">
+                <h2>주문자 정보</h2>
+                <div className="info-box">
+                    <p><strong>이름:</strong> {userProfile.name}</p>
+                    <p><strong>이메일:</strong> {userProfile.email}</p>
+                </div>
+            </section>
 
-//         </div>
-//     );
-// }
+            {/* 3. 배송 정보 입력 */}
+            <section className="order-section">
+                <h2>배송지 정보</h2>
+                <div className="shipping-form">
+                    <label htmlFor="receiverName">받는 사람</label>
+                    <input id="receiverName" name="receiverName" value={shippingInfo.receiverName} onChange={handleShippingInfoChange} />
+
+                    <label htmlFor="phone">연락처</label>
+                    <input id="phone" name="phone" type="tel" value={shippingInfo.phone} onChange={handleShippingInfoChange} />
+
+                    <label htmlFor="address">주소</label>
+                    <input id="address" name="address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
+                </div>
+            </section>
+
+            {/* 4. 토스페이먼츠 결제 */}
+            <section className="order-section">
+                <h2>결제</h2>
+
+            {/* 5. 결제 동의 및 금액 요약 */}
+                <aside className="order-summary">
+                    <div id="agreement"></div>
+                    <h3>결제 금액</h3>
+                    <div className="summary-row">
+                        <span>총 상품금액</span>
+                        <span>{totalProductPrice.toLocaleString()}원</span>
+                    </div>
+                    <div className="summary-row">
+                        <span>배송비</span>
+                        <span>+ {deliveryFee.toLocaleString()}원</span>
+                    </div>
+                    <div className="summary-row total">
+                        <span>최종 결제 금액</span>
+                        <span>{finalAmount.toLocaleString()}원</span>
+                    </div>
+                </aside>
+            </section>
+
+            <button className="payment-button" onClick={handlePayment}>
+                결제하기
+            </button>
+        </div>
+    );
+}

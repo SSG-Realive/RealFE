@@ -19,8 +19,28 @@ export async function getQnaList(
     searchParams: Record<string, any> = {}
 ): Promise<SellerQnaListResponse> {
     const query = new URLSearchParams(searchParams).toString();
-    const res = await sellerApi.get(`/seller/qna?${query}`);
-    return res.data;
+    const url = `/seller/qna?${query}`;
+    
+    console.log('=== SellerQna 목록 조회 API 호출 ===');
+    console.log('요청 URL:', url);
+    console.log('요청 파라미터:', searchParams);
+    
+    try {
+        const res = await sellerApi.get(url);
+        console.log('=== API 응답 상세 ===');
+        console.log('HTTP 상태:', res.status);
+        console.log('res.data 원본:', res.data);
+        console.log('res.data.content 첫 번째 항목:', res.data?.content?.[0]);
+        
+        return res.data;
+    } catch (error: any) {
+        console.error('=== SellerQna 목록 조회 API 에러 ===');
+        console.error('에러 상세:', error);
+        console.error('요청 URL:', url);
+        console.error('응답 상태:', error.response?.status);
+        console.error('응답 데이터:', error.response?.data);
+        throw error;
+    }
 }
 
 /**
@@ -35,7 +55,20 @@ export async function getQnaDetail(id: number): Promise<SellerQnaDetailResponse>
  * 판매자 QnA 작성
  */
 export async function createQna(data: SellerCreateQnaRequest): Promise<void> {
-    await sellerApi.post('/seller/qna/new', data);
+    console.log('=== SellerQna 생성 API 호출 ===');
+    console.log('요청 데이터:', data);
+    console.log('요청 URL: /seller/qna/new');
+    
+    try {
+        const response = await sellerApi.post('/seller/qna/new', data);
+        console.log('응답 성공:', response.status, response.data);
+    } catch (error: any) {
+        console.error('=== SellerQna 생성 API 에러 ===');
+        console.error('에러 상세:', error);
+        console.error('응답 상태:', error.response?.status);
+        console.error('응답 데이터:', error.response?.data);
+        throw error;
+    }
 }
 
 /**
@@ -46,8 +79,8 @@ export async function updateQna(id: number, data: SellerQnaUpdateRequest): Promi
 }
 
 /**
- * 판매자 QnA 삭제
+ * 판매자 QnA 삭제 (논리적 삭제 - isActive를 false로 변경)
  */
 export async function deleteQna(id: number): Promise<void> {
-    await sellerApi.patch(`/seller/qna/${id}/edit`);
+    await sellerApi.patch(`/seller/qna/${id}/delete`);
 }

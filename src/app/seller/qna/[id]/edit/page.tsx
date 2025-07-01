@@ -43,16 +43,16 @@ export default function QnaEditPage() {
     const handleSubmit = async () => {
         await updateQna(Number(id), form);
         alert('질문이 수정되었습니다.');
-        router.push('/seller/qna');
+        router.push('/seller/seller-qna');
     };
 
     const handleDelete = async () => {
-        const confirmed = window.confirm('정말로 이 QnA를 삭제하시겠습니까? 삭제 시 복구할 수 없습니다.');
+        const confirmed = window.confirm('정말로 이 QnA를 삭제하시겠습니까? 삭제된 QnA는 목록에서 숨겨집니다.');
         if (!confirmed) return;
 
         await deleteQna(Number(id));
         alert('QnA가 삭제되었습니다.');
-        router.push('/seller/qna');
+        router.push('/seller/seller-qna');
     };
 
     return (

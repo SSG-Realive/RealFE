@@ -70,7 +70,7 @@ export interface PayRequestDTO {
     // 토스페이먼츠 정보
     paymentKey: string;
     tossOrderId: string;
-    amount: number;
+    // amount 제거 - 서버에서 계산
 
     // ✨ 장바구니 결제 시 사용될 정보
     orderItems?: ProductQuantity[];

@@ -10,7 +10,6 @@ export interface SellerQnaResponse {
   updatedAt: string;
   answeredAt: string | null;
   isActive: boolean;
-  deleted: boolean;
 }
 
 // QnA 상세 조회 응답 DTO

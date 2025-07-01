@@ -65,13 +65,23 @@ export default function MiddleBannerCarousel({
                         {images.map((item, index) => (
                             <div key={index}>
                                 <Link href={item.link}>
-                                    <div className="relative w-full aspect-[4/2] sm:aspect-[4/1]">
+                                    <div
+                                        className="
+                      relative w-full
+                      h-[180px]
+                      sm:h-[250px]
+                      md:h-[320px]
+                      lg:h-[420px]
+                      xl:h-[480px]
+                      2xl:h-[520px]
+                    "
+                                    >
                                         <Image
                                             src={item.src}
                                             alt={`하단 배너 ${index + 1}`}
                                             fill
-                                            className="object-cover rounded-lg cursor-pointer"
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 90vw, 1200px"
+                                            className="object-cover object-bottom rounded-lg cursor-pointer"
+                                            sizes="100vw"
                                             priority={index === 0}
                                         />
                                     </div>

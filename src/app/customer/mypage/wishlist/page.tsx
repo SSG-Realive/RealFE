@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchWishlist, toggleWishlist } from '@/service/customer/wishlistService';
 import { ProductListDTO } from '@/types/seller/product/product';
-import Navbar from '@/components/customer/common/Navbar';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import useConfirm from '@/hooks/useConfirm';
@@ -90,7 +89,7 @@ export default function WishlistPage() {
 
                     {/* 상단 제목 및 버튼 */}
                     <section className="bg-white rounded-lg shadow p-4">
-                        <h1 className="text-xl text-rose-500 font-semibold mb-10 ml-3 mt-3">찜한 상품</h1>
+                        <h1 className="text-xl text-rose-500 font-semibold mb-10 ml-3 mt-3">찜 목록</h1>
 
                         {products.length > 0 && (
                             <>

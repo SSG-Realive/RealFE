@@ -13,6 +13,7 @@ export default function ChatbotFloatingButton() {
         '/admin',
         '/customer/signup',
         '/customer/member/login',
+        '/customer/cart',
     ];
 
     const shouldHide = hiddenPaths.some(

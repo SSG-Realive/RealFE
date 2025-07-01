@@ -11,12 +11,18 @@ interface Props {
     onToggleSelect: (cartItemId: number) => void;
 }
 
-export default function CartItemCard({ item, onQuantityChange, onDelete, isSelected, onToggleSelect }: Props) {
+export default function CartItemCard({
+                                         item,
+                                         onQuantityChange,
+                                         onDelete,
+                                         isSelected,
+                                         onToggleSelect,
+                                     }: Props) {
     return (
         <li className="flex items-center bg-white rounded-lg shadow-sm p-4 relative">
             <input
                 type="checkbox"
-                className="w-5 h-5 mr-4 flex-shrink-0"
+                className="w-5 h-5 mr-4 flex-shrink-0 accent-black"
                 checked={isSelected}
                 onChange={() => onToggleSelect(item.cartItemId)}
             />
@@ -28,28 +34,42 @@ export default function CartItemCard({ item, onQuantityChange, onDelete, isSelec
                     className="w-24 h-24 object-cover rounded-md flex-shrink-0"
                 />
                 <div className="flex-grow ml-4">
-                    {/* ✨ 판매자 이름 표시 부분 제거 */}
                     <h3 className="font-medium hover:underline leading-tight">{item.productName}</h3>
-                    <p className="font-bold mt-1">{item.productPrice.toLocaleString()}원</p>
-                    <div className="flex items-center mt-2">
+                    <p className="font-bold mt-1">
+                        {item.productPrice.toLocaleString()}
+                        <span className="text-sm ml-1">원</span>
+                    </p>
+
+                    <div className="flex items-center mt-2 gap-2">
+                        {/* ✅ 버튼 순서: - → 수량 → + */}
                         <button
-                            onClick={(e) => { e.preventDefault(); onQuantityChange(item.cartItemId, item.quantity - 1); }}
-                            className="px-2 py-1 border rounded"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onQuantityChange(item.cartItemId, item.quantity - 1);
+                            }}
+                            className="w-6 h-6 text-sm flex items-center justify-center border rounded hover:bg-gray-100"
                         >
                             -
                         </button>
-                        <span className="mx-3">{item.quantity}</span>
+                        <span className="w-6 text-center text-sm">{item.quantity}</span>
                         <button
-                            onClick={(e) => { e.preventDefault(); onQuantityChange(item.cartItemId, item.quantity + 1); }}
-                            className="px-2 py-1 border rounded"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onQuantityChange(item.cartItemId, item.quantity + 1);
+                            }}
+                            className="w-6 h-6 text-sm flex items-center justify-center border rounded hover:bg-gray-100"
                         >
                             +
                         </button>
                     </div>
                 </div>
             </Link>
+
             <button
-                onClick={(e) => { e.stopPropagation(); onDelete(item.cartItemId); }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(item.cartItemId);
+                }}
                 className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl"
             >
                 &times;

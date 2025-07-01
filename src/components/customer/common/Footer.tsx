@@ -12,6 +12,7 @@ export default function Footer() {
         '/admin',
         '/customer/signup',
         '/customer/member/login',
+        '/customer/cart',
     ];
 
     const shouldHide = hiddenPaths.some(

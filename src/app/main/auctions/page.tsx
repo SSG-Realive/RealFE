@@ -1,6 +1,6 @@
-// 'use client';
+'use client';
 
-// import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import { useAuctionStore } from '@/store/customer/auctionStore';
 // import AuctionCard, { AuctionItemCard } from '@/components/customer/auctions/AuctionCard';
 // import CategoryFilter from '@/components/customer/auctions/CategoryFilter';

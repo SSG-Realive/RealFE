@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react';
 import { OrderResponseDTO } from '@/types/orders/orderResponseDTO'; // DTO 타입 임포트
 import Navbar from '@/components/customer/common/Navbar';
 import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO';
-import {useRouter} from "next/navigation"; // DTO 타입 임포트
+import { useRouter } from "next/navigation"; // DTO 타입 임포트
+import { useAuthStore } from '@/store/customer/authStore';
 
 
 // --- 데이터 페칭 함수 (클라이언트에서 실행) ---
@@ -53,36 +54,18 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
-
+    const { accessToken, hydrated } = useAuthStore();
 
     useEffect(() => {
-        let token: string | null = null;
-        if (typeof window !== 'undefined') {
-            // ⭐ localStorage에서 'auth-storage' 키로 값을 가져옵니다.
-            const storedStateString = localStorage.getItem('auth-storage');
-            console.log('localStorage에서 가져온 원시 데이터 (auth-storage):', storedStateString); // 디버깅 로그
-
-            if (storedStateString) {
-                try {
-                    const parsedState = JSON.parse(storedStateString);
-                    // {state: {accessToken: ...}, version: 0} 구조이므로 parsedState.state.accessToken 에 접근합니다.
-                    token = parsedState.state?.accessToken;
-                    console.log('JSON.parse 후 추출된 accessToken:', token ? `가져옴 (길이: ${token.length})` : '없음'); // 디버깅 로그
-                } catch (e) {
-                    console.error('localStorage 데이터 파싱 오류:', e);
-                    setError("인증 정보 파싱에 실패했습니다. 다시 로그인 해주세요.");
-                    setLoading(false);
-                    return;
-                }
-            }
+        // hydrated 상태 확인 - 데이터 로딩이 완료되지 않았으면 대기
+        if (!hydrated) {
+            return;
         }
 
-        // 최종적으로 token 변수에 유효한 문자열이 들어 있는지 확인합니다.
-        console.log('useEffect 최종 확인: 토큰 존재 여부:', !!token);
-        if (!token) {
+        // 토큰 확인
+        if (!accessToken) {
             setError("로그인 토큰이 없습니다. 다시 로그인 해주세요.");
             setLoading(false);
-            console.log('⛔ API 호출 중단: 토큰이 없습니다.'); // API 호출이 중단되는 지점
             return;
         }
 
@@ -97,7 +80,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
         const getOrder = async () => {
             try {
                 // 변환된 numericOrderId와 토큰을 사용하여 데이터 페칭
-                const data = await fetchOrderDetail(numericOrderId, token as string); // `token`이 null이 아님을 TypeScript에 알림
+                const data = await fetchOrderDetail(numericOrderId, accessToken);
                 setOrderData(data);
             } catch (err) {
                 console.error("주문 상세 정보를 가져오는 데 실패:", err);
@@ -108,7 +91,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
         };
 
         getOrder();
-    }, [orderId]); // orderId가 변경될 때마다 useEffect 재실행
+    }, [orderId, accessToken, hydrated]); // 의존성 배열 업데이트
 
     // --- 로딩, 에러, 데이터 없음 상태에 따른 UI 렌더링 ---
     if (loading) {
@@ -241,6 +224,30 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                             ))}
                         </div>
                     )}
+                </div>
+
+                {/* 네비게이션 버튼 추가 */}
+                <div className="bg-white shadow-xl rounded-lg p-6 mt-8 border border-gray-200">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            onClick={() => router.push('/customer/orders')}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
+                        >
+                            📋 주문 목록으로 가기
+                        </button>
+                        <button
+                            onClick={() => router.push('/main')}
+                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold"
+                        >
+                            🛍️ 쇼핑 계속하기
+                        </button>
+                        <button
+                            onClick={() => router.back()}
+                            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 font-semibold"
+                        >
+                            ⬅️ 이전 페이지로
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -185,7 +185,7 @@ function ReviewPage() {
         return (
             <div className="container max-w-xl mx-auto py-10">
                 <Navbar/>
-                <h1 className="text-2xl font-bold mb-4">리뷰 작성 불가</h1>
+                <h1 className="text-2xl font-light mb-4">리뷰 작성 불가</h1>
                 <p>이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
                 <button
                     className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
@@ -201,7 +201,7 @@ function ReviewPage() {
     return (
         <div className="container max-w-xl mx-auto py-10">
             <Navbar/>
-            <h1 className="text-2xl font-bold mb-6">리뷰 작성</h1>
+            <h1 className="text-2xl font-light mb-6">리뷰 작성</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                     <label className="block mb-1">평점 (0.5 단위)</label>

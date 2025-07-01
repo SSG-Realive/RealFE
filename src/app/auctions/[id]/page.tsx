@@ -176,12 +176,12 @@ export default function AuctionDetailPage() {
 
           {/* 정보 + 입찰 */}
           <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-bold">{auction.adminProduct?.productName}</h1>
+            <h1 className="text-3xl font-light">{auction.adminProduct?.productName}</h1>
 
             <div className="border-t pt-4 mt-4 text-lg space-y-1">
-              <p>시작가: <span className="font-semibold">{auction.startPrice.toLocaleString()}원</span></p>
+              <p>시작가: <span className="font-light">{auction.startPrice.toLocaleString()}원</span></p>
               <p className="text-2xl text-red-600">
-                현재가: <span className="font-bold">{currentPrice.toLocaleString()}원</span>
+                현재가: <span className="font-light">{currentPrice.toLocaleString()}원</span>
               </p>
               {tickSize && <p className="text-sm text-gray-600">입찰 단위: {tickSize.toLocaleString()}원</p>}
               <p className="text-sm text-gray-500">경매 종료: {new Date(auction.endTime).toLocaleString()}</p>
@@ -189,7 +189,7 @@ export default function AuctionDetailPage() {
 
             {/* 입찰 폼 */}
             <form onSubmit={handleBidSubmit} className="space-y-3 pt-4">
-              <h2 className="text-xl font-semibold">입찰하기</h2>
+              <h2 className="text-xl font-light">입찰하기</h2>
               <input
                 type="number"
                 value={bidAmount}
@@ -208,7 +208,7 @@ export default function AuctionDetailPage() {
               <button
                 type="submit"
                 disabled={btnDisabled}
-                className="w-full bg-indigo-600 text-white font-bold py-3 rounded-md
+                className="w-full bg-indigo-600 text-white font-light py-3 rounded-md
                            hover:bg-indigo-700 disabled:bg-gray-400"
               >
                 {isLeading
@@ -221,7 +221,7 @@ export default function AuctionDetailPage() {
 
             {/* 입찰 내역 */}
             <div className="border-t pt-4">
-              <h3 className="text-lg font-semibold mb-2">입찰 내역</h3>
+              <h3 className="text-lg font-light mb-2">입찰 내역</h3>
               <ul className="space-y-2 max-h-60 overflow-y-auto">
                 {bids.length ? (
                   bids.map((b) => (
@@ -231,7 +231,7 @@ export default function AuctionDetailPage() {
                         ${b.customerId === myId ? 'bg-blue-50' : 'bg-gray-50'}`}
                     >
                       <span>{b.customerName || `사용자 ${b.customerId}`}</span>
-                      <span className="font-semibold">{b.bidPrice.toLocaleString()}원</span>
+                      <span className="font-light">{b.bidPrice.toLocaleString()}원</span>
                       <span className="text-sm text-gray-500">
                         {new Date(b.bidTime).toLocaleTimeString()}
                       </span>
@@ -248,7 +248,7 @@ export default function AuctionDetailPage() {
         {/* ---------- 다른 경매 ---------- */}
         {otherAuctions.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-2xl font-bold mb-4">진행중인 다른 경매</h2>
+            <h2 className="text-2xl font-light mb-4">진행중인 다른 경매</h2>
             <AuctionCard auctions={otherAuctions} />
           </section>
         )}

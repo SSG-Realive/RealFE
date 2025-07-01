@@ -70,7 +70,7 @@ async function SellerReviewPage({
                 <div className="flex flex-1">
                     <Sidebar />
                     <div className="flex-1 p-5 flex flex-col items-center bg-white m-5 rounded-lg shadow-md">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-8">리뷰 목록</h1>
+                        <h1 className="text-3xl font-light text-gray-800 mb-8">리뷰 목록</h1>
                         <div className="bg-gray-100 p-6 rounded-lg w-full max-w-4xl text-center">
                             <p className="text-gray-600 text-lg">아직 작성된 리뷰가 없습니다.</p>
                         </div>
@@ -106,7 +106,7 @@ async function SellerReviewPage({
             <div className="flex flex-1">
                 <Sidebar />
                 <div className="flex-1 p-5 flex flex-col items-center bg-white m-5 rounded-lg shadow-md">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-8">리뷰 목록</h1>
+                    <h1 className="text-3xl font-light text-gray-800 mb-8">리뷰 목록</h1>
 
                     <div className="bg-gray-200 p-4 rounded-md w-full max-w-4xl text-center mb-6">
                         <span className="text-xl font-semibold text-gray-800">리뷰 목록</span>
@@ -116,7 +116,7 @@ async function SellerReviewPage({
                         {reviewListData.reviews.map((review, index) => (
                             <Link href={`/customer/reviews/${review.reviewId}`} key={review.reviewId} passHref>
                                 <div className="bg-gray-100 p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center">
-                                    <span className="text-2xl font-bold text-gray-700 mr-4">
+                                    <span className="text-2xl font-light text-gray-700 mr-4">
                                         {reviewListData.page * reviewListData.size + index + 1}.
                                     </span>
                                     <div className="flex-1">
@@ -160,7 +160,7 @@ async function SellerReviewPage({
                                     <button
                                         className={`px-4 py-2 rounded-md transition-colors ${
                                             currentPage === i
-                                                ? 'bg-blue-700 text-white font-bold'
+                                                ? 'bg-blue-700 text-white font-light'
                                                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                                         }`}
                                     >

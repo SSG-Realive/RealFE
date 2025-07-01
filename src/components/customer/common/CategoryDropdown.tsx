@@ -83,7 +83,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
                     }}
                 >
                     <span
-                        className="inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800 z-50"
+                        className="inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-light tracking-tight text-gray-800 z-50"
                         onClick={() => goToCategory(null)}
                     >
                         전체
@@ -91,7 +91,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
 
                     {/* ✅ 모바일 전용 경매 버튼 (전체 옆) */}
                     <span
-                        className="inline-block md:hidden ml-2 px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-red-600 hover:text-red-700 z-50"
+                        className="inline-block md:hidden ml-2 px-2 pt-1 pb-1 cursor-pointer text-base font-light tracking-tight text-red-600 hover:text-red-700 z-50"
                         onClick={() => (location.href = '/auctions')}
                     >
                         경매
@@ -107,7 +107,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
                                     return (
                                         <li
                                             key={group.id}
-                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer relative font-semibold"
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer relative font-light"
                                             onMouseEnter={() => setHoveredFirstId(group.id)}
                                         >
                                             {group.name}
@@ -117,7 +117,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
                                                         <li
                                                             key={sub.id}
                                                             onClick={() => goToCategory(sub.id)}
-                                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer whitespace-nowrap font-medium"
+                                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer whitespace-nowrap font-light"
                                                         >
                                                             {sub.name}
                                                         </li>
@@ -160,8 +160,8 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
                             <span
                                 className={
                                     isCompact
-                                        ? 'inline-block relative px-2 sm:px-3 py-0.5 sm:py-1 cursor-pointer text-[11px] sm:text-sm font-medium bg-black text-white rounded-full hover:bg-gray-800 transition tracking-tight z-10'
-                                        : 'inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-gray-800 z-50'
+                                        ? 'inline-block relative px-2 sm:px-3 py-0.5 sm:py-1 cursor-pointer text-[11px] sm:text-sm font-light bg-black text-white rounded-full hover:bg-gray-800 transition tracking-tight z-10'
+                                        : 'inline-block relative px-2 pt-1 pb-1 cursor-pointer text-base font-light tracking-tight text-gray-800 z-50'
                                 }
                                 onClick={() => goToCategory(cat.id)}
                             >
@@ -176,7 +176,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
                                             <li
                                                 key={sub.id}
                                                 onClick={() => goToCategory(sub.id)}
-                                                className="px-4 py-2 hover:bg-gray-100 whitespace-nowrap cursor-pointer font-medium"
+                                                className="px-4 py-2 hover:bg-gray-100 whitespace-nowrap cursor-pointer font-light"
                                             >
                                                 {sub.name}
                                             </li>
@@ -190,7 +190,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
 
                 {/* ✅ 데스크탑 전용 경매 버튼 (맨 오른쪽) */}
                 <span
-                    className="hidden md:inline-block px-2 pt-1 pb-1 cursor-pointer text-base font-semibold tracking-tight text-red-600 hover:text-red-700 z-50"
+                    className="hidden md:inline-block px-2 pt-1 pb-1 cursor-pointer text-base font-light tracking-tight text-red-600 hover:text-red-700 z-50"
                     onClick={() => (location.href = '/auctions')}
                 >
                     경매

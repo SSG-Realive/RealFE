@@ -47,10 +47,10 @@ export default function EditReviewPage() {
         <div>
             <Navbar />
             <div className="max-w-2xl mx-auto px-6 py-10">
-                <h1 className="text-2xl font-bold mb-6">리뷰 수정</h1>
+                <h1 className="text-2xl font-light mb-6">리뷰 수정</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block font-medium mb-1">별점</label>
+                        <label className="block font-light mb-1">별점</label>
                         <select
                             value={rating}
                             onChange={(e) => setRating(Number(e.target.value))}
@@ -65,7 +65,7 @@ export default function EditReviewPage() {
                     </div>
 
                     <div>
-                        <label className="block font-medium mb-1">리뷰 내용</label>
+                        <label className="block font-light mb-1">리뷰 내용</label>
                         <textarea
                             value={content}
                             onChange={(e) => setContent(e.target.value)}

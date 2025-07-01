@@ -111,7 +111,7 @@ export default function CustomerHomePage() {
             {/* ✅ 주간 경매 */}
             {!categoryId && (
                 <section className="max-w-screen-xl mx-auto px-4 mt-1 mb-4 sm:mt-6 sm:mb-8">
-                    <h2 className="text-xl font-bold mb-4">주간 경매</h2>
+                    <h2 className="text-xl font-light mb-4">주간 경매</h2>
                     {auctionLoading ? (
                         <p>로딩 중...</p>
                     ) : auctionError ? (
@@ -133,7 +133,7 @@ export default function CustomerHomePage() {
             <section className="max-w-screen-xl mx-auto px-4 mt-6 mb-8">
                 <div className="w-full overflow-x-auto no-scrollbar">
                     <div className="inline-flex items-center gap-2 px-2 py-1">
-                        <h2 className="text-xl font-bold text-gray-800 mr-2 shrink-0">{getCategoryTitle()}</h2>
+                        <h2 className="text-xl font-light text-gray-800 mr-2 shrink-0">{getCategoryTitle()}</h2>
 
                         <button
                             onClick={() => {
@@ -143,7 +143,7 @@ export default function CustomerHomePage() {
                             }}
                             className={`text-sm transition whitespace-nowrap shrink-0 ${
                                 categoryId === null
-                                    ? 'text-black font-semibold underline'
+                                    ? 'text-black font-light underline'
                                     : 'text-gray-500 hover:text-black'
                             }`}
                         >
@@ -160,7 +160,7 @@ export default function CustomerHomePage() {
                                 }}
                                 className={`text-sm transition whitespace-nowrap shrink-0 ${
                                     categoryId === cat.id
-                                        ? 'text-black font-semibold underline'
+                                        ? 'text-black font-light underline'
                                         : 'text-gray-500 hover:text-black'
                                 }`}
                             >

@@ -66,7 +66,7 @@ export default function PopularProductsGrid() {
 
     return (
         <section className="max-w-screen-xl mx-auto mt-6 sm:mt-10 px-4">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">인기 상품</h2>
+        <h2 className="text-xl font-light text-gray-800 mb-6">인기 상품</h2>
 
             {/* 로딩 완료 후에만 슬라이더 렌더링 */}
             {products && (

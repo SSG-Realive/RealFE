@@ -16,7 +16,7 @@ interface Props {
 export default function GenderSelector({ gender, onChange }: Props) {
   return (
     <div className="mb-4">
-      <label className="block font-semibold mb-1">성별</label>
+      <label className="block font-light mb-1">성별</label>
       <Select value={gender} onValueChange={(value) => onChange(value as Gender)}>
         <SelectTrigger className="w-full">
           <SelectValue placeholder="선택" />

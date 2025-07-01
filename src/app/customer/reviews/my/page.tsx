@@ -3,7 +3,6 @@
 // import { useEffect, useState } from 'react';
 // import { useRouter, usePathname } from 'next/navigation';
 // import { useAuthStore } from '@/store/customer/authStore';
-// import Footer from '@/components/customer/common/Footer';
 // import {
 //     Heart,
 //     ShoppingCart,
@@ -128,7 +127,6 @@
 //                     </section>
 //                 </div>
 //             </main>
-//             <Footer />
 //         </>
 //     );
 // }

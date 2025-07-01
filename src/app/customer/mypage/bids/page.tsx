@@ -9,7 +9,7 @@ import {
   customerBidService,
   customerAuctionService,
 } from '@/service/customer/auctionService';
-import { publicAuctionService }  from '@/service/customer/publicAcutionService';
+import { publicAuctionService }  from '@/service/customer/publicAuctionService';
 import type { Bid, Auction }     from '@/types/customer/auctions';
 
 import GlobalDialog        from '@/components/ui/GlobalDialog';

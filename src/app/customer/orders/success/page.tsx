@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/customer/authStore';
-import { processDirectPaymentApi } from '@/service/order/orderService';
+import { processDirectPaymentApi, processCartPaymentApi } from '@/service/order/orderService';
 import type { PayRequestDTO } from '@/types/customer/order/order';
 
 export default function PaymentSuccessPage() {
@@ -60,7 +60,19 @@ export default function PaymentSuccessPage() {
                     ...(checkoutInfo.productId ? { productId: checkoutInfo.productId, quantity: checkoutInfo.quantity } : {})
                 };
 
-                const createdOrderId = await processDirectPaymentApi(payRequest);
+                // 장바구니 결제 vs 단일 상품 결제 구분
+                let createdOrderId: number;
+                if (checkoutInfo.orderItems && checkoutInfo.orderItems.length > 0) {
+                    // 장바구니 결제
+                    console.log('장바구니 결제 처리 중...');
+                    createdOrderId = await processCartPaymentApi(payRequest);
+                } else if (checkoutInfo.productId) {
+                    // 단일 상품 결제
+                    console.log('단일 상품 결제 처리 중...');
+                    createdOrderId = await processDirectPaymentApi(payRequest);
+                } else {
+                    throw new Error('결제 정보가 올바르지 않습니다.');
+                }
                 setOrderId(createdOrderId);
                 
                 // 체크아웃 정보 삭제

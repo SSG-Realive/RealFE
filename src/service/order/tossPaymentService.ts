@@ -10,7 +10,7 @@ export interface TossPaymentResponse {
     message: string;
 }
 
-// 토스페이먼츠 기본 SDK 서비스 (블로그 참고)
+// 토스페이먼츠 기본 SDK 서비스
 export interface TossPaymentConfig {
   clientKey: string;
   customerKey: string;
@@ -92,7 +92,7 @@ export const loadTossPayments = async (clientKey: string): Promise<any> => {
   });
 };
 
-// 결제 요청 (블로그 방식)
+// 결제 요청
 export const requestPayment = async (
   tossPayments: any,
   options: PaymentRequestOptions
@@ -112,8 +112,7 @@ export const requestPayment = async (
     }
     
     console.log('토스페이먼츠 결제창 호출 시작...');
-    
-    // 블로그에서 사용한 방식대로 결제 요청
+
     const result = await tossPayments.requestPayment('카드', {
       amount: options.amount,
       orderId: options.orderId,

@@ -211,8 +211,7 @@ export default function DirectOrderPage() {
                 customerId: customerId,
             };
             sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
-            
-            // 블로그 방식에 맞는 결제 요청 옵션
+
             const paymentOptions: PaymentRequestOptions = {
                 orderId: orderId,
                 orderName: `${productInfo.productName} ${productInfo.quantity}개`,
@@ -226,7 +225,6 @@ export default function DirectOrderPage() {
 
             console.log('결제 옵션:', paymentOptions);
 
-            // 블로그 방식으로 결제 요청
             console.log('토스페이먼츠 결제창 호출 중...');
             await requestPayment(tossPaymentsRef.current, paymentOptions);
         } catch (error: any) {
@@ -246,10 +244,9 @@ export default function DirectOrderPage() {
                 receiverName: shippingInfo.receiverName,
                 phone: shippingInfo.phone,
                 deliveryAddress: shippingInfo.address,
-                paymentMethod: paymentMethod,
+                paymentMethod: 'CARD', // 토스페이먼츠로 고정
                 paymentKey: paymentKey,
                 tossOrderId: orderId,
-                amount: amount,
                 productId: productInfo!.productId,
                 quantity: productInfo!.quantity,
             };
@@ -346,28 +343,26 @@ export default function DirectOrderPage() {
 
             {/* 4. 토스페이먼츠 결제 */}
             <section className="order-section">
-                <h2>결제 수단</h2>
-                <p>결제하기 버튼을 클릭하면 토스페이먼츠 결제창이 열립니다.</p>
-                {error && <div className="error-message">{error}</div>}
-            </section>
+                <h2>결제</h2>
 
             {/* 5. 결제 동의 및 금액 요약 */}
-            <aside className="order-summary">
-                <div id="agreement"></div>
-                <h3>결제 금액</h3>
-                <div className="summary-row">
-                    <span>총 상품금액</span>
-                    <span>{totalProductPrice.toLocaleString()}원</span>
-                </div>
-                <div className="summary-row">
-                    <span>배송비</span>
-                    <span>+ {deliveryFee.toLocaleString()}원</span>
-                </div>
-                <div className="summary-row total">
-                    <span>최종 결제 금액</span>
-                    <span>{finalAmount.toLocaleString()}원</span>
-                </div>
-            </aside>
+                <aside className="order-summary">
+                    <div id="agreement"></div>
+                    <h3>결제 금액</h3>
+                    <div className="summary-row">
+                        <span>총 상품금액</span>
+                        <span>{totalProductPrice.toLocaleString()}원</span>
+                    </div>
+                    <div className="summary-row">
+                        <span>배송비</span>
+                        <span>+ {deliveryFee.toLocaleString()}원</span>
+                    </div>
+                    <div className="summary-row total">
+                        <span>최종 결제 금액</span>
+                        <span>{finalAmount.toLocaleString()}원</span>
+                    </div>
+                </aside>
+            </section>
 
             <button className="payment-button" onClick={handlePayment}>
                 결제하기

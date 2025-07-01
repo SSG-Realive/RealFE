@@ -9,6 +9,7 @@ import {
     deleteCartItem,
 } from '@/service/customer/cartService';
 import { useCartStore } from '@/store/customer/useCartStore';
+import { useAuthStore } from '@/store/customer/authStore';
 import CartItemCard from '@/components/customer/cart/CartItemCard';
 import Navbar from '@/components/customer/common/Navbar';
 
@@ -19,9 +20,22 @@ export default function CartPage() {
     const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const router = useRouter();
 
+    const { hydrated, isAuthenticated } = useAuthStore();
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
 
     useEffect(() => {
+        // hydrated가 true이고 인증된 상태일 때만 API 호출
+        if (!hydrated) {
+            return; // 아직 인증 정보가 로딩 중
+        }
+        
+        if (!isAuthenticated()) {
+            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+            alert('로그인이 필요합니다.');
+            router.push('/login');
+            return;
+        }
+
         fetchCartList()
             .then(items => {
                 setCartItems(items);
@@ -29,7 +43,7 @@ export default function CartPage() {
             })
             .catch(() => alert('장바구니 불러오기 실패'))
             .finally(() => setLoading(false));
-    }, []);
+    }, [hydrated, isAuthenticated, router]);
 
     const totalPrice = cartItems
         .filter(item => selectedItemIds.has(item.cartItemId))
@@ -137,7 +151,11 @@ export default function CartPage() {
         router.push('/customer/orders/new');
     };
 
-    if (loading) return <div className="p-10">로딩 중...</div>;
+    if (!hydrated) {
+        return <div className="flex justify-center items-center h-screen">인증 정보를 확인하는 중...</div>;
+    }
+
+    if (loading) return <div className="p-10">장바구니를 불러오는 중...</div>;
 
     return (
         <>

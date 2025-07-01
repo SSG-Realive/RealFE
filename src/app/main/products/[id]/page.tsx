@@ -25,6 +25,7 @@ import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useAuthStore } from '@/store/customer/authStore';
 import { useGlobalDialog } from '@/app/context/dialogContext';
 
+
 /* ------------------------------------------------------------------ */
 
 export default function ProductDetailPage() {

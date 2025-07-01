@@ -54,7 +54,7 @@ export async function getSellerSettlementDetail(payoutLogId: number): Promise<Pa
     try {
         const res = await sellerApi.get(url);
         console.log('정산 상세 API 응답:', res.data);
-        return res.data;
+    return res.data;
     } catch (error: any) {
         console.error('정산 상세 API 에러:', {
             url,

@@ -43,7 +43,7 @@ export default function QnaEditPage() {
     const handleSubmit = async () => {
         await updateQna(Number(id), form);
         alert('질문이 수정되었습니다.');
-        router.push('/seller/seller-qna');
+        router.push('/seller/admin-qna');
     };
 
     const handleDelete = async () => {
@@ -52,7 +52,7 @@ export default function QnaEditPage() {
 
         await deleteQna(Number(id));
         alert('QnA가 삭제되었습니다.');
-        router.push('/seller/seller-qna');
+        router.push('/seller/admin-qna');
     };
 
     return (

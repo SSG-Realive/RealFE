@@ -24,7 +24,7 @@ export default function QnaCreatePage() {
     const handleSubmit = async () => {
         await createQna(form);
         alert('질문이 등록되었습니다.');
-        router.push('/seller/qna');
+        router.push('/seller/admin-qna');
     };
 
     return (

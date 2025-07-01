@@ -2,86 +2,353 @@
 
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { useEffect, useState } from 'react';
-
-// 임시 API 함수 예시 (실제 서비스 함수로 교체 필요)
-async function fetchSellerQnaList() {
-  const res = await fetch('/api/seller/admin-qna');
-  return res.json();
-}
-async function postSellerQna({ title, content }: { title: string; content: string }) {
-  await fetch('/api/seller/admin-qna', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, content }),
-  });
-}
+import { useRouter } from 'next/navigation';
+import { 
+  createAdminInquiry, 
+  getAdminInquiryList, 
+  AdminInquiryRequest, 
+  AdminInquiryResponse,
+  AdminInquiryListResponse 
+} from '@/service/seller/adminInquiryService';
+import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
+import { 
+  MessageCircle, 
+  Send, 
+  CheckCircle, 
+  Clock,
+  Plus,
+  Search
+} from 'lucide-react';
 
 export default function SellerAdminQnaPage() {
-  const [qnaList, setQnaList] = useState<any[]>([]);
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const checking = useSellerAuthGuard();
+  const router = useRouter();
+  
+  const [inquiryList, setInquiryList] = useState<AdminInquiryResponse[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 폼 상태
+  const [form, setForm] = useState<AdminInquiryRequest>({
+    title: '',
+    content: ''
+  });
+
+  // 필터 상태
+  const [searchKeyword, setSearchKeyword] = useState('');
+
+  // 문의 목록 로딩
+  const fetchInquiries = async (page = 0) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const searchParams: Record<string, any> = {
+        page,
+        size: 10,
+        ...(searchKeyword && { keyword: searchKeyword })
+      };
+
+      const response: AdminInquiryListResponse = await getAdminInquiryList(searchParams);
+      setInquiryList(response.content || []);
+      setTotalPages(response.totalPages || 1);
+      setTotalElements(response.totalElements || 0);
+      setCurrentPage(page);
+    } catch (err: any) {
+      console.error('문의 목록 조회 실패:', err);
+      setError('문의 목록을 불러오는데 실패했습니다.');
+      setInquiryList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchSellerQnaList().then(data => setQnaList(data.content || []));
-  }, []);
+    if (!checking) {
+      fetchInquiries(0);
+    }
+  }, [checking]);
 
+  // 문의 등록
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    await postSellerQna({ title, content });
-    setTitle('');
-    setContent('');
-    fetchSellerQnaList().then(data => setQnaList(data.content || []));
-    setLoading(false);
+    
+    if (!form.title.trim() || !form.content.trim()) {
+      alert('제목과 내용을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await createAdminInquiry(form);
+      
+      // 폼 초기화
+      setForm({
+        title: '',
+        content: ''
+      });
+      
+      alert('문의가 성공적으로 등록되었습니다.');
+      fetchInquiries(0); // 목록 새로고침
+    } catch (err: any) {
+      console.error('문의 등록 실패:', err);
+      alert('문의 등록에 실패했습니다.');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  // 검색 처리
+  const handleSearch = () => {
+    fetchInquiries(0);
+  };
+
+  // 상태별 배지
+  const getStatusBadge = (inquiry: AdminInquiryResponse) => {
+    if (inquiry.isAnswered) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
+          <CheckCircle className="w-3 h-3" />
+          답변완료
+        </span>
+      );
+    } else {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-600">
+          <Clock className="w-3 h-3" />
+          대기중
+        </span>
+      );
+    }
+  };
+
+  if (checking) {
+    return (
+      <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a89f91] mx-auto mb-4"></div>
+          <p className="text-[#5b4636]">인증 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SellerLayout>
-      <main className="min-h-screen w-full px-4 py-8 bg-white">
-        <h1 className="text-2xl font-bold mb-6">관리자 문의</h1>
-        <form onSubmit={handleSubmit} className="mb-8 space-y-3">
-          <input
-            className="w-full border rounded px-3 py-2"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            placeholder="제목"
-            required
-          />
-          <textarea
-            className="w-full border rounded px-3 py-2"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder="문의 내용"
-            required
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-            disabled={loading}
-          >
-            {loading ? '등록 중...' : '문의 등록'}
-          </button>
-        </form>
-        <h2 className="text-xl font-semibold mb-4">문의 내역</h2>
-        <ul className="space-y-4">
-          {qnaList.length === 0 && <li className="text-gray-500">문의 내역이 없습니다.</li>}
-          {qnaList.map(qna => (
-            <li key={qna.id} className="border rounded p-4">
-              <div className="font-bold">{qna.title}</div>
-              <div className="text-gray-700 mb-2">{qna.content}</div>
-              <div className="text-xs text-gray-400 mb-1">작성일: {qna.created_at}</div>
-              {qna.is_answered && (
-                <div className="mt-2 bg-green-50 border-l-4 border-green-400 p-2">
-                  <div className="font-semibold text-green-700">관리자 답변</div>
-                  <div>{qna.answer}</div>
-                  <div className="text-xs text-gray-400">답변일: {qna.answered_at}</div>
+      <div className="flex-1 w-full h-full px-4 py-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl md:text-2xl font-bold text-[#5b4636]">관리자 문의</h1>
+          <div className="flex items-center gap-2 text-sm text-[#a89f91]">
+            <MessageCircle className="w-4 h-4" />
+            총 {totalElements}건의 문의
+          </div>
+        </div>
+
+        {/* 상단 통계 카드 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 min-h-[140px] flex flex-col justify-center items-center">
+            <div className="flex items-center gap-3 mb-2">
+              <MessageCircle className="w-6 h-6 text-[#a89f91]" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#5b4636]">{totalElements}</div>
+                <div className="text-sm text-[#a89f91]">전체 문의</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 min-h-[140px] flex flex-col justify-center items-center">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-6 h-6 text-[#a89f91]" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#5b4636]">
+                  {inquiryList.filter(item => !item.isAnswered).length}
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      </main>
+                <div className="text-sm text-[#a89f91]">미답변</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 min-h-[140px] flex flex-col justify-center items-center">
+            <div className="flex items-center gap-3 mb-2">
+              <CheckCircle className="w-6 h-6 text-[#a89f91]" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#5b4636]">
+                  {inquiryList.filter(item => item.isAnswered).length}
+                </div>
+                <div className="text-sm text-[#a89f91]">답변완료</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 min-h-[140px] flex flex-col justify-center items-center">
+            <div className="flex items-center gap-3 mb-2">
+              <MessageCircle className="w-6 h-6 text-[#a89f91]" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-[#5b4636]">
+                  {totalElements > 0 ? Math.round((inquiryList.filter(item => item.isAnswered).length / inquiryList.length) * 100) : 0}%
+                </div>
+                <div className="text-sm text-[#a89f91]">답변률</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 문의 등록 폼 */}
+        <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 mb-8">
+          <h2 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
+            <Plus className="w-5 h-5" />
+            새 문의 등록
+          </h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* 제목 입력 */}
+            <div>
+              <label className="block text-sm font-medium text-[#5b4636] mb-2">제목</label>
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="문의 제목을 입력하세요"
+                className="w-full px-3 py-2 border border-[#d6ccc2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a89f91] bg-white text-[#5b4636]"
+                required
+              />
+            </div>
+
+            {/* 내용 입력 */}
+            <div>
+              <label className="block text-sm font-medium text-[#5b4636] mb-2">문의 내용</label>
+              <textarea
+                value={form.content}
+                onChange={(e) => setForm({ ...form, content: e.target.value })}
+                placeholder="문의 내용을 상세히 입력하세요"
+                rows={6}
+                className="w-full px-3 py-2 border border-[#d6ccc2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a89f91] bg-white text-[#5b4636] resize-none"
+                required
+              />
+            </div>
+
+            {/* 등록 버튼 */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex items-center gap-2 bg-[#a89f91] text-white px-6 py-2 rounded-lg hover:bg-[#9a8a7a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <Send className="w-4 h-4" />
+                {submitting ? '등록 중...' : '문의 등록'}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* 검색 */}
+        <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl p-6 mb-6">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder="제목 또는 내용으로 검색..."
+              className="flex-1 px-3 py-2 border border-[#d6ccc2] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#a89f91] bg-white text-[#5b4636]"
+            />
+            <button
+              onClick={handleSearch}
+              className="bg-[#a89f91] text-white px-4 py-2 rounded-lg hover:bg-[#9a8a7a] transition-colors flex items-center gap-2"
+            >
+              <Search className="w-4 h-4" />
+              검색
+            </button>
+          </div>
+        </div>
+
+        {/* 문의 목록 */}
+        <div className="bg-[#f5f1eb] border border-[#d6ccc2] rounded-xl shadow-xl overflow-hidden">
+          {loading ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#a89f91] mx-auto mb-4"></div>
+              <p className="text-[#5b4636]">문의 목록을 불러오는 중...</p>
+            </div>
+          ) : error ? (
+            <div className="p-8 text-center">
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={() => fetchInquiries(currentPage)}
+                className="bg-[#a89f91] text-white px-4 py-2 rounded-lg hover:bg-[#9a8a7a] transition-colors"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : inquiryList.length === 0 ? (
+            <div className="p-8 text-center">
+              <MessageCircle className="w-12 h-12 text-[#a89f91] mx-auto mb-4" />
+              <p className="text-[#5b4636] text-lg">등록된 문의가 없습니다.</p>
+              <p className="text-[#a89f91] text-sm mt-2">위 폼을 통해 첫 번째 문의를 등록해보세요.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-[#d6ccc2]">
+                <thead className="bg-[#f5f1eb]">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5b4636] uppercase tracking-wider">제목</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5b4636] uppercase tracking-wider">상태</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#5b4636] uppercase tracking-wider">등록일</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-[#5b4636] uppercase tracking-wider">액션</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-[#d6ccc2]">
+                  {inquiryList.map((inquiry) => (
+                    <tr key={inquiry.id} className="hover:bg-[#f5f1eb] transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-[#5b4636]">{inquiry.title}</div>
+                        <div className="text-sm text-[#a89f91] truncate max-w-xs">{inquiry.content}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(inquiry)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#5b4636]">
+                        {new Date(inquiry.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => router.push(`/seller/admin-qna/${inquiry.id}`)}
+                          className="text-[#a89f91] hover:text-[#5b4636] text-sm font-medium transition-colors"
+                        >
+                          상세보기
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-6">
+            <div className="flex gap-2">
+              {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => fetchInquiries(i)}
+                  className={`px-3 py-2 rounded ${
+                    currentPage === i
+                      ? 'bg-[#a89f91] text-white'
+                      : 'bg-white text-[#5b4636] border border-[#d6ccc2] hover:bg-[#f5f1eb]'
+                  } transition-colors`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </SellerLayout>
   );
 } 

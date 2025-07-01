@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'next/navigation';
 
@@ -8,11 +8,11 @@ import { Flame, Clock, Sparkles } from 'lucide-react';
 
 import type { Auction, PaginatedAuctionResponse } from '@/types/customer/auctions';
 import ProductImage from '@/components/ProductImage';
-import { publicAuctionService } from '@/service/customer/publicAcutionService';
+import { publicAuctionService } from '@/service/customer/publicAuctionService';
 import { useGlobalDialog } from '../context/dialogContext';
-import Footer from "@/components/customer/common/Footer";
 
 export default function AuctionListPage() {
+  
   const router = useRouter();
   const { show } = useGlobalDialog();
 
@@ -44,15 +44,19 @@ export default function AuctionListPage() {
   const timeLeft = (end: string) =>
       formatDistanceToNowStrict(new Date(end), { addSuffix: true });
 
-  const setupTrack = (ref: React.RefObject<HTMLUListElement>) => {
-    if (!ref.current) return;
-    const len =
-        Array.from(ref.current.children).reduce(
-            (sum, el) => sum + (el as HTMLElement).offsetWidth,
-            0
-        ) || 1;
-    ref.current.style.setProperty('--track-len', `${len}px`);
-  };
+  const setupTrack = (ref: React.Ref<HTMLUListElement>) => {
+  // ✅ [수정] ref가 함수이거나 null이면 아무것도 하지 않고 종료하는 코드
+  if (typeof ref === 'function' || !ref) return;
+
+  // 이 아래부터는 ref가 .current 속성을 가진 객체임이 보장됩니다.
+  if (!ref.current) return;
+  const len =
+    Array.from(ref.current.children).reduce(
+      (sum, el) => sum + (el as HTMLElement).offsetWidth,
+      0
+    ) || 1;
+  ref.current.style.setProperty('--track-len', `${len}px`);
+};
 
   useEffect(() => {
     const resizeHandler = () => {
@@ -66,7 +70,7 @@ export default function AuctionListPage() {
     return () => window.removeEventListener('resize', resizeHandler);
   }, [auctions]);
 
-  const renderSlider = (title: string, trackRef: React.RefObject<HTMLUListElement>) => {
+  const renderSlider = (title: string, trackRef: React.Ref<HTMLUListElement>) => {
     const iconMap: Record<string, JSX.Element> = {
       '실시간 경매': <Flame className="text-indigo-500" size={20} />,
       '인기 경매': <Flame className="text-red-500" size={20} />,
@@ -153,7 +157,6 @@ export default function AuctionListPage() {
           {renderSlider('마감 임박 경매', trackRef3)}
           {renderSlider('신규 경매', trackRef4)}
         </div>
-        <Footer />
       </div>
   );
 }

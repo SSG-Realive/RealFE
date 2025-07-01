@@ -17,7 +17,6 @@ import { fetchReviewsBySeller } from '@/service/customer/reviewService';
 
 import ReviewList from '@/components/customer/review/ReviewList';
 import ProductImage from '@/components/ProductImage';
-import Footer from '@/components/customer/common/Footer';
 
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
@@ -330,8 +329,6 @@ export default function ProductDetailPage() {
           </button>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

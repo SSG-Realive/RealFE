@@ -20,7 +20,7 @@ import BottomInspirationSlider from '@/components/main/BottomInspirationSlider';
 import ScrollToTopButton from '@/components/customer/common/ScrollToTopButton';
 import AuctionCard from '@/components/customer/auctions/AuctionCard';
 import { Auction } from '@/types/customer/auctions';
-import { publicAuctionService } from '@/service/customer/publicAcutionService';
+import { publicAuctionService } from '@/service/customer/publicAuctionService';
 
 const ITEMS_PER_PAGE = 10;
 

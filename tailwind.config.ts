@@ -1,8 +1,13 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss'
-
+import type { Config } from 'tailwindcss';
+import lineClamp from '@tailwindcss/line-clamp';
 
 const config: Config = {
+  content: [
+    './app/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './pages/**/*.{ts,tsx}',
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -10,11 +15,7 @@ const config: Config = {
       },
     },
   },
-  content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './pages/**/*.{ts,tsx}',
-  ],
-  plugins: [],
-}
-export default config
+  plugins: [lineClamp],
+};
+
+export default config;

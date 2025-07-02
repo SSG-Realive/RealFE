@@ -211,7 +211,7 @@ export default function AuctionPaymentPage() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">낙찰 정보를 찾을 수 없습니다</h2>
+            <h2 className="text-2xl font-light text-gray-900 mb-4">낙찰 정보를 찾을 수 없습니다</h2>
             <button
               onClick={() => router.push('/customer/member/auctions/won')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
@@ -230,7 +230,7 @@ export default function AuctionPaymentPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center">
             <div className="text-green-500 text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">이미 결제가 완료된 상품입니다</h2>
+            <h2 className="text-2xl font-light text-gray-900 mb-4">이미 결제가 완료된 상품입니다</h2>
             <p className="text-gray-600 mb-6">해당 경매 상품은 이미 결제가 완료되었습니다.</p>
             <button
               onClick={() => router.push('/customer/member/auctions/won')}
@@ -248,7 +248,7 @@ export default function AuctionPaymentPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">경매 상품 결제</h1>
+          <h1 className="text-3xl font-light text-gray-900 mb-2">경매 상품 결제</h1>
           <p className="text-gray-600">낙찰한 상품의 결제를 진행해주세요.</p>
         </div>
 
@@ -289,7 +289,7 @@ export default function AuctionPaymentPage() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">낙찰가</span>
-                <span className="text-xl font-bold text-blue-600">
+                <span className="text-xl font-light text-blue-600">
                   {formatPrice(auctionWin.winningBidPrice)}
                 </span>
               </div>
@@ -312,7 +312,7 @@ export default function AuctionPaymentPage() {
             
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-light text-gray-700 mb-2">
                   수령인 이름 *
                 </label>
                 <input
@@ -327,7 +327,7 @@ export default function AuctionPaymentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-light text-gray-700 mb-2">
                   연락처 *
                 </label>
                 <input
@@ -342,7 +342,7 @@ export default function AuctionPaymentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-light text-gray-700 mb-2">
                   배송 주소 *
                 </label>
                 <textarea
@@ -357,7 +357,7 @@ export default function AuctionPaymentPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-light text-gray-700 mb-2">
                   결제 수단 *
                 </label>
                 <select

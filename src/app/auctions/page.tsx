@@ -107,18 +107,18 @@ export default function AuctionListPage() {
 
                       {/* 텍스트 */}
                       <div className="p-4 text-left">
-                        <p className="text-base font-medium truncate">
+                        <p className="text-base font-light truncate">
                           {a.adminProduct?.productName}
                         </p>
-                        <p className="text-sm font-semibold text-gray-900 mt-1">
+                        <p className="text-sm font-light text-gray-900 mt-1">
                           시작 {a.startPrice.toLocaleString()}
                           <span className="ml-1 text-xs">원</span>
                         </p>
-                        <p className="text-sm font-semibold text-red-500 mt-0.5">
+                        <p className="text-sm font-light text-red-500 mt-0.5">
                           현재 {a.currentPrice.toLocaleString()}
                           <span className="ml-1 text-xs">원</span>
                         </p>
-                        <p className="text-sm font-semibold text-gray-500 mt-0.5">
+                        <p className="text-sm font-light text-gray-500 mt-0.5">
                           종료 {new Date(a.endTime).toLocaleString()}
                         </p>
                       </div>

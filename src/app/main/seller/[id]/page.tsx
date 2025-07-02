@@ -45,7 +45,7 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
 
     if (isNaN(sellerId)) {
         return (
-            <div className="flex justify-center items-center h-screen text-red-500 text-xl font-bold">
+            <div className="flex justify-center items-center h-screen text-red-500 text-xl font-light">
                 잘못된 판매자 ID입니다.
             </div>
         );
@@ -64,7 +64,7 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
 
     if (!seller) {
         return (
-            <div className="flex justify-center items-center h-screen text-red-500 text-xl font-bold">
+            <div className="flex justify-center items-center h-screen text-red-500 text-xl font-light">
                 판매자 정보를 찾을 수 없습니다.
             </div>
         );
@@ -95,24 +95,24 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
                         className="w-full h-full object-cover"
                         fallbackSrc="https://placehold.co/128x128/e0e0e0/555555?text=Profile" // 대체 이미지 URL
                     />
-                    <div className={`absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold ${ratingColorClass} border-2 border-white shadow-lg`}>
+                    <div className={`absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-light ${ratingColorClass} border-2 border-white shadow-lg`}>
                         {displayAverageRatingPercentile.toFixed(0)}%
                     </div>
                 </div>
 
                 <div className="flex-grow">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{seller.name}</h1>
+                    <h1 className="text-3xl font-light text-gray-800 mb-2">{seller.name}</h1>
                     <div className="text-gray-600 text-sm mb-1">
-                        <span className="font-semibold">연락처:</span> {seller.contactNumber || '정보 없음'}
+                        <span className="font-light">연락처:</span> {seller.contactNumber || '정보 없음'}
                     </div>
                     <div className="text-gray-600 text-sm mb-1">
-                        <span className="font-semibold">사업자 번호:</span> {seller.businessNumber || '정보 없음'}
+                        <span className="font-light">사업자 번호:</span> {seller.businessNumber || '정보 없음'}
                     </div>
                     <div className="text-gray-600 text-sm">
-                        <span className="font-semibold">가입일:</span> {seller.createdAt ? new Date(seller.createdAt).toLocaleDateString('ko-KR') : '정보 없음'}
+                        <span className="font-light">가입일:</span> {seller.createdAt ? new Date(seller.createdAt).toLocaleDateString('ko-KR') : '정보 없음'}
                     </div>
                     <div className="text-gray-600 text-sm mt-2">
-                        <span className="font-semibold">총 리뷰 수:</span> {seller.totalReviews}
+                        <span className="font-light">총 리뷰 수:</span> {seller.totalReviews}
                     </div>
                 </div>
             </div>

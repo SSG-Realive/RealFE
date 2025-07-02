@@ -1,6 +1,6 @@
 @font-face {
-  font-family: 'HakgyoansimWoojuR';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-2@1.0/HakgyoansimWoojuR.woff2') format('woff2');
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -150,8 +150,8 @@
 /* ✅ 폰트 전역 적용 설정 */
 @layer base {
   html {
-    font-size: 18px;
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    font-family: 'S-CoreDream-3Light', ui-sans-serif, system-ui, sans-serif;
   }
 
   * {
@@ -160,11 +160,11 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'S-CoreDream-3Light', ui-sans-serif, system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5 {
-    font-family: 'HakgyoansimWoojuR', ui-sans-serif, system-ui, sans-serif;
+    font-family: 'S-CoreDream-3Light', ui-sans-serif, system-ui, sans-serif;
     line-height: 1.4;
   }
 

@@ -171,28 +171,28 @@
 //               />
 //             </div>
             
-//             <h1 className="text-2xl font-bold text-gray-900 mb-4">
+//             <h1 className="text-2xl font-light text-gray-900 mb-4">
 //               {auction.adminProduct.productName}
 //             </h1>
             
 //             <div className="space-y-3 text-gray-600">
 //               <div className="flex justify-between">
 //                 <span>시작가:</span>
-//                 <span className="font-medium">{auction.startPrice.toLocaleString()}원</span>
+//                 <span className="font-light">{auction.startPrice.toLocaleString()}원</span>
 //               </div>
 //               <div className="flex justify-between">
 //                 <span>현재가:</span>
-//                 <span className="font-bold text-2xl text-blue-600">
+//                 <span className="font-light text-2xl text-blue-600">
 //                   {auction.currentPrice.toLocaleString()}원
 //                 </span>
 //               </div>
 //               <div className="flex justify-between">
 //                 <span>입찰 단위:</span>
-//                 <span className="font-medium">{tickSize.toLocaleString()}원</span>
+//                 <span className="font-light">{tickSize.toLocaleString()}원</span>
 //               </div>
 //               <div className="flex justify-between">
 //                 <span>경매 상태:</span>
-//                 <span className={`font-medium ${
+//                 <span className={`font-light ${
 //                   isActive ? 'text-green-600' : 'text-gray-500'
 //                 }`}>
 //                   {isActive ? '진행중' : '종료'}
@@ -213,13 +213,13 @@
 //           <div className="space-y-6">
 //             {/* 입찰 폼 */}
 //             <div className="bg-white rounded-lg shadow-lg p-6">
-//               <h2 className="text-xl font-bold text-gray-900 mb-4">입찰하기</h2>
+//               <h2 className="text-xl font-light text-gray-900 mb-4">입찰하기</h2>
               
 //               {loggedIn ? (
 //                 isActive ? (
 //                   <div className="space-y-4">
 //                     <div>
-//                       <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       <label className="block text-sm font-light text-gray-700 mb-2">
 //                         입찰 금액 (최소: {minBidAmount.toLocaleString()}원)
 //                       </label>
 //                       <input
@@ -235,7 +235,7 @@
 //                     <button
 //                       onClick={handleBid}
 //                       disabled={bidding || !bidAmount}
-//                       className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+//                       className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-light"
 //                     >
 //                       {bidding ? '입찰 중...' : '입찰하기'}
 //                     </button>
@@ -268,7 +268,7 @@
 
 //             {/* 입찰 내역 */}
 //             <div className="bg-white rounded-lg shadow-lg p-6">
-//               <h2 className="text-xl font-bold text-gray-900 mb-4">
+//               <h2 className="text-xl font-light text-gray-900 mb-4">
 //                 입찰 내역 ({bids.length}건)
 //               </h2>
               
@@ -281,14 +281,14 @@
 //                         className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-md"
 //                       >
 //                         <div>
-//                           <span className="font-medium">
+//                           <span className="font-light">
 //                             {loggedIn ? bid.customerName : '***'}
 //                           </span>
 //                           <span className="text-sm text-gray-500 ml-2">
 //                             {new Date(bid.bidTime).toLocaleString()}
 //                           </span>
 //                         </div>
-//                         <span className="font-bold text-blue-600">
+//                         <span className="font-light text-blue-600">
 //                           {bid.bidPrice.toLocaleString()}원
 //                         </span>
 //                       </div>

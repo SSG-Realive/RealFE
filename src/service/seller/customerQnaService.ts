@@ -20,7 +20,7 @@ export async function getCustomerQnaList(
         console.log('res.data 원본:', res.data);
         console.log('res.data 타입:', typeof res.data);
         
-        return res.data;
+    return res.data;
     } catch (error: any) {
         console.error('=== customerQnaService API 에러 ===');
         console.error('에러 상세:', error);

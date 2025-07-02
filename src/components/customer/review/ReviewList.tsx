@@ -21,7 +21,7 @@ export default function ReviewList({ reviews }: ReviewListProps) {
             {reviews.map((review) => (
                 <div key={review.reviewId} className="p-2">
                     <div className="flex justify-between items-center">
-                        <p className="text-sm font-semibold text-black">{review.productName}</p>
+                        <p className="text-sm font-light text-black">{review.productName}</p>
                         <div
                             className={`flex items-center gap-1 px-3 py-1 rounded-full border ${getTrafficLightBgClass(
                                 review.rating

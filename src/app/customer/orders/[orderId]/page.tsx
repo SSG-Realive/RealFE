@@ -9,14 +9,14 @@ interface PageProps {
     };
 }
 
-export default async function OrdersDetailPage({ params }: PageProps) {git
+export default async function OrdersDetailPage({ params }: PageProps) {
     const orderId = params.orderId; // URL 파라미터에서 orderId (string) 추출
 
     // 파라미터에 대한 기본적인 유효성 검사 (서버에서 미리 처리)
     if (isNaN(Number(orderId)) || Number(orderId) <= 0) {
         return (
             <div className="container mx-auto p-4 text-center text-red-600 font-inter">
-                <h1 className="text-3xl font-bold mb-6">오류</h1>
+                <h1 className="text-3xl font-light mb-6">오류</h1>
                 <p>유효하지 않은 주문 ID입니다.</p>
             </div>
         );

@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react';
 import { OrderResponseDTO } from '@/types/orders/orderResponseDTO'; // DTO 타입 임포트
 import Navbar from '@/components/customer/common/Navbar';
 import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO';
-import {useRouter} from "next/navigation"; // DTO 타입 임포트
+import { useRouter } from "next/navigation"; // DTO 타입 임포트
+import { useAuthStore } from '@/store/customer/authStore';
 
 
 // --- 데이터 페칭 함수 (클라이언트에서 실행) ---
@@ -53,36 +54,18 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
-
+    const { accessToken, hydrated } = useAuthStore();
 
     useEffect(() => {
-        let token: string | null = null;
-        if (typeof window !== 'undefined') {
-            // ⭐ localStorage에서 'auth-storage' 키로 값을 가져옵니다.
-            const storedStateString = localStorage.getItem('auth-storage');
-            console.log('localStorage에서 가져온 원시 데이터 (auth-storage):', storedStateString); // 디버깅 로그
-
-            if (storedStateString) {
-                try {
-                    const parsedState = JSON.parse(storedStateString);
-                    // {state: {accessToken: ...}, version: 0} 구조이므로 parsedState.state.accessToken 에 접근합니다.
-                    token = parsedState.state?.accessToken;
-                    console.log('JSON.parse 후 추출된 accessToken:', token ? `가져옴 (길이: ${token.length})` : '없음'); // 디버깅 로그
-                } catch (e) {
-                    console.error('localStorage 데이터 파싱 오류:', e);
-                    setError("인증 정보 파싱에 실패했습니다. 다시 로그인 해주세요.");
-                    setLoading(false);
-                    return;
-                }
-            }
+        // hydrated 상태 확인 - 데이터 로딩이 완료되지 않았으면 대기
+        if (!hydrated) {
+            return;
         }
 
-        // 최종적으로 token 변수에 유효한 문자열이 들어 있는지 확인합니다.
-        console.log('useEffect 최종 확인: 토큰 존재 여부:', !!token);
-        if (!token) {
+        // 토큰 확인
+        if (!accessToken) {
             setError("로그인 토큰이 없습니다. 다시 로그인 해주세요.");
             setLoading(false);
-            console.log('⛔ API 호출 중단: 토큰이 없습니다.'); // API 호출이 중단되는 지점
             return;
         }
 
@@ -97,7 +80,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
         const getOrder = async () => {
             try {
                 // 변환된 numericOrderId와 토큰을 사용하여 데이터 페칭
-                const data = await fetchOrderDetail(numericOrderId, token as string); // `token`이 null이 아님을 TypeScript에 알림
+                const data = await fetchOrderDetail(numericOrderId, accessToken);
                 setOrderData(data);
             } catch (err) {
                 console.error("주문 상세 정보를 가져오는 데 실패:", err);
@@ -108,7 +91,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
         };
 
         getOrder();
-    }, [orderId]); // orderId가 변경될 때마다 useEffect 재실행
+    }, [orderId, accessToken, hydrated]); // 의존성 배열 업데이트
 
     // --- 로딩, 에러, 데이터 없음 상태에 따른 UI 렌더링 ---
     if (loading) {
@@ -128,14 +111,14 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <Navbar/>
                 <div className="container mx-auto p-4 font-inter">
 
-                    <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+                    <h1 className="text-3xl font-light mb-6 text-center text-gray-800">
                         주문 상세
                     </h1>
                     <div
                         className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
                         role="alert"
                     >
-                        <strong className="font-bold">오류: </strong>
+                        <strong className="font-light">오류: </strong>
                         <span className="block sm:inline">{error}</span>
                     </div>
                 </div>
@@ -150,7 +133,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
 
                 <div className="container mx-auto p-4 text-center text-gray-700 font-inter">
 
-                    <h1 className="text-3xl font-bold mb-6">주문 상세</h1>
+                    <h1 className="text-3xl font-light mb-6">주문 상세</h1>
                     <p>주문 정보를 찾을 수 없습니다.</p>
                 </div>
             </div>
@@ -163,31 +146,31 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
             <Navbar/>
             <div className="container mx-auto p-4 bg-gray-50 min-h-screen font-inter">
 
-                <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-900 leading-tight">
+                <h1 className="text-4xl font-light mb-8 text-center text-gray-900 leading-tight">
                     주문 상세 정보
                 </h1>
 
                 <div className="bg-white shadow-xl rounded-lg p-8 mb-8 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 번호: <span className="font-normal text-blue-600">{orderData.orderId}</span></p>
-                            <p className="text-lg font-semibold mb-2">고객 ID: <span className="font-normal">{orderData.customerId}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송 주소: <span className="font-normal">{orderData.deliveryAddress}</span></p>
-                            <p className="text-lg font-semibold mb-2">총 주문 가격: <span className="font-normal text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
+                            <p className="text-lg font-semibold mb-2">주문 번호: <span className="font-light text-blue-600">{orderData.orderId}</span></p>
+                            <p className="text-lg font-semibold mb-2">고객 ID: <span className="font-light">{orderData.customerId}</span></p>
+                            <p className="text-lg font-semibold mb-2">배송 주소: <span className="font-light">{orderData.deliveryAddress}</span></p>
+                            <p className="text-lg font-semibold mb-2">총 주문 가격: <span className="font-light text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
                         </div>
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 일시: <span className="font-normal">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">최종 업데이트: <span className="font-normal">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">결제 방식: <span className="font-normal">{orderData.paymentType}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송비: <span className="font-normal">{orderData.deliveryFee.toLocaleString()}원</span></p>
-                            <p className="text-lg font-semibold mb-2">수령인: <span className="font-normal">{orderData.receiverName}</span></p>
-                            <p className="text-lg font-semibold mb-2">연락처: <span className="font-normal">{orderData.phone}</span></p>
+                            <p className="text-lg font-semibold mb-2">주문 일시: <span className="font-light">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-semibold mb-2">최종 업데이트: <span className="font-light">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-semibold mb-2">결제 방식: <span className="font-light">{orderData.paymentType}</span></p>
+                            <p className="text-lg font-semibold mb-2">배송비: <span className="font-light">{orderData.deliveryFee.toLocaleString()}원</span></p>
+                            <p className="text-lg font-semibold mb-2">수령인: <span className="font-light">{orderData.receiverName}</span></p>
+                            <p className="text-lg font-semibold mb-2">연락처: <span className="font-light">{orderData.phone}</span></p>
                         </div>
                     </div>
                     <p className="text-lg font-semibold mt-4">
                         주문 상태:{" "}
                         <span
-                            className={`relative inline-block px-4 py-1 font-bold leading-tight rounded-full ${
+                            className={`relative inline-block px-4 py-1 font-light leading-tight rounded-full ${
                                 orderData.orderStatus === "ORDER"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-red-100 text-red-800"
@@ -200,7 +183,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 </div>
 
                 <div className="bg-white shadow-xl rounded-lg p-8 border border-gray-200">
-                    <h2 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-3">주문 상품 목록</h2>
+                    <h2 className="text-3xl font-light mb-6 text-gray-800 border-b pb-3">주문 상품 목록</h2>
                     {orderData.orderItems.length === 0 ? (
                         <p className="text-lg text-gray-600 text-center py-4">주문된 상품이 없습니다.</p>
                     ) : (
@@ -228,7 +211,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                     <div className="flex-grow text-center md:text-left">
                                         <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>
                                         <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
-                                        <p className="text-xl font-bold text-blue-700">{item.price.toLocaleString()}원</p>
+                                        <p className="text-xl font-light text-blue-700">{item.price.toLocaleString()}원</p>
                                         <button
                                             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
                                             onClick={() =>
@@ -241,6 +224,30 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                             ))}
                         </div>
                     )}
+                </div>
+
+                {/* 네비게이션 버튼 추가 */}
+                <div className="bg-white shadow-xl rounded-lg p-6 mt-8 border border-gray-200">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                            onClick={() => router.push('/customer/orders')}
+                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
+                        >
+                            📋 주문 목록으로 가기
+                        </button>
+                        <button
+                            onClick={() => router.push('/main')}
+                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold"
+                        >
+                            🛍️ 쇼핑 계속하기
+                        </button>
+                        <button
+                            onClick={() => router.back()}
+                            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 font-semibold"
+                        >
+                            ⬅️ 이전 페이지로
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

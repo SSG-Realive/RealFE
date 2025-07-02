@@ -26,9 +26,16 @@ export default function AuctionRegisterPage() {
     setForm(prev => ({ ...prev, image: e.target.files ? e.target.files[0] : null }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("경매 등록 기능은 추후 구현 예정입니다!\n입력값: " + JSON.stringify(form, null, 2));
+    try {
+      // TODO: 실제 API 연동 필요
+      // await adminAuctionService.createAuction(form);
+      alert("경매 등록 기능은 백엔드 API 연동이 필요합니다.\n현재 입력값: " + JSON.stringify(form, null, 2));
+    } catch (error) {
+      console.error('경매 등록 실패:', error);
+      alert('경매 등록에 실패했습니다.');
+    }
   };
 
   return (

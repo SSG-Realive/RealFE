@@ -99,7 +99,7 @@ async function ReviewIdPage({ params }: { params: { reviewId: string } }) {
             <div className="flex flex-1">
                 <Sidebar />
                 <div className="flex-1 p-5 flex flex-col items-center bg-white m-5 rounded-lg shadow-md">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-8">리뷰 상세 보기</h1>
+                    <h1 className="text-3xl font-light text-gray-800 mb-8">리뷰 상세 보기</h1>
 
                     <div className="w-full max-w-4xl bg-white p-8 rounded-lg border border-gray-200 shadow-sm">
                         {/* 리뷰 제목 (상품명) */}
@@ -112,12 +112,12 @@ async function ReviewIdPage({ params }: { params: { reviewId: string } }) {
                         {/* 별점, 작성자, 작성일 정보 */}
                         <div className="flex items-center justify-between text-gray-600 text-sm mb-4">
                             <div className="flex items-center gap-2">
-                                <span className="font-medium">별점:</span>
+                                <span className="font-light">별점:</span>
                                 <span className="text-yellow-500 text-lg">{renderStars(reviewData.rating)}</span>
                                 <span className="ml-1 text-gray-700">({reviewData.rating}/5)</span>
                             </div>
                             <div className="flex items-center gap-4">
-                                <span className="font-medium">작성일:</span>
+                                <span className="font-light">작성일:</span>
                                 <span>{formatDateTime(reviewData.createdAt)}</span>
                             </div>
                         </div>
@@ -157,7 +157,7 @@ async function ReviewIdPage({ params }: { params: { reviewId: string } }) {
                             */}
                             <button
                                 onClick={() => router.back()} // 이 줄은 클라이언트 컴포넌트에서만 동작합니다.
-                                className="px-6 py-3 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-600 transition-colors"
+                                className="px-6 py-3 bg-gray-500 text-white font-light rounded-lg hover:bg-gray-600 transition-colors"
                             >
                                 목록으로 돌아가기
                             </button>

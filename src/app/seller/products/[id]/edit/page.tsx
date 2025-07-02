@@ -66,12 +66,22 @@ export default function ProductEditPage() {
         const { name, value } = e.target;
         if (name === 'stock') {
             const newStock = Number(value);
+            console.log('=== 재고 변경 ===');
+            console.log('이전 재고:', form.stock);
+            console.log('새 재고:', newStock);
+            console.log('현재 isActive:', form.isActive);
 
             setForm({
                 ...form,
                 stock: newStock,
-                isActive: newStock === 0 ? false : form.isActive,  // 🚩 재고가 0이면 isActive false 강제 설정
+                // 재고가 0이 되더라도 isActive를 강제로 변경하지 않음
+                // 사용자가 체크박스로 직접 제어하도록 함
             });
+            
+            // 재고가 0이면서 활성화된 상품에 대한 경고
+            if (newStock === 0 && form.isActive) {
+                console.log('경고: 재고가 0이지만 상품이 활성화되어 있습니다.');
+            }
         } else {
             setForm({ ...form, [name]: value });
         }
@@ -384,16 +394,27 @@ export default function ProductEditPage() {
                                         checked={form.isActive}
                                         disabled={form.stock === 0}  // 재고가 0이면 체크박스 비활성화
                                         onChange={(e) => {
+                                            console.log('=== isActive 체크박스 변경 ===');
+                                            console.log('현재 재고:', form.stock);
+                                            console.log('현재 isActive:', form.isActive);
+                                            console.log('변경하려는 값:', e.target.checked);
+                                            
                                             if (form.stock === 0 && e.target.checked) {
                                                 alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.');
+                                                console.log('재고 0으로 인한 활성화 차단');
                                                 return;  // 체크 방지
                                             }
+                                            
+                                            console.log('isActive 변경 적용:', e.target.checked);
                                             setForm({ ...form, isActive: e.target.checked });
                                         }}
                                         className="h-4 w-4 text-[#6b7280] focus:ring-[#6b7280] border-gray-300 rounded"
                                     />
                                     <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
                                         활성화 여부
+                                        <span className="ml-2 text-xs text-gray-500">
+                                            (현재: {form.isActive ? '활성' : '비활성'})
+                                        </span>
                                     </label>
                                 </div>
                             </div>

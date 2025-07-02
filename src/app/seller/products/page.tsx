@@ -42,7 +42,7 @@ export default function ProductListPage() {
   // 상품 상태 매핑 함수 - 실제 판매 상태 기반으로 수정
   const getProductSalesStatus = (product: ProductListItem) => {
     if (product.stock === 0) return { text: '품절', color: 'bg-red-100 text-red-800' };
-    if (!product.active) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
+    if (!product.isActive) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
     return { text: '판매중', color: 'bg-green-100 text-green-800' };
   };
 

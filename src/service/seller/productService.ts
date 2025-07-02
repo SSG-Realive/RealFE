@@ -50,7 +50,18 @@ export async function updateProduct(id: number, formData: FormData): Promise<voi
  */
 export async function getProductDetail(id: number): Promise<ProductDetail> {
     const res = await sellerApi.get(`/seller/products/${id}`);
-    return res.data;
+    const data = res.data;
+    
+    // 백엔드에서 active로 오는 필드를 isActive로 변환
+    if (data.active !== undefined) {
+        data.isActive = data.active;
+        delete data.active;
+    }
+    
+    console.log('=== 상품 상세 데이터 변환 ===');
+    console.log('변환된 데이터:', data);
+    
+    return data;
 }
 
 /**
@@ -59,10 +70,27 @@ export async function getProductDetail(id: number): Promise<ProductDetail> {
  */
 export async function getMyProducts(searchParams: Record<string, any> = {}): Promise<PageResponse<ProductListItem>> {
     const query = buildSearchParams(searchParams); // ✅ 빈 값 빼고 쿼리스트링 구성
-  console.log('→ 최종 요청 URL:', `/seller/products?${query}`); // 디버그 확인용
+    console.log('→ 최종 요청 URL:', `/seller/products?${query}`); // 디버그 확인용
 
-  const res = await sellerApi.get(`/seller/products?${query}`);
-  return res.data;
+    const res = await sellerApi.get(`/seller/products?${query}`);
+    const data = res.data;
+    
+    // 백엔드에서 active로 오는 필드를 isActive로 변환
+    if (data.dtoList && Array.isArray(data.dtoList)) {
+        data.dtoList = data.dtoList.map((product: any) => {
+            if (product.active !== undefined) {
+                product.isActive = product.active;
+                delete product.active;
+            }
+            return product;
+        });
+    }
+    
+    console.log('=== 상품 목록 데이터 변환 ===');
+    console.log('변환된 목록 개수:', data.dtoList?.length || 0);
+    console.log('첫 번째 상품 isActive:', data.dtoList?.[0]?.isActive);
+    
+    return data;
 }
 
 /**
@@ -93,21 +121,36 @@ export async function fetchCategories(): Promise<SellerCategoryDTO[]> {
  */
 export async function getMyProductStats(): Promise<{
   total: number;
-  selling: number;  // active=true && stock>0
-  suspended: number; // active=false
+  selling: number;  // isActive=true && stock>0
+  suspended: number; // isActive=false
   outOfStock: number; // stock=0
 }> {
   try {
     // 전체 상품을 가져오기 위해 충분히 큰 size로 요청
     const res = await sellerApi.get('/seller/products?size=1000');
-    const allProducts: ProductListItem[] = res.data.dtoList || [];
+    let allProducts: ProductListItem[] = res.data.dtoList || [];
+    
+    // 백엔드에서 active로 오는 필드를 isActive로 변환
+    allProducts = allProducts.map((product: any) => {
+        if (product.active !== undefined) {
+            product.isActive = product.active;
+            delete product.active;
+        }
+        return product;
+    });
     
     const stats = {
       total: allProducts.length,
-      selling: allProducts.filter(p => p.active && p.stock > 0).length,
-      suspended: allProducts.filter(p => !p.active).length,
+      selling: allProducts.filter(p => p.isActive && p.stock > 0).length,
+      suspended: allProducts.filter(p => !p.isActive).length,
       outOfStock: allProducts.filter(p => p.stock === 0).length
     };
+    
+    console.log('=== 상품 통계 계산 ===');
+    console.log('전체 상품:', stats.total);
+    console.log('판매중:', stats.selling);
+    console.log('판매중지:', stats.suspended);
+    console.log('품절:', stats.outOfStock);
     
     return stats;
   } catch (error) {

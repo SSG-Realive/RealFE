@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import AdminNotification from './AdminNotification';
 
 export default function AdminHeader({ title }: { title: string }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,7 +43,6 @@ export default function AdminHeader({ title }: { title: string }) {
       </button>
       <h1 style={{ fontWeight: 'bold', fontSize: 20, color: '#e5e7eb' }}>{title}</h1>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <AdminNotification />
         {isClient && (
           isLoggedIn ? (
             <button

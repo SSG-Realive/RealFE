@@ -49,8 +49,35 @@ export default function SellerDashboardPage() {
       // 총 매출(전체 누적) 통계
       const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
       const statsEndDate = new Date().toISOString().split('T')[0];
-      const statsData = await getSalesStatistics(statsStartDate, statsEndDate);
+      console.log(`=== 총 매출/주문 통계 조회 ===`);
+      console.log(`조회 기간: ${statsStartDate} ~ ${statsEndDate}`);
+      console.log(`API URL: /seller/dashboard/sales-stats?startDate=${statsStartDate}&endDate=${statsEndDate}`);
+      
+      let statsData = null;
+      try {
+        statsData = await getSalesStatistics(statsStartDate, statsEndDate);
+        console.log('✅ 백엔드 응답 성공:', statsData);
+        console.log('응답 데이터 타입:', typeof statsData);
+        console.log('응답 데이터 구조:', Object.keys(statsData || {}));
+        console.log('총 매출 (totalRevenue):', statsData?.totalRevenue);
+        console.log('총 주문 (totalOrders):', statsData?.totalOrders);
+        console.log('총 수수료 (totalFees):', statsData?.totalFees);
+        
+        if (!statsData) {
+          console.warn('⚠️ 응답 데이터가 null/undefined입니다');
+        } else if (statsData.totalRevenue === 0 && statsData.totalOrders === 0) {
+          console.warn('⚠️ 매출과 주문이 모두 0입니다. sales_logs 테이블에 데이터가 없거나 권한 문제일 수 있습니다');
+        }
+              } catch (error: any) {
+        console.error('❌ API 호출 실패:', error);
+        console.error('에러 상태:', error.response?.status);
+        console.error('에러 메시지:', error.response?.statusText);
+        console.error('에러 상세:', error.response?.data);
+      }
+      
+      console.log('setSalesStats 호출 전 - statsData:', statsData);
       setSalesStats(statsData);
+      console.log('setSalesStats 호출 후 - salesStats 상태 업데이트됨');
 
       // 일별 추이 (최근 30일)
       const endDate = new Date().toISOString().split('T')[0];
@@ -242,6 +269,7 @@ export default function SellerDashboardPage() {
             {lastUpdated && (
               <p className="text-sm text-[#6b7280]">마지막 업데이트: {lastUpdated}</p>
             )}
+            <p className="text-xs text-[#6b7280] mt-1">💡 판매 건수는 상품별 개별 판매 기록입니다. 주문 관리의 그룹핑과는 다를 수 있습니다.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -300,8 +328,9 @@ export default function SellerDashboardPage() {
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-4">
             <DollarSign className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 매출</h2>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 매출 (누적)</h2>
               <p className="text-2xl font-extrabold text-[#374151]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
+              <p className="text-xs text-[#6b7280] mt-1">전체 기간 누적 매출액</p>
             </div>
           </section>
           <section
@@ -310,8 +339,9 @@ export default function SellerDashboardPage() {
           >
             <Gavel className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 주문 수</h2>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 판매 건수 (누적)</h2>
               <p className="text-2xl font-extrabold text-[#374151]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
+              <p className="text-xs text-[#6b7280] mt-1">상품별 판매 건수 합계</p>
             </div>
           </section>
           <section
@@ -320,8 +350,9 @@ export default function SellerDashboardPage() {
           >
             <MessageCircle className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">미답변 문의</h2>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">미답변 문의 (전체)</h2>
               <p className="text-2xl font-extrabold text-[#6b7280]">{dashboard?.unansweredQnaCount ?? 0}건</p>
+              <p className="text-xs text-[#6b7280] mt-1">전체 미답변 문의 수</p>
             </div>
           </section>
         </div>
@@ -356,18 +387,18 @@ export default function SellerDashboardPage() {
           </section>
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#374151]">주문 통계</h3>
+              <h3 className="text-lg font-bold text-[#374151]">판매 통계</h3>
               <BarChart3 className="w-7 h-7 text-[#6b7280] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">오늘 주문</p>
+                <p className="text-sm text-[#374151] mb-1">오늘 판매</p>
                 <p className="text-xl font-bold text-[#374151]">
                   {dailyTrend.length > 0 ? dailyTrend[dailyTrend.length - 1]?.orderCount || 0 : 0}건
                 </p>
               </div>
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">이번 달 주문</p>
+                <p className="text-sm text-[#374151] mb-1">이번 달 판매</p>
                 <p className="text-xl font-bold text-[#374151]">
                   {monthlyTrendFilled.length > 0 ? monthlyTrendFilled[monthlyTrendFilled.length - 1]?.orderCount || 0 : 0}건
                 </p>

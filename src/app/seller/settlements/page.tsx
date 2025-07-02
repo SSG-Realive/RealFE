@@ -308,16 +308,26 @@ export default function SellerSettlementPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <DollarSign className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">총 매출</span>
+                                <span className="text-[#374151] text-sm font-semibold">총 매출 (필터링)</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalSales.toLocaleString() : totalSales.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">
+                                {filterType === 'date' && `${filterDate} 당일`}
+                                {filterType === 'period' && `${filterFrom}~${filterTo}`}
+                                {filterType === 'all' && '전체 기간'}
+                            </div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <Clock className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">총 주문 건수</span>
+                                <span className="text-[#374151] text-sm font-semibold">총 주문 건수 (필터링)</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{summary ? summary.payoutCount : totalSettlements}건</div>
+                            <div className="text-xs text-[#6b7280] mt-1">
+                                {filterType === 'date' && `${filterDate} 당일`}
+                                {filterType === 'period' && `${filterFrom}~${filterTo}`}
+                                {filterType === 'all' && '전체 기간'}
+                            </div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">

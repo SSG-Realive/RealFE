@@ -198,9 +198,10 @@ export default function SellerQnaPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <Clock className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">답변 대기</span>
+                                <span className="text-[#374151] text-sm font-semibold">답변 대기 (현재 페이지)</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{currentPageUnanswered}건</div>
+                            <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">

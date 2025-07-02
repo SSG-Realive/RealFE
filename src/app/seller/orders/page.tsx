@@ -126,15 +126,17 @@ export default function SellerOrderListPage() {
         <SellerLayout>
           <div className="w-full h-full px-4 py-8">
             <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#374151]">주문 관리</h1>
+            <p className="text-sm text-[#6b7280] mb-6">주문번호 기준으로 그룹핑된 주문 목록입니다. 하나의 주문에 여러 상품이 포함될 수 있습니다.</p>
             
             {/* 상단 통계 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                 <div className="flex items-center gap-3 mb-2">
                   <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
-                  <span className="text-[#374151] text-sm font-semibold">총 주문</span>
+                  <span className="text-[#374151] text-sm font-semibold">총 주문 (그룹핑)</span>
                 </div>
                 <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
+                <div className="text-xs text-[#6b7280] mt-1">주문번호 기준 그룹핑</div>
               </section>
               <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                 <div className="flex items-center gap-3 mb-2">

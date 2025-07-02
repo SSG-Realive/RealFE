@@ -139,11 +139,16 @@ export async function getMyProductStats(): Promise<{
         return product;
     });
     
+    // 품절 상품들 상세 확인
+    const outOfStockProducts = allProducts.filter(p => p.stock === 0);
+    const sellingProducts = allProducts.filter(p => p.isActive && p.stock > 0);
+    const suspendedProducts = allProducts.filter(p => !p.isActive);
+    
     const stats = {
       total: allProducts.length,
-      selling: allProducts.filter(p => p.isActive && p.stock > 0).length,
-      suspended: allProducts.filter(p => !p.isActive).length,
-      outOfStock: allProducts.filter(p => p.stock === 0).length
+      selling: sellingProducts.length,
+      suspended: suspendedProducts.length,
+      outOfStock: outOfStockProducts.length
     };
     
     console.log('=== 상품 통계 계산 ===');
@@ -151,6 +156,14 @@ export async function getMyProductStats(): Promise<{
     console.log('판매중:', stats.selling);
     console.log('판매중지:', stats.suspended);
     console.log('품절:', stats.outOfStock);
+    
+    // 품절 상품 상세 정보
+    if (outOfStockProducts.length > 0) {
+      console.log('=== 품절 상품 상세 ===');
+      outOfStockProducts.forEach(p => {
+        console.log(`상품 "${p.name}": 재고=${p.stock}, isActive=${p.isActive}`);
+      });
+    }
     
     return stats;
   } catch (error) {

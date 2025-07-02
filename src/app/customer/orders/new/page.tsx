@@ -8,7 +8,8 @@ import { fetchMyProfile } from '@/service/customer/customerService';
 import { loadTossPayments, DEFAULT_CONFIG } from '@/service/order/tossPaymentService';
 import type { CartItem } from '@/types/customer/cart/cart';
 import type { MemberReadDTO } from '@/types/customer/member/member';
-import Navbar from '@/components/customer/common/Navbar';
+import useDialog from '@/hooks/useDialog';
+import GlobalDialog from '@/components/ui/GlobalDialog';
 
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY as string;
 
@@ -23,11 +24,12 @@ export default function NewOrderPage() {
     const [phone, setPhone] = useState<string>('');
     const [receiverName, setReceiverName] = useState<string>('');
     const tossPaymentsRef = useRef<any>(null);
+    const { open, message, handleClose, show } = useDialog();
 
     // 사용자 정보 로딩 및 장바구니 유효성 검사
     useEffect(() => {
         if (cartItems.length === 0) {
-            alert("결제할 상품 정보가 없습니다. 장바구니 페이지로 돌아갑니다.");
+            show("결제할 상품 정보가 없습니다. 장바구니 페이지로 돌아갑니다.");
             router.replace('/customer/cart');
             return;
         }
@@ -90,12 +92,12 @@ export default function NewOrderPage() {
     const handlePayment = async () => {
         const tossPayments = tossPaymentsRef.current;
         if (!tossPayments || !userProfile) {
-            alert("결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
+            show("결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
             return;
         }
 
         if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
-            alert("배송지 정보를 모두 입력해주세요.");
+            show("배송지 정보를 모두 입력해주세요.");
             return;
         }
 
@@ -123,7 +125,7 @@ export default function NewOrderPage() {
             });
         } catch (error) {
             console.error("결제 요청 실패:", error);
-            alert("결제에 실패했습니다. 다시 시도해주세요.");
+            show("결제에 실패했습니다. 다시 시도해주세요.");
         }
     };
 
@@ -132,8 +134,10 @@ export default function NewOrderPage() {
     }
 
     return (
+        <>
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
         <div className="bg-white min-h-screen pb-24 lg:pb-0">
-            
+
             <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
                 <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
 
@@ -175,10 +179,10 @@ export default function NewOrderPage() {
                         >
                             {finalAmount.toLocaleString()}원 결제하기
                         </button>
-
                     </section>
                 </div>
             </main>
         </div>
+        </>
     );
 }

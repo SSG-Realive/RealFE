@@ -32,7 +32,7 @@ export default function PaymentFailPage() {
         <div className="min-h-screen flex items-center justify-center">
             <div className="text-center max-w-md mx-auto p-6">
                 <div className="text-red-500 text-6xl mb-4">❌</div>
-                <h1 className="text-2xl font-bold mb-4">결제에 실패했습니다</h1>
+                <h1 className="text-2xl font-light mb-4">결제에 실패했습니다</h1>
                 <p className="text-gray-600 mb-6">
                     {getErrorMessage(code)}
                 </p>

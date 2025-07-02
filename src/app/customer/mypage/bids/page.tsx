@@ -50,7 +50,7 @@ function BidCard({
 
       {/* 정보 */}
       <div className="flex-1 space-y-1 overflow-hidden">
-        <p className="font-medium truncate">
+        <p className="font-light truncate">
           {auction.adminProduct?.productName ?? `경매 #${bid.auctionId}`}
         </p>
         <p className="text-sm">
@@ -136,7 +136,7 @@ export default function MyBidCardsPage() {
       <GlobalDialog open={open} message={message} onClose={handleClose} />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">나의 입찰 현황</h1>
+        <h1 className="text-2xl font-light mb-6">나의 입찰 현황</h1>
 
         {/* 카드 그리드 */}
         {cards.length === 0 && !loading ? (

@@ -12,6 +12,7 @@ export default function Footer() {
         '/admin',
         '/customer/signup',
         '/customer/member/login',
+        '/customer/cart',
     ];
 
     const shouldHide = hiddenPaths.some(
@@ -22,7 +23,7 @@ export default function Footer() {
 
     return (
         <footer className="w-full bg-gray-100 py-8 mt-10 text-center text-sm text-gray-600">
-            <p className="mb-1 font-semibold">© 2025 Realive</p>
+            <p className="mb-1 font-light">© 2025 Realive</p>
             <p>중고 가구 거래 플랫폼 | 개인정보처리방침 | 이용약관</p>
         </footer>
     );

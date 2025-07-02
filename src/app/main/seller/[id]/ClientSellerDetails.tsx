@@ -118,7 +118,7 @@ export default function ClientSellerDetails({
         <>
             {/* 판매자 리뷰 섹션 */}
             <div className="mb-8 p-4 bg-white rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">판매자 리뷰</h2>
+                <h2 className="text-2xl font-light text-gray-800 mb-4 border-b pb-2">판매자 리뷰</h2>
                 {reviews.length === 0 && !loadingReviews ? (
                     <p className="text-gray-500">아직 작성된 리뷰가 없습니다.</p>
                 ) : (
@@ -147,7 +147,7 @@ export default function ClientSellerDetails({
                                                 </svg>
                                             ))}
                                         </div>
-                                        <span className="ml-2 text-gray-700 text-sm font-semibold">({review.rating}/5)</span>
+                                        <span className="ml-2 text-gray-700 text-sm font-light">({review.rating}/5)</span>
                                         <span className="ml-2 text-gray-700 text-xs">{review.productName}</span>
                                     </div>
                                     <p className="text-gray-800 text-sm mb-2">
@@ -200,7 +200,7 @@ export default function ClientSellerDetails({
 
             {/* 판매자 상품 목록 섹션 */}
             <div className="mb-8 p-4 bg-white rounded-lg shadow-md">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">판매자 상품 목록</h2>
+                <h2 className="text-2xl font-light text-gray-800 mb-4 border-b pb-2">판매자 상품 목록</h2>
                 {products.length === 0 && !loadingProducts ? (
                     <p className="text-gray-500">등록된 상품이 없습니다.</p>
                 ) : (
@@ -219,8 +219,8 @@ export default function ClientSellerDetails({
                                     fallbackSrc={`https://placehold.co/400x300/e0e0e0/555555?text=${product.name || 'Product'}`}
                                 />
                                 <div className="p-4">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">{product.name || '상품명 없음'}</h3>
-                                    <p className="text-gray-700 text-base font-bold mb-2">
+                                    <h3 className="text-lg font-light text-gray-900 mb-1 line-clamp-2">{product.name || '상품명 없음'}</h3>
+                                    <p className="text-gray-700 text-base font-light mb-2">
                                         {product.price ? product.price.toLocaleString('ko-KR') + '원' : '가격 정보 없음'}
                                     </p>
                                     <p className="text-gray-600 text-sm">재고: {product.stock}</p>

@@ -29,7 +29,7 @@ export default function CategoryFilter({
                             setSelectedId(id);
                             onSelect(id);
                         }}
-                        className={`text-sm font-semibold px-2 py-1 rounded-full whitespace-nowrap transition-all
+                        className={`text-sm font-light px-2 py-1 rounded-full whitespace-nowrap transition-all
                             ${
                             selectedId === id
                                 ? 'bg-black text-white'

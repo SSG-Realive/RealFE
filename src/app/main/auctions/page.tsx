@@ -60,7 +60,7 @@
 //       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 //         <div className="mb-8">
 //           <div className="flex justify-between items-center mb-4">
-//             <h1 className="text-3xl font-bold text-gray-900">진행중인 경매</h1>
+//             <h1 className="text-3xl font-light text-gray-900">진행중인 경매</h1>
 //             {loggedIn && (
 //               <div className="text-sm text-gray-600">
 //                 환영합니다, {userName}님! 
@@ -79,7 +79,7 @@
 //           <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
 //             <div className="flex items-center justify-between">
 //               <div>
-//                 <h3 className="text-lg font-semibold text-blue-900 mb-1">
+//                 <h3 className="text-lg font-light text-blue-900 mb-1">
 //                   🎯 경매에 참여하고 싶으신가요?
 //                 </h3>
 //                 <p className="text-blue-700">

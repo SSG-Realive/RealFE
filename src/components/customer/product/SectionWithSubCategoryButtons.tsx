@@ -80,12 +80,12 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
             {/* 🔹 타이틀 + 서브 카테고리 버튼 줄 */}
             <div className="w-full overflow-x-auto no-scrollbar">
                 <div className="inline-flex items-center gap-2 px-2 py-1">
-                    <h2 className="text-xl font-bold text-gray-800 mr-2 shrink-0">{title}</h2>
+                    <h2 className="text-xl font-light text-gray-800 mr-2 shrink-0">{title}</h2>
                     <button
                         onClick={() => setSelectedSubId(null)}
                         className={`text-sm transition whitespace-nowrap shrink-0 ${
                             selectedSubId === null
-                                ? 'text-black font-semibold underline'
+                                ? 'text-black font-light underline'
                                 : 'text-gray-500 hover:text-black'
                         }`}
                     >
@@ -97,7 +97,7 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
                             onClick={() => setSelectedSubId(cat.id)}
                             className={`text-sm transition whitespace-nowrap shrink-0 ${
                                 selectedSubId === cat.id
-                                    ? 'text-black font-semibold underline'
+                                    ? 'text-black font-light underline'
                                     : 'text-gray-500 hover:text-black'
                             }`}
                         >

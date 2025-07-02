@@ -11,7 +11,7 @@ export default function PaymentSuccessPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const { id: customerId, accessToken, hydrated } = useAuthStore();
-    
+
     const [orderId, setOrderId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -20,22 +20,22 @@ export default function PaymentSuccessPage() {
         const processPayment = async () => {
             try {
                 setLoading(true);
-                
+
                 // hydrated 상태 확인 - 데이터 로딩이 완료되지 않았으면 대기
                 if (!hydrated) {
                     return;
                 }
-                
+
                 // 인증 확인
                 if (!customerId || !accessToken) {
                     throw new Error('로그인이 필요합니다.');
                 }
-                
+
                 // URL 파라미터에서 결제 정보 가져오기
                 const paymentKey = searchParams.get('paymentKey');
                 const orderId = searchParams.get('orderId');
                 const amount = searchParams.get('amount');
-                
+
                 if (!paymentKey || !orderId || !amount) {
                     throw new Error('결제 정보가 올바르지 않습니다.');
                 }
@@ -47,7 +47,7 @@ export default function PaymentSuccessPage() {
                 }
 
                 const checkoutInfo = JSON.parse(checkoutInfoStr);
-                
+
                 // 결제 승인 요청 (amount 제거 - 서버에서 계산)
                 const payRequest: PayRequestDTO = {
                     paymentKey,
@@ -74,10 +74,10 @@ export default function PaymentSuccessPage() {
                     throw new Error('결제 정보가 올바르지 않습니다.');
                 }
                 setOrderId(createdOrderId);
-                
+
                 // 체크아웃 정보 삭제
                 sessionStorage.removeItem('checkout_info');
-                
+
             } catch (err) {
                 console.error('결제 처리 실패:', err);
                 setError(err instanceof Error ? err.message : '결제 처리에 실패했습니다.');
@@ -104,21 +104,20 @@ export default function PaymentSuccessPage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center max-w-md mx-auto p-6">
-                    <div className="text-red-500 text-6xl mb-4">❌</div>
                     <h1 className="text-2xl font-light mb-4">결제 처리 실패</h1>
                     <p className="text-gray-600 mb-6">{error}</p>
                     <div className="space-y-3">
-                        <button 
+                        <button
                             onClick={() => router.back()}
-                            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-semibold transition-colors duration-200"
+                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-none hover:bg-blue-700"
                         >
-                            ⬅️ 이전 페이지로 돌아가기
+                            이전 페이지로 돌아가기
                         </button>
-                        <Link 
+                        <Link
                             href="/customer/orders"
-                            className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
+                            className="block w-full bg-gray-600 text-white py-2 px-4 rounded-none hover:bg-gray-700 text-center"
                         >
-                            📜 주문 목록으로 가기
+                            주문 목록으로 가기
                         </Link>
                     </div>
                 </div>
@@ -129,33 +128,32 @@ export default function PaymentSuccessPage() {
     return (
         <div className="min-h-screen flex items-center justify-center">
             <div className="text-center max-w-md mx-auto p-6">
-                <div className="text-green-500 text-6xl mb-4">✅</div>
                 <h1 className="text-2xl font-light mb-4">결제가 완료되었습니다!</h1>
                 <p className="text-gray-600 mb-6">
                     주문이 성공적으로 처리되었습니다.<br />
-                    주문번호: <span className="font-semibold">{orderId}</span>
+                    주문번호: <span className="font-light">{orderId}</span>
                 </p>
                 <div className="space-y-3">
-                    <Link 
+                    <Link
                         href={`/customer/orders/${orderId}`}
-                        className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 text-center font-semibold transition-colors duration-200"
+                        className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
                     >
-                        📋 주문 상세보기
+                        주문 상세보기
                     </Link>
-                    <Link 
+                    <Link
                         href="/customer/orders"
-                        className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
+                        className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
                     >
-                        📜 주문 목록으로 가기
+                        주문 목록으로 가기
                     </Link>
-                    <Link 
+                    <Link
                         href="/main"
-                        className="block w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 text-center font-semibold transition-colors duration-200"
+                        className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 text-center"
                     >
-                        🛍️ 쇼핑 계속하기
+                        쇼핑 계속하기
                     </Link>
                 </div>
             </div>
         </div>
     );
-} 
+}

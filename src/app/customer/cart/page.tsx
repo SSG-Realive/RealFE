@@ -151,20 +151,20 @@ export default function CartPage() {
             <GlobalDialog open={open} message={message} onClose={handleClose} />
             <main className="max-w-4xl mx-auto p-6 pb-40">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-light">장바구니</h1>
+                    <h1 className="text-xl font-light">장바구니</h1>
                     {cartItems.length > 0 && (
                         <div className="flex gap-2">
                             <button
                                 onClick={handleClearCart}
-                                className="text-sm text-red-600 px-3 py-1 border border-red-600 rounded hover:bg-red-50"
+                                className="text-sm text-red-600 border border-red-300 px-3 py-1 hover:bg-red-50 rounded-md"
                             >
-                                장바구니 비우기
+                                전체 삭제
                             </button>
                             <button
                                 onClick={() => setIsEditMode((prev) => !prev)}
-                                className="text-sm text-gray-600 px-3 py-1 border rounded hover:bg-gray-100"
+                                className="text-sm text-gray-600 border border-gray-300 px-3 py-1 hover:bg-gray-100 rounded-md"
                             >
-                                상품 편집
+                                수정
                             </button>
                         </div>
                     )}
@@ -224,7 +224,7 @@ export default function CartPage() {
                             <button
                                 onClick={handleCheckout}
                                 disabled={selectedItemIds.size === 0}
-                                className="py-3 px-6 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-300"
+                                className="py-2 px-8 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-300"
                             >
                                 결제
                             </button>

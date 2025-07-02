@@ -15,9 +15,10 @@ function getCircleColor(rating: number) {
 }
 
 function getStatusText(rating: number) {
+  if (rating === 5.0) return '최고'; // 완벽한 5점
   if (rating >= 0.1 && rating <= 2.0) return '부정적'; // 빨강 구간
   if (rating >= 2.1 && rating <= 3.5) return '보통'; // 노랑 구간
-  if (rating >= 3.6 && rating <= 5.0) return '긍정적'; // 초록 구간
+  if (rating >= 3.6 && rating < 5.0) return '긍정적'; // 초록 구간
   return '평가없음'; // 회색 구간
 }
 

@@ -158,20 +158,22 @@ export default function OrderListPage() {
                                     className="button-outline button-delete"
                                     onClick={() => handleDeleteClick(order.orderId)}
                                     disabled={isDeleting && orderToDeleteId === order.orderId}
+                                    style={{ borderRadius: '0px' }}
                                 >
                                     {isDeleting && orderToDeleteId === order.orderId ? '삭제 중...' : '구매내역 삭제'}
                                 </button>
 
                                 <button
                                     className="button-outline"
-                                    onClick={() => router.push(`/customer/orders/${order.orderId}`)}
-                                    style={{ 
-                                        backgroundColor: '#3B82F6', 
+                                    onClick={() => router.push(`/customer/mypage/orders/${order.orderId}`)}
+                                    style={{
+                                        backgroundColor: '#000000',
                                         color: 'white',
-                                        border: '1px solid #3B82F6'
+                                        border: '1px solid #000000',
+                                        borderRadius: '0px'
                                     }}
                                 >
-                                    📋 주문 상세보기
+                                    주문 상세보기
                                 </button>
                             </div>
                         </div>

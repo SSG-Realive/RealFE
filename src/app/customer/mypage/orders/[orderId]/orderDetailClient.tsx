@@ -1,4 +1,4 @@
-// src/app/customer/orders/[orderId]/OrderDetailClient.tsx
+// src/app/customer/mypage/orders/[orderId]/OrderDetailClient.tsx
 // 이 파일은 클라이언트 컴포넌트입니다.
 'use client';
 
@@ -230,7 +230,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <div className="bg-white shadow-xl rounded-lg p-6 mt-8 border border-gray-200">
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <button
-                            onClick={() => router.push('/customer/orders')}
+                            onClick={() => router.push('/customer/mypage/orders')}
                             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
                         >
                             📋 주문 목록으로 가기

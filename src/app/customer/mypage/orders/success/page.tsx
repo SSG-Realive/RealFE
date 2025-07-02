@@ -114,7 +114,7 @@ export default function PaymentSuccessPage() {
                             이전 페이지로 돌아가기
                         </button>
                         <Link
-                            href="/customer/orders"
+                            href="/customer/mypage/orders"
                             className="block w-full bg-gray-600 text-white py-2 px-4 rounded-none hover:bg-gray-700 text-center"
                         >
                             주문 목록으로 가기
@@ -135,13 +135,13 @@ export default function PaymentSuccessPage() {
                 </p>
                 <div className="space-y-3">
                     <Link
-                        href={`/customer/orders/${orderId}`}
+                        href={`/customer/mypage/orders/${orderId}`}
                         className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
                     >
                         주문 상세보기
                     </Link>
                     <Link
-                        href="/customer/orders"
+                        href="/customer/mypage/orders"
                         className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
                     >
                         주문 목록으로 가기

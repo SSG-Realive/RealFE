@@ -120,8 +120,8 @@ export default function NewOrderPage() {
                 orderId: orderId,
                 orderName: orderName,
                 customerName: userProfile.name || initialName || '고객',
-                successUrl: `${window.location.origin}/customer/orders/success`,
-                failUrl: `${window.location.origin}/customer/orders/fail`,
+                successUrl: `${window.location.origin}/customer/mypage/orders/success`,
+                failUrl: `${window.location.origin}/customer/mypage/orders/fail`,
             });
         } catch (error) {
             console.error("결제 요청 실패:", error);

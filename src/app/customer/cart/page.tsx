@@ -136,7 +136,7 @@ export default function CartPage() {
         const itemsToCheckout = cartItems.filter((item) => selectedItemIds.has(item.cartItemId));
         if (itemsToCheckout.length === 0) return show('결제할 상품을 선택해주세요.');
         setItemsForCheckout(itemsToCheckout);
-        router.push('/customer/orders/new');
+        router.push('/customer/mypage/orders/new');
     };
 
     if (!hydrated) {

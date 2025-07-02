@@ -66,14 +66,14 @@ export default function MyReviewPage() {
 
                             {/* 본문 */}
                             <p className="font-semibold">{review.productName}</p>
-                            <div className="flex justify-between items-center mb-2">
+                            <div className="flex justify-end items-center mb-2">
                                 {/* 별점 아이콘 + 점수 (왼쪽) */}
-                                <div className="flex items-center space-x-1 text-yellow-400">
+                                {/* <div className="flex items-center space-x-1 text-yellow-400">
                                     {Array.from({ length: 5 }, (_, i) => (
                                     <span key={i}>{i < Math.floor(review.rating) ? '★' : '☆'}</span>
                                     ))}
                                     <p className="text-yellow-500">{review.rating}</p>
-                                </div>
+                                </div> */}
 
                                 {/* 신호등 평가 (오른쪽) */}
                                 <div

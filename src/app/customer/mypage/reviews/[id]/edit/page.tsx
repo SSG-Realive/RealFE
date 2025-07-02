@@ -6,6 +6,7 @@ import { fetchReviewDetail, updateReview } from '@/service/customer/reviewServic
 import { uploadReviewImages, deleteReviewImage } from '@/service/customer/reviewImageService'; // 이미지 API 함수
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Navbar from '@/components/customer/common/Navbar';
+import StarRating from '@/components/customer/review/StarRating';
 
 export default function EditReviewPage() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function EditReviewPage() {
   const [review, setReview] = useState<ReviewResponseDTO | null>(null);
   const [content, setContent] = useState('');
   const [rating, setRating] = useState(5);
+  const [tempRating, setTempRating] = useState<number | null>(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,20 +109,13 @@ export default function EditReviewPage() {
       <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block font-semibold mb-2 text-gray-700">
-              별점: {rating.toFixed(1)}점
-            </label>
-            <input
-              type="range"
-              min={1}
-              max={5}
-              step={0.1}
-              value={rating}
-              onChange={(e) => setRating(parseFloat(e.target.value))}
-              className="w-full accent-teal-600"
-            />
-          </div>
+        <div>
+        <label className="block font-semibold mb-2 text-gray-700">
+            별점: {(tempRating ?? rating).toFixed(1)}점
+        </label>
+        <StarRating rating={rating} setRating={setRating} setTempRating={setTempRating} />
+        </div>
+
 
           <div>
             <label className="block font-semibold mb-2 text-gray-700">리뷰 내용</label>
@@ -132,7 +127,7 @@ export default function EditReviewPage() {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block font-semibold mb-2 text-gray-700">기존 이미지</label>
             <div className="flex flex-wrap gap-3 mb-4">
               {existingImages.map((url) => (
@@ -176,7 +171,7 @@ export default function EditReviewPage() {
                 );
               })}
             </div>
-          </div>
+          </div> */}
 
           <button
             type="submit"

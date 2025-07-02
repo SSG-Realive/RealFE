@@ -10,10 +10,10 @@ interface TrafficLightStatusCardProps {
 }
 
 function getCircleColor(rating: number) {
-  if (rating <= 2 && rating > 0) return '#ef4444'; // 빨강
-  if (rating === 3) return '#facc15'; // 노랑
-  if (rating >= 4) return '#22c55e'; // 초록
-  return '#d1d5db'; // 회색
+  if (rating >= 0.1 && rating <= 2.0) return '#ef4444'; // 빨강 (0.1~2.0)
+  if (rating >= 2.1 && rating <= 3.5) return '#facc15'; // 노랑 (2.1~3.5)
+  if (rating >= 3.6 && rating <= 5.0) return '#22c55e'; // 초록 (3.6~5.0)
+  return '#d1d5db'; // 회색 (평가없음)
 }
 
 export default function TrafficLightStatusCard({ 

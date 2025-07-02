@@ -88,6 +88,10 @@ export default function ProductEditPage() {
             return;
         }
 
+        console.log('=== 상품 수정 시작 ===');
+        console.log('수정할 상품 ID:', productId);
+        console.log('폼 데이터:', form);
+
         const formData = new FormData();
         formData.append('name', form.name);
         formData.append('description', form.description);
@@ -101,19 +105,64 @@ export default function ProductEditPage() {
         formData.append('categoryId', String(form.categoryId)); // ✅ categoryId 만 서버 전송
 
         // 이미지
-        if (imageThumbnail) formData.append('imageThumbnail', imageThumbnail);
-        if (videoThumbnail) formData.append('videoThumbnail', videoThumbnail);
+        if (imageThumbnail) {
+            console.log('대표 이미지 추가:', imageThumbnail.name);
+            formData.append('imageThumbnail', imageThumbnail);
+        }
+        if (videoThumbnail) {
+            console.log('대표 영상 추가:', videoThumbnail.name);
+            formData.append('videoThumbnail', videoThumbnail);
+        }
         if (subImages) {
-            Array.from(subImages).forEach((file) => formData.append('subImages', file));
+            console.log('서브 이미지 개수:', subImages.length);
+            Array.from(subImages).forEach((file, index) => {
+                console.log(`서브 이미지 ${index + 1}:`, file.name);
+                formData.append('subImages', file);
+            });
+        }
+
+        // FormData 내용 로깅
+        console.log('=== FormData 내용 ===');
+        for (let [key, value] of formData.entries()) {
+            if (value instanceof File) {
+                console.log(`${key}: [파일] ${value.name} (${value.size} bytes)`);
+            } else {
+                console.log(`${key}: ${value}`);
+            }
         }
 
         try {
+            console.log('API 호출 시작...');
             await updateProduct(Number(productId), formData);
+            console.log('상품 수정 성공!');
             alert('상품이 수정되었습니다.');
             router.push('/seller/products');
-        } catch (err) {
-            console.error('수정 실패', err);
-            setError('상품 수정 중 오류가 발생했습니다.');
+        } catch (err: any) {
+            console.error('=== 상품 수정 실패 ===');
+            console.error('에러 객체:', err);
+            console.error('에러 메시지:', err.message);
+            console.error('응답 상태:', err.response?.status);
+            console.error('응답 데이터:', err.response?.data);
+            console.error('응답 헤더:', err.response?.headers);
+            
+            let errorMessage = '상품 수정 중 오류가 발생했습니다.';
+            
+            if (err.response?.status === 400) {
+                errorMessage = '입력 데이터가 올바르지 않습니다. 필수 항목을 확인해주세요.';
+            } else if (err.response?.status === 401) {
+                errorMessage = '로그인이 필요합니다.';
+            } else if (err.response?.status === 403) {
+                errorMessage = '해당 상품을 수정할 권한이 없습니다.';
+            } else if (err.response?.status === 404) {
+                errorMessage = '상품을 찾을 수 없습니다.';
+            } else if (err.response?.status >= 500) {
+                errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            setError(errorMessage);
+            alert(`수정 실패: ${errorMessage}`);
         }
     };
 
@@ -129,25 +178,25 @@ export default function ProductEditPage() {
     };
 
     if (checking) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
             <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">인증 확인 중...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
+                <p className="text-[#374151]">인증 확인 중...</p>
             </div>
         </div>
     );
     
     if (loading) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
             <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">상품 정보를 불러오는 중...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
+                <p className="text-[#374151]">상품 정보를 불러오는 중...</p>
             </div>
         </div>
     );
     
     if (error) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
             <div className="text-center">
                 <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
                 <p className="text-red-600">{error}</p>
@@ -156,10 +205,10 @@ export default function ProductEditPage() {
     );
     
     if (!form) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
+        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
             <div className="text-center">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">상품 정보를 불러올 수 없습니다.</p>
+                <p className="text-[#374151]">상품 정보를 불러올 수 없습니다.</p>
             </div>
         </div>
     );
@@ -178,19 +227,19 @@ export default function ProductEditPage() {
                     <div className="flex items-center gap-4 mb-6">
                         <button
                             onClick={() => router.push(`/seller/products/${productId}`)}
-                            className="flex items-center gap-2 text-[#bfa06a] hover:text-[#5b4636] transition-colors font-bold"
+                            className="flex items-center gap-2 text-[#6b7280] hover:text-[#374151] transition-colors font-bold"
                         >
                             <ArrowLeft className="w-5 h-5" />
                             상품 상세로
                         </button>
-                        <h1 className="text-xl md:text-2xl font-bold text-[#5b4636]">상품 수정</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">상품 수정</h1>
                     </div>
 
                     <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
                         {/* 기본 정보 섹션 */}
-                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
-                            <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-[#bfa06a]" />
+                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
+                                <Package className="w-5 h-5 text-[#6b7280]" />
                                 기본 정보
                             </h3>
                             
@@ -203,7 +252,7 @@ export default function ProductEditPage() {
                                     <select
                                         value={parentCategoryIdState}
                                         onChange={handleParentCategoryChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         required
                                     >
                                         <option value="">-- 선택 --</option>
@@ -220,7 +269,7 @@ export default function ProductEditPage() {
                                     <select
                                         value={form.categoryId || ''}
                                         onChange={handleSubCategoryChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         required
                                     >
                                         <option value="">-- 선택 --</option>
@@ -241,7 +290,7 @@ export default function ProductEditPage() {
                                     value={form.name} 
                                     onChange={handleChange} 
                                     required 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                     placeholder="상품명을 입력하세요"
                                 />
                             </div>
@@ -257,16 +306,16 @@ export default function ProductEditPage() {
                                     onChange={handleChange} 
                                     required 
                                     rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] resize-none"
                                     placeholder="상품 설명을 입력하세요"
                                 />
                             </div>
                         </div>
 
                         {/* 가격 및 재고 섹션 */}
-                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
-                            <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
-                                <DollarSign className="w-5 h-5" />
+                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
+                                <DollarSign className="w-5 h-5 text-[#6b7280]" />
                                 가격 및 재고
                             </h3>
                             
@@ -281,7 +330,7 @@ export default function ProductEditPage() {
                                         value={form.price} 
                                         onChange={handleChange} 
                                         required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         placeholder="가격을 입력하세요"
                                     />
                                 </div>
@@ -296,7 +345,7 @@ export default function ProductEditPage() {
                                         value={form.stock} 
                                         onChange={handleChange} 
                                         required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         placeholder="재고 수량을 입력하세요"
                                     />
                                 </div>
@@ -304,9 +353,9 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 상품 상태 섹션 */}
-                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
-                            <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
-                                <Tag className="w-5 h-5" />
+                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
+                                <Tag className="w-5 h-5 text-[#6b7280]" />
                                 상품 상태
                             </h3>
                             
@@ -319,7 +368,7 @@ export default function ProductEditPage() {
                                         name="status"
                                         value={form.status}
                                         onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         required
                                     >
                                         <option value="상">상</option>
@@ -341,7 +390,7 @@ export default function ProductEditPage() {
                                             }
                                             setForm({ ...form, isActive: e.target.checked });
                                         }}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-[#6b7280] focus:ring-[#6b7280] border-gray-300 rounded"
                                     />
                                     <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
                                         활성화 여부
@@ -351,9 +400,9 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 크기 정보 섹션 */}
-                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
-                            <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
-                                <Ruler className="w-5 h-5" />
+                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
+                                <Ruler className="w-5 h-5 text-[#6b7280]" />
                                 크기 정보
                             </h3>
                             
@@ -368,7 +417,7 @@ export default function ProductEditPage() {
                                         value={form.width} 
                                         onChange={handleChange} 
                                         required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         placeholder="가로"
                                     />
                                 </div>
@@ -383,7 +432,7 @@ export default function ProductEditPage() {
                                         value={form.depth} 
                                         onChange={handleChange} 
                                         required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         placeholder="세로"
                                     />
                                 </div>
@@ -398,7 +447,7 @@ export default function ProductEditPage() {
                                         value={form.height} 
                                         onChange={handleChange} 
                                         required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
                                         placeholder="높이"
                                     />
                                 </div>
@@ -406,9 +455,9 @@ export default function ProductEditPage() {
                         </div>
 
                         {/* 미디어 섹션 */}
-                        <div className="bg-[#e3f6f5] rounded-xl shadow border border-[#bfa06a] p-8">
-                            <h3 className="text-lg font-semibold text-[#5b4636] mb-4 flex items-center gap-2">
-                                <Image className="w-5 h-5" />
+                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
+                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
+                                <Image className="w-5 h-5 text-[#6b7280]" />
                                 미디어
                             </h3>
                             
@@ -427,7 +476,7 @@ export default function ProductEditPage() {
                                         accept="image/*" 
                                         onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} 
                                         required={form?.imageThumbnailUrl ? false : true} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
+                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
                                     />
                                 </div>
 
@@ -440,7 +489,7 @@ export default function ProductEditPage() {
                                         type="file" 
                                         accept="video/*" 
                                         onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
+                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
                                     />
                                 </div>
 
@@ -453,7 +502,7 @@ export default function ProductEditPage() {
                                         accept="image/*" 
                                         multiple 
                                         onChange={(e) => setSubImages(e.target.files)} 
-                                        className="w-full px-3 py-2 border border-[#bfa06a] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:border-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#bfa06a] file:text-[#4b3a2f] hover:file:bg-[#e3f6f5]"
+                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
                                     />
                                 </div>
                             </div>
@@ -473,7 +522,7 @@ export default function ProductEditPage() {
                         <div className="flex justify-end">
                             <button 
                                 type="submit" 
-                                className="flex items-center gap-2 bg-[#bfa06a] hover:bg-[#5b4636] text-[#4b3a2f] hover:text-[#e9dec7] py-3 px-6 rounded-lg font-medium transition-colors"
+                                className="flex items-center gap-2 bg-[#d1d5db] hover:bg-[#6b7280] text-[#374151] hover:text-white py-3 px-6 rounded-lg font-medium transition-colors"
                             >
                                 <Save className="w-4 h-4" />
                                 상품 수정

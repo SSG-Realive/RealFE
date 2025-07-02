@@ -141,8 +141,8 @@ export default function OrderListPage() {
                             <span className="order-status">{order.orderStatus}</span>
                         </div>
                         <div className="order-card-content">
-                            {order.orderItems.map((item) => (
-                                <div key={`${order.orderId}-${item.orderItemId}`} className="order-item">
+                            {order.orderItems.map((item, index) => (
+                                <div key={`${order.orderId}-${item.orderItemId || item.productId}-${index}`} className="order-item">
                                     <div className="item-info">
                                         <p className="item-name">{item.productName}</p>
                                         <p className="item-details">
@@ -167,8 +167,13 @@ export default function OrderListPage() {
                                 <button
                                     className="button-outline"
                                     onClick={() => router.push(`/customer/orders/${order.orderId}`)}
+                                    style={{ 
+                                        backgroundColor: '#3B82F6', 
+                                        color: 'white',
+                                        border: '1px solid #3B82F6'
+                                    }}
                                 >
-                                    주문 상세
+                                    📋 주문 상세보기
                                 </button>
                             </div>
                         </div>

@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/customer/authStore';
-import { processDirectPaymentApi } from '@/service/order/orderService';
+import { processDirectPaymentApi, processCartPaymentApi } from '@/service/order/orderService';
 import type { PayRequestDTO } from '@/types/customer/order/order';
 
 export default function PaymentSuccessPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { id: customerId } = useAuthStore();
+    const { id: customerId, accessToken, hydrated } = useAuthStore();
     
     const [orderId, setOrderId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
@@ -20,6 +20,16 @@ export default function PaymentSuccessPage() {
         const processPayment = async () => {
             try {
                 setLoading(true);
+                
+                // hydrated 상태 확인 - 데이터 로딩이 완료되지 않았으면 대기
+                if (!hydrated) {
+                    return;
+                }
+                
+                // 인증 확인
+                if (!customerId || !accessToken) {
+                    throw new Error('로그인이 필요합니다.');
+                }
                 
                 // URL 파라미터에서 결제 정보 가져오기
                 const paymentKey = searchParams.get('paymentKey');
@@ -38,21 +48,31 @@ export default function PaymentSuccessPage() {
 
                 const checkoutInfo = JSON.parse(checkoutInfoStr);
                 
-                // 결제 승인 요청
+                // 결제 승인 요청 (amount 제거 - 서버에서 계산)
                 const payRequest: PayRequestDTO = {
                     paymentKey,
                     tossOrderId: orderId,
-                    amount: parseInt(amount),
                     receiverName: checkoutInfo.shippingInfo.receiverName,
                     phone: checkoutInfo.shippingInfo.phone,
                     deliveryAddress: checkoutInfo.shippingInfo.address,
                     paymentMethod: 'CARD', // 기본값
-                    customerId: customerId,
                     ...(checkoutInfo.orderItems ? { orderItems: checkoutInfo.orderItems } : {}),
                     ...(checkoutInfo.productId ? { productId: checkoutInfo.productId, quantity: checkoutInfo.quantity } : {})
                 };
 
-                const createdOrderId = await processDirectPaymentApi(payRequest);
+                // 장바구니 결제 vs 단일 상품 결제 구분
+                let createdOrderId: number;
+                if (checkoutInfo.orderItems && checkoutInfo.orderItems.length > 0) {
+                    // 장바구니 결제
+                    console.log('장바구니 결제 처리 중...');
+                    createdOrderId = await processCartPaymentApi(payRequest);
+                } else if (checkoutInfo.productId) {
+                    // 단일 상품 결제
+                    console.log('단일 상품 결제 처리 중...');
+                    createdOrderId = await processDirectPaymentApi(payRequest);
+                } else {
+                    throw new Error('결제 정보가 올바르지 않습니다.');
+                }
                 setOrderId(createdOrderId);
                 
                 // 체크아웃 정보 삭제
@@ -67,7 +87,7 @@ export default function PaymentSuccessPage() {
         };
 
         processPayment();
-    }, [searchParams, customerId]);
+    }, [searchParams, customerId, accessToken, hydrated]);
 
     if (loading) {
         return (
@@ -85,20 +105,20 @@ export default function PaymentSuccessPage() {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center max-w-md mx-auto p-6">
                     <div className="text-red-500 text-6xl mb-4">❌</div>
-                    <h1 className="text-2xl font-bold mb-4">결제 처리 실패</h1>
+                    <h1 className="text-2xl font-light mb-4">결제 처리 실패</h1>
                     <p className="text-gray-600 mb-6">{error}</p>
                     <div className="space-y-3">
                         <button 
                             onClick={() => router.back()}
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 font-semibold transition-colors duration-200"
                         >
-                            이전 페이지로 돌아가기
+                            ⬅️ 이전 페이지로 돌아가기
                         </button>
                         <Link 
                             href="/customer/orders"
-                            className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
+                            className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
                         >
-                            주문 목록으로 가기
+                            📜 주문 목록으로 가기
                         </Link>
                     </div>
                 </div>
@@ -110,7 +130,7 @@ export default function PaymentSuccessPage() {
         <div className="min-h-screen flex items-center justify-center">
             <div className="text-center max-w-md mx-auto p-6">
                 <div className="text-green-500 text-6xl mb-4">✅</div>
-                <h1 className="text-2xl font-bold mb-4">결제가 완료되었습니다!</h1>
+                <h1 className="text-2xl font-light mb-4">결제가 완료되었습니다!</h1>
                 <p className="text-gray-600 mb-6">
                     주문이 성공적으로 처리되었습니다.<br />
                     주문번호: <span className="font-semibold">{orderId}</span>
@@ -118,21 +138,21 @@ export default function PaymentSuccessPage() {
                 <div className="space-y-3">
                     <Link 
                         href={`/customer/orders/${orderId}`}
-                        className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
+                        className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 text-center font-semibold transition-colors duration-200"
                     >
-                        주문 상세보기
+                        📋 주문 상세보기
                     </Link>
                     <Link 
                         href="/customer/orders"
-                        className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
+                        className="block w-full bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 text-center font-semibold transition-colors duration-200"
                     >
-                        주문 목록으로 가기
+                        📜 주문 목록으로 가기
                     </Link>
                     <Link 
                         href="/main"
-                        className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 text-center"
+                        className="block w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 text-center font-semibold transition-colors duration-200"
                     >
-                        쇼핑 계속하기
+                        🛍️ 쇼핑 계속하기
                     </Link>
                 </div>
             </div>

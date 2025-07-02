@@ -49,6 +49,7 @@ export interface Bid {
   bidPrice: number;
   bidTime: string;
   isWinning: boolean;
+  leading?: boolean;
 }
 
 export interface PaginatedBidResponse {
@@ -61,4 +62,12 @@ export interface PaginatedBidResponse {
 export interface PlaceBidRequest {
   auctionId: number;
   bidPrice: number;
+}
+
+export interface GetAuctionsParams {
+  category?: string; // 카테고리는 선택사항
+  page: number;
+  size: number;
+  sort?: string; // 정렬 파라미터 (예: 'endTime,asc')
+  status?: string; // 상태별 조회 (예: 'PROCEEDING')
 }

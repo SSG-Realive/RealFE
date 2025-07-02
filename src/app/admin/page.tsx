@@ -13,7 +13,7 @@ export default function AdminIntroPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#a89f91] items-center justify-center">
+    <div className="flex flex-col min-h-screen w-full bg-white items-center justify-center">
       <main className="flex-1 flex flex-col items-center justify-center">
         <h1 style={{ fontSize: 40, fontWeight: 'bold', marginBottom: 32, color: '#222' }}>관리자 페이지</h1>
         <p style={{ fontSize: 18, color: '#555', marginBottom: 40 }}>Realive 서비스 관리자 전용 페이지</p>

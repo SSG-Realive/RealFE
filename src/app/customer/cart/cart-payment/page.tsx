@@ -98,14 +98,14 @@ async function CartPaymentPage() {
 
     return (
         <div className="container mx-auto p-4 max-w-2xl">
-            <h1 className="text-3xl font-bold mb-8 text-center">결제</h1>
+            <h1 className="text-3xl font-light mb-8 text-center">결제</h1>
 
             {/* 주문 정보 요약 */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h2 className="text-xl font-semibold mb-4">주문 정보</h2>
                 <div className="space-y-2">
                     {/* Receiver Name, Phone, Delivery Address는 Form 필드로 이동하여 사용자 입력 가능하게 */}
-                    <p><span className="font-medium">총 결제 금액:</span> {cartData.totalPrice?.toLocaleString()}원</p>
+                    <p><span className="font-light">총 결제 금액:</span> {cartData.totalPrice?.toLocaleString()}원</p>
                 </div>
             </div>
 
@@ -115,7 +115,7 @@ async function CartPaymentPage() {
                 <form className="space-y-4" action={handlePayment}>
                     {/* 수령인 정보 */}
                     <div>
-                        <label htmlFor="receiverName" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="receiverName" className="block text-sm font-light text-gray-700 mb-1">
                             수령인
                         </label>
                         <input
@@ -129,7 +129,7 @@ async function CartPaymentPage() {
                     </div>
                     {/* 연락처 정보 */}
                     <div>
-                        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="phone" className="block text-sm font-light text-gray-700 mb-1">
                             연락처
                         </label>
                         <input
@@ -143,7 +143,7 @@ async function CartPaymentPage() {
                     </div>
                     {/* 배송지 정보 */}
                     <div>
-                        <label htmlFor="deliveryAddress" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="deliveryAddress" className="block text-sm font-light text-gray-700 mb-1">
                             배송지
                         </label>
                         <input
@@ -158,7 +158,7 @@ async function CartPaymentPage() {
 
                     {/* 카드 번호 입력 (민감 정보이므로 실제 서비스에선 PG사 SDK 사용 권장) */}
                     <div>
-                        <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="cardNumber" className="block text-sm font-light text-gray-700 mb-1">
                             카드 번호
                         </label>
                         <input
@@ -175,7 +175,7 @@ async function CartPaymentPage() {
                     {/* 카드 유효기간 */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="expiryMonth" className="block text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="expiryMonth" className="block text-sm font-light text-gray-700 mb-1">
                                 유효기간 (월)
                             </label>
                             <input
@@ -189,7 +189,7 @@ async function CartPaymentPage() {
                             />
                         </div>
                         <div>
-                            <label htmlFor="expiryYear" className="block text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="expiryYear" className="block text-sm font-light text-gray-700 mb-1">
                                 유효기간 (년)
                             </label>
                             <input
@@ -206,7 +206,7 @@ async function CartPaymentPage() {
 
                     {/* CVC */}
                     <div>
-                        <label htmlFor="cvc" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="cvc" className="block text-sm font-light text-gray-700 mb-1">
                             CVC
                         </label>
                         <input

@@ -45,7 +45,7 @@ export default function Wishlist() {
                                     alt={p.name}
                                     className="w-full h-32 object-cover rounded"
                                 />
-                                <div className="mt-1 text-sm font-medium">{p.name}</div>
+                                <div className="mt-1 text-sm font-light">{p.name}</div>
                                 <button
                                     className="text-red-500 text-sm mt-1"
                                     onClick={() => handleToggle(p.id)}

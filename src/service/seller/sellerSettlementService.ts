@@ -48,6 +48,19 @@ export async function getSellerSettlementSummary(from: string, to: string): Prom
  * @param payoutLogId 정산 로그 ID
  */
 export async function getSellerSettlementDetail(payoutLogId: number): Promise<PayoutLogDetailResponse> {
-    const res = await sellerApi.get(`/seller/settlements/${payoutLogId}/detail`);
+    const url = `/seller/settlements/${payoutLogId}/detail`;
+    console.log('정산 상세 API 호출:', url);
+    
+    try {
+        const res = await sellerApi.get(url);
+        console.log('정산 상세 API 응답:', res.data);
     return res.data;
+    } catch (error: any) {
+        console.error('정산 상세 API 에러:', {
+            url,
+            payoutLogId,
+            error: error.response?.data || error.message
+        });
+        throw error;
+    }
 }

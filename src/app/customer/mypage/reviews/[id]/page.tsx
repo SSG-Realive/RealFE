@@ -20,7 +20,6 @@ export default function ReviewDetailPage() {
 
     useEffect(() => {
         if (!id) return;
-
         fetchReviewDetail(Number(id))
             .then(setReview)
             .catch(() => setError('리뷰 정보를 불러오지 못했습니다.'));

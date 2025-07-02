@@ -46,57 +46,65 @@ export default function SellerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#a89f91] px-4">
-      <div className="w-full max-w-md mx-auto">
-        <div className="bg-[#e3f6f5] rounded-lg shadow-md p-6 md:p-8 border border-[#bfa06a]">
-          <h1 className="text-2xl font-bold text-center mb-6 text-[#5b4636]">판매자 로그인</h1>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#f3f4f6] px-4">
+      <div className="w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
+        <div className="bg-[#f3f4f6] rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
+          <h1 className="text-2xl font-bold text-center mb-6 text-[#374151]">판매자 로그인</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#5b4636] mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-[#374151] mb-2">
                 이메일
               </label>
               <input 
+                type="email"
                 id="email" 
-                type="email" 
+                name="email"
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a]"
+                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
                 placeholder="이메일을 입력하세요"
               />
             </div>
+            
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-[#5b4636] mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-[#374151] mb-2">
                 비밀번호
               </label>
               <input 
+                type="password"
                 id="password" 
-                type="password" 
+                name="password"
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border border-[#bfa06a] rounded-md focus:outline-none focus:ring-2 focus:ring-[#bfa06a] bg-[#e3f6f5] text-[#5b4636] placeholder-[#bfa06a]"
+                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
                 placeholder="비밀번호를 입력하세요"
               />
             </div>
+            
             {error && (
-              <p className="text-[#b94a48] text-sm bg-[#fbeee0] p-3 rounded-md border border-[#bfa06a]">
+              <p className="text-[#dc2626] text-sm bg-[#f3f4f6] p-3 rounded-md border-2 border-[#d1d5db]">
                 {error}
               </p>
             )}
+            
             <button 
               type="submit" 
-              className="w-full bg-[#bfa06a] text-[#4b3a2f] py-3 px-4 rounded-md font-medium hover:bg-[#5b4636] hover:text-[#e9dec7] focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:ring-offset-2 transition-colors"
+              className="w-full bg-[#d1d5db] text-[#374151] py-2 px-4 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] focus:outline-none focus:ring-2 focus:ring-[#d1d5db] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               로그인
             </button>
-            <Link
-              href="/seller/signup"
-              className="block w-full mt-4 py-3 px-4 rounded-md border-2 border-[#bfa06a] bg-[#e9dec7] text-[#5b4636] font-medium text-center hover:bg-[#bfa06a] hover:text-[#e9dec7] focus:outline-none focus:ring-2 focus:ring-[#bfa06a] focus:ring-offset-2 transition-colors"
-            >
-              회원가입
-            </Link>
           </form>
+          
+          <div className="mt-6 text-center">
+            <p className="text-sm text-[#6b7280]">
+              아직 계정이 없으신가요?{' '}
+              <Link href="/seller/signup" className="text-[#374151] hover:text-[#6b7280] font-medium">
+                판매자 회원가입
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

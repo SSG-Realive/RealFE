@@ -3,21 +3,38 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Slider from 'react-slick';
-import { Heart, HeartIcon } from 'lucide-react';
+import { Heart, HeartIcon, ShoppingCart } from 'lucide-react';
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-import { fetchFeaturedSellersWithProducts} from "@/service/customer/productService";
+import { fetchFeaturedSellersWithProducts } from "@/service/customer/productService";
 import { toggleWishlist } from "@/service/customer/wishlistService";
+import { addToCart } from '@/service/customer/cartService';
 import { FeaturedSellerWithProducts } from "@/types/product";
 import ProductImage from "@/components/ProductImage";
+import { useAuthStore } from '@/store/customer/authStore';
+import { useRouter, usePathname } from 'next/navigation';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function FeaturedSellersSection() {
     const [featured, setFeatured] = useState<FeaturedSellerWithProducts[]>([]);
     const [likedMap, setLikedMap] = useState<Record<number, boolean>>({});
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    const router = useRouter();
+    const pathname = usePathname();
+    const { show } = useGlobalDialog();
+
+    const withAuth = async (action: () => Promise<void>) => {
+        if (!useAuthStore.getState().accessToken) {
+            await show('로그인이 필요한 서비스입니다.');
+            router.push(`/customer/member/login?redirectTo=${encodeURIComponent(pathname)}`);
+            return;
+        }
+        await action();
+    };
 
     useEffect(() => {
         fetchFeaturedSellersWithProducts()
@@ -27,7 +44,6 @@ export default function FeaturedSellersSection() {
                 const picked = shuffled.slice(0, 3);
                 setFeatured(picked);
 
-                // 찜 상태 초기화
                 const map: Record<number, boolean> = {};
                 picked.forEach(seller => {
                     seller.products.forEach(p => {
@@ -56,6 +72,14 @@ export default function FeaturedSellersSection() {
             setLikedMap(prev => ({ ...prev, [productId]: current }));
             alert('찜 처리 중 오류가 발생했습니다.');
         }
+    };
+
+    const handleAddToCart = async (productId: number) => {
+        await withAuth(() =>
+            addToCart({ productId, quantity: 1 }).then(() =>
+                show('장바구니에 담았습니다.')
+            )
+        );
     };
 
     if (loading) {
@@ -87,14 +111,14 @@ export default function FeaturedSellersSection() {
       `}</style>
 
             <div className="max-w-7xl mx-auto p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
+                <h2 className="text-xl font-light text-gray-800 text-center mb-6">
                     오늘의 판매자 상품
                 </h2>
 
                 <div className="space-y-10">
                     {featured.map((seller) => (
                         <div key={seller.sellerId}>
-                            <h3 className="text-lg font-bold text-gray-700 mb-4 text-center">
+                            <h3 className="text-lg font-light text-gray-700 mb-4 text-center">
                                 {seller.sellerName}
                             </h3>
 
@@ -124,10 +148,23 @@ export default function FeaturedSellersSection() {
                                                         className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow"
                                                     />
 
-                                                    {/* 찜 하트 버튼 */}
+                                                    {/* 장바구니 버튼 (좌측 상단) */}
                                                     <button
                                                         onClick={(e) => {
-                                                            e.preventDefault(); // 링크 이동 방지
+                                                            e.preventDefault();
+                                                            handleAddToCart(product.productId);
+                                                        }}
+                                                        className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow hover:bg-white z-10"
+                                                        type="button"
+                                                        title="장바구니 담기"
+                                                    >
+                                                        <ShoppingCart size={18} className="text-gray-600" />
+                                                    </button>
+
+                                                    {/* 찜 버튼 (우측 상단) */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
                                                             handleToggleWishlist(product.productId);
                                                         }}
                                                         className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow hover:bg-white z-10"
@@ -144,8 +181,8 @@ export default function FeaturedSellersSection() {
 
                                                 {/* 텍스트 */}
                                                 <div className="mt-4 text-black">
-                                                    <p className="text-base font-medium truncate">{product.name}</p>
-                                                    <p className="text-sm font-semibold text-gray-800 mt-1">
+                                                    <p className="text-base font-light truncate">{product.name}</p>
+                                                    <p className="text-sm font-light text-gray-800 mt-1">
                                                         {product.price.toLocaleString()}
                                                         <span className="text-xs align-middle ml-1">원</span>
                                                     </p>

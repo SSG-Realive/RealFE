@@ -57,8 +57,13 @@ adminApi.interceptors.request.use((config) => {
 adminApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    console.error('AdminApi Error:', error.response?.status, error.response?.data);
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.log('관리자 인증 만료, 로그아웃 처리');
       useAdminAuthStore.getState().logout();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin/login';
+      }
     }
     return Promise.reject(error);
   }

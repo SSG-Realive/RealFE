@@ -9,7 +9,7 @@ interface AuthState {
   userName: string | null;
   isTemporaryUser: boolean;
   hydrated: boolean;
-
+  setHydrated: (isHydrated: boolean) => void;
   // 액션
   setAuth: (p: {
     id: number;
@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
       userName: null,
       isTemporaryUser: false,
       hydrated: false,
-
+      setHydrated: (isHydrated) => set({ hydrated: isHydrated }),
       setAuth: ({ id, accessToken, refreshToken, email, userName, temporaryUser }) =>
         set({
           id,
@@ -49,13 +49,13 @@ export const useAuthStore = create<AuthState>()(
         }),
 
       setTokens: (a, r) => set({ accessToken: a, refreshToken: r }),
-
+      
       setUserName: (name) => set({ userName: name }),
 
       logout: () =>
         set({
           id: null,
-          accessToken: null,
+          accessToken: null,  
           refreshToken: null,
           email: null,
           userName: null,
@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          state.hydrated = true;
+          state.setHydrated(true);
         }
       },
     }

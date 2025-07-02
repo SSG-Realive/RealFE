@@ -10,17 +10,17 @@ import {
   MemberModifyDTO,
   MemberReadDTO,
 } from '@/types/customer/member/member';
-import Navbar from '@/components/customer/common/Navbar';
 import AddressInput from '@/components/customer/join/AddressInput';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import { parseAddress } from '@/lib/address-utils';
 import { Pencil } from 'lucide-react';
 
+
 function ReadOnlyCard({ label, value }: { label: string; value?: string | null }) {
   return (
     <section className="rounded-2xl bg-white/90 p-5 shadow ring-1 ring-gray-100">
-      <h2 className="mb-2 text-sm font-medium text-gray-500">{label}</h2>
+      <h2 className="mb-2 text-sm font-light text-gray-500">{label}</h2>
       <p className="text-[17px] sm:text-base text-gray-800 break-words">
         {value || '-'}
       </p>
@@ -42,7 +42,7 @@ function EditableCard(props: {
   return (
     <section className="rounded-2xl bg-white/90 p-5 shadow ring-1 ring-gray-100 space-y-2">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-gray-500">{label}</h2>
+        <h2 className="text-sm font-light text-gray-500">{label}</h2>
         {!editing && (
           <button
             type="button"
@@ -77,7 +77,7 @@ function EditableCard(props: {
 export default function EditProfilePage() {
   const router = useRouter();
 
-  const { open, message, setOpen, show } = useDialog();
+  const { open, message, handleClose, show } = useDialog();
 
   /* ---------------- data ---------------- */
   const [profile, setProfile] = useState<MemberReadDTO | null>(null);
@@ -87,7 +87,7 @@ export default function EditProfilePage() {
   const [addrEdit,    setAddrEdit]    = useState(false);
 
   const [phone, setPhone]           = useState('');
-  const [addrStr, setAddrStr]       = useState('');      
+  const [addrStr, setAddrStr]       = useState('');
     const [saving, setSaving] = useState(false);
   /* ------------ fetch my info ------------ */
   useEffect(() => {
@@ -125,7 +125,6 @@ export default function EditProfilePage() {
   if (!profile) {
     return (
       <>
-        <Navbar />
         <p className="p-6 text-center text-gray-500">로딩 중…</p>
       </>
     );
@@ -136,8 +135,8 @@ export default function EditProfilePage() {
 
   return (
   <>
-    <GlobalDialog open={open} message={message} onClose={() => setOpen(false)} />
-    <Navbar />
+    <GlobalDialog open={open} message={message} onClose={handleClose} />
+    
 
     <main className="mx-auto w-full max-w-xl px-4 py-10 space-y-6">
 
@@ -217,7 +216,7 @@ export default function EditProfilePage() {
             type="button"
             onClick={handleSubmit}
             disabled={saving}
-            className="rounded-md bg-amber-500 px-5 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 disabled:opacity-50"
+            className="rounded-md bg-amber-500 px-5 py-2 text-sm font-light text-white shadow hover:bg-amber-600 disabled:opacity-50"
           >
             {saving ? '저장 중…' : '저장'}
           </button>

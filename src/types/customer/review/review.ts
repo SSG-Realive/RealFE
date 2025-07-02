@@ -27,3 +27,11 @@ export interface ProductSummaryDTO {
   name: string;
   imageThumbnailUrl: string;
 }
+
+export interface ReviewCreateRequestDTO {
+  orderId: number;
+  sellerId: number;
+  rating: number;
+  content: string;
+  imageUrls: string[];
+}

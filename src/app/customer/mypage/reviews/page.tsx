@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { fetchMyReviews } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-import Navbar from '@/components/customer/common/Navbar';
 import Link from 'next/link';
 import {
     getTrafficLightEmoji,
@@ -11,6 +10,8 @@ import {
     getTrafficLightBgClass
 } from '@/types/admin/review';
 
+
+// 내 리뷰 목록 조회 페이지
 
 // 내 리뷰 목록 조회 페이지
 
@@ -28,11 +29,11 @@ export default function MyReviewPage() {
             })
             .finally(() => setLoading(false));
     }, []);
+    
 
 
     return (
         <div>
-            <Navbar />
             <div className="max-w-3xl mx-auto px-4 py-10">
                 <h1 className="text-2xl font-bold mb-2">내가 작성한 리뷰</h1>
                 <p className="text-sm text-gray-500 mb-15">

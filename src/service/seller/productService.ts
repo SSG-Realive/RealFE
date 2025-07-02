@@ -1,4 +1,3 @@
-
 import { sellerApi } from '@/lib/apiClient';
 import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
 import { PageResponse } from '@/types/seller/page/pageResponse';
@@ -26,9 +25,24 @@ export async function createProduct(formData: FormData): Promise<number> {
  * 상품 수정 API
  */
 export async function updateProduct(id: number, formData: FormData): Promise<void> {
-    await sellerApi.put(`/seller/products/${id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    console.log('=== updateProduct API 호출 ===');
+    console.log('상품 ID:', id);
+    console.log('요청 URL:', `/seller/products/${id}`);
+    
+    try {
+        const res = await sellerApi.put(`/seller/products/${id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        console.log('API 응답 성공:', res.status, res.statusText);
+        console.log('응답 데이터:', res.data);
+    } catch (error: any) {
+        console.error('=== updateProduct API 에러 ===');
+        console.error('에러 상태:', error.response?.status);
+        console.error('에러 메시지:', error.response?.statusText);
+        console.error('에러 데이터:', error.response?.data);
+        console.error('전체 에러:', error);
+        throw error;
+    }
 }
 
 /**
@@ -71,4 +85,39 @@ const buildSearchParams = (params: Record<string, any>): string => {
 export async function fetchCategories(): Promise<SellerCategoryDTO[]> {
     const res = await sellerApi.get('/seller/categories');
     return res.data;
+}
+
+/**
+ * 판매자 전체 상품 통계 조회 API
+ * @returns 전체 상품에 대한 판매 상태별 통계
+ */
+export async function getMyProductStats(): Promise<{
+  total: number;
+  selling: number;  // active=true && stock>0
+  suspended: number; // active=false
+  outOfStock: number; // stock=0
+}> {
+  try {
+    // 전체 상품을 가져오기 위해 충분히 큰 size로 요청
+    const res = await sellerApi.get('/seller/products?size=1000');
+    const allProducts: ProductListItem[] = res.data.dtoList || [];
+    
+    const stats = {
+      total: allProducts.length,
+      selling: allProducts.filter(p => p.active && p.stock > 0).length,
+      suspended: allProducts.filter(p => !p.active).length,
+      outOfStock: allProducts.filter(p => p.stock === 0).length
+    };
+    
+    return stats;
+  } catch (error) {
+    console.error('판매자 상품 통계 조회 실패:', error);
+    // 에러 시 기본값 반환
+    return {
+      total: 0,
+      selling: 0,
+      suspended: 0,
+      outOfStock: 0
+    };
+  }
 }

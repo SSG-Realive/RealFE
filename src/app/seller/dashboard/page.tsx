@@ -6,6 +6,7 @@ import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend } from '@/service/seller/sellerService';
+import { getCustomerQnaList } from '@/service/seller/customerQnaService';
 import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySalesDTO } from '@/types/seller/dashboard/sellerDashboardResponse';
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
@@ -24,6 +25,7 @@ export default function SellerDashboardPage() {
   const [salesStats, setSalesStats] = useState<SellerSalesStatsDTO | null>(null);
   const [dailyTrend, setDailyTrend] = useState<DailySalesDTO[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlySalesDTO[]>([]);
+  const [actualUnansweredCount, setActualUnansweredCount] = useState(0); // 실제 미답변 문의 수
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -46,6 +48,29 @@ export default function SellerDashboardPage() {
       const dashboardData = await getDashboard();
       setDashboard(dashboardData);
 
+      // 실제 미답변 문의 수 계산을 위해 QnA 데이터 조회
+      try {
+        console.log('🔍 실제 미답변 문의 수 계산 시작...');
+        const qnaResponse = await getCustomerQnaList({ page: 0, size: 100 }); // 충분히 큰 사이즈로 조회
+        
+        const qnaList = qnaResponse?.content || [];
+        const unansweredCount = qnaList.filter((item: any) => {
+          const qna = item.qna || item;
+          return !(qna.isAnswered || qna.answered === true || qna.answered === 'true');
+        }).length;
+        
+        console.log('📊 QnA 데이터 분석 결과:');
+        console.log('- 전체 QnA 수:', qnaList.length);
+        console.log('- 실제 미답변 수:', unansweredCount);
+        console.log('- 기존 대시보드 값:', dashboardData?.unansweredQnaCount);
+        
+        setActualUnansweredCount(unansweredCount);
+      } catch (qnaError) {
+        console.error('❌ QnA 데이터 조회 실패:', qnaError);
+        // QnA 조회 실패 시 기존 대시보드 값 사용
+        setActualUnansweredCount(dashboardData?.unansweredQnaCount || 0);
+      }
+
       // 총 매출(전체 누적) 통계
       const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
       const statsEndDate = new Date().toISOString().split('T')[0];
@@ -67,12 +92,26 @@ export default function SellerDashboardPage() {
           console.warn('⚠️ 응답 데이터가 null/undefined입니다');
         } else if (statsData.totalRevenue === 0 && statsData.totalOrders === 0) {
           console.warn('⚠️ 매출과 주문이 모두 0입니다. sales_logs 테이블에 데이터가 없거나 권한 문제일 수 있습니다');
+          console.log('📊 대안: 기본 대시보드 데이터를 확인해보세요');
+          console.log('🔍 판매자 토큰 상태:', localStorage.getItem('sellerToken') ? '존재' : '없음');
+        } else {
+          console.log('✅ 정상적인 매출/주문 데이터 확인됨');
         }
-              } catch (error: any) {
+      } catch (error: any) {
         console.error('❌ API 호출 실패:', error);
         console.error('에러 상태:', error.response?.status);
         console.error('에러 메시지:', error.response?.statusText);
         console.error('에러 상세:', error.response?.data);
+        
+        // 에러 발생 시 빈 객체로 설정 (UI가 깨지지 않도록)
+        statsData = {
+          totalRevenue: 0,
+          totalOrders: 0,
+          totalFees: 0,
+          dailySalesTrend: [],
+          monthlySalesTrend: []
+        };
+        console.log('📝 에러로 인해 기본값으로 설정됨:', statsData);
       }
       
       console.log('setSalesStats 호출 전 - statsData:', statsData);
@@ -351,8 +390,8 @@ export default function SellerDashboardPage() {
             <MessageCircle className="w-10 h-10 text-[#6b7280]" />
             <div>
               <h2 className="text-[#374151] text-sm font-semibold mb-1">미답변 문의 (전체)</h2>
-              <p className="text-2xl font-extrabold text-[#6b7280]">{dashboard?.unansweredQnaCount ?? 0}건</p>
-              <p className="text-xs text-[#6b7280] mt-1">전체 미답변 문의 수</p>
+              <p className="text-2xl font-extrabold text-[#6b7280]">{actualUnansweredCount}건</p>
+              <p className="text-xs text-[#6b7280] mt-1">실제 미답변 문의 수</p>
             </div>
           </section>
         </div>

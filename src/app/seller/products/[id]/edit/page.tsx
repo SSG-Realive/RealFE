@@ -392,15 +392,15 @@ export default function ProductEditPage() {
                                         type="checkbox"
                                         id="active"
                                         checked={form.isActive}
-                                        disabled={form.stock === 0}  // 재고가 0이면 체크박스 비활성화
                                         onChange={(e) => {
                                             console.log('=== isActive 체크박스 변경 ===');
                                             console.log('현재 재고:', form.stock);
                                             console.log('현재 isActive:', form.isActive);
                                             console.log('변경하려는 값:', e.target.checked);
                                             
+                                            // 재고가 0인 상태에서 활성화하려고 할 때만 경고
                                             if (form.stock === 0 && e.target.checked) {
-                                                alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.');
+                                                alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.\n재고를 먼저 추가해주세요.');
                                                 console.log('재고 0으로 인한 활성화 차단');
                                                 return;  // 체크 방지
                                             }
@@ -415,6 +415,11 @@ export default function ProductEditPage() {
                                         <span className="ml-2 text-xs text-gray-500">
                                             (현재: {form.isActive ? '활성' : '비활성'})
                                         </span>
+                                        {form.stock === 0 && (
+                                            <span className="ml-2 text-xs text-red-500">
+                                                ⚠️ 재고 0: 활성화 불가
+                                            </span>
+                                        )}
                                     </label>
                                 </div>
                             </div>

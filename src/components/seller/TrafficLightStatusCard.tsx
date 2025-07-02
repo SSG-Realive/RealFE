@@ -1,7 +1,5 @@
 'use client';
 
-import { getTrafficLightText } from '@/types/admin/review';
-
 interface TrafficLightStatusCardProps {
   title: string;
   rating: number;
@@ -14,6 +12,13 @@ function getCircleColor(rating: number) {
   if (rating >= 2.1 && rating <= 3.5) return '#facc15'; // 노랑 (2.1~3.5)
   if (rating >= 3.6 && rating <= 5.0) return '#22c55e'; // 초록 (3.6~5.0)
   return '#d1d5db'; // 회색 (평가없음)
+}
+
+function getStatusText(rating: number) {
+  if (rating >= 0.1 && rating <= 2.0) return '부정적'; // 빨강 구간
+  if (rating >= 2.1 && rating <= 3.5) return '보통'; // 노랑 구간
+  if (rating >= 3.6 && rating <= 5.0) return '긍정적'; // 초록 구간
+  return '평가없음'; // 회색 구간
 }
 
 export default function TrafficLightStatusCard({ 
@@ -40,7 +45,7 @@ export default function TrafficLightStatusCard({
           </svg>
         </span>
         <div className="text-lg font-bold text-[#374151] mb-1">{title}</div>
-        <div className="text-xl font-extrabold text-[#374151] mb-1">{isNoReview ? '평가 없음' : getTrafficLightText(rating)}</div>
+        <div className="text-xl font-extrabold text-[#374151] mb-1">{isNoReview ? '평가 없음' : getStatusText(rating)}</div>
         <div className="text-sm text-[#a89f91] mt-1">리뷰 {count ?? 0}건</div>
       </div>
     </div>

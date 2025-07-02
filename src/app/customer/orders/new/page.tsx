@@ -132,10 +132,10 @@ export default function NewOrderPage() {
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen pb-24 lg:pb-0">
+        <div className="bg-white min-h-screen pb-24 lg:pb-0">
             
             <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-                <h1 className="text-2xl lg:text-3xl font-light mb-6">주문 / 결제</h1>
+                <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
 
                 <div className="space-y-6">
                     <section className="bg-white p-6 rounded-lg shadow-sm">
@@ -168,9 +168,14 @@ export default function NewOrderPage() {
                             <div className="border-t my-2"></div>
                             <div className="flex justify-between font-light text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
                         </div>
-                        <button className="w-full bg-green-500 text-white font-light py-3 mt-4 rounded-md hover:bg-green-600 transition-colors" onClick={handlePayment} disabled={cartItems.length === 0}>
+                        <button
+                            className="w-full bg-black text-white font-light py-3 mt-4 rounded-none hover:bg-gray-800 transition-colors"
+                            onClick={handlePayment}
+                            disabled={cartItems.length === 0}
+                        >
                             {finalAmount.toLocaleString()}원 결제하기
                         </button>
+
                     </section>
                 </div>
             </main>

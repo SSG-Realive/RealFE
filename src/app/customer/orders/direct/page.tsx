@@ -302,7 +302,7 @@ export default function DirectOrderPage() {
                 }}
             />
 
-            <h1 className="page-title">주문/결제</h1>
+            <h1 className="page-title">주문·결제</h1>
 
             {/* 1. 주문 상품 정보 */}
             <section className="order-section">
@@ -364,7 +364,10 @@ export default function DirectOrderPage() {
                 </aside>
             </section>
 
-            <button className="payment-button" onClick={handlePayment}>
+            <button
+                className="w-full bg-black text-white px-4 py-2 rounded hover:bg-gray-900 transition"
+                onClick={handlePayment}
+            >
                 결제하기
             </button>
         </div>

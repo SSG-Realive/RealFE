@@ -87,7 +87,11 @@ export default function ProductDetailPage() {
         setWishlistLoading(true);
         try {
           await toggleWishlist({ productId: product.id });
-          setIsWished((prev) => !prev);
+          setIsWished((prev) => {
+            const newState = !prev;
+            show(newState ? '찜한 상품에 추가되었습니다.' : '찜 목록에서 제거되었습니다.');
+            return newState;
+          });
         } finally {
           setWishlistLoading(false);
         }
@@ -123,7 +127,7 @@ export default function ProductDetailPage() {
           />
 
           <div>
-            <h1 className="text-2xl font-light mb-2">{product.name}</h1>
+            <h1 className="text-xl font-light mb-2">{product.name}</h1>
             <p className="text-sm text-gray-700 mb-4">{product.description}</p>
             <p className="text-xl font-light mb-6">
               {product.price.toLocaleString()}
@@ -189,7 +193,7 @@ export default function ProductDetailPage() {
                 <button
                     onClick={handleBuyNow}
                     className="flex-1 px-5 py-3 bg-black text-white hover:bg-gray-900 text-sm font-light"
-                >바로 구매</button>
+                >구매</button>
               </div>
             </div>
           </div>

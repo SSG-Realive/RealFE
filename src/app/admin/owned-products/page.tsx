@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Filter, Package, DollarSign, Calendar, Eye } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/apiClient';
 
 interface Product {

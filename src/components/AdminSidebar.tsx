@@ -139,7 +139,6 @@ export default function AdminSidebar() {
               <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
                 <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/list" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/list')}>경매 목록</Link></li>
                 <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/bid" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/bid')}>입찰 내역</Link></li>
-                <li className="py-2 pl-6 sm:pl-4 w-full"><Link href="/admin/auction-management/register" className="block text-base px-3 py-2 sm:text-lg sm:py-3 sm:px-4 rounded hover:bg-teal-600 transition-colors w-full" style={getSubLinkStyle('/admin/auction-management/register')}>경매 등록</Link></li>
               </ul>
             </Accordion>
           </li>

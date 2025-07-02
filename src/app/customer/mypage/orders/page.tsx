@@ -165,8 +165,13 @@ export default function OrderListPage() {
                                 <button
                                     className="button-outline"
                                     onClick={() => router.push(`/customer/orders/${order.orderId}`)}
+                                    style={{ 
+                                        backgroundColor: '#3B82F6', 
+                                        color: 'white',
+                                        border: '1px solid #3B82F6'
+                                    }}
                                 >
-                                    주문 상세
+                                    📋 주문 상세보기
                                 </button>
                             </div>
                         </div>

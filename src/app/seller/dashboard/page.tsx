@@ -10,7 +10,7 @@ import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySal
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import dynamic from 'next/dynamic';
-import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel, Armchair } from 'lucide-react';
+import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel, Armchair, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 
@@ -26,6 +26,7 @@ export default function SellerDashboardPage() {
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlySalesDTO[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [chartFilter, setChartFilter] = useState<'daily' | 'monthly'>('daily');
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
@@ -33,48 +34,57 @@ export default function SellerDashboardPage() {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const fetchDashboardData = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      
+      // 기본 대시보드 데이터
+      const dashboardData = await getDashboard();
+      setDashboard(dashboardData);
+
+      // 총 매출(전체 누적) 통계
+      const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
+      const statsEndDate = new Date().toISOString().split('T')[0];
+      const statsData = await getSalesStatistics(statsStartDate, statsEndDate);
+      setSalesStats(statsData);
+
+      // 일별 추이 (최근 30일)
+      const endDate = new Date().toISOString().split('T')[0];
+      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const dailyData = await getDailySalesTrend(startDate, endDate);
+      setDailyTrend(dailyData);
+
+      // 월별 추이 (최근 6개월)
+      const endMonthDate = new Date();
+      const startMonthDate = new Date();
+      startMonthDate.setMonth(endMonthDate.getMonth() - 5);
+      startMonthDate.setDate(1); // 각 월의 1일로 맞추기
+      const startMonthStr = startMonthDate.toISOString().split('T')[0];
+      const endMonthStr = endMonthDate.toISOString().split('T')[0];
+      const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
+      setMonthlyTrend(monthlyData);
+
+      setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
+    } catch (err) {
+      console.error('대시보드 정보 가져오기 실패', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchDashboardData(true);
+  };
+
   useEffect(() => {
     if (checking) {
       return;
     }
-
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        
-        // 기본 대시보드 데이터
-        const dashboardData = await getDashboard();
-        setDashboard(dashboardData);
-
-        // 총 매출(전체 누적) 통계
-        const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
-        const statsEndDate = new Date().toISOString().split('T')[0];
-        const statsData = await getSalesStatistics(statsStartDate, statsEndDate);
-        setSalesStats(statsData);
-
-        // 일별 추이 (최근 30일)
-        const endDate = new Date().toISOString().split('T')[0];
-        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        const dailyData = await getDailySalesTrend(startDate, endDate);
-        setDailyTrend(dailyData);
-
-        // 월별 추이 (최근 6개월)
-        const endMonthDate = new Date();
-        const startMonthDate = new Date();
-        startMonthDate.setMonth(endMonthDate.getMonth() - 5);
-        startMonthDate.setDate(1); // 각 월의 1일로 맞추기
-        const startMonthStr = startMonthDate.toISOString().split('T')[0];
-        const endMonthStr = endMonthDate.toISOString().split('T')[0];
-        const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
-        setMonthlyTrend(monthlyData);
-
-        setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
-      } catch (err) {
-        console.error('대시보드 정보 가져오기 실패', err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchDashboardData();
   }, [checking]);
@@ -198,11 +208,25 @@ export default function SellerDashboardPage() {
   if (checking || loading) {
     return (
       <SellerLayout>
-        <main className="bg-white min-h-screen w-full">
-          <h1 className="text-2xl font-extrabold mb-6 text-[#5b4636] tracking-wide">판매자 대시보드</h1>
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#bfa06a]"></div>
-            <span className="ml-3 text-[#5b4636]">로딩 중...</span>
+        <main className="min-h-screen w-full px-4 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">판매자 대시보드</h1>
+              <p className="text-sm text-[#6b7280]">데이터를 불러오는 중...</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                disabled={true}
+                className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg font-medium shadow-sm border border-[#d1d5db] opacity-50 cursor-not-allowed"
+              >
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                로딩 중...
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
+            <span className="ml-3 text-[#374151] text-lg">대시보드 정보를 불러오는 중...</span>
           </div>
         </main>
       </SellerLayout>
@@ -213,9 +237,21 @@ export default function SellerDashboardPage() {
     <SellerLayout>
       <main className="min-h-screen w-full px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-4 md:mb-0">판매자 대시보드</h1>
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">판매자 대시보드</h1>
+            {lastUpdated && (
+              <p className="text-sm text-[#6b7280]">마지막 업데이트: {lastUpdated}</p>
+            )}
+          </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-[#374151] bg-[#f3f4f6] rounded px-3 py-1 border-2 border-[#d1d5db]">마지막 업데이트<br />{lastUpdated}</span>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db] disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? '새로고침 중...' : '데이터 새로고침'}
+            </button>
             <button
               onClick={() => setChartFilter('daily')}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${

@@ -9,7 +9,7 @@ interface PageProps {
     };
 }
 
-export default async function OrdersDetailPage({ params }: PageProps) {git
+export default async function OrdersDetailPage({ params }: PageProps) {
     const orderId = params.orderId; // URL 파라미터에서 orderId (string) 추출
 
     // 파라미터에 대한 기본적인 유효성 검사 (서버에서 미리 처리)

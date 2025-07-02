@@ -19,35 +19,54 @@ interface ProductStats {
   categoryStats: { [key: string]: number };
 }
 
-// 카테고리 대분류 매핑
+// 실제 DB 카테고리 구조에 맞는 대분류 매핑
 const getMainCategory = (categoryName: string): string => {
+  if (!categoryName) return '기타 가구';
+  
+  // ">" 구분자로 분리해서 첫 번째 부분(대분류) 추출
+  const parts = categoryName.split(' > ').map(part => part.trim());
+  const mainCategoryName = parts[0] || categoryName;
+  
+  // 실제 DB 카테고리 구조에 맞는 매핑
   const categoryMap: { [key: string]: string } = {
-    '가구': '가구',
-    '침실가구': '가구',
-    '거실가구': '가구',
-    '주방가구': '가구',
-    '서재가구': '가구',
-    '수납가구': '가구',
-    '아동가구': '가구',
-    '가전제품': '가전',
-    '주방가전': '가전',
-    '생활가전': '가전',
-    '컴퓨터': '가전',
-    '전자제품': '가전',
-    '의류': '패션',
-    '신발': '패션',
-    '가방': '패션',
-    '액세서리': '패션',
-    '도서': '문화',
-    '문구': '문화',
-    '스포츠용품': '문화',
-    '장난감': '문화',
-    '화장품': '뷰티',
-    '미용용품': '뷰티',
-    '기타': '기타'
+    // 대분류 직접 매핑
+    '거실 가구': '거실 가구',
+    '침실 가구': '침실 가구', 
+    '주방·다이닝 가구': '주방·다이닝 가구',
+    '서재·오피스 가구': '서재·오피스 가구',
+    '기타 가구': '기타 가구',
+    
+    // 소분류들을 대분류로 매핑
+    '소파': '거실 가구',
+    '거실 테이블': '거실 가구',
+    'TV·미디어장': '거실 가구',
+    '진열장·책장': '거실 가구',
+    
+    '침대': '침실 가구',
+    '매트리스': '침실 가구',
+    '화장대·거울': '침실 가구',
+    '옷장·행거': '침실 가구',
+    '수납장·서랍장': '침실 가구',
+    
+    '식탁': '주방·다이닝 가구',
+    '주방 의자': '주방·다이닝 가구',
+    '주방 수납장': '주방·다이닝 가구',
+    '아일랜드 식탁·홈바': '주방·다이닝 가구',
+    
+    '책상': '서재·오피스 가구',
+    '사무용 의자': '서재·오피스 가구',
+    '책장': '서재·오피스 가구',
+    
+    '현관·중문 가구': '기타 가구',
+    '야외·아웃도어 가구': '기타 가구',
+    '리퍼·전시가구': '기타 가구',
+    'DIY·부속품': '기타 가구'
   };
 
-  return categoryMap[categoryName] || '기타';
+  const mapped = categoryMap[mainCategoryName] || '기타 가구';
+  console.log(`카테고리 처리: "${categoryName}" -> 대분류: "${mainCategoryName}" -> 매핑: "${mapped}"`);
+  
+  return mapped;
 };
 
 const StatCard = ({ title, value, unit, icon, color, trend }: {
@@ -114,7 +133,9 @@ const AdminDashboardPage = () => {
   const [periodType, setPeriodType] = useState<'DAILY' | 'MONTHLY'>('DAILY');
   const [showModal, setShowModal] = useState(false);
   const [monthlySalesData, setMonthlySalesData] = useState<any[]>([]);
+  const [isEmptyData, setIsEmptyData] = useState(false);
   const router = useRouter();
+  const { accessToken, hydrated, initialize } = useAdminAuthStore();
 
   useEffect(() => {
     // URL에서 로그인 성공 메시지 확인
@@ -128,37 +149,41 @@ const AdminDashboardPage = () => {
   }, [router]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const adminToken = localStorage.getItem('adminToken');
-      const storeToken = useAdminAuthStore.getState().accessToken;
-
-      // localStorage나 Zustand 스토어에 토큰이 없으면 로그인 페이지로 이동
-      if (!adminToken && !storeToken) {
-        router.replace('/admin/login');
+    // 스토어가 hydrated되지 않았으면 초기화
+    if (typeof window !== 'undefined' && !hydrated) {
+      initialize();
         return;
       }
 
-      // localStorage에 토큰이 있지만 Zustand 스토어에 없으면 동기화
-      if (adminToken && !storeToken) {
-        const refreshToken = localStorage.getItem('adminRefreshToken');
-        useAdminAuthStore.getState().setTokens(adminToken, refreshToken || '');
-      }
+    // hydrated 상태이지만 토큰이 없으면 로그인 페이지로 이동
+    if (hydrated && !accessToken) {
+      router.replace('/admin/login');
+      return;
     }
-  }, [router]);
+  }, [router, hydrated, accessToken, initialize]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const today = new Date().toISOString().split('T')[0];
-      const data = await getAdminDashboard(today, periodType);
+      
+      let data;
+      
+      if (periodType === 'DAILY') {
+        const today = new Date().toISOString().split('T')[0];
+        data = await getAdminDashboard(today, periodType);
+      } else {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
+        data = await getAdminDashboard(startDate, periodType);
+      }
 
       if (!data) {
         throw new Error('데이터를 불러오는데 실패했습니다.');
-      }
+      } 
 
-      console.log('Dashboard Data:', data);
-      console.log('Member Summary Stats:', data.memberSummaryStats);
       setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -187,20 +212,10 @@ const AdminDashboardPage = () => {
 
       const allProducts = allProductsRes.data.dtoList || [];
 
-      console.log('상품 데이터:', allProducts);
-      console.log('첫 번째 상품:', allProducts[0]);
-
       // 상태별 통계 계산
       const highQualityProducts = allProducts.filter((p: any) => p.status === "상").length;
       const mediumQualityProducts = allProducts.filter((p: any) => p.status === "중").length;
       const lowQualityProducts = allProducts.filter((p: any) => p.status === "하").length;
-
-      console.log('상태별 통계:', {
-        highQualityProducts,
-        mediumQualityProducts,
-        lowQualityProducts,
-        total: allProducts.length
-      });
 
       // 카테고리별 통계 계산 (대분류로 그룹화)
       const categoryStats: { [key: string]: number } = {};
@@ -218,10 +233,9 @@ const AdminDashboardPage = () => {
         categoryStats
       };
 
-      console.log('최종 상품 통계:', statsData);
       setProductStats(statsData);
     } catch (error) {
-      console.error('상품 통계 조회 실패:', error);
+      console.error('Failed to fetch product stats:', error);
     }
   };
 
@@ -247,7 +261,7 @@ const AdminDashboardPage = () => {
           const data = await getSalesStatistics(start, end);
           setMonthlySalesData(data?.data || []);
         } catch (error) {
-          console.error('월간 매출 데이터 조회 실패:', error);
+          console.error('Failed to fetch monthly sales data:', error);
           setMonthlySalesData([]);
         }
       }
@@ -262,18 +276,14 @@ const AdminDashboardPage = () => {
   // 첫 페이지 로딩
   useEffect(() => {
     const initializeData = async () => {
+      if (!hydrated) return;
+      
       await fetchDashboardData();
       await fetchProductStats();
     };
 
     initializeData();
-  }, []);
-
-  useEffect(() => {
-    if (productStats) {
-      console.log('차트에 전달하는 상품 데이터:', productStats);
-    }
-  }, [productStats]);
+  }, [hydrated, accessToken]);
 
   if (loading) {
     return (
@@ -389,15 +399,13 @@ const AdminDashboardPage = () => {
             unit="건"
             icon={<ShoppingCart className="w-6 h-6 text-white" />}
             color="bg-blue-500"
-            trend={{ value: 12, isPositive: true }}
           />
           <StatCard
             title="총 매출"
-            value={dashboardData.salesSummaryStats?.totalRevenueInPeriod?.toLocaleString() || 0}
+            value={dashboardData.salesSummaryStats?.totalRevenueInPeriod?.toLocaleString() || "0"}
             unit="원"
             icon={<DollarSign className="w-6 h-6 text-white" />}
             color="bg-green-500"
-            trend={{ value: 8, isPositive: true }}
           />
           <StatCard
             title="활성 회원"
@@ -405,7 +413,6 @@ const AdminDashboardPage = () => {
             unit="명"
             icon={<Users className="w-6 h-6 text-white" />}
             color="bg-purple-500"
-            trend={{ value: 5, isPositive: true }}
           />
           <StatCard
             title="전체 상품"
@@ -413,7 +420,6 @@ const AdminDashboardPage = () => {
             unit="개"
             icon={<Package className="w-6 h-6 text-white" />}
             color="bg-orange-500"
-            trend={{ value: 15, isPositive: true }}
           />
         </div>
 

@@ -13,7 +13,7 @@ import {
 } from '@/service/customer/productService';
 import { toggleWishlist } from '@/service/customer/wishlistService';
 import { addToCart } from '@/service/customer/cartService';
-import { fetchReviewsBySeller } from '@/service/customer/reviewService';
+import { fetchReviewsBySeller  } from '@/service/customer/reviewService';
 
 import ReviewList from '@/components/customer/review/ReviewList';
 import ProductImage from '@/components/ProductImage';

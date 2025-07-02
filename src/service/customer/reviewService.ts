@@ -35,7 +35,7 @@ export async function deleteReview(reviewId: number): Promise<void> {
 // 리뷰 수정
 export async function updateReview(
     reviewId: number,
-    data: { content: string; rating: number }
+    data: { content: string; rating: number; imageUrls: string[] }
 ): Promise<void> {
     await apiClient.put(`/customer/reviews/${reviewId}`, data);
 }

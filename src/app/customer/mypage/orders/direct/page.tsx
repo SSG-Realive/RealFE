@@ -1,4 +1,4 @@
-// src/app/customer/orders/direct/page.tsx (DirectOrderPage)
+// src/app/customer/mypage/orders/direct/page.tsx (DirectOrderPage)
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
@@ -216,8 +216,8 @@ export default function DirectOrderPage() {
                 orderId: orderId,
                 orderName: `${productInfo.productName} ${productInfo.quantity}개`,
                 amount: finalAmount,
-                successUrl: `${window.location.origin}/customer/orders/success`,
-                failUrl: `${window.location.origin}/customer/orders/fail`,
+                successUrl: `${window.location.origin}/customer/mypage/orders/success`,
+                failUrl: `${window.location.origin}/customer/mypage/orders/fail`,
                 customerEmail: userProfile.email || 'customer@example.com',
                 customerName: shippingInfo.receiverName,
                 customerMobilePhone: shippingInfo.phone,
@@ -251,7 +251,7 @@ export default function DirectOrderPage() {
                 quantity: productInfo!.quantity,
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/orders/direct-payment`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/customer/mypage/orders/direct-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ export const getOrderList = async (page: number, size: number = 10): Promise<Pag
 
 /**
  * [API] 단일 상품 바로 구매 정보 조회
- * GET /api/customer/orders/direct-payment-info
+ * GET /api/customer/mypage/orders/direct-payment-info
  * * @param productId 상품 ID
  * @param quantity 수량
  * @returns 상품 정보
@@ -35,7 +35,7 @@ export const getDirectPaymentInfo = async (
 ): Promise<DirectPaymentInfoDTO> => {
     
     // GET 요청 시, params 옵션을 사용해 쿼리 파라미터를 전달합니다.
-    // -> /api/customer/orders/direct-payment-info?productId=123&quantity=1
+    // -> /api/customer/mypage/orders/direct-payment-info?productId=123&quantity=1
     const { data } = await customerApi.get<DirectPaymentInfoDTO>('/customer/orders/direct-payment-info', {
         params: {
             productId,
@@ -49,7 +49,7 @@ export const getDirectPaymentInfo = async (
 
 /**
  * [API] 단일 상품 바로 구매 및 최종 결제 승인 요청
- * POST /api/customer/orders/direct-payment
+ * POST /api/customer/mypage/orders/direct-payment
  * * @param requestData 결제 승인에 필요한 모든 정보
  * @returns 생성된 주문의 ID
  */

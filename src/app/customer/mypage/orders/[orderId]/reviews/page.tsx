@@ -4,7 +4,6 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import { ReviewCreateRequestDTO } from "@/types/reviews/reviewCreateRequestDTO";
 import { ReviewResponseDTO } from "@/types/reviews/reviewResponseDTO";
-import Navbar from "@/components/customer/common/Navbar";
 import Sidebar from "@/components/seller/SellerSidebar";
 
 const NewReviewPage = () => {
@@ -32,7 +31,7 @@ const NewReviewPage = () => {
             try {
                 // 1. 주문 상세 정보를 가져와 sellerId 획득
                 // 이 API 경로는 실제 백엔드의 주문 상세 조회 API와 일치해야 합니다.
-                // 이 예시에서는 /api/customer/orders/{orderId}가 sellerId를 포함한 주문 정보를 반환한다고 가정합니다.
+                // 이 예시에서는 /api/customer/mypage/orders/{orderId}가 sellerId를 포함한 주문 정보를 반환한다고 가정합니다.
                 const orderResponse = await fetch(`/api/customer/orders/${orderId}`);
                 if (!orderResponse.ok) {
                     throw new Error('주문 정보를 불러오는 데 실패했습니다.');
@@ -132,7 +131,7 @@ const NewReviewPage = () => {
             setHasReviewed(true); // 성공 시 리뷰 작성 상태 업데이트
 
             alert('리뷰가 성공적으로 작성되었습니다.');
-            router.push(`/customer/orders/${orderId}`); // 리뷰 작성 후 주문 상세 페이지로 이동
+            router.push(`/customer/mypage/orders/${orderId}`); // 리뷰 작성 후 주문 상세 페이지로 이동
         } catch (err: any) {
             console.error('리뷰 작성 오류:', err);
             setError(err.message || '알 수 없는 오류가 발생했습니다.');
@@ -145,7 +144,6 @@ const NewReviewPage = () => {
     if (isLoading) {
         return (
             <div className="flex flex-col min-h-screen bg-gray-100">
-                <Navbar />
                 <div className="flex-1 p-5 flex flex-col items-center justify-center">
                     <p className="text-xl text-gray-700">정보를 불러오는 중...</p>
                 </div>
@@ -157,14 +155,13 @@ const NewReviewPage = () => {
     if (error || hasReviewed) {
         return (
             <div className="flex flex-col min-h-screen bg-gray-100">
-                <Navbar />
                 <div className="flex-1 p-5 flex flex-col items-center justify-center">
                     {error && <p className="text-red-600 text-xl mb-4">{error}</p>}
                     {hasReviewed && !error && (
                         <p className="text-xl text-gray-700 mb-4">이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
                     )}
                     <button
-                        onClick={() => router.push(`/customer/orders/${orderId}`)}
+                        onClick={() => router.push(`/customer/mypage/orders/${orderId}`)}
                         className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                         주문 상세 보기
@@ -177,7 +174,6 @@ const NewReviewPage = () => {
     // 리뷰 작성 폼 UI
     return (
         <div className="flex flex-col min-h-screen bg-gray-100">
-            <Navbar />
             <div className="flex flex-1">
                 <Sidebar />
                 <div className="flex-1 p-5 flex flex-col items-center bg-white m-5 rounded-lg shadow-md">

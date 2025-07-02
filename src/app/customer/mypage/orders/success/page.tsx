@@ -131,7 +131,7 @@ export default function PaymentSuccessPage() {
                 <h1 className="text-2xl font-light mb-4">결제가 완료되었습니다!</h1>
                 <p className="text-gray-600 mb-6">
                     주문이 성공적으로 처리되었습니다.<br />
-                    주문번호: <span className="font-semibold">{orderId}</span>
+                    주문번호: <span className="font-light">{orderId}</span>
                 </p>
                 <div className="space-y-3">
                     <Link

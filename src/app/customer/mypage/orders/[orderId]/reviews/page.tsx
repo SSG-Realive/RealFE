@@ -181,7 +181,7 @@ const NewReviewPage = () => {
             <div className="flex flex-1">
                 <Sidebar />
                 <div className="flex-1 p-5 flex flex-col items-center bg-white m-5 rounded-lg shadow-md">
-                    <h1 className="text-2xl font-semibold text-gray-800 mb-8">리뷰 작성</h1>
+                    <h1 className="text-2xl font-light text-gray-800 mb-8">리뷰 작성</h1>
                     <form onSubmit={handleSubmit} className="w-full max-w-2xl flex flex-col gap-5">
                         {/* 별점 입력 UI */}
                         <div className="flex items-center gap-2 mb-4">

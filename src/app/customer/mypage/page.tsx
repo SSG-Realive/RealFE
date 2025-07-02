@@ -74,7 +74,7 @@ export default function MyPage() {
                 {/* 주요 메뉴 */}
                 <section className="mt-12 mb-20">
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
-                        <CircleBtn label="주문내역" icon={<ReceiptText size={24} />} onClick={() => router.push('/customer/orders')} />
+                        <CircleBtn label="주문내역" icon={<ReceiptText size={24} />} onClick={() => router.push('/customer/mypage/orders')} />
                         <CircleBtn label="찜 목록" icon={<Heart size={27} />} onClick={() => router.push('/customer/mypage/wishlist')} />
                         <CircleBtn label="장바구니" icon={<ShoppingCart size={27} />} onClick={() => router.push('/customer/cart')} />
                         <CircleBtn label="낙찰한 경매" icon={<Gavel size={27} />} onClick={() => router.push('/customer/member/auctions/won')} />
@@ -94,7 +94,7 @@ export default function MyPage() {
                     <div className="relative bg-gray-50 rounded-xl p-5 cursor-pointer">
                         <div className="flex items-center mb-3 gap-2">
                             <Gavel className="text-gray-600" size={20} />
-                            <h2 className="font-semibold text-base">참여 중인 경매</h2>
+                            <h2 className="font-light text-base">참여 중인 경매</h2>
                         </div>
 
                         {bids.length === 0 ? (
@@ -127,7 +127,7 @@ export default function MyPage() {
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs text-gray-500">#{b.auctionId}</span>
                                                         <span
-                                                            className={`text-[11px] font-semibold px-2 py-[1px] rounded-full
+                                                            className={`text-[11px] font-light px-2 py-[1px] rounded-full
                                 ${b.leading
                                                                 ? 'bg-blue-100 text-blue-700'
                                                                 : 'bg-red-100 text-red-700'}`}
@@ -177,7 +177,7 @@ function InfoCard({ icon, title, children }: { icon: React.ReactNode; title: str
         <div className="bg-gray-50 rounded-xl p-5">
             <div className="flex items-center mb-3 gap-2">
                 {icon}
-                <h2 className="font-semibold text-base">{title}</h2>
+                <h2 className="font-light text-base">{title}</h2>
             </div>
             <p className="text-sm text-gray-600">{children}</p>
         </div>

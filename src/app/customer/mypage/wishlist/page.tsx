@@ -87,7 +87,7 @@ export default function WishlistPage() {
 
                     {/* 상단 제목 및 버튼 */}
                     <section className="rounded-lg p-4">
-                        <h1 className="text-xl text-black font-semibold mb-10 ml-3 mt-3">찜 목록</h1>
+                        <h1 className="text-xl text-black font-light mb-10 ml-3 mt-3">찜 목록</h1>
 
                         {products.length > 0 && (
                             <>
@@ -101,7 +101,7 @@ export default function WishlistPage() {
                                             className="relative cursor-pointer px-2 py-1"
                                         >
                                             <span
-                                                className={`relative z-10 ${selectedParentCategory === null ? 'text-slate-600 font-semibold' : ''}`}
+                                                className={`relative z-10 ${selectedParentCategory === null ? 'text-slate-600 font-light' : ''}`}
                                             >
                                                 전체
                                             </span>
@@ -116,7 +116,7 @@ export default function WishlistPage() {
                                                 className="relative cursor-pointer px-2 py-1"
                                             >
                                                 <span
-                                                    className={`relative z-10 ${selectedParentCategory === name ? 'text-slate-600 font-semibold' : ''}`}
+                                                    className={`relative z-10 ${selectedParentCategory === name ? 'text-slate-600 font-light' : ''}`}
                                                 >
                                                     {name}
                                                 </span>

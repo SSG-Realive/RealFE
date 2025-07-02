@@ -7,7 +7,7 @@ export default function MypageCard({
 }) {
     return (
         <div className="bg-white shadow rounded-lg p-4">
-            <h2 className="text-lg font-semibold mb-2">{title}</h2>
+            <h2 className="text-lg font-light mb-2">{title}</h2>
             {children}
         </div>
     );

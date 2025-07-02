@@ -170,21 +170,21 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <div className="bg-white shadow-xl rounded-lg p-8 mb-8 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 번호: <span className="font-light text-blue-600">{orderData.orderId}</span></p>
-                            <p className="text-lg font-semibold mb-2">고객 ID: <span className="font-light">{orderData.customerId}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송 주소: <span className="font-light">{orderData.deliveryAddress}</span></p>
-                            <p className="text-lg font-semibold mb-2">총 주문 가격: <span className="font-light text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
+                            <p className="text-lg font-light mb-2">주문 번호: <span className="font-light text-blue-600">{orderData.orderId}</span></p>
+                            <p className="text-lg font-light mb-2">고객 ID: <span className="font-light">{orderData.customerId}</span></p>
+                            <p className="text-lg font-light mb-2">배송 주소: <span className="font-light">{orderData.deliveryAddress}</span></p>
+                            <p className="text-lg font-light mb-2">총 주문 가격: <span className="font-light text-green-700">{orderData.totalPrice.toLocaleString()}원</span></p>
                         </div>
                         <div>
-                            <p className="text-lg font-semibold mb-2">주문 일시: <span className="font-light">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">최종 업데이트: <span className="font-light">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
-                            <p className="text-lg font-semibold mb-2">결제 방식: <span className="font-light">{orderData.paymentType}</span></p>
-                            <p className="text-lg font-semibold mb-2">배송비: <span className="font-light">{orderData.deliveryFee.toLocaleString()}원</span></p>
-                            <p className="text-lg font-semibold mb-2">수령인: <span className="font-light">{orderData.receiverName}</span></p>
-                            <p className="text-lg font-semibold mb-2">연락처: <span className="font-light">{orderData.phone}</span></p>
+                            <p className="text-lg font-light mb-2">주문 일시: <span className="font-light">{new Date(orderData.orderCreatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-light mb-2">최종 업데이트: <span className="font-light">{new Date(orderData.updatedAt).toLocaleString()}</span></p>
+                            <p className="text-lg font-light mb-2">결제 방식: <span className="font-light">{orderData.paymentType}</span></p>
+                            <p className="text-lg font-light mb-2">배송비: <span className="font-light">{orderData.deliveryFee.toLocaleString()}원</span></p>
+                            <p className="text-lg font-light mb-2">수령인: <span className="font-light">{orderData.receiverName}</span></p>
+                            <p className="text-lg font-light mb-2">연락처: <span className="font-light">{orderData.phone}</span></p>
                         </div>
                     </div>
-                    <p className="text-lg font-semibold mt-4">
+                    <p className="text-lg font-light mt-4">
                         주문 상태:{" "}
                         <span
                             className={`relative inline-block px-4 py-1 font-light leading-tight rounded-full ${
@@ -226,7 +226,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                         />
                                     </div>
                                     <div className="flex-grow text-center md:text-left">
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>
+                                        <h3 className="text-xl font-light text-gray-800 mb-1">{item.productName}</h3>
                                         <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
                                         <p className="text-xl font-light text-blue-700">{item.price.toLocaleString()}원</p>
                                         <button

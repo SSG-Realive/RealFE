@@ -62,7 +62,7 @@ export default function NewOrderPage() {
         const initializeTossPayments = async () => {
             try {
                 console.log('토스페이먼츠 기본 SDK 초기화 시작...', { customerId, finalAmount });
-                
+
                 // 토스페이먼츠 객체 생성 (바로결제와 동일)
                 if (!(window as any).TossPayments) {
                     const tossPayments = await loadTossPayments(DEFAULT_CONFIG.CLIENT_KEY);
@@ -71,9 +71,9 @@ export default function NewOrderPage() {
                     const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
                     tossPaymentsRef.current = tossPayments;
                 }
-                
+
                 console.log('토스페이먼츠 기본 SDK 초기화 완료');
-                
+
             } catch (error: any) {
                 console.error("토스페이먼츠 기본 SDK 초기화 실패:", error);
             }
@@ -106,7 +106,7 @@ export default function NewOrderPage() {
             shippingInfo: shippingInfo,
         };
         sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
-        
+
         const orderName = cartItems.length > 1
             ? `${cartItems[0].productName} 외 ${cartItems.length - 1}건`
             : cartItems[0].productName;
@@ -135,54 +135,54 @@ export default function NewOrderPage() {
 
     return (
         <>
-        <GlobalDialog open={open} message={message} onClose={handleClose} />
-        <div className="bg-white min-h-screen pb-24 lg:pb-0">
+            <GlobalDialog open={open} message={message} onClose={handleClose} />
+            <div className="bg-white min-h-screen pb-24 lg:pb-0">
 
-            <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-                <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
+                <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
+                    <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
 
-                <div className="space-y-6">
-                    <section className="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 className="text-lg font-semibold mb-4">배송지</h2>
-                        <div className="space-y-3">
-                            <div><label className="text-sm font-light text-gray-700">받는 분</label><input type="text" name="receiverName" value={shippingInfo.receiverName} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                            <div><label className="text-sm font-light text-gray-700">연락처</label><input type="text" name="phone" value={shippingInfo.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                            <div><label className="text-sm font-light text-gray-700">주소</label><input type="text" name="address" value={shippingInfo.address} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                        </div>
-                    </section>
-                    
-                    <section className="bg-white p-6 rounded-lg shadow-sm">
-                        <h2 className="text-lg font-semibold mb-4">주문 상품</h2>
-                        <div className="space-y-4">
-                            {cartItems.map(item => (
-                                <div key={item.cartItemId} className="flex items-start space-x-4">
-                                    <img src={item.imageThumbnailUrl || '/default-image.png'} alt={item.productName} className="w-20 h-20 object-cover rounded-md flex-shrink-0" />
-                                    <div className="flex-grow"><p className="font-light">{item.productName}</p><p className="text-sm text-gray-500">수량: {item.quantity}개</p></div>
-                                    <p className="font-semibold whitespace-nowrap">{(item.productPrice * item.quantity).toLocaleString()}원</p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                    <div className="space-y-6">
+                        <section className="bg-white p-6 rounded-lg shadow-sm">
+                            <h2 className="text-lg font-semibold mb-4">배송지</h2>
+                            <div className="space-y-3">
+                                <div><label className="text-sm font-light text-gray-700">받는 분</label><input type="text" name="receiverName" value={shippingInfo.receiverName} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                                <div><label className="text-sm font-light text-gray-700">연락처</label><input type="text" name="phone" value={shippingInfo.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                                <div><label className="text-sm font-light text-gray-700">주소</label><input type="text" name="address" value={shippingInfo.address} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
+                            </div>
+                        </section>
 
-                    <section className="bg-white p-6 rounded-lg shadow-sm">
-                        <h3 className="text-lg font-semibold mb-4">결제 금액</h3>
-                        <div className="space-y-2">
-                            <div className="flex justify-between text-sm"><span>총 상품금액</span><span>{totalProductPrice.toLocaleString()}원</span></div>
-                            <div className="flex justify-between text-sm"><span>배송비</span><span>+ {deliveryFee.toLocaleString()}원</span></div>
-                            <div className="border-t my-2"></div>
-                            <div className="flex justify-between font-light text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
-                        </div>
-                        <button
-                            className="w-full bg-black text-white font-light py-3 mt-4 rounded-none hover:bg-gray-800 transition-colors"
-                            onClick={handlePayment}
-                            disabled={cartItems.length === 0}
-                        >
-                            {finalAmount.toLocaleString()}원 결제하기
-                        </button>
-                    </section>
-                </div>
-            </main>
-        </div>
+                        <section className="bg-white p-6 rounded-lg shadow-sm">
+                            <h2 className="text-lg font-semibold mb-4">주문 상품</h2>
+                            <div className="space-y-4">
+                                {cartItems.map(item => (
+                                    <div key={item.cartItemId} className="flex items-start space-x-4">
+                                        <img src={item.imageThumbnailUrl || '/default-image.png'} alt={item.productName} className="w-20 h-20 object-cover rounded-md flex-shrink-0" />
+                                        <div className="flex-grow"><p className="font-light">{item.productName}</p><p className="text-sm text-gray-500">수량: {item.quantity}개</p></div>
+                                        <p className="font-semibold whitespace-nowrap">{(item.productPrice * item.quantity).toLocaleString()}원</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        <section className="bg-white p-6 rounded-lg shadow-sm">
+                            <h3 className="text-lg font-semibold mb-4">결제 금액</h3>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-sm"><span>총 상품금액</span><span>{totalProductPrice.toLocaleString()}원</span></div>
+                                <div className="flex justify-between text-sm"><span>배송비</span><span>+ {deliveryFee.toLocaleString()}원</span></div>
+                                <div className="border-t my-2"></div>
+                                <div className="flex justify-between font-light text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
+                            </div>
+                            <button
+                                className="w-full bg-black text-white font-light py-3 mt-4 rounded-none hover:bg-gray-800 transition-colors"
+                                onClick={handlePayment}
+                                disabled={cartItems.length === 0}
+                            >
+                                {finalAmount.toLocaleString()}원 결제하기
+                            </button>
+                        </section>
+                    </div>
+                </main>
+            </div>
         </>
     );
 }

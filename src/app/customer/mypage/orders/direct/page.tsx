@@ -266,7 +266,7 @@ export default function DirectOrderPage() {
 
             const result = await response.json();
             alert('결제가 성공적으로 완료되었습니다!');
-            router.push('/customer/orders');
+            router.push('/customer/mypage/orders');
             
         } catch (error) {
             console.error('결제 승인 처리 오류:', error);

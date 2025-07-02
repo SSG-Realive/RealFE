@@ -42,7 +42,7 @@ export default function MyReviewPage() {
                                 href={`/customer/mypage/reviews/${review.reviewId}`}
                                 className="block border rounded p-4 hover:shadow transition"
                             >
-                                <p className="font-semibold">{review.productName}</p>
+                                <p className="font-light">{review.productName}</p>
                                 <p className="text-yellow-500">⭐ {review.rating}</p>
                                 <p className="text-gray-700 text-sm mt-1 line-clamp-2">{review.content}</p>
                                 <p className="text-xs text-gray-400 mt-1">

@@ -32,7 +32,7 @@ export async function getQnaList(
         console.log('res.data 원본:', res.data);
         console.log('res.data.content 첫 번째 항목:', res.data?.content?.[0]);
         
-        return res.data;
+    return res.data;
     } catch (error: any) {
         console.error('=== SellerQna 목록 조회 API 에러 ===');
         console.error('에러 상세:', error);

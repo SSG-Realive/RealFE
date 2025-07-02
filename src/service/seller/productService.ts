@@ -86,3 +86,38 @@ export async function fetchCategories(): Promise<SellerCategoryDTO[]> {
     const res = await sellerApi.get('/seller/categories');
     return res.data;
 }
+
+/**
+ * 판매자 전체 상품 통계 조회 API
+ * @returns 전체 상품에 대한 판매 상태별 통계
+ */
+export async function getMyProductStats(): Promise<{
+  total: number;
+  selling: number;  // active=true && stock>0
+  suspended: number; // active=false
+  outOfStock: number; // stock=0
+}> {
+  try {
+    // 전체 상품을 가져오기 위해 충분히 큰 size로 요청
+    const res = await sellerApi.get('/seller/products?size=1000');
+    const allProducts: ProductListItem[] = res.data.dtoList || [];
+    
+    const stats = {
+      total: allProducts.length,
+      selling: allProducts.filter(p => p.active && p.stock > 0).length,
+      suspended: allProducts.filter(p => !p.active).length,
+      outOfStock: allProducts.filter(p => p.stock === 0).length
+    };
+    
+    return stats;
+  } catch (error) {
+    console.error('판매자 상품 통계 조회 실패:', error);
+    // 에러 시 기본값 반환
+    return {
+      total: 0,
+      selling: 0,
+      suspended: 0,
+      outOfStock: 0
+    };
+  }
+}

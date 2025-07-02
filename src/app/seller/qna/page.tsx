@@ -7,7 +7,7 @@ import { CustomerQnaResponse, CustomerQnaListResponse } from '@/types/seller/cus
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerHeader from '@/components/seller/SellerHeader';
-import { MessageCircle, CheckCircle, Clock, Plus, Eye, Search, Filter, User, Package, Percent } from 'lucide-react';
+import { MessageCircle, CheckCircle, Clock, Plus, Eye, Search, Filter, User, Package, Percent, RefreshCw } from 'lucide-react';
 
 export default function SellerQnaPage() {
     const checking = useSellerAuthGuard();
@@ -20,6 +20,7 @@ export default function SellerQnaPage() {
     const [page, setPage] = useState(0);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -28,70 +29,80 @@ export default function SellerQnaPage() {
         setSidebarOpen(!sidebarOpen);
     };
 
+    const fetchData = async (isRefresh = false) => {
+        try {
+            if (isRefresh) {
+                setRefreshing(true);
+            } else {
+                setLoading(true);
+            }
+            
+            console.log('[QnA 페이지] API 호출 시작');
+            
+            const response = await getCustomerQnaList({ page, size: 10 });
+            console.log('[QnA 페이지] === API 응답 상세 분석 ===');
+            console.log('전체 응답:', response);
+            console.log('응답 타입:', typeof response);
+            console.log('content 존재:', !!response?.content);
+            console.log('content 배열 길이:', response?.content?.length);
+            
+            if (response?.content) {
+                console.log('첫 번째 아이템 구조:', response.content[0]);
+                console.log('첫 번째 아이템 키들:', Object.keys(response.content[0] || {}));
+                
+                // 각 아이템의 구조 분석
+                response.content.forEach((item: any, index: number) => {
+                    console.log(`아이템 ${index}:`, {
+                        hasQna: !!item.qna,
+                        hasProductSummary: !!item.productSummary,
+                        qnaKeys: item.qna ? Object.keys(item.qna) : [],
+                        productKeys: item.productSummary ? Object.keys(item.productSummary) : [],
+                        directKeys: Object.keys(item)
+                    });
+                });
+            }
+            
+            setQnaList(response?.content || []);
+            setTotalPages(response?.totalPages || 0);
+            setTotalElements(response?.totalElements || 0);
+            setError('');
+            console.log('[QnA 페이지] 데이터 설정 완료');
+        } catch (err: any) {
+            console.error('=== 고객 QnA 목록 조회 실패 ===');
+            console.error('에러 객체:', err);
+            console.error('에러 메시지:', err.message);
+            console.error('응답 상태:', err.response?.status);
+            console.error('응답 데이터:', err.response?.data);
+            
+            let errorMessage = '고객 QnA 데이터를 불러오는 데 실패했습니다.';
+            
+            if (err.response?.status === 500) {
+                if (err.response?.data?.message?.includes('Duplicate key')) {
+                    errorMessage = '데이터 중복 오류가 발생했습니다. 백엔드팀에 문의해주세요. (Duplicate key error)';
+                } else {
+                    errorMessage = '서버 내부 오류가 발생했습니다. 백엔드팀에 문의해주세요.';
+                }
+            } else if (err.response?.status === 401) {
+                errorMessage = '로그인이 필요합니다.';
+            } else if (err.response?.status === 403) {
+                errorMessage = '접근 권한이 없습니다.';
+            } else if (err.response?.data?.message) {
+                errorMessage = err.response.data.message;
+            }
+            
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
+
+    const handleRefresh = () => {
+        fetchData(true);
+    };
+
     useEffect(() => {
         if (checking) return;
-        
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                console.log('[QnA 페이지] API 호출 시작');
-                
-                const response = await getCustomerQnaList({ page, size: 10 });
-                console.log('[QnA 페이지] === API 응답 상세 분석 ===');
-                console.log('전체 응답:', response);
-                console.log('응답 타입:', typeof response);
-                console.log('content 존재:', !!response?.content);
-                console.log('content 배열 길이:', response?.content?.length);
-                
-                if (response?.content) {
-                    console.log('첫 번째 아이템 구조:', response.content[0]);
-                    console.log('첫 번째 아이템 키들:', Object.keys(response.content[0] || {}));
-                    
-                    // 각 아이템의 구조 분석
-                    response.content.forEach((item: any, index: number) => {
-                        console.log(`아이템 ${index}:`, {
-                            hasQna: !!item.qna,
-                            hasProductSummary: !!item.productSummary,
-                            qnaKeys: item.qna ? Object.keys(item.qna) : [],
-                            productKeys: item.productSummary ? Object.keys(item.productSummary) : [],
-                            directKeys: Object.keys(item)
-                        });
-                    });
-                }
-                
-                setQnaList(response?.content || []);
-                setTotalPages(response?.totalPages || 0);
-                setTotalElements(response?.totalElements || 0);
-                setError('');
-                console.log('[QnA 페이지] 데이터 설정 완료');
-            } catch (err: any) {
-                console.error('=== 고객 QnA 목록 조회 실패 ===');
-                console.error('에러 객체:', err);
-                console.error('에러 메시지:', err.message);
-                console.error('응답 상태:', err.response?.status);
-                console.error('응답 데이터:', err.response?.data);
-                
-                let errorMessage = '고객 QnA 데이터를 불러오는 데 실패했습니다.';
-                
-                if (err.response?.status === 500) {
-                    if (err.response?.data?.message?.includes('Duplicate key')) {
-                        errorMessage = '데이터 중복 오류가 발생했습니다. 백엔드팀에 문의해주세요. (Duplicate key error)';
-                    } else {
-                        errorMessage = '서버 내부 오류가 발생했습니다. 백엔드팀에 문의해주세요.';
-                    }
-                } else if (err.response?.status === 401) {
-                    errorMessage = '로그인이 필요합니다.';
-                } else if (err.response?.status === 403) {
-                    errorMessage = '접근 권한이 없습니다.';
-                } else if (err.response?.data?.message) {
-                    errorMessage = err.response.data.message;
-                }
-                
-                setError(errorMessage);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, [page, checking]);
 
@@ -158,7 +169,22 @@ export default function SellerQnaPage() {
             </div>
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
-                    <h1 className="text-xl md:text-2xl font-bold mb-6 text-[#5b4636]">고객 문의 관리</h1>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                        <h1 className="text-xl md:text-2xl font-bold text-[#5b4636] mb-2 md:mb-0">고객 문의 관리</h1>
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm text-[#6b7280]">
+                                총 {totalElements}건의 문의
+                            </span>
+                            <button
+                                onClick={handleRefresh}
+                                disabled={refreshing}
+                                className="inline-flex items-center gap-2 bg-[#f3f4f6] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db] disabled:opacity-50"
+                            >
+                                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                                {refreshing ? '새로고침 중...' : '새로고침'}
+                            </button>
+                        </div>
+                    </div>
 
                     {/* 상단 통계 카드 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -225,10 +251,31 @@ export default function SellerQnaPage() {
                     ) : filteredQnaList.length === 0 ? (
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
                             <MessageCircle className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
-                            <p className="text-[#374151] text-lg">고객 문의가 없습니다.</p>
-                            <p className="text-[#6b7280] text-sm mt-2">
-                                {error ? '서버 문제로 데이터를 불러올 수 없습니다.' : '등록된 고객 문의가 없습니다.'}
-                            </p>
+                            <p className="text-[#374151] text-lg font-semibold">고객 문의가 없습니다</p>
+                            <div className="mt-4 space-y-2">
+                                <p className="text-[#6b7280] text-sm">
+                                    {totalElements === 0 
+                                        ? '아직 등록된 고객 문의가 없습니다.' 
+                                        : '검색 조건에 맞는 고객 문의가 없습니다.'
+                                    }
+                                </p>
+                                {totalElements === 0 && (
+                                    <div className="mt-4 p-4 bg-[#e5e7eb] rounded-lg">
+                                        <p className="text-[#374151] text-sm font-medium mb-2">💡 고객 문의가 없는 이유</p>
+                                        <ul className="text-[#6b7280] text-xs space-y-1 text-left">
+                                            <li>• 아직 고객이 상품에 대한 문의를 하지 않았을 수 있습니다.</li>
+                                            <li>• 백엔드 API 연결에 문제가 있을 수 있습니다.</li>
+                                            <li>• 데이터베이스에 문의 데이터가 없을 수 있습니다.</li>
+                                        </ul>
+                                        <button
+                                            onClick={handleRefresh}
+                                            className="mt-3 text-[#0f766e] text-xs font-medium hover:underline"
+                                        >
+                                            다시 시도하기 →
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
@@ -277,25 +324,140 @@ export default function SellerQnaPage() {
 
                     {/* 페이지네이션 */}
                     {totalPages > 1 && (
-                        <div className="mt-6 flex justify-center">
-                            <div className="flex gap-2">
-                            <button
+                        <div className="mt-6 flex flex-col items-center gap-4">
+                            {/* 페이지 정보 */}
+                            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-[#6b7280]">
+                                <span>
+                                    전체 {totalElements}건 중 {(page * 10) + 1}-{Math.min((page + 1) * 10, totalElements)}건 표시
+                                </span>
+                                
+                                {/* 빠른 페이지 이동 */}
+                                <div className="flex items-center gap-2">
+                                    <span>페이지 이동:</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={totalPages}
+                                        value={page + 1}
+                                        onChange={(e) => {
+                                            const newPage = parseInt(e.target.value) - 1;
+                                            if (!isNaN(newPage) && newPage >= 0 && newPage < totalPages) {
+                                                setPage(newPage);
+                                            }
+                                        }}
+                                        className="w-16 px-2 py-1 text-center border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] focus:outline-none focus:ring-2 focus:ring-[#bfa06a]"
+                                    />
+                                    <span>/ {totalPages}</span>
+                                </div>
+                            </div>
+                            
+                            {/* 페이지 버튼들 */}
+                            <div className="flex items-center gap-1">
+                                {/* 첫 페이지 */}
+                                <button
+                                    onClick={() => setPage(0)}
+                                    disabled={page === 0}
+                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                >
+                                    ««
+                                </button>
+                                
+                                {/* 이전 페이지 */}
+                                <button
                                     onClick={() => setPage(Math.max(0, page - 1))}
-                                disabled={page === 0}
-                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280]"
-                            >
-                                이전
-                            </button>
-                                <span className="px-3 py-2 text-[#374151]">
-                                {page + 1} / {totalPages}
-                            </span>
-                            <button
+                                    disabled={page === 0}
+                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                >
+                                    ‹ 이전
+                                </button>
+                                
+                                {/* 페이지 번호들 */}
+                                {(() => {
+                                    const maxVisiblePages = 5;
+                                    const halfVisible = Math.floor(maxVisiblePages / 2);
+                                    let startPage = Math.max(0, page - halfVisible);
+                                    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+                                    
+                                    // startPage 조정
+                                    if (endPage - startPage + 1 < maxVisiblePages) {
+                                        startPage = Math.max(0, endPage - maxVisiblePages + 1);
+                                    }
+                                    
+                                    const pageButtons = [];
+                                    
+                                    // 첫 페이지가 보이지 않으면 ... 표시
+                                    if (startPage > 0) {
+                                        pageButtons.push(
+                                            <button
+                                                key={0}
+                                                onClick={() => setPage(0)}
+                                                className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                            >
+                                                1
+                                            </button>
+                                        );
+                                        if (startPage > 1) {
+                                            pageButtons.push(
+                                                <span key="ellipsis1" className="px-2 py-2 text-[#6b7280]">...</span>
+                                            );
+                                        }
+                                    }
+                                    
+                                    // 페이지 번호 버튼들
+                                    for (let i = startPage; i <= endPage; i++) {
+                                        pageButtons.push(
+                                            <button
+                                                key={i}
+                                                onClick={() => setPage(i)}
+                                                className={`px-3 py-2 border rounded transition-colors ${
+                                                    i === page
+                                                        ? 'bg-[#bfa06a] text-white border-[#bfa06a]'
+                                                        : 'border-[#d1d5db] bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#6b7280]'
+                                                }`}
+                                            >
+                                                {i + 1}
+                                            </button>
+                                        );
+                                    }
+                                    
+                                    // 마지막 페이지가 보이지 않으면 ... 표시
+                                    if (endPage < totalPages - 1) {
+                                        if (endPage < totalPages - 2) {
+                                            pageButtons.push(
+                                                <span key="ellipsis2" className="px-2 py-2 text-[#6b7280]">...</span>
+                                            );
+                                        }
+                                        pageButtons.push(
+                                            <button
+                                                key={totalPages - 1}
+                                                onClick={() => setPage(totalPages - 1)}
+                                                className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                            >
+                                                {totalPages}
+                                            </button>
+                                        );
+                                    }
+                                    
+                                    return pageButtons;
+                                })()}
+                                
+                                {/* 다음 페이지 */}
+                                <button
                                     onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                                     disabled={page === totalPages - 1}
-                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280]"
-                            >
-                                다음
-                            </button>
+                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                >
+                                    다음 ›
+                                </button>
+                                
+                                {/* 마지막 페이지 */}
+                                <button
+                                    onClick={() => setPage(totalPages - 1)}
+                                    disabled={page === totalPages - 1}
+                                    className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
+                                >
+                                    »»
+                                </button>
                             </div>
                         </div>
                     )}

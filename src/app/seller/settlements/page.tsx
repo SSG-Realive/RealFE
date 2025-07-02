@@ -266,6 +266,26 @@ export default function SellerSettlementPage() {
     const totalCommission = dailyPayouts.reduce((sum, item) => sum + item.totalCommission, 0);
     const totalPayout = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
 
+    // 정산 상태별 통계 계산
+    const getSettlementStatus = (item: any) => {
+        const saleDate = new Date(item.soldAt || item.date);
+        const settlementDate = new Date(saleDate);
+        settlementDate.setDate(saleDate.getDate() + 7);
+        const today = new Date();
+        
+        if (settlementDate < today) return 'completed'; // 정산 완료
+        if (settlementDate.toDateString() === today.toDateString()) return 'today'; // 오늘 정산
+        return 'pending'; // 정산 대기
+    };
+
+    const pendingSettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'pending');
+    const todaySettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'today');
+    const completedSettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'completed');
+
+    const pendingAmount = pendingSettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
+    const todayAmount = todaySettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
+    const completedAmount = completedSettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
+
     if (checking || loading) {
         return (
             <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
@@ -307,43 +327,138 @@ export default function SellerSettlementPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <DollarSign className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">총 매출 (필터링)</span>
+                                <Clock className="w-8 h-8 text-blue-600" />
+                                <span className="text-[#374151] text-sm font-semibold">정산 대기</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalSales.toLocaleString() : totalSales.toLocaleString()}원</div>
-                            <div className="text-xs text-[#6b7280] mt-1">
-                                {filterType === 'date' && `${filterDate} 당일`}
-                                {filterType === 'period' && `${filterFrom}~${filterTo}`}
-                                {filterType === 'all' && '전체 기간'}
-                            </div>
+                            <div className="text-2xl font-bold text-blue-600">{pendingSettlements.length}건</div>
+                            <div className="text-sm font-semibold text-blue-600">{pendingAmount.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">앞으로 정산 예정</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <Clock className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">총 주문 건수 (필터링)</span>
+                                <CheckCircle className="w-8 h-8 text-green-600" />
+                                <span className="text-[#374151] text-sm font-semibold">오늘 정산</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.payoutCount : totalSettlements}건</div>
-                            <div className="text-xs text-[#6b7280] mt-1">
-                                {filterType === 'date' && `${filterDate} 당일`}
-                                {filterType === 'period' && `${filterFrom}~${filterTo}`}
-                                {filterType === 'all' && '전체 기간'}
-                            </div>
+                            <div className="text-2xl font-bold text-green-600">{todaySettlements.length}건</div>
+                            <div className="text-sm font-semibold text-green-600">{todayAmount.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">오늘 정산 처리</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <CheckCircle className="w-8 h-8 text-[#6b7280]" />
+                                <DollarSign className="w-8 h-8 text-gray-600" />
                                 <span className="text-[#374151] text-sm font-semibold">정산 완료</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-gray-600">{completedSettlements.length}건</div>
+                            <div className="text-sm font-semibold text-gray-600">{completedAmount.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">이미 정산됨</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <Calculator className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">수수료</span>
+                                <TrendingUp className="w-8 h-8 text-[#6b7280]" />
+                                <span className="text-[#374151] text-sm font-semibold">총 정산액</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalCommission.toLocaleString() : totalCommission.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">
+                                {filterType === 'date' && `${filterDate} 당일`}
+                                {filterType === 'period' && `${filterFrom}~${filterTo}`}
+                                {filterType === 'all' && '전체 기간'}
+                            </div>
                         </section>
                     </div>
+
+                    {/* 정산 예정 현황 (대기 중인 정산이 있을 때만 표시) */}
+                    {pendingSettlements.length > 0 && (
+                        <div className="mb-8">
+                            <h2 className="text-lg font-bold text-[#374151] mb-4 flex items-center gap-2">
+                                <Calendar className="w-5 h-5" />
+                                정산 예정 현황
+                                <span className="text-sm font-normal text-[#6b7280]">({pendingSettlements.length}건 대기 중)</span>
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                {(() => {
+                                    // 정산 예정일별로 그룹핑
+                                    const groupedByDate = pendingSettlements.reduce((acc: any, item) => {
+                                        const saleDate = new Date(item.soldAt || item.date);
+                                        const settlementDate = new Date(saleDate);
+                                        settlementDate.setDate(saleDate.getDate() + 7);
+                                        const dateKey = `${settlementDate.getFullYear()}-${String(settlementDate.getMonth() + 1).padStart(2, '0')}-${String(settlementDate.getDate()).padStart(2, '0')}`;
+                                        
+                                        if (!acc[dateKey]) {
+                                            acc[dateKey] = {
+                                                date: dateKey,
+                                                dateObj: settlementDate,
+                                                items: [],
+                                                totalAmount: 0,
+                                                count: 0
+                                            };
+                                        }
+                                        
+                                        acc[dateKey].items.push(item);
+                                        acc[dateKey].totalAmount += item.payoutAmount;
+                                        acc[dateKey].count += 1;
+                                        
+                                        return acc;
+                                    }, {});
+                                    
+                                    // 날짜순으로 정렬
+                                    const sortedGroups = Object.values(groupedByDate).sort((a: any, b: any) => 
+                                        a.dateObj.getTime() - b.dateObj.getTime()
+                                    );
+                                    
+                                    return sortedGroups.slice(0, 8).map((group: any) => { // 최대 8개까지만 표시
+                                        const today = new Date();
+                                        const daysFromToday = Math.ceil((group.dateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                                        
+                                        return (
+                                            <div key={group.date} className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 hover:bg-blue-100 transition-colors">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="text-sm font-semibold text-blue-800">
+                                                        {group.date}
+                                                    </div>
+                                                    <div className="text-xs text-blue-600 bg-blue-200 px-2 py-1 rounded">
+                                                        {daysFromToday === 0 ? '오늘' : 
+                                                         daysFromToday === 1 ? '내일' : 
+                                                         daysFromToday > 0 ? `${daysFromToday}일 후` : 
+                                                         `${Math.abs(daysFromToday)}일 지남`}
+                                                    </div>
+                                                </div>
+                                                <div className="text-lg font-bold text-blue-700">
+                                                    {group.totalAmount.toLocaleString()}원
+                                                </div>
+                                                <div className="text-sm text-blue-600">
+                                                    {group.count}건의 정산 예정
+                                                </div>
+                                                {group.count > 3 && (
+                                                    <div className="text-xs text-blue-500 mt-1">
+                                                        상품 {group.count}개의 정산
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    });
+                                })()}
+                            </div>
+                            {(() => {
+                                // 정산 예정일 개수 계산
+                                const uniqueDates = new Set();
+                                pendingSettlements.forEach(item => {
+                                    const saleDate = new Date(item.soldAt || item.date);
+                                    const settlementDate = new Date(saleDate);
+                                    settlementDate.setDate(saleDate.getDate() + 7);
+                                    const dateKey = `${settlementDate.getFullYear()}-${String(settlementDate.getMonth() + 1).padStart(2, '0')}-${String(settlementDate.getDate()).padStart(2, '0')}`;
+                                    uniqueDates.add(dateKey);
+                                });
+                                
+                                return uniqueDates.size > 8 && (
+                                    <div className="mt-4 text-center">
+                                        <div className="text-sm text-[#6b7280]">
+                                            총 {uniqueDates.size}개의 정산 예정일이 있습니다. 하단 표에서 전체 내역을 확인하세요.
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+                    )}
 
                     {/* 필터 섹션 */}
                     <div className="bg-[#f3f4f6] p-4 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
@@ -428,27 +543,27 @@ export default function SellerSettlementPage() {
                                         onChange={(e) => setFilterTo(e.target.value)}
                                         placeholder="종료일"
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-white text-[#374151]"
-                            />
-                        </div>
+                                    />
+                                </div>
                             )}
 
                             {/* 필터 버튼들 */}
                             <div className="flex gap-2">
-                        <button
+                                <button
                                     onClick={applyFilter}
                                     disabled={filterType === 'date' && !filterDate || filterType === 'period' && (!filterFrom || !filterTo)}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Search className="w-4 h-4" />
+                                >
+                                    <Search className="w-4 h-4" />
                                     조회
-                        </button>
-                        <button
+                                </button>
+                                <button
                                     onClick={resetFilter}
                                     className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151]"
-                        >
-                            <RefreshCw className="w-4 h-4" />
+                                >
+                                    <RefreshCw className="w-4 h-4" />
                                     초기화
-                        </button>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -505,75 +620,111 @@ export default function SellerSettlementPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                                        {dailyPayouts.map((item) => (
-                                            <tr key={item.id} className="hover:bg-[#e5e7eb] transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
-                                                    <div>
-                                                        <div className="font-semibold">
-                                                            {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                        {dailyPayouts.map((item) => {
+                                            const status = getSettlementStatus(item);
+                                            const rowBgClass = 
+                                                status === 'pending' ? 'bg-blue-50 hover:bg-blue-100' :
+                                                status === 'today' ? 'bg-green-50 hover:bg-green-100' :
+                                                'bg-gray-50 hover:bg-gray-100';
+                                            
+                                            return (
+                                                <tr key={item.id} className={`${rowBgClass} transition-colors`}>
+                                                    <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
+                                                        <div>
+                                                            <div className="font-semibold">
+                                                                {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                                            </div>
+                                                            <div className="text-xs text-[#6b7280]">
+                                                                {item.soldAt ? item.soldAt.split('T')[1]?.split('.')[0] : '-'}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                        {item.productId || '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                        {item.customerId || '-'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                        <div>
+                                                            <div>{item.quantity || '-'}개</div>
+                                                            <div className="text-xs text-[#6b7280]">
+                                                                {item.unitPrice ? `${item.unitPrice.toLocaleString()}원` : '-'}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
+                                                        {item.totalSales.toLocaleString()}원
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                        {item.totalCommission.toLocaleString()}원
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
+                                                        {item.payoutAmount.toLocaleString()}원
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                        <div className="flex items-center justify-center gap-2">
+                                                            {status === 'pending' && <Clock className="w-4 h-4 text-blue-600" />}
+                                                            {status === 'today' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                                                            {status === 'completed' && <DollarSign className="w-4 h-4 text-gray-600" />}
+                                                            <div className="text-sm text-[#374151]">
+                                                                {(() => {
+                                                                    // 정산 처리일 계산: 판매일 + 7일
+                                                                    const saleDate = new Date(item.soldAt || item.date);
+                                                                    const settlementDate = new Date(saleDate);
+                                                                    settlementDate.setDate(saleDate.getDate() + 7);
+                                                                    
+                                                                    // 오늘 날짜와 비교
+                                                                    const today = new Date();
+                                                                    const isToday = settlementDate.toDateString() === today.toDateString();
+                                                                    const isPast = settlementDate < today;
+                                                                    const isFuture = settlementDate > today;
+                                                                    
+                                                                    return (
+                                                                        <div className={`${
+                                                                            isToday ? 'text-green-600 font-semibold' : 
+                                                                            isPast ? 'text-gray-600' : 
+                                                                            'text-blue-600'
+                                                                        }`}>
+                                                                            {settlementDate.getFullYear()}-{String(settlementDate.getMonth() + 1).padStart(2, '0')}-{String(settlementDate.getDate()).padStart(2, '0')}
+                                                                            {isToday && ' (오늘)'}
+                                                                            {isFuture && ' (예정)'}
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </div>
                                                         </div>
                                                         <div className="text-xs text-[#6b7280]">
-                                                            {item.soldAt ? item.soldAt.split('T')[1]?.split('.')[0] : '-'}
+                                                            판매일 + 7일
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                    {item.productId || '-'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                    {item.customerId || '-'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                    <div>
-                                                        <div>{item.quantity || '-'}개</div>
-                                                        <div className="text-xs text-[#6b7280]">
-                                                            {item.unitPrice ? `${item.unitPrice.toLocaleString()}원` : '-'}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
-                                                    {item.totalSales.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                    {item.totalCommission.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
-                                                    {item.payoutAmount.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <div className="text-sm text-[#374151]">
-                                                        {item.processedAt.split('T')[0]}
-                                                    </div>
-                                                    <div className="text-xs text-[#6b7280]">
-                                                        {item.processedAt.split('T')[1]?.split('.')[0]}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <button
-                                                        onClick={() => {
-                                                            // 개별 주문 상세 데이터를 모달에 표시
-                                                            const mockDetail = {
-                                                                payoutInfo: {
-                                                                    id: item.originalPayoutId,
-                                                                    sellerId: item.sellerId,
-                                                                    periodStart: item.date,
-                                                                    periodEnd: item.date,
-                                                                    totalSales: item.totalSales,
-                                                                    totalCommission: item.totalCommission,
-                                                                    payoutAmount: item.payoutAmount,
-                                                                    processedAt: item.processedAt
-                                                                },
-                                                                salesDetails: item.salesDetails || []
-                                                            };
-                                                            setSelectedPayout(mockDetail);
-                                                        }}
-                                                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
-                                                    >
-                                                        <Eye className="w-4 h-4" /> 상세 보기
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                        <button
+                                                            onClick={() => {
+                                                                // 개별 주문 상세 데이터를 모달에 표시
+                                                                const mockDetail = {
+                                                                    payoutInfo: {
+                                                                        id: item.originalPayoutId,
+                                                                        sellerId: item.sellerId,
+                                                                        periodStart: item.date,
+                                                                        periodEnd: item.date,
+                                                                        totalSales: item.totalSales,
+                                                                        totalCommission: item.totalCommission,
+                                                                        payoutAmount: item.payoutAmount,
+                                                                        processedAt: item.processedAt
+                                                                    },
+                                                                    salesDetails: item.salesDetails || []
+                                                                };
+                                                                setSelectedPayout(mockDetail);
+                                                            }}
+                                                            className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
+                                                        >
+                                                            <Eye className="w-4 h-4" /> 상세 보기
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

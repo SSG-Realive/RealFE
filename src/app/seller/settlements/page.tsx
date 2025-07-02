@@ -11,7 +11,11 @@ import {
     getSellerSettlementSummary,
     getSellerSettlementDetail,
 } from '@/service/seller/sellerSettlementService';
-import { SellerSettlementResponse, PayoutLogDetailResponse } from '@/types/seller/sellersettlement/sellerSettlement';
+import { 
+    SellerSettlementResponse, 
+    PayoutLogDetailResponse,
+    DailySettlementItem 
+} from '@/types/seller/sellersettlement/sellerSettlement';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { 
     DollarSign, 
@@ -58,6 +62,7 @@ export default function SellerSettlementPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [dailyPayouts, setDailyPayouts] = useState<DailySettlementItem[]>([]); // 하루 단위로 재구성된 정산 데이터
 
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
@@ -69,6 +74,9 @@ export default function SellerSettlementPage() {
             setLoading(true);
             const res = await getSellerSettlementList();
             setPayouts(res || []);
+            
+            // 하루 단위로 재구성
+            await createDailyPayoutsFromDetails(res || []);
             setError(null);
         } catch (err) {
             console.error('정산 목록 조회 실패:', err);
@@ -84,6 +92,9 @@ export default function SellerSettlementPage() {
             setLoading(true);
             const res = await getSellerSettlementListByDate(date);
             setPayouts(res || []);
+            
+            // 하루 단위로 재구성
+            await createDailyPayoutsFromDetails(res || []);
             setError(null);
         } catch (err) {
             console.error('날짜 필터 조회 실패:', err);
@@ -99,6 +110,9 @@ export default function SellerSettlementPage() {
             setLoading(true);
             const res = await getSellerSettlementListByPeriod(from, to);
             setPayouts(res || []);
+            
+            // 하루 단위로 재구성
+            await createDailyPayoutsFromDetails(res || []);
             
             // 요약 정보도 함께 조회
             const summaryRes = await getSellerSettlementSummary(from, to);
@@ -174,11 +188,83 @@ export default function SellerSettlementPage() {
         fetchFilteredByDate(getTodayDate());
     }, [checking]);
 
-    // 통계 계산 (전체 또는 필터된 결과)
-    const totalSettlements = payouts.length;
-    const totalSales = payouts.reduce((sum, item) => sum + item.totalSales, 0);
-    const totalCommission = payouts.reduce((sum, item) => sum + item.totalCommission, 0);
-    const totalPayout = payouts.reduce((sum, item) => sum + item.payoutAmount, 0);
+    // 정산 상세 데이터를 날짜별 + 건별로 분리하여 정산 목록 생성
+    const createDailyPayoutsFromDetails = async (payoutList: SellerSettlementResponse[]) => {
+        try {
+            const dailyData: DailySettlementItem[] = [];
+            
+            for (const payout of payoutList) {
+                try {
+                    // 각 정산의 상세 정보 조회
+                    const detail = await getSellerSettlementDetail(payout.id);
+                    
+                    // 각 salesDetail을 개별 항목으로 처리
+                    detail.salesDetails.forEach((saleDetail, index) => {
+                        const saleDate = saleDetail.salesLog.soldAt.split('T')[0]; // YYYY-MM-DD 형식으로 변환
+                        
+                        dailyData.push({
+                            id: `${payout.id}_${saleDate}_${index}`, // 고유 ID 생성 (건별)
+                            originalPayoutId: payout.id,
+                            sellerId: payout.sellerId,
+                            date: saleDate,
+                            periodStart: saleDate,
+                            periodEnd: saleDate,
+                            totalSales: saleDetail.salesLog.totalPrice, // 개별 주문 금액
+                            totalCommission: saleDetail.commissionLog.commissionAmount, // 개별 수수료
+                            payoutAmount: saleDetail.salesLog.totalPrice - saleDetail.commissionLog.commissionAmount, // 개별 지급액
+                            processedAt: payout.processedAt,
+                            salesCount: 1, // 개별 건이므로 항상 1
+                            salesDetails: [saleDetail], // 해당 건의 상세 내역
+                            // 추가 정보
+                            productId: saleDetail.salesLog.productId,
+                            customerId: saleDetail.salesLog.customerId,
+                            quantity: saleDetail.salesLog.quantity,
+                            unitPrice: saleDetail.salesLog.unitPrice,
+                            orderItemId: saleDetail.salesLog.orderItemId,
+                            soldAt: saleDetail.salesLog.soldAt
+                        });
+                    });
+                } catch (detailError) {
+                    console.error(`정산 상세 조회 실패 (ID: ${payout.id}):`, detailError);
+                    // 상세 조회 실패 시 원본 데이터를 하루 단위로 변환
+                    dailyData.push({
+                        id: `${payout.id}_${payout.periodStart}_fallback`,
+                        originalPayoutId: payout.id,
+                        sellerId: payout.sellerId,
+                        date: payout.periodStart,
+                        periodStart: payout.periodStart,
+                        periodEnd: payout.periodEnd,
+                        totalSales: payout.totalSales,
+                        totalCommission: payout.totalCommission,
+                        payoutAmount: payout.payoutAmount,
+                        processedAt: payout.processedAt,
+                        salesCount: 1,
+                        salesDetails: []
+                    });
+                }
+            }
+            
+            // 날짜순, 시간순으로 정렬 (최신순)
+            dailyData.sort((a, b) => {
+                const dateA = new Date(a.soldAt || a.date).getTime();
+                const dateB = new Date(b.soldAt || b.date).getTime();
+                return dateB - dateA;
+            });
+            
+            console.log('판매일별 + 건별로 분리된 정산 데이터:', dailyData);
+            setDailyPayouts(dailyData);
+            
+        } catch (error) {
+            console.error('판매일별 + 건별 정산 데이터 생성 실패:', error);
+            setDailyPayouts([]);
+        }
+    };
+
+    // 통계 계산 (건별로 분리된 결과 사용)
+    const totalSettlements = dailyPayouts.length;
+    const totalSales = dailyPayouts.reduce((sum, item) => sum + item.totalSales, 0);
+    const totalCommission = dailyPayouts.reduce((sum, item) => sum + item.totalCommission, 0);
+    const totalPayout = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
 
     if (checking || loading) {
         return (
@@ -199,20 +285,20 @@ export default function SellerSettlementPage() {
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
                     <div className="mb-6">
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리 (주문별)</h1>
                         {filterType === 'date' && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'}
+                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'} - 해당 날짜에 판매된 각 주문의 정산 내역
                             </p>
                         )}
                         {filterType === 'period' && filterFrom && filterTo && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                조회 기간: {filterFrom} ~ {filterTo}
+                                조회 기간: {filterFrom} ~ {filterTo} - 해당 기간에 판매된 각 주문의 정산 내역
                             </p>
                         )}
                         {filterType === 'all' && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                전체 기간 조회
+                                전체 기간 조회 - 모든 판매 주문의 정산 내역
                             </p>
                         )}
                     </div>
@@ -229,7 +315,7 @@ export default function SellerSettlementPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <Clock className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">정산 대기</span>
+                                <span className="text-[#374151] text-sm font-semibold">총 주문 건수</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{summary ? summary.payoutCount : totalSettlements}건</div>
                         </section>
@@ -253,7 +339,7 @@ export default function SellerSettlementPage() {
                     <div className="bg-[#f3f4f6] p-4 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
                         <div className="flex items-center gap-2 mb-4">
                             <Filter className="w-5 h-5 text-[#6b7280]" />
-                            <h3 className="text-[#374151] font-semibold">필터 옵션 (기본: 일별 조회)</h3>
+                            <h3 className="text-[#374151] font-semibold">필터 옵션 (기본: 주문별 조회)</h3>
                         </div>
                         
                         <div className="flex flex-col md:flex-row gap-4 items-end">
@@ -277,7 +363,7 @@ export default function SellerSettlementPage() {
                                             : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
                                     }`}
                                 >
-                                    일별 조회
+                                    주문별
                                 </button>
                                 <button
                                     onClick={() => setFilterType('period')}
@@ -362,11 +448,11 @@ export default function SellerSettlementPage() {
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-4">
                             <p className="text-[#374151]">{error}</p>
                         </div>
-                    ) : payouts.length === 0 ? (
+                    ) : dailyPayouts.length === 0 ? (
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
                             <CreditCard className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
                             <p className="text-[#6b7280] text-lg">
-                                {filterType === 'date' ? `${filterDate} 날짜의 정산 내역이 없습니다.` : '정산 내역이 없습니다.'}
+                                {filterType === 'date' ? `${filterDate} 날짜에 판매된 주문의 정산 내역이 없습니다.` : '판매된 주문의 정산 내역이 없습니다.'}
                             </p>
                             {filterType === 'date' && (
                                 <p className="text-[#6b7280] text-sm mt-2">
@@ -381,13 +467,13 @@ export default function SellerSettlementPage() {
                                 <div className="flex items-start gap-3">
                                     <div className="w-5 h-5 bg-blue-500 rounded-full text-white text-xs flex items-center justify-center mt-0.5">i</div>
                                     <div>
-                                        <h4 className="font-semibold text-blue-800 mb-1">일별 정산 데이터 검증 안내</h4>
+                                        <h4 className="font-semibold text-blue-800 mb-1">주문별 정산 데이터 안내</h4>
                                         <p className="text-blue-700 text-sm">
                                             {filterType === 'date' 
-                                                ? `${filterDate} 날짜의 정확한 정산 금액을 확인하려면 각 항목의 "상세 보기"를 클릭하여 주문별 상세 내역을 확인해주세요.`
-                                                : '정확한 정산 금액을 확인하려면 각 항목의 "상세 보기"를 클릭하여 주문별 상세 내역을 확인해주세요.'
+                                                ? `${filterDate} 날짜에 판매된 각 주문의 정산 내역입니다. 각 행은 개별 주문을 나타내며, "상세 보기"를 클릭하여 해당 주문의 상세 정보를 확인할 수 있습니다.`
+                                                : '각 행은 개별 주문을 나타내며, "상세 보기"를 클릭하여 해당 주문의 상세 정보를 확인할 수 있습니다.'
                                             } 
-                                            상세 페이지에서 모든 주문이 올바르게 합산되었는지 자동으로 검증됩니다.
+                                            모든 주문 정보가 정확하게 표시됩니다.
                                         </p>
                                     </div>
                                 </div>
@@ -397,22 +483,45 @@ export default function SellerSettlementPage() {
                                 <table className="min-w-full divide-y divide-[#d1d5db]">
                                     <thead className="bg-[#f3f4f6]">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">정산 기간</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매일시</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상품ID</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">고객ID</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수량/단가</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">총 매출</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수수료</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">지급액</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">처리일시</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">검증 상태</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">정산 처리일</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상세보기</th>
                                         </tr>
                                     </thead>
                                     <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                                        {payouts.map((item) => (
+                                        {dailyPayouts.map((item) => (
                                             <tr key={item.id} className="hover:bg-[#e5e7eb] transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
-                                                    {item.periodStart} ~ {item.periodEnd}
+                                                    <div>
+                                                        <div className="font-semibold">
+                                                            {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                                        </div>
+                                                        <div className="text-xs text-[#6b7280]">
+                                                            {item.soldAt ? item.soldAt.split('T')[1]?.split('.')[0] : '-'}
+                                                        </div>
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                    {item.productId || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                    {item.customerId || '-'}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                    <div>
+                                                        <div>{item.quantity || '-'}개</div>
+                                                        <div className="text-xs text-[#6b7280]">
+                                                            {item.unitPrice ? `${item.unitPrice.toLocaleString()}원` : '-'}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
                                                     {item.totalSales.toLocaleString()}원
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
@@ -421,18 +530,33 @@ export default function SellerSettlementPage() {
                                                 <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
                                                     {item.payoutAmount.toLocaleString()}원
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                                                    {item.processedAt}
-                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                                                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                                        미검증
-                                                    </span>
+                                                    <div className="text-sm text-[#374151]">
+                                                        {item.processedAt.split('T')[0]}
+                                                    </div>
+                                                    <div className="text-xs text-[#6b7280]">
+                                                        {item.processedAt.split('T')[1]?.split('.')[0]}
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-center">
                                                     <button
-                                                        onClick={() => fetchPayoutDetail(item.id)}
+                                                        onClick={() => {
+                                                            // 개별 주문 상세 데이터를 모달에 표시
+                                                            const mockDetail = {
+                                                                payoutInfo: {
+                                                                    id: item.originalPayoutId,
+                                                                    sellerId: item.sellerId,
+                                                                    periodStart: item.date,
+                                                                    periodEnd: item.date,
+                                                                    totalSales: item.totalSales,
+                                                                    totalCommission: item.totalCommission,
+                                                                    payoutAmount: item.payoutAmount,
+                                                                    processedAt: item.processedAt
+                                                                },
+                                                                salesDetails: item.salesDetails || []
+                                                            };
+                                                            setSelectedPayout(mockDetail);
+                                                        }}
                                                         className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
                                                     >
                                                         <Eye className="w-4 h-4" /> 상세 보기

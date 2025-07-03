@@ -10,7 +10,10 @@ import {
 import { useAuthStore } from '@/store/customer/authStore';
 import { customerBidService } from '@/service/customer/auctionService';
 import type { Bid } from '@/types/customer/auctions';
+import { Order } from '@/types/customer/order/order';
+import { getRecentOrder } from '@/service/order/orderService';
 import { useGlobalDialog } from '@/app/context/dialogContext';
+import OrderPreviewCard from '@/components/customer/order/OrderPreviewCard';
 
 export default function MyPage() {
     const router = useRouter();
@@ -22,14 +25,30 @@ export default function MyPage() {
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
 
-    const ITEMS_PER_PAGE = 4;
+    const [recentOrder, setRecentOrder] = useState<Order | null>(null);
     const [bids, setBids] = useState<Bid[]>([]);
     const [page, setPage] = useState(0);
+    const ITEMS_PER_PAGE = 4;
 
     const totalPages = Math.ceil(bids.length / ITEMS_PER_PAGE);
     const canPrev = page > 0;
     const canNext = page < totalPages - 1;
 
+    // 최근 주문 정보 호출
+    useEffect(() => {
+        if (!isAuthenticatedFn()) return;
+
+        (async () => {
+            try {
+                const data = await getRecentOrder();
+                setRecentOrder(data);
+            } catch {
+                console.warn('최근 주문 정보를 불러오지 못했습니다.');
+            }
+        })();
+    }, [isAuthenticatedFn]);
+
+    // 입찰 내역 호출
     useEffect(() => {
         if (!isAuthenticatedFn()) return;
 
@@ -64,8 +83,8 @@ export default function MyPage() {
                     <h1 className="text-xl font-light">마이페이지</h1>
                     {userName && (
                         <span className="absolute right-0 top-7 text-sm text-gray-500">
-              {userName}님, 환영합니다.
-            </span>
+                            {userName}님, 환영합니다.
+                        </span>
                     )}
                 </div>
 
@@ -86,9 +105,26 @@ export default function MyPage() {
                 {/* 활동 정보 */}
                 <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* 주문/배송 */}
-                    <InfoCard icon={<Package size={20} />} title="주문 및 배송 현황">
-                        최근 주문한 상품이 없습니다.
-                    </InfoCard>
+                    <div className="relative bg-gray-50 rounded-xl p-5">
+                        <div className="flex items-center mb-3 gap-2">
+                            <Package className="text-gray-600" size={20} />
+                            <h2 className="font-light text-base">최근 주문 및 배송 현황</h2>
+                            <button
+                                onClick={() => router.push('/customer/mypage/orders')}
+                                className="absolute top-2 right-2 text-xs text-gray-500 hover:text-gray-700"
+                            >
+                                전체보기
+                            </button>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                            {recentOrder ? (
+                                <OrderPreviewCard order={recentOrder} />
+                            ) : (
+                                <p className="text-sm text-gray-600">최근 주문한 상품이 없습니다.</p>
+                            )}
+                        </div>
+                    </div>
+
 
                     {/* 참여 중인 경매 */}
                     <div className="relative bg-gray-50 rounded-xl p-5 cursor-pointer">
@@ -128,12 +164,12 @@ export default function MyPage() {
                                                         <span className="text-xs text-gray-500">#{b.auctionId}</span>
                                                         <span
                                                             className={`text-[11px] font-light px-2 py-[1px] rounded-full
-                                ${b.leading
+                                                                ${b.leading
                                                                 ? 'bg-blue-100 text-blue-700'
                                                                 : 'bg-red-100 text-red-700'}`}
                                                         >
-                              {b.leading ? '상위 입찰' : '경쟁 중'}
-                            </span>
+                                                            {b.leading ? '상위 입찰' : '경쟁 중'}
+                                                        </span>
                                                     </div>
                                                     <p className="text-sm font-light">{b.bidPrice.toLocaleString()}원</p>
                                                 </div>
@@ -144,7 +180,6 @@ export default function MyPage() {
                             </div>
                         )}
 
-                        {/* 오른쪽 하단에 위치한 ALL 버튼 (→ 제거됨) */}
                         <button
                             onClick={() => router.push('/customer/mypage/bids')}
                             className="absolute top-2 right-2 text-xs text-gray-500 hover:text-gray-700"
@@ -169,18 +204,6 @@ function CircleBtn({ label, icon, onClick }: { label: string; icon: React.ReactN
             {icon}
             <span className="text-sm mt-1">{label}</span>
         </button>
-    );
-}
-
-function InfoCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
-    return (
-        <div className="bg-gray-50 rounded-xl p-5">
-            <div className="flex items-center mb-3 gap-2">
-                {icon}
-                <h2 className="font-light text-base">{title}</h2>
-            </div>
-            <p className="text-sm text-gray-600">{children}</p>
-        </div>
     );
 }
 

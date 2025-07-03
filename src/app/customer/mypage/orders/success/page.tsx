@@ -1,5 +1,7 @@
 'use client';
 
+import { XCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -102,20 +104,21 @@ export default function PaymentSuccessPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center max-w-md mx-auto p-6">
-                    <h1 className="text-2xl font-light mb-4">결제 처리 실패</h1>
-                    <p className="text-gray-600 mb-6">{error}</p>
-                    <div className="space-y-3">
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="text-center max-w-md mx-auto p-6 mt-12">
+                    <XCircle className="mx-auto text-red-500 w-12 h-12 mb-4" />
+                    <h1 className="text-2xl font-semibold text-red-600 mb-2">결제 처리 실패</h1>
+                    <p className="text-gray-500 text-sm mb-6">주문 정보를 찾을 수 없습니다.</p>
+                    <div className="space-y-2">
                         <button
                             onClick={() => router.back()}
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-none hover:bg-blue-700"
+                            className="w-full bg-black text-white py-2 px-4 rounded-none hover:bg-neutral-800"
                         >
                             이전 페이지로 돌아가기
                         </button>
                         <Link
                             href="/customer/mypage/orders"
-                            className="block w-full bg-gray-600 text-white py-2 px-4 rounded-none hover:bg-gray-700 text-center"
+                            className="block w-full bg-black text-white py-2 px-4 rounded-none hover:bg-neutral-800 text-center"
                         >
                             주문 목록으로 가기
                         </Link>
@@ -126,29 +129,30 @@ export default function PaymentSuccessPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center max-w-md mx-auto p-6">
-                <h1 className="text-2xl font-light mb-4">결제가 완료되었습니다!</h1>
-                <p className="text-gray-600 mb-6">
+        <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="text-center max-w-md mx-auto p-6 mt-12">
+                <CheckCircle className="mx-auto text-green-500 w-12 h-12 mb-4" />
+                <h1 className="text-2xl font-semibold text-green-600 mb-2">결제가 완료되었습니다!</h1>
+                <p className="text-gray-600 text-sm leading-relaxed mb-6">
                     주문이 성공적으로 처리되었습니다.<br />
                     주문번호: <span className="font-light">{orderId}</span>
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-2">
                     <Link
                         href={`/customer/mypage/orders/${orderId}`}
-                        className="block w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 text-center"
+                        className="block w-full bg-black text-white py-2 px-4 rounded-none hover:bg-neutral-800 text-center"
                     >
                         주문 상세보기
                     </Link>
                     <Link
                         href="/customer/mypage/orders"
-                        className="block w-full bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 text-center"
+                        className="block w-full bg-black text-white py-2 px-4 rounded-none hover:bg-neutral-800 text-center"
                     >
                         주문 목록으로 가기
                     </Link>
                     <Link
                         href="/main"
-                        className="block w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 text-center"
+                        className="block w-full bg-black text-white py-2 px-4 rounded-none hover:bg-neutral-800 text-center"
                     >
                         쇼핑 계속하기
                     </Link>

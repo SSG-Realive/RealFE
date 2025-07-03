@@ -20,6 +20,7 @@ const menuItems: MenuItem[] = [
   { label: "상품관리", href: "/seller/products" },
   { label: "주문관리", href: "/seller/orders" },
   { label: "정산관리", href: "/seller/settlements" },
+  { label: "피드백", href: "/seller/reviews" },
   { label: "고객문의확인", href: "/seller/qna" },
   { label: "관리자 문의", href: "/seller/admin-qna" },
 ];

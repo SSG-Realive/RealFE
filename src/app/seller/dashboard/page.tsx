@@ -350,6 +350,7 @@ export default function SellerDashboardPage() {
               rating={dashboard?.averageRating ?? 0}
               count={dashboard?.totalReviews ?? 0}
               className="h-full w-full text-2xl"
+              onClick={() => router.push('/seller/reviews')}
             />
           </div>
           {/* 우측: 나머지 카드들 */}

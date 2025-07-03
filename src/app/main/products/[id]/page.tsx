@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react'; // useMemo 임포트 추가
 import {
   useParams,
   useRouter,
@@ -16,20 +16,21 @@ import {
 import { toggleWishlist } from '@/service/customer/wishlistService';
 import { addToCart } from '@/service/customer/cartService';
 import { fetchReviewsBySeller } from '@/service/customer/reviewService';
-// ⭐⭐ 올바른 QnA 서비스 파일 임포트 확인 (새로운 qnaService.ts)
 import { getProductQnaList } from '@/service/customer/customerQnaService';
 
 import ReviewList from '@/components/customer/review/ReviewList';
 import ProductImage from '@/components/ProductImage';
 import QnaList from '@/components/customer/qna/QnaList';
+// ✨ TrafficLightStatusCard 컴포넌트 임포트
+import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-// ⭐⭐ 새 QnA 타입 임포트 (경로에 맞게 수정해주세요)
 import { CustomerQnaResponse, CustomerQnaListResponse } from '@/types/customer/qna/customerQnaResponse';
 
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useGlobalDialog } from '@/app/context/dialogContext';
+import TrafficLightStatusCardforProductDetail from "@/components/seller/TrafficLightStatusCardforProductDetail";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -38,14 +39,13 @@ export default function ProductDetailPage() {
   const { show } = useGlobalDialog();
 
   const withAuth = async (action: () => Promise<void>) => {
-    // 현재는 단순히 action 실행 (인증 로직은 별도 구현 후 통합)
     await action();
   };
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [related, setRelated] = useState<ProductListDTO[]>([]);
   const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
-  const [qnas, setQnas] = useState<CustomerQnaResponse[]>([]); // ⭐⭐ QnA 상태 타입 변경
+  const [qnas, setQnas] = useState<CustomerQnaResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isWished, setIsWished] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -73,8 +73,8 @@ export default function ProductDetailPage() {
     }
     if (id) {
       const pid = Number(id);
-      getProductQnaList(pid) // ⭐⭐ getProductQnaList 호출
-          .then((res: CustomerQnaListResponse) => setQnas(res.content)) // ⭐⭐ 응답 타입 변경 및 content 접근
+      getProductQnaList(pid)
+          .then((res: CustomerQnaListResponse) => setQnas(res.content))
           .catch((err) => {
             console.error('Failed to fetch QnAs:', err);
           });
@@ -91,6 +91,17 @@ export default function ProductDetailPage() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // ⭐⭐⭐ 새로 추가된 부분: 리뷰 평균 평점 계산
+  const { averageRating, reviewCount } = useMemo(() => {
+    if (!reviews || reviews.length === 0) {
+      return { averageRating: 0, reviewCount: 0 };
+    }
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const avg = totalRating / reviews.length;
+    return { averageRating: parseFloat(avg.toFixed(1)), reviewCount: reviews.length }; // 소수점 한 자리까지
+  }, [reviews]);
+
 
   const handleToggleWishlist = () =>
       withAuth(async () => {
@@ -121,7 +132,6 @@ export default function ProductDetailPage() {
 
   const handleWriteQna = () => {
     withAuth(async () => {
-      // QnA 작성 페이지로 이동. 예: /customer/qna/write?productId=123
       router.push(`/customer/qna/write?productId=${id}`);
     });
   };
@@ -147,6 +157,16 @@ export default function ProductDetailPage() {
               {product.price.toLocaleString()}
               <span className="text-sm ml-1">원</span>
             </p>
+
+            {/* ✨ 여기에 TrafficLightStatusCard를 삽입합니다 */}
+            <div className="mb-6"> {/* 여백을 위한 div 추가 */}
+              <TrafficLightStatusCardforProductDetail
+                  title="상품 평점"
+                  rating={averageRating}
+                  count={reviewCount}
+                  className="mx-auto" // 중앙 정렬을 위해 mx-auto 추가 (필요 시)
+              />
+            </div>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
               <p><span className="font-light">상품상태:</span> {product.status}</p>

@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import apiClient from '@/lib/apiClient';
+import { AlertTriangle, Search, Plus, Eye } from 'lucide-react';
 
 interface Penalty {
   id: string;
-  customerId: number; // Long 타입 (백엔드에서 Long으로 변경됨)
+  customerId: number;
   reason: string;
-  date: string;
+  createdAt: string;
 }
 
 export default function PenaltyListPage() {
@@ -15,9 +16,12 @@ export default function PenaltyListPage() {
   const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+    
+    // 패널티 목록 로딩
     apiClient.get('/admin/penalties?userType=CUSTOMER&page=0&size=100', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -25,9 +29,22 @@ export default function PenaltyListPage() {
       }
     })
       .then(res => {
+        console.log('Penalties API response:', res.data);
+        console.log('Penalties content:', res.data.content);
+        if (res.data.content && res.data.content.length > 0) {
+          console.log('First penalty item:', res.data.content[0]);
+          console.log('Available fields:', Object.keys(res.data.content[0]));
+        }
         setPenalties(res.data.content || []);
+        setLoading(false);
       })
-      .catch(() => setPenalties([]));
+      .catch((error) => {
+        console.log('Penalties API error:', error);
+        setPenalties([]);
+        setLoading(false);
+      });
+    
+    // 고객 목록 로딩
     apiClient.get('/admin/users?userType=CUSTOMER&page=0&size=100', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -53,66 +70,205 @@ export default function PenaltyListPage() {
   }
 
   return (
-    <div className="w-full max-w-full min-h-screen bg-gray-50 p-2 sm:p-6 overflow-x-auto">
-      <div className="w-full max-w-full">
-        {/* 데스크탑 표 */}
-        <div className="hidden md:block">
-          <h2 className="text-2xl font-bold mb-6">사용자 패널티 목록</h2>
-          <input
-            type="text"
-            placeholder="사용자/사유 검색"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="border rounded px-3 py-2 mb-4"
-          />
-          <div className="overflow-x-auto w-full">
-            <table className="min-w-[900px] w-full border text-sm">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="whitespace-nowrap px-2 py-2 text-xs">번호</th>
-                  <th className="whitespace-nowrap px-2 py-2 text-xs">User</th>
-                  <th className="whitespace-nowrap px-2 py-2 text-xs">사유</th>
-                  <th className="whitespace-nowrap px-2 py-2 text-xs">일자</th>
-                  <th className="whitespace-nowrap px-2 py-2 text-xs">View</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p, idx) => (
-                  <tr key={p.id}>
-                    <td className="whitespace-nowrap px-2 py-2 text-xs">{idx + 1}</td>
-                    <td className="whitespace-nowrap px-2 py-2 text-xs">{getCustomerName(p.customerId)}</td>
-                    <td className="whitespace-nowrap px-2 py-2 text-xs">{p.reason}</td>
-                    <td className="whitespace-nowrap px-2 py-2 text-xs">{p.date}</td>
-                    <td className="whitespace-nowrap px-2 py-2 text-xs"><a href={`/admin/customers/penalty/${p.id}`}>View</a></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        {/* 헤더 */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-3 bg-red-600 rounded-xl">
+              <AlertTriangle className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">사용자 패널티 관리</h1>
+              <p className="text-gray-600 mt-1">사용자 패널티를 조회하고 관리할 수 있습니다</p>
+            </div>
           </div>
-          <button
-            className="mt-4 px-4 py-2 bg-red-500 text-white rounded"
-            onClick={() => router.push('/admin/customers/penalty/register')}
-          >
-            사용자 패널티 등록
-          </button>
-        </div>
-        {/* 모바일 카드형 */}
-        <div className="block md:hidden space-y-4">
-          {filtered.map((p, idx) => (
-            <div key={p.id || idx} className="bg-white rounded shadow p-4">
-              <div className="font-bold mb-2">번호: {idx + 1}</div>
-              <div className="mb-1">User: {getCustomerName(p.customerId)}</div>
-              <div className="mb-1">사유: {p.reason}</div>
-              <div>
-                <button
-                  className="text-blue-600 underline"
-                  onClick={() => router.push(`/admin/customers/penalty/${p.id}`)}
-                >
-                  상세 보기
-                </button>
+
+          {/* 통계 카드 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">전체 패널티</p>
+                  <p className="text-2xl font-bold text-gray-900">{penalties.length.toLocaleString()}</p>
+                </div>
               </div>
             </div>
-          ))}
+            
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">이번 달 패널티</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {penalties.filter(p => {
+                      const penaltyDate = new Date(p.createdAt);
+                      const now = new Date();
+                      return penaltyDate.getMonth() === now.getMonth() && penaltyDate.getFullYear() === now.getFullYear();
+                    }).length.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-blue-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">검색 결과</p>
+                  <p className="text-2xl font-bold text-blue-600">{filtered.length.toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 검색 및 액션 */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="사용자 ID 또는 사유로 검색하세요..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+            
+            <button
+              className="lg:w-auto w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2"
+              onClick={() => router.push('/admin/customers/penalty/register')}
+            >
+              <Plus className="w-5 h-5" />
+              패널티 등록
+            </button>
+          </div>
+        </div>
+
+        {/* 패널티 목록 */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">패널티 정보를 불러오는 중...</p>
+              </div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="text-center">
+                <AlertTriangle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <div className="text-gray-500 text-lg font-medium mb-2">패널티가 없습니다</div>
+                <div className="text-gray-400 text-sm">
+                  {search ? '검색 조건을 변경해보세요.' : '등록된 패널티가 없습니다.'}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* 데스크탑 테이블 */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">번호</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">사용자</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">패널티 사유</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">발생일</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">액션</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filtered.map((penalty, idx) => (
+                      <tr key={penalty.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{idx + 1}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900">{getCustomerName(penalty.customerId)}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 max-w-md truncate" title={penalty.reason}>
+                            {penalty.reason}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {penalty.createdAt ? (() => {
+                              try {
+                                const date = new Date(penalty.createdAt);
+                                return isNaN(date.getTime()) ? penalty.createdAt : date.toLocaleDateString();
+                              } catch (error) {
+                                return penalty.createdAt;
+                              }
+                            })() : '-'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => router.push(`/admin/customers/penalty/${penalty.id}`)}
+                            className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            상세보기
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* 모바일 카드 */}
+              <div className="lg:hidden divide-y divide-gray-100">
+                {filtered.map((penalty, idx) => (
+                  <div key={penalty.id} className="p-6">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900">#{idx + 1}</h3>
+                        <p className="text-sm text-gray-500 mb-2">{getCustomerName(penalty.customerId)}</p>
+                        <p className="text-sm text-gray-600 mb-2">{penalty.reason}</p>
+                                                 <p className="text-xs text-gray-400">
+                           {penalty.createdAt ? (() => {
+                             try {
+                               const date = new Date(penalty.createdAt);
+                               return isNaN(date.getTime()) ? penalty.createdAt : date.toLocaleDateString();
+                             } catch (error) {
+                               return penalty.createdAt;
+                             }
+                           })() : '-'}
+                         </p>
+                      </div>
+                      <button
+                        onClick={() => router.push(`/admin/customers/penalty/${penalty.id}`)}
+                        className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        상세보기
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

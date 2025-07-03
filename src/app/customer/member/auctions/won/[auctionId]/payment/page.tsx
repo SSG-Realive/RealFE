@@ -212,11 +212,9 @@ function AuctionPaymentComponent() {
   return (
     <div className="bg-white min-h-screen">
       <main className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-light mb-6">경매 상품 결제</h1>
-
         {/* 배송지 */}
-        <section className="bg-white p-6 rounded-lg border mb-6">
-          <h2 className="text-lg font-semibold mb-4">배송지</h2>
+        <section className="bg-white p-6 rounded-lg mb-6">
+          <h2 className="text-lg font-light mb-4">배송지</h2>
           <div className="space-y-3">
             <div>
               <label className="text-sm text-gray-700">받는 분</label>
@@ -225,7 +223,7 @@ function AuctionPaymentComponent() {
                 name="receiverName"
                 value={shippingInfo.receiverName}
                 onChange={handleChange}
-                className="mt-1 w-full border p-2 rounded"
+                className="mt-1 w-full border border-gray-300 p-2 rounded"
               />
             </div>
             <div>
@@ -235,7 +233,7 @@ function AuctionPaymentComponent() {
                 name="phone"
                 value={shippingInfo.phone}
                 onChange={handleChange}
-                className="mt-1 w-full border p-2 rounded"
+                className="mt-1 w-full border border-gray-300 p-2 rounded"
               />
             </div>
             <div>
@@ -245,15 +243,15 @@ function AuctionPaymentComponent() {
                 name="address"
                 value={shippingInfo.address}
                 onChange={handleChange}
-                className="mt-1 w-full border p-2 rounded"
+                className="mt-1 w-full border border-gray-300 p-2 rounded"
               />
             </div>
           </div>
         </section>
 
         {/* 주문 상품 */}
-        <section className="bg-white p-6 rounded-lg border mb-6">
-          <h2 className="text-lg font-semibold mb-4">주문 상품</h2>
+        <section className="bg-white p-6 rounded-lg border border-gray-300 mb-6">
+          <h2 className="text-lg font-light mb-4">주문 상품</h2>
           <div className="flex items-start gap-4">
             <img
               src={auctionInfo.productImageUrl || '/images/default-product.png'}
@@ -263,15 +261,15 @@ function AuctionPaymentComponent() {
             <div className="flex-grow">
               <p>{auctionInfo.productName}</p>
             </div>
-            <p className="font-semibold">
+            <p className="font-light">
               {auctionInfo.winningBidPrice.toLocaleString()}원
             </p>
           </div>
         </section>
 
         {/* 결제 금액 */}
-        <section className="bg-white p-6 rounded-lg border">
-          <h3 className="text-lg font-semibold mb-4">결제 금액</h3>
+        <section className="bg-white p-6 rounded-lg border border-gray-300">
+          <h3 className="text-lg font-light mb-4">결제 금액</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>낙찰가</span>
@@ -282,7 +280,7 @@ function AuctionPaymentComponent() {
               <span>+ {deliveryFee.toLocaleString()}원</span>
             </div>
             <hr className="my-2" />
-            <div className="flex justify-between font-semibold text-base">
+            <div className="flex justify-between font-light text-base">
               <span>최종 결제 금액</span>
               <span>{finalAmount.toLocaleString()}원</span>
             </div>
@@ -290,7 +288,7 @@ function AuctionPaymentComponent() {
 
           <button
             onClick={handlePayment}
-            className="w-full bg-blue-600 text-white py-3 mt-4 rounded hover:bg-blue-700"
+            className="w-full bg-black text-white py-3 mt-4 rounded-none hover:bg-black"
           >
             {finalAmount.toLocaleString()}원 결제하기
           </button>
@@ -364,7 +362,7 @@ function PaymentResultHandler() {
   return (
     <div className="text-center py-20">
       <h2
-        className={`text-2xl font-semibold ${
+        className={`text-2xl font-light ${
           status === 'SUCCESS'
             ? 'text-green-600'
             : status === 'ERROR'

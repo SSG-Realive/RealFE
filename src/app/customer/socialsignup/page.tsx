@@ -25,7 +25,6 @@ export default function SocialSignupPage() {
 
   return (
     <div>
-      <h1>추가 정보 입력</h1>
       <SocialSignupForm
         email={email}
         token={accessToken}

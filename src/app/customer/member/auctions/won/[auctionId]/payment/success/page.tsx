@@ -99,7 +99,7 @@ function PaymentSuccessComponent() {
   if (status === 'PROCESSING') {
     return (
       <div className="text-center py-20">
-        <h2 className="text-xl font-semibold">결제 승인 중...</h2>
+        <h2 className="text-xl font-light">결제 승인 중...</h2>
         <p className="text-gray-600 mt-2">안전하게 결제를 처리하고 있습니다. 잠시만 기다려주세요.</p>
       </div>
     );
@@ -108,7 +108,7 @@ function PaymentSuccessComponent() {
   if (status === 'ERROR') {
     return (
       <div className="text-center py-20">
-        <h2 className="text-xl font-semibold text-red-500">결제 승인 실패</h2>
+        <h2 className="text-xl font-light text-red-500">결제 승인 실패</h2>
         <p className="text-gray-600 mt-2">{message}</p>
         <Link href={`/customer/member/auctions/won/${auctionId}/payment`}>
           <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -121,7 +121,7 @@ function PaymentSuccessComponent() {
   
   return (
     <div className="text-center py-20">
-      <h2 className="text-xl font-semibold text-green-600">결제가 성공적으로 완료되었습니다.</h2>
+      <h2 className="text-xl font-light text-green-600">결제가 성공적으로 완료되었습니다.</h2>
       <p className="text-gray-600 mt-2">주문 내역은 마이페이지에서 확인하실 수 있습니다.</p>
       <div className="mt-6">
         {orderId && (

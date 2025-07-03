@@ -32,8 +32,8 @@ export interface AuctionCreateRequestDTO {
 
 export interface AuctionUpdateRequestDTO {
   id: number;
+  startTime?: string;
   endTime?: string;
-  status?: 'PROCEEDING' | 'COMPLETED' | 'CANCELLED' | 'FAILED';
 }
 
 export interface AuctionCancelResponseDTO {

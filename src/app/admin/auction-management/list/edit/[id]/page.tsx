@@ -30,8 +30,12 @@ export default function AuctionEditPage() {
   const [error, setError] = useState<string | null>(null);
   
   // 수정할 데이터
-  const [endTime, setEndTime] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const [startDate, setStartDate] = useState<string>('');
+  const [startHour, setStartHour] = useState<string>('12');
+  const [startMinute, setStartMinute] = useState<string>('00');
+  const [endDate, setEndDate] = useState<string>('');
+  const [endHour, setEndHour] = useState<string>('12');
+  const [endMinute, setEndMinute] = useState<string>('00');
 
   useEffect(() => {
     if (id) {
@@ -46,8 +50,19 @@ export default function AuctionEditPage() {
       setAuction(data);
       
       // 초기값 설정
-      setEndTime(data.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : '');
-      setStatus(data.status || '');
+      if (data.startTime) {
+        const startTime = new Date(data.startTime);
+        setStartDate(startTime.toISOString().slice(0, 10));
+        setStartHour(startTime.getHours().toString().padStart(2, '0'));
+        setStartMinute(startTime.getMinutes().toString().padStart(2, '0'));
+      }
+      
+      if (data.endTime) {
+        const endTime = new Date(data.endTime);
+        setEndDate(endTime.toISOString().slice(0, 10));
+        setEndHour(endTime.getHours().toString().padStart(2, '0'));
+        setEndMinute(endTime.getMinutes().toString().padStart(2, '0'));
+      }
       
       setError(null);
     } catch (err) {
@@ -64,10 +79,19 @@ export default function AuctionEditPage() {
     try {
       setSaving(true);
       
+      // 날짜와 시간을 조합하여 ISO 문자열 생성
+      const startTime = startDate && startHour && startMinute 
+        ? new Date(`${startDate}T${startHour}:${startMinute}:00`).toISOString()
+        : undefined;
+      
+      const endTime = endDate && endHour && endMinute
+        ? new Date(`${endDate}T${endHour}:${endMinute}:00`).toISOString()
+        : undefined;
+
       const updateData: AuctionUpdateRequestDTO = {
         id: auction.id,
-        endTime: endTime ? new Date(endTime).toISOString() : undefined,
-        status: status as any || undefined
+        startTime,
+        endTime
       };
 
       await adminAuctionService.updateAuction(auction.id, updateData);
@@ -155,7 +179,7 @@ export default function AuctionEditPage() {
                   경매 수정
                 </h1>
                 <p className="text-gray-600 text-lg mt-2">
-                  경매 정보를 수정할 수 있습니다.
+                  경매 시간을 수정할 수 있습니다.
                 </p>
               </div>
             </div>
@@ -192,10 +216,6 @@ export default function AuctionEditPage() {
                   <p className="text-blue-600 font-semibold mt-1">{auction.currentPrice?.toLocaleString()}원</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">시작시간</Label>
-                  <p className="text-gray-900 mt-1">{new Date(auction.startTime).toLocaleString()}</p>
-                </div>
-                <div>
                   <Label className="text-sm font-medium text-gray-700">현재 상태</Label>
                   <Badge className="mt-1">
                     {auction.statusText || auction.status}
@@ -211,39 +231,107 @@ export default function AuctionEditPage() {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Gavel className="w-5 h-5" />
-                  <span>수정할 정보</span>
+                  <span>수정할 시간</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="endTime">종료시간</Label>
-                  <Input
-                    id="endTime"
-                    type="datetime-local"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full"
-                  />
+                {/* 시작시간 */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">시작시간</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="startDate" className="text-sm">날짜</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="startHour" className="text-sm">시간</Label>
+                      <Select value={startHour} onValueChange={setStartHour}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
+                              {(i + 1).toString().padStart(2, '0')}시
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="startMinute" className="text-sm">분</Label>
+                      <Select value={startMinute} onValueChange={setStartMinute}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {Array.from({ length: 60 }, (_, i) => (
+                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                              {i.toString().padStart(2, '0')}분
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   <p className="text-sm text-gray-500">
-                    현재 종료시간: {new Date(auction.endTime).toLocaleString()}
+                    현재 시작시간: {new Date(auction.startTime).toLocaleString()}
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="status">상태</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="상태를 선택하세요" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PROCEEDING">진행중</SelectItem>
-                      <SelectItem value="COMPLETED">완료</SelectItem>
-                      <SelectItem value="CANCELLED">취소됨</SelectItem>
-                      <SelectItem value="FAILED">실패</SelectItem>
-                    </SelectContent>
-                  </Select>
+                {/* 종료시간 */}
+                <div className="space-y-4">
+                  <Label className="text-base font-medium">종료시간</Label>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="endDate" className="text-sm">날짜</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endHour" className="text-sm">시간</Label>
+                      <Select value={endHour} onValueChange={setEndHour}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {Array.from({ length: 12 }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
+                              {(i + 1).toString().padStart(2, '0')}시
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="endMinute" className="text-sm">분</Label>
+                      <Select value={endMinute} onValueChange={setEndMinute}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-60">
+                          {Array.from({ length: 60 }, (_, i) => (
+                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                              {i.toString().padStart(2, '0')}분
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                   <p className="text-sm text-gray-500">
-                    현재 상태: {auction.statusText || auction.status}
+                    현재 종료시간: {new Date(auction.endTime).toLocaleString()}
                   </p>
                 </div>
 

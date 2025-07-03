@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { X, Package, DollarSign, Calendar, Eye, Star, Gavel } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import apiClient from '@/lib/apiClient';
 
 interface OwnedProduct {
@@ -35,8 +38,12 @@ export default function OwnedProductDetailModal({
   onAuctionCreated 
 }: OwnedProductDetailModalProps) {
   const [startPrice, setStartPrice] = useState<string>("");
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [startHour, setStartHour] = useState<string>("12");
+  const [startMinute, setStartMinute] = useState<string>("00");
+  const [endDate, setEndDate] = useState<string>("");
+  const [endHour, setEndHour] = useState<string>("12");
+  const [endMinute, setEndMinute] = useState<string>("00");
   const [isCreatingAuction, setIsCreatingAuction] = useState(false);
   const [showAuctionForm, setShowAuctionForm] = useState(false);
 
@@ -44,8 +51,12 @@ export default function OwnedProductDetailModal({
   useEffect(() => {
     if (isOpen) {
       setStartPrice("");
-      setStartTime("");
-      setEndTime("");
+      setStartDate("");
+      setStartHour("12");
+      setStartMinute("00");
+      setEndDate("");
+      setEndHour("12");
+      setEndMinute("00");
       setShowAuctionForm(false);
     }
   }, [isOpen]);
@@ -64,15 +75,19 @@ export default function OwnedProductDetailModal({
       alert("유효한 시작 가격을 입력해주세요.");
       return;
     }
-    if (!startTime) {
-      alert("경매 시작 시간을 입력해주세요.");
+    if (!startDate) {
+      alert("경매 시작 날짜를 입력해주세요.");
       return;
     }
-    if (!endTime) {
-      alert("경매 종료 시간을 입력해주세요.");
+    if (!endDate) {
+      alert("경매 종료 날짜를 입력해주세요.");
       return;
     }
 
+    // 날짜와 시간을 조합하여 ISO 문자열 생성
+    const startTime = new Date(`${startDate}T${startHour}:${startMinute}:00`).toISOString();
+    const endTime = new Date(`${endDate}T${endHour}:${endMinute}:00`).toISOString();
+    
     const startDateTime = new Date(startTime);
     const endDateTime = new Date(endTime);
     
@@ -339,22 +354,95 @@ export default function OwnedProductDetailModal({
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Label className="block text-sm font-medium text-gray-700 mb-2">
                             경매 기간
-                          </label>
-                          <div className="space-y-2">
-                            <input
-                              type="datetime-local"
-                              value={startTime}
-                              onChange={(e) => setStartTime(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                            />
-                            <input
-                              type="datetime-local"
-                              value={endTime}
-                              onChange={(e) => setEndTime(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                            />
+                          </Label>
+                          <div className="space-y-4">
+                            {/* 시작시간 */}
+                            <div>
+                              <Label className="text-sm text-gray-600 mb-2 block">시작시간</Label>
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="w-full"
+                                  />
+                                </div>
+                                <div>
+                                  <Select value={startHour} onValueChange={setStartHour}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-60">
+                                      {Array.from({ length: 12 }, (_, i) => (
+                                        <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
+                                          {(i + 1).toString().padStart(2, '0')}시
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Select value={startMinute} onValueChange={setStartMinute}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-60">
+                                      {Array.from({ length: 60 }, (_, i) => (
+                                        <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                          {i.toString().padStart(2, '0')}분
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* 종료시간 */}
+                            <div>
+                              <Label className="text-sm text-gray-600 mb-2 block">종료시간</Label>
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <Input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="w-full"
+                                  />
+                                </div>
+                                <div>
+                                  <Select value={endHour} onValueChange={setEndHour}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-60">
+                                      {Array.from({ length: 12 }, (_, i) => (
+                                        <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
+                                          {(i + 1).toString().padStart(2, '0')}시
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Select value={endMinute} onValueChange={setEndMinute}>
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-60">
+                                      {Array.from({ length: 60 }, (_, i) => (
+                                        <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                          {i.toString().padStart(2, '0')}분
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

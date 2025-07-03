@@ -97,7 +97,6 @@ export default function WonAuctionsPage() {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: 20 }}>
       <header style={{ marginBottom: 20, paddingBottom: 10, borderBottom: '1px solid #eee' }}>
-        <h1 className="text-2xl font-bold text-gray-800">낙찰받은 경매</h1>
         <p className="text-sm text-gray-600 mt-1">내가 낙찰받은 경매 목록입니다. 결제할 상품을 선택하세요.</p>
       </header>
 

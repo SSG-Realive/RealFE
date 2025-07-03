@@ -154,7 +154,7 @@ export default function PenaltyListPage() {
             
             <button
               className="lg:w-auto w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2"
-              onClick={() => router.push('/admin/customers/penalty/register')}
+              onClick={() => router.push('/admin/member-management/penalty/register')}
             >
               <Plus className="w-5 h-5" />
               패널티 등록
@@ -223,7 +223,7 @@ export default function PenaltyListPage() {
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={() => router.push(`/admin/customers/penalty/${penalty.id}`)}
+                            onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
                             className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
                           >
                             <Eye className="w-4 h-4 mr-1" />
@@ -257,7 +257,7 @@ export default function PenaltyListPage() {
                          </p>
                       </div>
                       <button
-                        onClick={() => router.push(`/admin/customers/penalty/${penalty.id}`)}
+                        onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
                         className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
                       >
                         <Eye className="w-4 h-4 mr-1" />

@@ -4,13 +4,6 @@ import { useEffect, useState } from "react";
 import apiClient from '@/lib/apiClient';
 import { AlertTriangle, ArrowLeft, User, Calendar, FileText, Hash } from 'lucide-react';
 
-// 더미 데이터
-const dummyPenalties = [
-  { id: "1", user: "user1", reason: "부적절한 행동", date: "2024-03-01", userImage: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=facearea&w=256&q=80" },
-  { id: "2", user: "user2", reason: "비매너", date: "2024-03-02", userImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&w=256&q=80" },
-  { id: "3", user: "user3", reason: "규정 위반", date: "2024-03-03", userImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=facearea&w=256&q=80" },
-];
-
 export default function PenaltyDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -176,7 +169,7 @@ export default function PenaltyDetailPage() {
           {/* 액션 버튼 */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button 
-              onClick={() => router.push('/admin/customers/penalty')}
+              onClick={() => router.push('/admin/member-management/penalty')}
               className="w-full bg-gray-600 text-white rounded-xl px-6 py-3 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-5 h-5" />

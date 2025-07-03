@@ -302,8 +302,6 @@ export default function DirectOrderPage() {
                 }}
             />
 
-            <h1 className="page-title">주문·결제</h1>
-
             {/* 1. 주문 상품 정보 */}
             <section className="order-section">
                 <h2>주문 상품</h2>

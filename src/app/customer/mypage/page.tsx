@@ -79,10 +79,9 @@ export default function MyPage() {
         <main className="min-h-screen py-5">
             <div className="max-w-6xl mx-auto bg-white rounded-xl px-6 pt-6">
                 {/* 타이틀 */}
-                <div className="relative mb-6">
-                    <h1 className="text-xl font-light">마이페이지</h1>
+                <div className="mb-6">
                     {userName && (
-                        <span className="absolute right-0 top-7 text-sm text-gray-500">
+                        <span className="text-sm text-gray-600 font-light">
                             {userName}님, 환영합니다.
                         </span>
                     )}
@@ -105,7 +104,7 @@ export default function MyPage() {
                 {/* 활동 정보 */}
                 <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* 주문/배송 */}
-                    <div className="relative bg-gray-50 rounded-xl p-5">
+                    <div className="relative bg-white-50 rounded-xl p-5">
                         <div className="flex items-center mb-3 gap-2">
                             <Package className="text-gray-600" size={20} />
                             <h2 className="font-light text-base">최근 주문 및 배송 현황</h2>
@@ -127,7 +126,7 @@ export default function MyPage() {
 
 
                     {/* 참여 중인 경매 */}
-                    <div className="relative bg-gray-50 rounded-xl p-5 cursor-pointer">
+                    <div className="relative bg-white-50 rounded-xl p-5 cursor-pointer">
                         <div className="flex items-center mb-3 gap-2">
                             <Gavel className="text-gray-600" size={20} />
                             <h2 className="font-light text-base">참여 중인 경매</h2>

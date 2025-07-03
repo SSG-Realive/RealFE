@@ -87,10 +87,10 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 {/* 주문 상세 정보 */}
                 <div className="bg-gray-100 shadow-xl rounded-lg p-6 border border-gray-200 max-w-2xl mx-auto w-full mt-6">
                     <h1 className="text-2xl font-light mb-6 text-center text-gray-900">주문 상세 정보</h1>
-                    <p className="mb-1">주문 번호: <span className="font-semibold">{orderData.orderId}</span></p>
+                    <p className="mb-1">주문 번호: <span className="font-light">{orderData.orderId}</span></p>
                     <p className="mb-1">고객 ID: {orderData.customerId}</p>
                     <p className="mb-1">배송 주소: {orderData.deliveryAddress}</p>
-                    <p className="mb-1">총 주문 가격: <span className="font-semibold">{orderData.totalPrice.toLocaleString()}원</span></p>
+                    <p className="mb-1">총 주문 가격: <span className="font-light">{orderData.totalPrice.toLocaleString()}원</span></p>
                     <p className="mb-1">주문 일시: {new Date(orderData.orderCreatedAt).toLocaleString()}</p>
                     <p className="mb-1">최종 업데이트: {new Date(orderData.updatedAt).toLocaleString()}</p>
                     <p className="mb-1">결제 방식: {orderData.paymentType}</p>
@@ -132,11 +132,11 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                                 />
                                 <div className="flex flex-col justify-between flex-grow">
                                     <div>
-                                        <h3 className="text-base font-semibold text-gray-800 mb-1 line-clamp-2 min-h-[3.5rem]">
+                                        <h3 className="text-base font-light text-gray-800 mb-1 line-clamp-2 min-h-[3.5rem]">
                                             {item.productName}
                                         </h3>
                                         <p className="text-sm text-gray-600 mb-1">{item.quantity}개</p>
-                                        <p className="text-base font-bold text-black mb-2">
+                                        <p className="text-base font-light text-black mb-2">
                                             {item.price.toLocaleString()}원
                                         </p>
                                     </div>
@@ -158,13 +158,13 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                 <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center max-w-2xl mx-auto">
                     <button
                         onClick={() => router.push('/main')}
-                        className="px-6 py-3 bg-black text-white rounded-none hover:bg-gray-900 transition font-semibold"
+                        className="px-6 py-3 bg-black text-white rounded-none hover:bg-gray-900 transition font-light"
                     >
                         쇼핑 계속하기
                     </button>
                     <button
                         onClick={() => router.back()}
-                        className="px-6 py-3 bg-black text-white rounded-none hover:bg-gray-900 transition font-semibold"
+                        className="px-6 py-3 bg-black text-white rounded-none hover:bg-gray-900 transition font-light"
                     >
                         이전 페이지로
                     </button>

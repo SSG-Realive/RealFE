@@ -34,14 +34,19 @@ export default function CartItemCard({
                     className="w-24 h-24 object-cover rounded-md flex-shrink-0"
                 />
                 <div className="flex-grow ml-4">
-                    <h3 className="font-light hover:underline leading-tight">{item.productName}</h3>
-                    <p className="font-light mt-1">
+                    {/* 상품명 */}
+                    <h3 className="text-base font-light text-gray-800 hover:underline leading-tight">
+                        {item.productName}
+                    </h3>
+
+                    {/* 가격 */}
+                    <p className="text-sm text-gray-600 mt-1">
                         {item.productPrice.toLocaleString()}
-                        <span className="text-sm ml-1">원</span>
+                        <span className="ml-1">원</span>
                     </p>
 
+                    {/* 수량 조절 */}
                     <div className="flex items-center mt-2 gap-2">
-                        {/* ✅ 버튼 순서: - → 수량 → + */}
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
@@ -51,7 +56,7 @@ export default function CartItemCard({
                         >
                             -
                         </button>
-                        <span className="w-6 text-center text-sm">{item.quantity}</span>
+                        <span className="w-6 text-center text-sm text-gray-500">{item.quantity}</span>
                         <button
                             onClick={(e) => {
                                 e.preventDefault();

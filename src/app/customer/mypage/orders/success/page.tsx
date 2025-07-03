@@ -50,6 +50,7 @@ export default function PaymentSuccessPage() {
 
                 const checkoutInfo = JSON.parse(checkoutInfoStr);
 
+                
                 // 결제 승인 요청 (amount 제거 - 서버에서 계산)
                 const payRequest: PayRequestDTO = {
                     paymentKey,
@@ -107,7 +108,7 @@ export default function PaymentSuccessPage() {
             <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="text-center max-w-md mx-auto p-6 mt-12">
                     <XCircle className="mx-auto text-red-500 w-12 h-12 mb-4" />
-                    <h1 className="text-2xl font-semibold text-red-600 mb-2">결제 처리 실패</h1>
+                    <h1 className="text-2xl font-light text-red-600 mb-2">결제 처리 실패</h1>
                     <p className="text-gray-500 text-sm mb-6">주문 정보를 찾을 수 없습니다.</p>
                     <div className="space-y-2">
                         <button
@@ -132,7 +133,7 @@ export default function PaymentSuccessPage() {
         <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="text-center max-w-md mx-auto p-6 mt-12">
                 <CheckCircle className="mx-auto text-green-500 w-12 h-12 mb-4" />
-                <h1 className="text-2xl font-semibold text-green-600 mb-2">결제가 완료되었습니다!</h1>
+                <h1 className="text-2xl font-light text-green-600 mb-2">결제가 완료되었습니다!</h1>
                 <p className="text-gray-600 text-sm leading-relaxed mb-6">
                     주문이 성공적으로 처리되었습니다.<br />
                     주문번호: <span className="font-light">{orderId}</span>

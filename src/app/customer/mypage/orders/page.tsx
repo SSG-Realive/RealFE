@@ -5,6 +5,7 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getOrderList, deleteOrder } from '@/service/order/orderService';
 import { useAuthStore } from '@/store/customer/authStore';
 import { Page, Order, OrderItem } from '@/types/customer/order/order';
+import MyPageLayout from '@/components/layouts/MyPageLayout';
 
 import './OrderListPage.css';
 
@@ -103,10 +104,15 @@ export default function OrderListPage() {
 
     if (hydrated && !isAuthenticated()) {
         return (
-            <div className="container notice-section">
-                <h2>로그인이 필요합니다</h2>
-                <p>주문 내역을 확인하시려면 로그인해주세요.</p>
-                <button className="button-primary" onClick={() => router.push('/login')}>로그인 페이지로 이동</button>
+            <div className="flex flex-col justify-center items-center min-h-screen text-center transform -translate-y-12">
+                <h2 className="text-lg font-semibold mb-2">로그인이 필요합니다.</h2>
+                <p className="text-sm text-gray-500 mb-6">주문 내역을 확인하시려면 로그인해주세요.</p>
+                <button
+                    className="bg-black text-white text-sm px-5 py-2 rounded-none"
+                    onClick={() => router.push('/login')}
+                >
+                    로그인 페이지로 이동
+                </button>
             </div>
         );
     }
@@ -126,52 +132,50 @@ export default function OrderListPage() {
 
     return (
         <div>
+            <MyPageLayout>
         <div className="container order-list-page">
-            <h1>주문 내역</h1>
-
             <div className="order-list-container">
                 {ordersPage.content.map((order) => (
                     <div key={order.orderId} className="order-card">
                         <div className="order-card-header">
-                            <h2 className="order-date">
+                            <p className="text-sm text-gray-800 font-normal">
                                 주문일: {new Date(order.orderCreatedAt).toLocaleDateString()}
-                            </h2>
-                            <span className="order-status">{order.orderStatus}</span>
+                            </p>
+                            <span className="text-sm text-gray-500 font-normal">
+      {order.orderStatus}
+    </span>
                         </div>
-                        <div className="order-card-content">
+
+                        <div className="order-card-content space-y-1">
                             {order.orderItems.map((item, index) => (
                                 <div key={`${order.orderId}-${item.orderItemId || item.productId}-${index}`} className="order-item">
                                     <div className="item-info">
-                                        <p className="item-name">{item.productName}</p>
-                                        <p className="item-details">
-                                            {item.price.toLocaleString()}원 x {item.quantity}개
-                                        </p>
+                                        <p className="text-sm text-gray-800 font-normal">{item.productName}</p>
+                                        <p className="text-sm text-gray-600">{item.price.toLocaleString()}원 x {item.quantity}개</p>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                        <div className="order-card-footer">
-                            <p className="total-price">총 결제 금액: <strong>{order.totalPrice.toLocaleString()}원</strong></p>
 
-                            <div className="order-actions">
+                        <div className="order-card-footer">
+                            <p className="text-sm text-gray-800 font-normal">
+                                총 결제 금액: {order.totalPrice.toLocaleString()}원
+                            </p>
+
+                            <div className="order-actions mt-2">
                                 <button
-                                    className="button-outline button-delete"
+                                    className="text-sm border border-red-400 text-red-500 px-3 py-1 font-normal"
+                                    style={{ borderRadius: '0px' }}
                                     onClick={() => handleDeleteClick(order.orderId)}
                                     disabled={isDeleting && orderToDeleteId === order.orderId}
-                                    style={{ borderRadius: '0px' }}
                                 >
                                     {isDeleting && orderToDeleteId === order.orderId ? '삭제 중...' : '구매내역 삭제'}
                                 </button>
 
                                 <button
-                                    className="button-outline"
+                                    className="text-sm border border-black bg-black text-white px-3 py-1 font-normal"
+                                    style={{ borderRadius: '0px' }}
                                     onClick={() => router.push(`/customer/mypage/orders/${order.orderId}`)}
-                                    style={{
-                                        backgroundColor: '#000000',
-                                        color: 'white',
-                                        border: '1px solid #000000',
-                                        borderRadius: '0px'
-                                    }}
                                 >
                                     주문 상세보기
                                 </button>
@@ -181,29 +185,35 @@ export default function OrderListPage() {
                 ))}
             </div>
 
-            <div className="pagination-container">
+            <div className="pagination-container flex justify-center gap-2 mt-6">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={ordersPage.first}
-                    className="page-button"
+                    className="text-sm text-gray-500 disabled:text-gray-300 hover:underline"
                 >
-                    이전
+                    ◀
                 </button>
-                {[...Array(ordersPage.totalPages).keys()].map(pageIdx => (
+
+                {[...Array(ordersPage.totalPages).keys()].map((pageIdx) => (
                     <button
                         key={pageIdx}
                         onClick={() => handlePageChange(pageIdx)}
-                        className={`page-button ${currentPage === pageIdx ? 'active' : ''}`}
+                        className={`text-sm px-2 py-1 ${
+                            currentPage === pageIdx
+                                ? 'font-bold text-black underline'
+                                : 'text-gray-500 hover:underline'
+                        }`}
                     >
                         {pageIdx + 1}
                     </button>
                 ))}
+
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={ordersPage.last}
-                    className="page-button"
+                    className="text-sm text-gray-500 disabled:text-gray-300 hover:underline"
                 >
-                    다음
+                    ▶
                 </button>
             </div>
 
@@ -242,6 +252,7 @@ export default function OrderListPage() {
                 </div>
             )}
         </div>
+            </MyPageLayout>
         </div>
     );
 }

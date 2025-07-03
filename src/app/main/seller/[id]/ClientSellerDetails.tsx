@@ -1,21 +1,15 @@
-// src/app/main/seller/[id]/ClientSellerDetails.tsx
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Link from 'next/link'; // ⭐ Link 컴포넌트 임포트 ⭐
-
-// DTO 인터페이스 임포트 (기존과 동일)
+import Link from 'next/link';
 import { ReviewResponseDTO } from '@/types/reviews/reviewResponseDTO';
 import { ProductListDTO } from '@/types/seller/product/product';
-
-// 서비스 함수 임포트 (기존과 동일)
 import {
     getSellerReviews as fetchSellerReviewsService,
     getSellerProducts as fetchSellerProductsService
 } from '@/service/seller/sellerService';
-
-// ImageWithFallback 컴포넌트 임포트 (기존과 동일)
 import ImageWithFallback from '@/components/common/imageWithFallback';
+import { getTrafficLightBgClass, getTrafficLightEmoji, getTrafficLightText } from '@/types/admin/review';
 
 interface ClientSellerDetailsProps {
     sellerId: number;
@@ -25,31 +19,30 @@ interface ClientSellerDetailsProps {
     initialHasMoreProducts: boolean;
 }
 
-// ⭐ 리뷰 내용을 간략하게 표시하기 위한 최대 길이 설정 ⭐
 const REVIEW_SUMMARY_LENGTH = 100;
 
 export default function ClientSellerDetails({
-                                                sellerId,
-                                                initialReviews,
-                                                initialHasMoreReviews,
-                                                initialProducts,
-                                                initialHasMoreProducts
-                                            }: ClientSellerDetailsProps) {
+    sellerId,
+    initialReviews,
+    initialHasMoreReviews,
+    initialProducts,
+    initialHasMoreProducts
+}: ClientSellerDetailsProps) {
     const [reviews, setReviews] = useState<ReviewResponseDTO[]>(initialReviews || []);
     const [products, setProducts] = useState<ProductListDTO[]>(initialProducts || []);
-
-    const [reviewPage, setReviewPage] = useState<number>(1);
-    const [productPage, setProductPage] = useState<number>(1);
-
+    const [reviewPage, setReviewPage] = useState<number>(0); // 0-based indexing
+    const [productPage, setProductPage] = useState<number>(0); // 0-based indexing
     const [hasMoreReviews, setHasMoreReviews] = useState<boolean>(initialHasMoreReviews);
     const [hasMoreProducts, setHasMoreProducts] = useState<boolean>(initialHasMoreProducts);
-
     const [loadingReviews, setLoadingReviews] = useState<boolean>(false);
     const [loadingProducts, setLoadingProducts] = useState<boolean>(false);
-    const observerTarget = useRef<HTMLDivElement>(null);
+    const [expandedReviews, setExpandedReviews] = useState<Record<number, boolean>>({});
+    
+    // 별도의 observer refs for reviews and products
+    const reviewObserverTarget = useRef<HTMLDivElement>(null);
+    const productObserverTarget = useRef<HTMLDivElement>(null);
 
-    // ⭐ 각 리뷰의 전체 내용 표시 여부를 관리하는 상태 ⭐
-    const [expandedReviews, setExpandedReviews] = useState<Record<string, boolean>>({});
+    
 
     const toggleReviewExpansion = (reviewId: number) => {
         setExpandedReviews(prev => ({
@@ -60,14 +53,32 @@ export default function ClientSellerDetails({
 
     const loadMoreReviews = useCallback(async () => {
         if (loadingReviews || !hasMoreReviews) return;
+        
         setLoadingReviews(true);
         try {
-            const { reviews: newReviews, hasMore: newHasMoreReviews } = await fetchSellerReviewsService(sellerId, reviewPage);
-            setReviews(prevReviews => [...prevReviews, ...newReviews]);
-            setHasMoreReviews(newHasMoreReviews);
-            setReviewPage(prevPage => prevPage + 1);
-        } catch (error) {
-            console.error("판매자 리뷰 추가 로드 실패:", error);
+            const nextPage = reviewPage + 1;
+            const { reviews: newReviews, hasMore } = await fetchSellerReviewsService(sellerId, nextPage);
+
+            if (newReviews && newReviews.length > 0) {
+                setReviews(prev => {
+                    // 중복 제거: 기존 리뷰 ID들을 Set으로 만들어서 체크
+                    const existingIds = new Set(prev.map(r => r.reviewId));
+                    const uniqueNewReviews = newReviews.filter(review => !existingIds.has(review.reviewId));
+                    
+                    // 중복이 제거된 새 리뷰가 있을 때만 추가
+                    if (uniqueNewReviews.length > 0) {
+                        return [...prev, ...uniqueNewReviews];
+                    }
+                    return prev;
+                });
+                setReviewPage(nextPage);
+                setHasMoreReviews(hasMore);
+            } else {
+                setHasMoreReviews(false);
+            }
+        } catch (err) {
+            console.error("리뷰 추가 로드 실패:", err);
+            setHasMoreReviews(false);
         } finally {
             setLoadingReviews(false);
         }
@@ -75,180 +86,229 @@ export default function ClientSellerDetails({
 
     const loadMoreProducts = useCallback(async () => {
         if (loadingProducts || !hasMoreProducts) return;
+        
         setLoadingProducts(true);
         try {
-            const { products: newProducts, hasMore: newHasMoreProducts } = await fetchSellerProductsService(sellerId, productPage);
-            setProducts(prevProducts => [...prevProducts, ...newProducts]);
-            setHasMoreProducts(newHasMoreProducts);
-            setProductPage(prevPage => prevPage + 1);
-        } catch (error) {
-            console.error("판매자 상품 추가 로드 실패:", error);
+            const nextPage = productPage + 1;
+            const { products: newProducts, hasMore } = await fetchSellerProductsService(sellerId, nextPage);
+
+            if (newProducts && newProducts.length > 0) {
+                setProducts(prev => {
+                    // 중복 제거: 기존 상품 ID들을 Set으로 만들어서 체크
+                    const existingIds = new Set(prev.map(p => p.id));
+                    const uniqueNewProducts = newProducts.filter(product => !existingIds.has(product.id));
+                    
+                    // 중복이 제거된 새 상품이 있을 때만 추가
+                    if (uniqueNewProducts.length > 0) {
+                        return [...prev, ...uniqueNewProducts];
+                    }
+                    return prev;
+                });
+                setProductPage(nextPage);
+                setHasMoreProducts(hasMore);
+            } else {
+                setHasMoreProducts(false);
+            }
+        } catch (err) {
+            console.error("상품 추가 로드 실패:", err);
+            setHasMoreProducts(false);
         } finally {
             setLoadingProducts(false);
         }
     }, [sellerId, productPage, loadingProducts, hasMoreProducts]);
 
+    // 리뷰 무한 스크롤 observer
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting) {
-                    if (hasMoreReviews) {
-                        loadMoreReviews();
-                    }
-                    if (hasMoreProducts) {
-                        loadMoreProducts();
-                    }
-                }
-            },
-            { threshold: 0.5 }
-        );
+        const reviewObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMoreReviews && !loadingReviews) {
+                loadMoreReviews();
+            }
+        }, { 
+            threshold: 0.1,
+            rootMargin: '50px'
+        });
 
-        if (observerTarget.current) {
-            observer.observe(observerTarget.current);
+        if (reviewObserverTarget.current) {
+            reviewObserver.observe(reviewObserverTarget.current);
         }
 
         return () => {
-            if (observerTarget.current) {
-                observer.unobserve(observerTarget.current);
+            if (reviewObserverTarget.current) {
+                reviewObserver.unobserve(reviewObserverTarget.current);
             }
         };
-    }, [loadMoreReviews, loadMoreProducts, hasMoreReviews, hasMoreProducts]);
+    }, [loadMoreReviews, hasMoreReviews, loadingReviews]);
+
+    // 상품 무한 스크롤 observer
+    useEffect(() => {
+        const productObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMoreProducts && !loadingProducts) {
+                loadMoreProducts();
+            }
+        }, { 
+            threshold: 0.1,
+            rootMargin: '50px'
+        });
+
+        if (productObserverTarget.current) {
+            productObserver.observe(productObserverTarget.current);
+        }
+
+        return () => {
+            if (productObserverTarget.current) {
+                productObserver.unobserve(productObserverTarget.current);
+            }
+        };
+    }, [loadMoreProducts, hasMoreProducts, loadingProducts]);
 
     return (
         <>
-            {/* 판매자 리뷰 섹션 */}
-            <div className="mb-8 p-4 bg-white rounded-lg shadow-md">
-                <h2 className="text-2xl font-light text-gray-800 mb-4 border-b pb-2">판매자 리뷰</h2>
-                {reviews.length === 0 && !loadingReviews ? (
-                    <p className="text-gray-500">아직 작성된 리뷰가 없습니다.</p>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {reviews.map((review) => {
-                            const isExpanded = expandedReviews[review.reviewId];
-                            const displayContent = isExpanded
-                                ? review.content
-                                : (review.content && review.content.length > REVIEW_SUMMARY_LENGTH
-                                    ? review.content.substring(0, REVIEW_SUMMARY_LENGTH) + '...'
-                                    : review.content);
+            <div className="mb-12 p-6 bg-blue-50 rounded-2xl shadow-lg border border-blue-100">
+            <h2 className="text-2xl font-semibold text-blue-900 mb-6 border-b border-blue-200 pb-2">
+                🗣️ 판매자 리뷰
+            </h2>
 
-                            return (
-                                <div key={review.reviewId} className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
-                                    <div className="flex items-center mb-2">
-                                        <div className="flex text-yellow-500">
-                                            {[...Array(5)].map((_, i) => (
-                                                <svg
-                                                    key={i}
-                                                    className={`w-5 h-5 ${i < review.rating ? 'text-yellow-500' : 'text-gray-300'}`}
-                                                    fill="currentColor"
-                                                    viewBox="0 0 20 20"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.071 3.292a1 1 0 00.95.69h3.46c.969 0 1.371 1.24.588 1.81l-2.793 2.03.882 3.291c.269 1.003-.836 1.772-1.611 1.144L10 14.073l-2.793 2.03c-.775.628-1.88-.141-1.611-1.144l.882-3.292-2.793-2.03c-.783-.57-.38-1.81.588-1.81h3.46a1 1 0 00.95-.69l1.07-3.292z" />
-                                                </svg>
-                                            ))}
-                                        </div>
-                                        <span className="ml-2 text-gray-700 text-sm font-light">({review.rating}/5)</span>
-                                        <span className="ml-2 text-gray-700 text-xs">{review.productName}</span>
-                                    </div>
-                                    <p className="text-gray-800 text-sm mb-2">
-                                        {displayContent}
-                                        {review.content && review.content.length > REVIEW_SUMMARY_LENGTH && (
-                                            <button
-                                                onClick={() => toggleReviewExpansion(review.reviewId)}
-                                                className="text-blue-600 hover:underline ml-1 text-xs"
-                                            >
-                                                {isExpanded ? '간략히' : '더보기'}
-                                            </button>
-                                        )}
-                                    </p>
-                                    {review.imageUrls && Array.isArray(review.imageUrls) && review.imageUrls.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mb-2">
-                                            {review.imageUrls.map((imageUrl, idx) => (
-                                                <ImageWithFallback
-                                                    key={idx}
-                                                    src={imageUrl}
-                                                    alt={`리뷰 이미지 ${idx + 1}`}
-                                                    className="w-16 h-16 object-cover rounded-md"
-                                                    fallbackSrc="/images/placeholder.jpg"
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
-                                    <div className="text-gray-500 text-xs flex justify-between">
-                                        <span>고객 ID: {review.customerId}</span>
-                                        <span>{review.createdAt ? new Date(review.createdAt).toLocaleDateString('ko-KR') : ''}</span>
-                                    </div>
-                                    {review.isHidden && (
-                                        <span className="text-red-500 text-xs mt-1"> (숨김 처리된 리뷰)</span>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-                {/* 리뷰 로딩 중 표시 */}
-                {loadingReviews && (
-                    <div className="flex justify-center items-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                    </div>
-                )}
-                {/* 더 이상 리뷰가 없을 때 메시지 표시 */}
-                {!hasMoreReviews && reviews.length > 0 && (
-                    <p className="text-center text-gray-500 text-sm mt-4">더 이상 리뷰가 없습니다.</p>
-                )}
-            </div>
+            {reviews.length === 0 && !loadingReviews ? (
+                <p className="text-gray-500">아직 작성된 리뷰가 없습니다.</p>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-1 sm:gap-5">
+                {/* gap: 모바일에서 1, sm 이상 5로 */}
+                {reviews.map((review) => {
+                    const isExpanded = expandedReviews[review.reviewId];
+                    const displayContent = isExpanded
+                    ? review.content
+                    : review.content.length > REVIEW_SUMMARY_LENGTH
+                    ? review.content.substring(0, REVIEW_SUMMARY_LENGTH) + '...'
+                    : review.content;
 
-            {/* 판매자 상품 목록 섹션 */}
-            <div className="mb-8 p-4 bg-white rounded-lg shadow-md">
-                <h2 className="text-2xl font-light text-gray-800 mb-4 border-b pb-2">판매자 상품 목록</h2>
-                {products.length === 0 && !loadingProducts ? (
-                    <p className="text-gray-500">등록된 상품이 없습니다.</p>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {products.map((product) => (
-                            // ⭐ 상품 클릭 시 상세 페이지로 이동하도록 Link 컴포넌트로 감쌈 ⭐
-                            <Link
-                                key={product.id}
-                                href={`/main/products/${product.id}`} // 상품 상세 페이지 URL (예시)
-                                className="block border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
+                    return (
+                    <div
+                        key={review.reviewId}
+                        className="rounded-xl bg-white p-3 shadow-md border border-gray-100 sm:p-4 sm:mb-2"
+                    >
+                        <div className="flex justify-end mb-2">
+                        <div
+                            className={`flex items-center gap-1 px-2 py-0.5 rounded-full border ${getTrafficLightBgClass(
+                            review.rating
+                            )} bg-white`}
+                        >
+                            <span className="text-sm sm:text-base">{getTrafficLightEmoji(review.rating)}</span>
+                            <span className="text-xs sm:text-sm text-gray-700">{getTrafficLightText(review.rating)}</span>
+                        </div>
+                        </div>
+
+                        <p className="text-gray-800 text-xs sm:text-sm mb-2 leading-relaxed">
+                        {displayContent}
+                        {review.content.length > REVIEW_SUMMARY_LENGTH && (
+                            <button
+                            onClick={() => toggleReviewExpansion(review.reviewId)}
+                            className="text-indigo-600 hover:underline ml-1 text-xs"
                             >
-                                <ImageWithFallback
-                                    src={product.imageThumbnailUrl}
-                                    alt={product.name || '상품 이미지'}
-                                    className="w-full h-48 object-cover"
-                                    fallbackSrc={`https://placehold.co/400x300/e0e0e0/555555?text=${product.name || 'Product'}`}
-                                />
-                                <div className="p-4">
-                                    <h3 className="text-lg font-light text-gray-900 mb-1 line-clamp-2">{product.name || '상품명 없음'}</h3>
-                                    <p className="text-gray-700 text-base font-light mb-2">
-                                        {product.price ? product.price.toLocaleString('ko-KR') + '원' : '가격 정보 없음'}
-                                    </p>
-                                    <p className="text-gray-600 text-sm">재고: {product.stock}</p>
-                                    <p className="text-gray-600 text-sm">상태: {product.status}</p>
-                                    <p className="text-gray-600 text-sm">카테고리: {product.categoryName}</p>
-                                    {product.parentCategoryName && <p className="text-gray-600 text-sm">상위 카테고리: {product.parentCategoryName}</p>}
-                                    <p className="text-gray-600 text-sm">판매자: {product.sellerName}</p>
-                                    <p className="text-gray-600 text-sm">활성화: {product.isActive ? '판매중' : '판매중지'}</p>
-                                    <p className="text-gray-600 text-sm">위시리스트: {product.isWished ? '추가됨' : '미추가'}</p>
-                                </div>
-                            </Link>
-                        ))}
+                            {isExpanded ? '간략히' : '더보기'}
+                            </button>
+                        )}
+                        </p>
+
+                        {review.imageUrls?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {review.imageUrls.map((url, idx) => (
+                            <ImageWithFallback
+                                key={idx}
+                                src={url}
+                                alt={`리뷰 이미지 ${idx + 1}`}
+                                className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-md"
+                                fallbackSrc="/images/placeholder.jpg"
+                            />
+                            ))}
+                        </div>
+                        )}
+
+                        <div className="text-gray-500 text-[10px] sm:text-xs flex justify-between">
+                        <span>고객 ID: {review.customerId}</span>
+                        <span>{new Date(review.createdAt).toLocaleDateString('ko-KR')}</span>
+                        </div>
                     </div>
-                )}
-                {/* 상품 로딩 중 표시 */}
-                {loadingProducts && (
-                    <div className="flex justify-center items-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                    );
+                })}
+                </div>
+            )}
+            
+
+
+            {/* 더보기 버튼 */}
+            {hasMoreReviews && !loadingReviews && (
+            <div className="text-center mt-8">
+                <button
+                onClick={loadMoreReviews}
+                className="px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
+                >
+                리뷰 더보기
+                </button>
+            </div>
+            )}
+
+            {loadingReviews && <p className="text-center text-sm text-gray-500 mt-4">리뷰 로딩 중...</p>}
+            {!hasMoreReviews && reviews.length > 0 && (
+            <p className="text-center text-gray-400 text-sm mt-4"> 더 이상 리뷰가 없습니다.</p>
+            )}
+
+            {/* 리뷰 무한 스크롤 observer 타겟 */}
+            {hasMoreReviews && <div ref={reviewObserverTarget} className="h-1" />}
+        </div>
+
+        {/* 상품 영역 */}
+        <div className="mb-12 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b border-gray-300 pb-2">
+            🛒 판매자 상품 목록
+            </h2>
+
+            {products.length === 0 && !loadingProducts ? (
+            <p className="text-gray-500">등록된 상품이 없습니다.</p>
+            ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((product) => {
+                const isInactive = !product.active;
+
+                return (
+                <Link
+                    key={product.id}
+                    href={`/main/products/${product.id}`}
+                    className={`rounded-xl overflow-hidden shadow hover:shadow-lg transition flex flex-col ${
+                    isInactive ? 'opacity-50' : ''
+                    }`}
+                >
+                    <ImageWithFallback
+                    src={product.imageThumbnailUrl}
+                    alt={product.name}
+                    className="w-full h-30 sm:h-48 object-cover"
+                    fallbackSrc={`https://placehold.co/400x300/e0e0e0/555555?text=${product.name}`}
+                    />
+
+                    <div className="p-2 sm:p-4 bg-gray-50 flex-grow flex flex-col justify-between gap-0.5 sm:gap-1">
+                    <h3 className="text-xs sm:text-base font-medium line-clamp-2 text-gray-800">
+                        {product.name}
+                    </h3>
+                    <p className="text-xs sm:text-base text-gray-700">{product.price?.toLocaleString()}원</p>
+                    <p className="text-[11px] sm:text-sm text-gray-500">상태: {product.status}</p>
                     </div>
-                )}
-                {/* 더 이상 상품이 없을 때 메시지 표시 */}
-                {!hasMoreProducts && products.length > 0 && (
-                    <p className="text-center text-gray-500 text-sm mt-4">더 이상 상품이 없습니다.</p>
-                )}
+
+                </Link>
+                );
+            })}
             </div>
 
-            {/* Intersection Observer 대상 요소 (무한 스크롤 트리거) */}
-            <div ref={observerTarget} className="h-4 w-full bg-transparent"></div>
+            )}
+
+            {loadingProducts && <p className="text-center text-sm text-gray-500 mt-4">상품 로딩 중...</p>}
+            {!hasMoreProducts && products.length > 0 && (
+            <p className="text-center text-gray-400 text-sm mt-4"> 더 이상 상품이 없습니다.</p>
+            )}
+
+            {/* 상품 무한 스크롤 observer 타겟 */}
+            {hasMoreProducts && <div ref={productObserverTarget} className="h-1" />}
+        </div>
         </>
+
+
     );
 }

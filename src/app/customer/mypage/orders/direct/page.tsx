@@ -212,6 +212,8 @@ export default function DirectOrderPage() {
             };
             sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
 
+            const sanitizedPhone = shippingInfo.phone.replace(/[^0-9]/g, '');
+
             const paymentOptions: PaymentRequestOptions = {
                 orderId: orderId,
                 orderName: `${productInfo.productName} ${productInfo.quantity}개`,
@@ -220,8 +222,9 @@ export default function DirectOrderPage() {
                 failUrl: `${window.location.origin}/customer/mypage/orders/fail`,
                 customerEmail: userProfile.email || 'customer@example.com',
                 customerName: shippingInfo.receiverName,
-                customerMobilePhone: shippingInfo.phone,
+                customerMobilePhone: sanitizedPhone,
             };
+
 
             console.log('결제 옵션:', paymentOptions);
 
@@ -240,9 +243,10 @@ export default function DirectOrderPage() {
 
     const processPaymentApproval = async (paymentKey: string, orderId: string, amount: number) => {
         try {
+            const sanitizedPhone = shippingInfo.phone.replace(/[^0-9]/g, '');
             const payRequestDTO: PayRequestDTO = {
                 receiverName: shippingInfo.receiverName,
-                phone: shippingInfo.phone,
+                phone: sanitizedPhone,
                 deliveryAddress: shippingInfo.address,
                 paymentMethod: 'CARD', // 토스페이먼츠로 고정
                 paymentKey: paymentKey,

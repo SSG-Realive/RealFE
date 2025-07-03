@@ -182,8 +182,12 @@ export default function ProductDetailPage() {
                   <p><span className="font-light">카테고리:</span> {product.categoryName}</p>
               )}
               {product.sellerName && (
-                  <p><span className="font-light">판매자:</span> {product.sellerName}</p>
+                <p className="cursor-pointer hover:underline text-blue-600"
+                  onClick={() => router.push(`/main/seller/${product.id}`)}>
+                  <span className="font-light text-gray-700">판매자:</span> {product.sellerName}
+                </p>
               )}
+
             </div>
 
             <div className="border-t border-b py-6 mb-8">

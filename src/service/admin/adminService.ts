@@ -125,14 +125,22 @@ export async function getMonthlySummariesForPeriod(startDate: string, endDate: s
 // 상품 품질별 통계 조회
 export async function getProductQualityStats() {
   try {
-    const response = await adminApi.get('/admin/products?size=1000');
-    const products = response.data.dtoList || [];
+    // 올바른 통계 API 호출
+    const today = new Date().toISOString().split('T')[0];
+    const response = await adminApi.get(`/admin/stats/dashboard?date=${today}`);
+    const dashboardStats = response.data.data;
+    
+    // 전체 상품 목록도 함께 조회하여 품질별 통계 계산
+    const productsResponse = await adminApi.get('/admin/products?size=1000');
+    const products = productsResponse.data.dtoList || [];
     
     const stats = {
       high: products.filter((p: any) => p.status === "상").length,
       medium: products.filter((p: any) => p.status === "중").length,
       low: products.filter((p: any) => p.status === "하").length,
-      total: products.length
+      total: dashboardStats.totalProducts || products.length,
+      sellerProducts: dashboardStats.sellerProducts || 0,
+      adminProducts: dashboardStats.adminProducts || 0
     };
     
     return stats;

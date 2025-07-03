@@ -5,6 +5,7 @@ interface TrafficLightStatusCardProps {
   rating: number;
   count?: number;
   className?: string;
+  onClick?: () => void;
 }
 
 function getCircleColor(rating: number, reviewCount: number) {
@@ -40,11 +41,15 @@ export default function TrafficLightStatusCard({
   title, 
   rating, 
   count,
-  className = "" 
+  className = "",
+  onClick
 }: TrafficLightStatusCardProps) {
   const isNoReview = !count || rating === 0;
   return (
-    <div className={`bg-[#f3f4f6] rounded-2xl shadow-xl border-2 border-[#d1d5db] flex flex-col items-center justify-center py-8 px-6 min-h-[180px] min-w-[220px] transition-all hover:border-[#a89f91] hover:shadow-2xl ${className}`}>
+    <div 
+      className={`bg-[#f3f4f6] rounded-2xl shadow-xl border-2 border-[#d1d5db] flex flex-col items-center justify-center py-8 px-6 min-h-[180px] min-w-[220px] transition-all hover:border-[#a89f91] hover:shadow-2xl ${onClick ? 'cursor-pointer hover:scale-105' : ''} ${className}`}
+      onClick={onClick}
+    >
       <div className="flex flex-col items-center justify-center w-full">
         <span className="mb-2 animate-pulse" style={{ display: 'inline-block' }}>
           <svg width="56" height="56" viewBox="0 0 56 56">

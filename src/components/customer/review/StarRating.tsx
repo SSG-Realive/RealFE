@@ -18,9 +18,10 @@ export default function StarRating({ rating, setRating, setTempRating }: StarRat
     const offsetX = e.clientX - rect.left;
     const percent = offsetX / rect.width;
     const newRating = Math.round(percent * 10) / 2;
-    const clamped = newRating < 0.5 ? 0.5 : newRating > 5 ? 5 : newRating;
+    const clamped = newRating < 1 ? 1 : newRating > 5 ? 5 : newRating;
     setHoverRating(clamped);
-    setTempRating?.(clamped); // 부모에게 전달
+    setTempRating?.(clamped); // 마우스 이동 시 임시로 별점 설정
+
   };
 
   const handleClick = () => {

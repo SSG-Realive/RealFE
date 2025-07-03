@@ -1,35 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Package, DollarSign, Eye } from "lucide-react";
-import apiClient from "@/lib/apiClient";
+import { Package, DollarSign, Eye, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
 import dynamic from 'next/dynamic';
 import { ApexOptions } from 'apexcharts';
 import { getProductQualityStats, getDailyProductRegistrationStats } from '@/service/admin/adminService';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-interface ProductStats {
-  totalProducts: number;
-  sellerProducts: number;
-  adminProducts: number;
-  highQualityProducts: number;    // 상
-  mediumQualityProducts: number;  // 중
-  lowQualityProducts: number;     // 하
-  totalValue: number;
-  averagePrice: number;
-}
-
-interface ProductQualityStats {
-  high: number;
-  medium: number;
-  low: number;
-  total: number;
-}
-
 interface DailyProductRegistration {
-  date: string;  // "2024-06-15" 형태
+  date: string;
   count: number;
 }
 
@@ -80,8 +59,8 @@ export default function ProductDashboardPage() {
   // 통계 카드용 데이터 계산
   const stats = productStats ? {
     totalProducts: productStats.total,
-    sellerProducts: productStats.total,
-    adminProducts: 0,
+    sellerProducts: productStats.sellerProducts,
+    adminProducts: productStats.adminProducts,
     highQualityProducts: productStats.high,
     mediumQualityProducts: productStats.medium,
     lowQualityProducts: productStats.low,
@@ -93,7 +72,7 @@ export default function ProductDashboardPage() {
   const pieChartOptions: ApexOptions = {
     chart: {
       type: 'donut',
-      height: 200,
+      height: 250,
       toolbar: {
         show: false
       }
@@ -101,25 +80,25 @@ export default function ProductDashboardPage() {
     labels: ['상', '중', '하'],
     colors: ['#10b981', '#f59e0b', '#ef4444'],
     legend: {
-      position: 'bottom',
-      labels: {
-        colors: '#6b7280'
-      }
+      show: false
     },
     dataLabels: {
-      enabled: true,
-      formatter: function(val) {
-        return `${val}%`;
-      },
-      style: {
-        fontSize: '12px',
-        colors: ['#fff']
+      enabled: false
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '60%',
+          labels: {
+            show: false
+          }
+        }
       }
     },
     tooltip: {
-      theme: 'dark',
+      theme: 'light',
       y: {
-        formatter: function(value, { series, seriesIndex, dataPointIndex, w }) {
+        formatter: function(value) {
           return `${value}개`;
         }
       }
@@ -170,7 +149,7 @@ export default function ProductDashboardPage() {
       strokeDashArray: 5
     },
     tooltip: {
-      theme: 'dark',
+      theme: 'light',
       y: {
         formatter: function(value) {
           return `${value}개`;
@@ -186,18 +165,17 @@ export default function ProductDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow p-6">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-gray-400 rounded-full animate-spin mx-auto" style={{ animationDelay: '0.5s' }}></div>
+          </div>
+          <p className="text-gray-600 text-lg font-medium">상품 통계를 불러오는 중...</p>
+          <div className="mt-4 flex justify-center space-x-2">
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
           </div>
         </div>
       </div>
@@ -206,39 +184,52 @@ export default function ProductDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">오류가 발생했습니다</h3>
-            <p className="text-gray-600">{error}</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-32 h-32 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
+            <AlertTriangle className="w-16 h-16 text-red-500" />
           </div>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">오류가 발생했습니다</h3>
+          <p className="text-gray-600 mb-8 text-lg">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-8 py-4 bg-gray-800 text-white rounded-2xl font-semibold hover:bg-gray-700 transition-all duration-300"
+          >
+            다시 시도
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-8 w-full">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto p-6">
         {/* 헤더 섹션 */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">상품 통계 대시보드</h1>
-              <p className="text-gray-600">전체 상품 현황과 통계를 한눈에 확인하세요</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="bg-white rounded-lg px-4 py-2 shadow-sm border">
-                <div className="text-sm text-gray-500">마지막 업데이트</div>
-                <div className="text-sm font-medium text-gray-900">
-                  {new Date().toLocaleDateString('ko-KR', { 
-                    month: 'long', 
-                    day: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-8 h-8 text-white" />
                 </div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-gray-800">
+                  상품 통계 대시보드
+                </h1>
+                <p className="text-gray-600 mt-1">전체 상품 현황과 통계를 한눈에 확인하세요</p>
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-2xl px-6 py-3 border border-gray-200">
+              <div className="text-gray-600 text-sm">마지막 업데이트</div>
+              <div className="text-lg font-bold text-gray-800">
+                {new Date().toLocaleDateString('ko-KR', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
               </div>
             </div>
           </div>
@@ -247,18 +238,16 @@ export default function ProductDashboardPage() {
         {/* 품질 경고 섹션 */}
         {productStats && productStats.low > productStats.high && (
           <div className="mb-8">
-            <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-xl p-6 shadow-sm">
+            <div className="bg-red-50 border border-red-200 rounded-3xl p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
+                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-6 h-6 text-red-600" />
                   </div>
                 </div>
                 <div className="ml-4">
                   <h3 className="text-lg font-semibold text-red-800">품질 관리 주의</h3>
-                  <p className="text-red-700 mt-1">하품질 상품이 상품질 상품보다 많습니다. 품질 관리가 필요합니다.</p>
+                  <p className="text-red-700 mt-1">품질이 "하"인 상품이 "상" 상품보다 많습니다. 품질 관리가 필요합니다.</p>
                 </div>
               </div>
             </div>
@@ -266,75 +255,69 @@ export default function ProductDashboardPage() {
         )}
 
         {/* 메인 통계 카드 그리드 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* 전체 상품 카드 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 w-full max-w-full min-w-0 overflow-x-auto">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">전체 상품</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.totalProducts.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-gray-800">{stats?.totalProducts.toLocaleString()}</p>
                 <div className="mt-2 flex items-center text-sm">
                   <span className="text-gray-500">판매자</span>
                   <span className="ml-2 font-medium text-blue-600">{stats?.sellerProducts.toLocaleString()}</span>
                   <span className="mx-2 text-gray-300">•</span>
                   <span className="text-gray-500">관리자</span>
-                  <span className="ml-2 font-medium text-purple-600">{stats?.adminProducts.toLocaleString()}</span>
+                  <span className="ml-2 font-medium text-gray-600">{stats?.adminProducts.toLocaleString()}</span>
                 </div>
               </div>
-              <div className="p-3 bg-blue-50 rounded-xl">
+              <div className="p-3 bg-blue-100 rounded-2xl">
                 <Package className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
 
           {/* 품질별 카드들 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 w-full max-w-full min-w-0 overflow-x-auto">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">상</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">상품질</p>
                 <p className="text-3xl font-bold text-green-600">{stats?.highQualityProducts.toLocaleString()}</p>
                 <div className="mt-2 text-sm text-gray-500">
                   {stats?.totalProducts ? Math.round((stats.highQualityProducts / stats.totalProducts) * 100) : 0}% 비율
                 </div>
               </div>
-              <div className="p-3 bg-green-50 rounded-xl">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+              <div className="p-3 bg-green-100 rounded-2xl">
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 w-full max-w-full min-w-0 overflow-x-auto">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">중</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">중품질</p>
                 <p className="text-3xl font-bold text-yellow-600">{stats?.mediumQualityProducts.toLocaleString()}</p>
                 <div className="mt-2 text-sm text-gray-500">
                   {stats?.totalProducts ? Math.round((stats.mediumQualityProducts / stats.totalProducts) * 100) : 0}% 비율
                 </div>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-xl">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
+              <div className="p-3 bg-yellow-100 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 text-yellow-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 w-full max-w-full min-w-0 overflow-x-auto">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">하</p>
+                <p className="text-sm font-medium text-gray-600 mb-1">하품질</p>
                 <p className="text-3xl font-bold text-red-600">{stats?.lowQualityProducts.toLocaleString()}</p>
                 <div className="mt-2 text-sm text-gray-500">
                   {stats?.totalProducts ? Math.round((stats.lowQualityProducts / stats.totalProducts) * 100) : 0}% 비율
                 </div>
               </div>
-              <div className="p-3 bg-red-50 rounded-xl">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <div className="p-3 bg-red-100 rounded-2xl">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
               </div>
             </div>
           </div>
@@ -343,10 +326,10 @@ export default function ProductDashboardPage() {
         {/* 가치 및 분포 섹션 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* 총 상품 가치 */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">총 상품 가치</h3>
-              <div className="p-2 bg-purple-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-800">총 상품 가치</h3>
+              <div className="p-2 bg-purple-100 rounded-xl">
                 <DollarSign className="w-5 h-5 text-purple-600" />
               </div>
             </div>
@@ -357,23 +340,23 @@ export default function ProductDashboardPage() {
                 </p>
                 <p className="text-sm text-gray-500">전체 상품 가치</p>
               </div>
-              <div className="pt-3 border-t border-gray-100">
+              <div className="pt-3 border-t border-gray-200">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">평균 가격</span>
-                  <span className="font-medium text-gray-900">{stats?.averagePrice.toLocaleString()}원</span>
+                  <span className="font-medium text-gray-800">{stats?.averagePrice.toLocaleString()}원</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* 품질별 분포 파이 차트 */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <div className="lg:col-span-2 bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">품질별 분포</h3>
+                <h3 className="text-lg font-semibold text-gray-800">품질별 분포</h3>
                 <p className="text-sm text-gray-600">상품 품질별 등록 현황</p>
               </div>
-              <div className="p-2 bg-blue-50 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-xl">
                 <Eye className="w-5 h-5 text-blue-600" />
               </div>
             </div>
@@ -388,18 +371,42 @@ export default function ProductDashboardPage() {
                   />
                 </div>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{productStats.high}</div>
-                      <div className="text-sm text-green-700 font-medium">상</div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-green-100 rounded-xl">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium text-green-700">상품질</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-600">{productStats.high}개</div>
+                        <div className="text-sm text-green-600">
+                          {productStats.total > 0 ? ((productStats.high / productStats.total) * 100).toFixed(1) : 0}%
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-600">{productStats.medium}</div>
-                      <div className="text-sm text-yellow-700 font-medium">중</div>
+                    <div className="flex items-center justify-between p-3 bg-yellow-100 rounded-xl">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
+                        <span className="font-medium text-yellow-700">중품질</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-yellow-600">{productStats.medium}개</div>
+                        <div className="text-sm text-yellow-600">
+                          {productStats.total > 0 ? ((productStats.medium / productStats.total) * 100).toFixed(1) : 0}%
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-center p-4 bg-red-50 rounded-lg">
-                      <div className="text-2xl font-bold text-red-600">{productStats.low}</div>
-                      <div className="text-sm text-red-700 font-medium">하</div>
+                    <div className="flex items-center justify-between p-3 bg-red-100 rounded-xl">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
+                        <span className="font-medium text-red-700">하품질</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-red-600">{productStats.low}개</div>
+                        <div className="text-sm text-red-600">
+                          {productStats.total > 0 ? ((productStats.low / productStats.total) * 100).toFixed(1) : 0}%
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -409,10 +416,10 @@ export default function ProductDashboardPage() {
         </div>
 
         {/* 일별 상품 등록 추이 차트 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+        <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">일별 상품 등록 추이</h3>
+              <h3 className="text-lg font-semibold text-gray-800">일별 상품 등록 추이</h3>
               <p className="text-sm text-gray-600">최근 30일간 상품 등록 현황</p>
             </div>
             <div className="flex items-center space-x-2">
@@ -433,10 +440,8 @@ export default function ProductDashboardPage() {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
+                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="w-8 h-8 text-gray-400" />
                   </div>
                   <p className="text-gray-500">데이터가 없습니다</p>
                 </div>

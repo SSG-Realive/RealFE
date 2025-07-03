@@ -209,7 +209,7 @@ export default function SellerSettlementPage() {
         
         if (type === 'all') {
             // 전체 조회 즉시 실행
-            fetchAll();
+        fetchAll();
         } else if (type === 'date') {
             // 현재 설정된 날짜로 조회 (없으면 오늘 날짜)
             const dateToUse = filterDate || getTodayDate();

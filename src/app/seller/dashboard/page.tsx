@@ -37,16 +37,16 @@ export default function SellerDashboardPage() {
   };
 
   const fetchDashboardData = async (isRefresh = false) => {
-    try {
+      try {
       if (isRefresh) {
         setRefreshing(true);
       } else {
         setLoading(true);
       }
-      
-      // 기본 대시보드 데이터
-      const dashboardData = await getDashboard();
-      setDashboard(dashboardData);
+        
+        // 기본 대시보드 데이터
+        const dashboardData = await getDashboard();
+        setDashboard(dashboardData);
 
       // 실제 미답변 문의 수 계산을 위해 QnA 데이터 조회
       try {
@@ -71,9 +71,9 @@ export default function SellerDashboardPage() {
         setActualUnansweredCount(dashboardData?.unansweredQnaCount || 0);
       }
 
-      // 총 매출(전체 누적) 통계
-      const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
-      const statsEndDate = new Date().toISOString().split('T')[0];
+        // 총 매출(전체 누적) 통계
+        const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
+        const statsEndDate = new Date().toISOString().split('T')[0];
       console.log(`=== 총 매출/주문 통계 조회 ===`);
       console.log(`조회 기간: ${statsStartDate} ~ ${statsEndDate}`);
       console.log(`API URL: /seller/dashboard/sales-stats?startDate=${statsStartDate}&endDate=${statsEndDate}`);
@@ -115,33 +115,33 @@ export default function SellerDashboardPage() {
       }
       
       console.log('setSalesStats 호출 전 - statsData:', statsData);
-      setSalesStats(statsData);
+        setSalesStats(statsData);
       console.log('setSalesStats 호출 후 - salesStats 상태 업데이트됨');
 
-      // 일별 추이 (최근 30일)
-      const endDate = new Date().toISOString().split('T')[0];
-      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      const dailyData = await getDailySalesTrend(startDate, endDate);
-      setDailyTrend(dailyData);
+        // 일별 추이 (최근 30일)
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const dailyData = await getDailySalesTrend(startDate, endDate);
+        setDailyTrend(dailyData);
 
-      // 월별 추이 (최근 6개월)
-      const endMonthDate = new Date();
-      const startMonthDate = new Date();
-      startMonthDate.setMonth(endMonthDate.getMonth() - 5);
-      startMonthDate.setDate(1); // 각 월의 1일로 맞추기
-      const startMonthStr = startMonthDate.toISOString().split('T')[0];
-      const endMonthStr = endMonthDate.toISOString().split('T')[0];
-      const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
-      setMonthlyTrend(monthlyData);
+        // 월별 추이 (최근 6개월)
+        const endMonthDate = new Date();
+        const startMonthDate = new Date();
+        startMonthDate.setMonth(endMonthDate.getMonth() - 5);
+        startMonthDate.setDate(1); // 각 월의 1일로 맞추기
+        const startMonthStr = startMonthDate.toISOString().split('T')[0];
+        const endMonthStr = endMonthDate.toISOString().split('T')[0];
+        const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
+        setMonthlyTrend(monthlyData);
 
-      setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
-    } catch (err) {
-      console.error('대시보드 정보 가져오기 실패', err);
-    } finally {
-      setLoading(false);
+        setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
+      } catch (err) {
+        console.error('대시보드 정보 가져오기 실패', err);
+      } finally {
+        setLoading(false);
       setRefreshing(false);
-    }
-  };
+      }
+    };
 
   const handleRefresh = () => {
     fetchDashboardData(true);

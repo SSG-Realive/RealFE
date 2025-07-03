@@ -7,6 +7,7 @@ import { SellerOrderDetailResponse, DeliveryStatus } from '@/types/seller/seller
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import Image from 'next/image';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function OrderDetailPage() {
     const checking = useSellerAuthGuard();
@@ -20,7 +21,7 @@ export default function OrderDetailPage() {
     const [newStatus, setNewStatus] = useState<string>('');
     const [trackingNumber, setTrackingNumber] = useState<string>('');
     const [carrier, setCarrier] = useState<string>('');
-
+    const {show} = useGlobalDialog();
     const getValidStatusOptions = (currentStatus: string): string[] => {
         // 백엔드 규칙에 맞춰 유효한 전이만 허용
         switch (currentStatus) {
@@ -70,7 +71,7 @@ export default function OrderDetailPage() {
         const isCarrierChanged = order.carrier !== carrier;
 
         if (!isStatusChanged && !isTrackingChanged && !isCarrierChanged) {
-            alert('변경사항이 없습니다.');
+            show('변경사항이 없습니다.');
             return;
         }
 
@@ -87,7 +88,7 @@ export default function OrderDetailPage() {
         try {
             await updateDeliveryStatus(Number(orderId), updateData);
 
-            alert('배송 상태가 변경되었습니다.');
+            await show('배송 상태가 변경되었습니다.');
             const updatedData = await getOrderDetail(Number(orderId));
             setOrder(updatedData);
             setNewStatus(updatedData.deliveryStatus);
@@ -96,7 +97,7 @@ export default function OrderDetailPage() {
         } catch (err) {
             console.error('배송 상태 변경 실패', err);
             console.error('Error details:', err);
-            alert('배송 상태 변경 중 오류 발생: ' + (err as any)?.response?.data?.message || err);
+            show('배송 상태 변경 중 오류 발생: ');
         }
     };
 
@@ -106,11 +107,11 @@ export default function OrderDetailPage() {
 
         try {
             await cancelOrderDelivery(Number(orderId));
-            alert('배송이 취소되었습니다.');
+            await show('배송이 취소되었습니다.');
             location.reload();
         } catch (err) {
             console.error('배송 취소 실패', err);
-            alert('배송 취소 중 오류 발생');
+            show('배송 취소 중 오류 발생');
         }
     };
 

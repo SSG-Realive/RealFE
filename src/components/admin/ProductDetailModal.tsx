@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { X, Package, DollarSign, Calendar, User, ShoppingCart, Eye, Star } from "lucide-react";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 interface Product {
   id: number;
@@ -32,7 +33,7 @@ export default function ProductDetailModal({
   const [purchaseQuantity, setPurchaseQuantity] = useState<number>(1);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [showPurchaseForm, setShowPurchaseForm] = useState(false);
-
+  const {show} = useGlobalDialog();
   // 모달이 열릴 때마다 초기화
   useEffect(() => {
     if (isOpen) {
@@ -56,15 +57,15 @@ export default function ProductDetailModal({
     });
     
     if (numericPrice <= 0 || isNaN(numericPrice)) {
-      alert("유효한 매입 가격을 입력해주세요.");
+      show("유효한 매입 가격을 입력해주세요.");
       return;
     }
     if (purchaseQuantity <= 0) {
-      alert("매입 수량을 입력해주세요.");
+      show("매입 수량을 입력해주세요.");
       return;
     }
     if (purchaseQuantity > product.stock) {
-      alert("매입 수량이 재고보다 많습니다.");
+      show("매입 수량이 재고보다 많습니다.");
       return;
     }
 
@@ -74,7 +75,7 @@ export default function ProductDetailModal({
       onClose();
     } catch (error) {
       console.error("매입 처리 중 오류:", error);
-      alert("매입 처리 중 오류가 발생했습니다.");
+      await show("매입 처리 중 오류가 발생했습니다.");
     } finally {
       setIsPurchasing(false);
     }

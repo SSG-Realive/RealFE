@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Search, Filter, Eye, Package, DollarSign, Calendar, User, ShoppingCart } from "lucide-react";
 import apiClient from "@/lib/apiClient";
 import ProductDetailModal from "@/components/admin/ProductDetailModal";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 // CSS 스타일 추가
 const styles = `
@@ -118,6 +119,7 @@ export default function ProductManagementPage() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const {show} = useGlobalDialog();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -294,7 +296,7 @@ export default function ProductManagementPage() {
       });
 
       if (response.status === 200) {
-        alert(`매입이 완료되었습니다!\n상품: ${selectedProduct?.name}\n매입가: ${purchasePrice.toLocaleString()}원\n수량: ${quantity}개`);
+        show(`매입이 완료되었습니다!\n상품: ${selectedProduct?.name}\n매입가: ${purchasePrice.toLocaleString()}원\n수량: ${quantity}개`);
         
         // 상품 목록 새로고침
         const productsRes = await apiClient.get('/admin/products?size=100', {
@@ -311,7 +313,7 @@ export default function ProductManagementPage() {
         errorMessage = error.response.data.message;
       }
       
-      alert(errorMessage);
+      show(errorMessage);
     }
   };
 

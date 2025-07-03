@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminReviewQnaList, answerAdminReviewQna } from "@/service/admin/reviewService";
 import { AdminReviewQna, AdminReviewQnaListRequest } from "@/types/admin/review";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReviewQnaPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function ReviewQnaPage() {
   const [answeredFilter, setAnsweredFilter] = useState<string>("");
   const [selectedQna, setSelectedQna] = useState<AdminReviewQna | null>(null);
   const [answerText, setAnswerText] = useState("");
+  const {show} = useGlobalDialog();
 
   // Q&A 목록 조회
   const fetchQnas = async (page: number = 1) => {
@@ -56,19 +58,19 @@ export default function ReviewQnaPage() {
   // 답변 등록
   const handleSubmitAnswer = async () => {
     if (!selectedQna || !answerText.trim()) {
-      alert('답변을 입력해주세요.');
+      show('답변을 입력해주세요.');
       return;
     }
 
     try {
       await answerAdminReviewQna(selectedQna.id, { answer: answerText });
-      alert('답변이 등록되었습니다.');
+      show('답변이 등록되었습니다.');
       setSelectedQna(null);
       setAnswerText("");
       fetchQnas(currentPage); // 목록 새로고침
     } catch (err: any) {
       console.error('답변 등록 실패:', err);
-      alert(err.message || '답변 등록에 실패했습니다.');
+      show(err.message || '답변 등록에 실패했습니다.');
     }
   };
 

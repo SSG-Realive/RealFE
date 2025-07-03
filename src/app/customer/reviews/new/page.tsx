@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '@/components/customer/common/Navbar';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 // 
 
@@ -22,7 +23,7 @@ function ReviewPage() {
     const [images, setImages] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
-
+    const {show} = useGlobalDialog();
     const [alreadyReviewed, setAlreadyReviewed] = useState<boolean | null>(null); // 중복 여부
 
     // 토큰을 안전하게 가져오고 파싱하는 함수
@@ -84,7 +85,7 @@ function ReviewPage() {
                     console.error('상세 에러 객체:', err);
                     // 401 Unauthorized 에러라면 로그인 페이지로 리디렉션 등을 고려할 수 있습니다.
                     if (axios.isAxiosError(err) && err.response?.status === 401) {
-                        alert('로그인이 필요하거나 세션이 만료되었습니다.');
+                        show('로그인이 필요하거나 세션이 만료되었습니다.');
                         router.push('/login'); // 로그인 페이지 경로로 변경하세요.
                     }
                 });
@@ -166,7 +167,7 @@ function ReviewPage() {
             if (axios.isAxiosError(error) && error.response) {
                 console.error('리뷰 등록 백엔드 응답 데이터:', error.response.data);
                 if (error.response.status === 401) {
-                    alert('로그인이 필요하거나 세션이 만료되었습니다.');
+                    show('로그인이 필요하거나 세션이 만료되었습니다.');
                     router.push('/login'); // 로그인 페이지 경로로 변경하세요.
                 }
             }

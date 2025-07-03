@@ -6,6 +6,7 @@ import { AdminReviewReport, AdminReviewReportListRequest, ReviewReportStatus } f
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReviewReportedPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function ReviewReportedPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<ReviewReportStatus>('PENDING');
+  const {show} = useGlobalDialog();
 
   // 로그인 체크
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function ReviewReportedPage() {
         router.replace('/admin/login');
         return;
       }
-      alert(err.message || '신고 처리에 실패했습니다.');
+      show(err.message || '신고 처리에 실패했습니다.');
     }
   };
 

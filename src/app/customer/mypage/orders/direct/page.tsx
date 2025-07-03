@@ -1,7 +1,7 @@
 // src/app/customer/mypage/orders/direct/page.tsx (DirectOrderPage)
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { fetchMyProfile } from '@/service/customer/customerService';
@@ -15,6 +15,9 @@ import {
   PaymentRequestOptions
 } from '@/service/order/tossPaymentService';
 import './DirectOrderPage.css';
+import { useGlobalDialog } from '@/app/context/dialogContext';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import AddressInput , { parseAddress } from '@/components/customer/join/AddressInput';
 
 // UserProfile 타입은 그대로 유지
 interface UserProfile {
@@ -29,13 +32,30 @@ export default function DirectOrderPage() {
     const { id: customerId } = useAuthStore();
     const tossPaymentsRef = useRef<any>(null);
     const [scriptLoaded, setScriptLoaded] = useState(false);
-
+    const {show} = useGlobalDialog();
     // --- 상태 관리 ---
     const [productInfo, setProductInfo] = useState<DirectPaymentInfoDTO | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [pageError, setPageError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    const [confirmPromise, setConfirmPromise] = useState<{ resolve: (value: boolean) => void } | null>(null);
+    const [confirmMessage, setConfirmMessage] = useState('');
+
+    const confirm = (message: string): Promise<boolean> => {
+        return new Promise((resolve) => {
+            setConfirmMessage(message);
+            setConfirmPromise({ resolve });
+        });
+    };
+
+    const handleConfirmResolve = (result: boolean) => {
+        if (confirmPromise) {
+            confirmPromise.resolve(result);
+            setConfirmPromise(null);
+        }
+    };
 
     // 배송지 폼 상태
     const [shippingInfo, setShippingInfo] = useState({
@@ -148,6 +168,10 @@ export default function DirectOrderPage() {
     const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPaymentMethod(e.target.value as 'CARD' | 'CELL_PHONE' | 'ACCOUNT');
     };
+    //AddressInput 컴포넌트가 사용할 함수
+const handleAddressChange = useCallback((fullAddress: string) => {
+    setShippingInfo(prev => ({ ...prev, address: fullAddress }));
+}, []);
 
     const handlePayment = async () => {
         console.log('결제하기 버튼 클릭됨');
@@ -156,17 +180,17 @@ export default function DirectOrderPage() {
         console.log('window.TossPayments:', (window as any).TossPayments);
 
         if (!productInfo || !userProfile) {
-            alert("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
+            show("주문 정보를 불러오는 중이거나 유효하지 않습니다.");
             return;
         }
 
         if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
-            alert("배송지 정보를 모두 입력해주세요.");
+            show("배송지 정보를 모두 입력해주세요.");
             return;
         }
 
         const totalPaymentAmount = productInfo.price * productInfo.quantity + 3000;
-        const confirmPayment = window.confirm(
+        const confirmPayment = await confirm(
             `총 ${totalPaymentAmount.toLocaleString()}원에 대해 결제를 진행하시겠습니까?`
         );
 
@@ -183,12 +207,12 @@ export default function DirectOrderPage() {
                     tossPaymentsRef.current = tossPayments;
                     console.log('토스페이먼츠 객체 재초기화 완료');
                 } else {
-                    alert('토스페이먼츠 SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+                    show('토스페이먼츠 SDK가 로드되지 않았습니다. 다시 결제를 진행해주세요.');
                     return;
                 }
             } catch (error) {
                 console.error('토스페이먼츠 객체 재초기화 실패:', error);
-                alert('결제 시스템 초기화에 실패했습니다. 페이지를 새로고침해주세요.');
+                show('결제 시스템 초기화에 실패했습니다. 다시 결제를 진행해 주세요.');
                 return;
             }
         }
@@ -233,7 +257,7 @@ export default function DirectOrderPage() {
             if (error.paymentKey && error.orderId && error.amount) {
                 await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
             } else {
-                alert(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
+                show(`결제 처리 중 오류가 발생했습니다: ${error.message}`);
             }
         }
     };
@@ -265,12 +289,12 @@ export default function DirectOrderPage() {
             }
 
             const result = await response.json();
-            alert('결제가 성공적으로 완료되었습니다!');
+            await show('결제가 성공적으로 완료되었습니다!');
             router.push('/customer/mypage/orders');
             
         } catch (error) {
             console.error('결제 승인 처리 오류:', error);
-            alert('결제 승인 처리 중 오류가 발생했습니다.');
+            show('결제 승인 처리 중 오류가 발생했습니다.');
         }
     };
 
@@ -288,6 +312,13 @@ export default function DirectOrderPage() {
 
     return (
         <div className="order-page-container">
+            {confirmPromise && (
+                <ConfirmDialog
+                    open={true}
+                    message={confirmMessage}
+                    onResolve={handleConfirmResolve}
+                />
+            )}
             {/* 토스페이먼츠 기본 SDK 로드 */}
             <Script
                 src="https://js.tosspayments.com/v1/payment"
@@ -335,7 +366,10 @@ export default function DirectOrderPage() {
                     <input id="phone" name="phone" type="tel" value={shippingInfo.phone} onChange={handleShippingInfoChange} />
 
                     <label htmlFor="address">주소</label>
-                    <input id="address" name="address" value={shippingInfo.address} onChange={handleShippingInfoChange} />
+                    <AddressInput
+        onAddressChange={handleAddressChange}
+        defaultAddress={parseAddress(shippingInfo.address)}
+    />
                 </div>
             </section>
 

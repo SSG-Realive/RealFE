@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { ReviewCreateRequestDTO } from "@/types/reviews/reviewCreateRequestDTO";
 import { ReviewResponseDTO } from "@/types/reviews/reviewResponseDTO";
 import Sidebar from "@/components/seller/SellerSidebar";
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 const NewReviewPage = () => {
     const router = useRouter();
@@ -18,7 +19,7 @@ const NewReviewPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
     const [hasReviewed, setHasReviewed] = useState<boolean>(false); // 리뷰 작성 여부 상태
-
+    const {show} = useGlobalDialog();
     useEffect(() => {
         if (!orderId || Array.isArray(orderId)) {
             setIsLoading(false);
@@ -130,7 +131,7 @@ const NewReviewPage = () => {
             setSuccess(true);
             setHasReviewed(true); // 성공 시 리뷰 작성 상태 업데이트
 
-            alert('리뷰가 성공적으로 작성되었습니다.');
+            show('리뷰가 성공적으로 작성되었습니다.');
             router.push(`/customer/mypage/orders/${orderId}`); // 리뷰 작성 후 주문 상세 페이지로 이동
         } catch (err: any) {
             console.error('리뷰 작성 오류:', err);

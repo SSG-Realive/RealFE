@@ -7,6 +7,7 @@ import { uploadReviewImages, deleteReviewImage } from '@/service/customer/review
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Navbar from '@/components/customer/common/Navbar';
 import StarRating from '@/components/customer/review/StarRating';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function EditReviewPage() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ export default function EditReviewPage() {
   const [tempRating, setTempRating] = useState<number | null>(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const {show} = useGlobalDialog();
   // 이미지 관리
   const [existingImages, setExistingImages] = useState<string[]>([]); // 서버에 저장된 기존 이미지 URL 리스트
   const [newImages, setNewImages] = useState<File[]>([]); // 새로 업로드할 이미지 파일들
@@ -89,11 +90,11 @@ export default function EditReviewPage() {
 
       // 이미지 변경사항 서버 DB 반영이 필요하면 별도 API 호출 로직 추가
 
-      alert('리뷰가 수정되었습니다.');
+      show('리뷰가 수정되었습니다.');
       router.push(`/customer/mypage/reviews/${id}`);
     } catch (err) {
       console.error(err);
-      alert('리뷰 수정 중 오류가 발생했습니다.');
+      show('리뷰 수정 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }

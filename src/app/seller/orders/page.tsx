@@ -40,7 +40,7 @@ export default function SellerOrderListPage() {
   };
 
   const fetchData = async (isRefresh = false) => {
-    try {
+      try {
       if (isRefresh) {
         setRefreshing(true);
       } else {
@@ -67,18 +67,18 @@ export default function SellerOrderListPage() {
         contentLength: res.content?.length
       });
       
-      setOrders(res.content || []);
+        setOrders(res.content || []);
       setTotalPages(res.totalPages || 0);
       setTotalElements(res.totalElements || 0);
-      setError(null);
+        setError(null);
     } catch (err: any) {
-      console.error('주문 목록 조회 실패', err);
-      setError('주문 목록을 불러오는 데 실패했습니다.');
-    } finally {
-      setLoading(false);
+        console.error('주문 목록 조회 실패', err);
+        setError('주문 목록을 불러오는 데 실패했습니다.');
+      } finally {
+        setLoading(false);
       setRefreshing(false);
-    }
-  };
+      }
+    };
 
   const handleRefresh = () => {
     fetchData(true);
@@ -168,7 +168,7 @@ export default function SellerOrderListPage() {
   return (
     <div className="flex flex-col min-h-screen w-full">
       <main className="flex-1">
-        <SellerLayout>
+    <SellerLayout>
           <div className="w-full h-full px-4 py-8">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-xl md:text-2xl font-bold text-[#374151]">주문 관리</h1>
@@ -189,63 +189,63 @@ export default function SellerOrderListPage() {
             <p className="text-sm text-[#6b7280] mb-6">주문번호 기준으로 그룹핑된 주문 목록입니다. 하나의 주문에 여러 상품이 포함될 수 있습니다.</p>
             
             {/* 상단 통계 카드 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
-                  <span className="text-[#374151] text-sm font-semibold">총 주문</span>
-                </div>
-                <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 주문 수</div>
-              </section>
-              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <Clock className="w-8 h-8 text-[#6b7280]" />
-                  <span className="text-[#374151] text-sm font-semibold">대기 중</span>
-                </div>
-                <div className="text-2xl font-bold text-[#374151]">{preparingOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
-              </section>
-              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <Truck className="w-8 h-8 text-[#6b7280]" />
-                  <span className="text-[#374151] text-sm font-semibold">배송 중</span>
-                </div>
-                <div className="text-2xl font-bold text-[#374151]">{inProgressOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
-              </section>
-              <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                <div className="flex items-center gap-3 mb-2">
-                  <CheckCircle className="w-8 h-8 text-[#6b7280]" />
-                  <span className="text-[#374151] text-sm font-semibold">완료</span>
-                </div>
-                <div className="text-2xl font-bold text-[#374151]">{completedOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
-              </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">총 주문</span>
             </div>
+            <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
+                <div className="text-xs text-[#6b7280] mt-1">전체 주문 수</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">대기 중</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{preparingOrders}건</div>
+                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <Truck className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">배송 중</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{inProgressOrders}건</div>
+                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+          </section>
+          <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+            <div className="flex items-center gap-3 mb-2">
+              <CheckCircle className="w-8 h-8 text-[#6b7280]" />
+              <span className="text-[#374151] text-sm font-semibold">완료</span>
+            </div>
+            <div className="text-2xl font-bold text-[#374151]">{completedOrders}건</div>
+                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+          </section>
+        </div>
             
             {/* 검색/필터 영역 */}
-            <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <input
-                  type="text"
+        <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
+          <div className="flex flex-col md:flex-row gap-4">
+          <input
+            type="text"
                   placeholder="주문번호, 고객명 또는 상품명으로 검색..."
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-                />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-                >
-                  <option value="">전체 상태</option>
-                  <option value="INIT">주문 접수</option>
-                  <option value="DELIVERY_PREPARING">배송 준비</option>
-                  <option value="DELIVERY_IN_PROGRESS">배송 중</option>
-                  <option value="DELIVERY_COMPLETED">배송 완료</option>
-                </select>
+              className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+              className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
+          >
+            <option value="">전체 상태</option>
+            <option value="INIT">주문 접수</option>
+            <option value="DELIVERY_PREPARING">배송 준비</option>
+            <option value="DELIVERY_IN_PROGRESS">배송 중</option>
+            <option value="DELIVERY_COMPLETED">배송 완료</option>
+          </select>
                 <button
                   onClick={handleSearch}
                   className="flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded hover:bg-[#e5e7eb]"
@@ -253,18 +253,18 @@ export default function SellerOrderListPage() {
                   <Search className="w-4 h-4" />
                   검색
                 </button>
-              </div>
-            </div>
+          </div>
+        </div>
             
             {/* 주문 목록 */}
-            {error ? (
-              <div className="bg-[#fbeee0] border border-[#6b7280] rounded-lg p-4">
-                <p className="text-[#b94a48]">{error}</p>
-              </div>
-            ) : filteredOrders.length === 0 ? (
+        {error ? (
+          <div className="bg-[#fbeee0] border border-[#6b7280] rounded-lg p-4">
+            <p className="text-[#b94a48]">{error}</p>
+          </div>
+        ) : filteredOrders.length === 0 ? (
               <div className="bg-[#f3f4f6] border border-[#6b7280] rounded-lg p-8 text-center">
-                <Armchair className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
-                <p className="text-[#6b7280] text-lg">주문이 없습니다.</p>
+            <Armchair className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
+            <p className="text-[#6b7280] text-lg">주문이 없습니다.</p>
                 <div className="mt-4 space-y-2">
                   <p className="text-[#6b7280] text-sm">
                     {totalElements === 0 
@@ -285,30 +285,30 @@ export default function SellerOrderListPage() {
                     </button>
                   ) : null}
                 </div>
-              </div>
-            ) : (
+          </div>
+        ) : (
               <>
-                <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
-                  <table className="min-w-full divide-y divide-[#d1d5db]">
-                    <thead className="bg-[#f3f4f6]">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문번호</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문일시</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">고객명</th>
+              <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
+            <table className="min-w-full divide-y divide-[#d1d5db]">
+                  <thead className="bg-[#f3f4f6]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문번호</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">주문일시</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">고객명</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">상품정보</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">총 수량</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">배송상태</th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-[#374151] uppercase tracking-wider">액션</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#374151] uppercase tracking-wider">배송상태</th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-[#374151] uppercase tracking-wider">액션</th>
+                </tr>
+              </thead>
+                  <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                       {filteredOrders.map((order: any) => (
-                        <tr key={order.orderId} className="hover:bg-[#e5e7eb] transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">#{order.orderId}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                            {new Date(order.orderedAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">{order.customerName}</td>
+                  <tr key={order.orderId} className="hover:bg-[#e5e7eb] transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">#{order.orderId}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                      {new Date(order.orderedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">{order.customerName}</td>
                           <td className="px-6 py-4 text-[#374151]">
                             {order.products.length === 1 ? (
                               <span>{order.products[0].name}</span>
@@ -322,22 +322,22 @@ export default function SellerOrderListPage() {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{order.totalQuantity}개</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {getStatusBadge(order.deliveryStatus)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
-                            <button
-                              onClick={() => router.push(`/seller/orders/${order.orderId}`)}
-                              className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm"
-                            >
-                              <Eye className="w-4 h-4" /> 상세 보기
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(order.deliveryStatus)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <button
+                        onClick={() => router.push(`/seller/orders/${order.orderId}`)}
+                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm"
+                      >
+                        <Eye className="w-4 h-4" /> 상세 보기
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
                 {/* 페이징 */}
                 {totalPages > 1 && (
@@ -386,9 +386,9 @@ export default function SellerOrderListPage() {
                   </div>
                 )}
               </>
-            )}
-          </div>
-        </SellerLayout>
+        )}
+      </div>
+    </SellerLayout>
       </main>
     </div>
   );

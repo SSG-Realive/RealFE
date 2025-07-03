@@ -3,6 +3,9 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/apiClient';
 import { Users, Search, Filter, UserCheck, UserX, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Seller {
   id: number;
@@ -34,9 +37,9 @@ interface ErrorResponse {
 
 const AdminSellersPage: React.FC = () => {
   const [sellers, setSellers] = useState<Seller[]>([]);
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
-  const [activeFilter, setActiveFilter] = useState('');
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
@@ -120,23 +123,21 @@ const AdminSellersPage: React.FC = () => {
   }, [fetchSellers]);
 
   // 필터링된 판매자 목록
-  const filteredSellers = useMemo(() => {
-    return sellers.filter(seller => {
-      const matchesSearch = !search.trim() || 
-        seller.name.toLowerCase().includes(search.toLowerCase()) ||
-        seller.email.toLowerCase().includes(search.toLowerCase());
-      
-      const matchesStatus = !status || 
-        (status === '승인' && seller.is_approved) ||
-        (status === '승인처리전' && !seller.is_approved);
-      
-      const matchesActiveFilter = !activeFilter || 
-        (activeFilter === 'active' && seller.is_active) ||
-        (activeFilter === 'inactive' && !seller.is_active);
-      
-      return matchesSearch && matchesStatus && matchesActiveFilter;
-    });
-  }, [sellers, search, status, activeFilter]);
+  const filteredSellers = sellers.filter(seller => {
+    const matchesSearch = search === "" || 
+      seller.name.toLowerCase().includes(search.toLowerCase()) ||
+      seller.email.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesStatus = status === "all" || 
+      (status === "승인" && seller.is_approved) ||
+      (status === "승인처리전" && !seller.is_approved);
+    
+    const matchesActiveFilter = activeFilter === "all" ||
+      (activeFilter === "active" && seller.is_active) ||
+      (activeFilter === "inactive" && !seller.is_active);
+    
+    return matchesSearch && matchesStatus && matchesActiveFilter;
+  });
 
   // 상태 토글 핸들러
   const handleToggleActive = useCallback(async (seller: Seller) => {
@@ -303,12 +304,12 @@ const AdminSellersPage: React.FC = () => {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Input
                   type="text"
                   placeholder="이름 또는 이메일로 검색하세요..."
                   value={search}
                   onChange={handleSearchChange}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full pl-10"
                 />
               </div>
             </div>
@@ -316,15 +317,16 @@ const AdminSellersPage: React.FC = () => {
             <div className="lg:w-48">
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  value={status}
-                  onChange={handleStatusChange}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none bg-white transition-all"
-                >
-                  <option value="">전체 승인 상태</option>
-                  <option value="승인">승인</option>
-                  <option value="승인처리전">승인처리전</option>
-                </select>
+                <Select value={status} onValueChange={(value) => setStatus(value)}>
+                  <SelectTrigger className="w-full pl-10">
+                    <SelectValue placeholder="전체 승인 상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 승인 상태</SelectItem>
+                    <SelectItem value="승인">승인</SelectItem>
+                    <SelectItem value="승인처리전">승인처리전</SelectItem>
+                  </SelectContent>
+                </Select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
             </div>
@@ -332,15 +334,16 @@ const AdminSellersPage: React.FC = () => {
             <div className="lg:w-48">
               <div className="relative">
                 <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  value={activeFilter}
-                  onChange={handleActiveFilterChange}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none bg-white transition-all"
-                >
-                  <option value="">전체 활성 상태</option>
-                  <option value="active">활성</option>
-                  <option value="inactive">정지</option>
-                </select>
+                <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value)}>
+                  <SelectTrigger className="w-full pl-10">
+                    <SelectValue placeholder="전체 활성 상태" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">전체 활성 상태</SelectItem>
+                    <SelectItem value="active">활성</SelectItem>
+                    <SelectItem value="inactive">정지</SelectItem>
+                  </SelectContent>
+                </Select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
             </div>
@@ -361,12 +364,12 @@ const AdminSellersPage: React.FC = () => {
               <div className="text-center">
                 <div className="text-red-500 text-lg font-semibold mb-2">오류가 발생했습니다</div>
                 <div className="text-gray-600 mb-6">{error}</div>
-                <button
+                <Button
                   onClick={fetchSellers}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  variant="default"
                 >
                   다시 시도
-                </button>
+                </Button>
               </div>
             </div>
           ) : filteredSellers.length === 0 ? (
@@ -437,30 +440,29 @@ const AdminSellersPage: React.FC = () => {
                           <div className="flex flex-col gap-2">
                             {!seller.is_approved && (
                               <div className="flex gap-1 justify-center">
-                                <button
+                                <Button
                                   onClick={() => handleApproval(seller, true)}
                                   disabled={updatingId === seller.id}
-                                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                                  variant="default"
+                                  size="sm"
                                 >
                                   승인
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                   onClick={() => handleApproval(seller, false)}
                                   disabled={updatingId === seller.id}
-                                  className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-colors"
+                                  variant="outline"
+                                  size="sm"
                                 >
                                   거절
-                                </button>
+                                </Button>
                               </div>
                             )}
-                            <button
+                            <Button
                               onClick={() => handleToggleActive(seller)}
                               disabled={updatingId === seller.id}
-                              className={`px-3 py-1 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-                                seller.is_active
-                                  ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
-                                  : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white'
-                              } ${updatingId === seller.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              variant={seller.is_active ? "destructive" : "success"}
+                              size="sm"
                             >
                               {updatingId === seller.id ? (
                                 <>
@@ -470,7 +472,7 @@ const AdminSellersPage: React.FC = () => {
                               ) : (
                                 seller.is_active ? '정지' : '복구'
                               )}
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>
@@ -519,30 +521,29 @@ const AdminSellersPage: React.FC = () => {
                         <div className="flex flex-wrap gap-2">
                           {!seller.is_approved && (
                             <>
-                              <button
+                              <Button
                                 onClick={() => handleApproval(seller, true)}
                                 disabled={updatingId === seller.id}
-                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                                variant="default"
+                                size="sm"
                               >
                                 승인
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 onClick={() => handleApproval(seller, false)}
                                 disabled={updatingId === seller.id}
-                                className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 transition-colors"
+                                variant="outline"
+                                size="sm"
                               >
                                 거절
-                              </button>
+                              </Button>
                             </>
                           )}
-                          <button
+                          <Button
                             onClick={() => handleToggleActive(seller)}
                             disabled={updatingId === seller.id}
-                            className={`px-3 py-1 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-                              seller.is_active
-                                ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
-                                : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white'
-                            } ${updatingId === seller.id ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            variant={seller.is_active ? "destructive" : "success"}
+                            size="sm"
                           >
                             {updatingId === seller.id ? (
                               <>
@@ -552,7 +553,7 @@ const AdminSellersPage: React.FC = () => {
                             ) : (
                               seller.is_active ? '정지' : '복구'
                             )}
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>

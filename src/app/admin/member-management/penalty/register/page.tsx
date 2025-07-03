@@ -36,7 +36,7 @@ export default function PenaltyRegisterPage() {
         }
       });
       alert('패널티가 등록되었습니다.');
-      router.push('/admin/customers/penalty');
+      router.push('/admin/member-management/penalty');
     } catch (err) {
       const error = err as any;
       alert('등록 실패: ' + (error?.response?.data?.message || error?.message || '알 수 없는 오류'));
@@ -129,12 +129,12 @@ export default function PenaltyRegisterPage() {
               <p className="mt-1 text-sm text-gray-500">1-100 사이의 값을 입력하세요</p>
             </div>
 
-            {/* 버튼 그룹 */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            {/* 등록 버튼 */}
+            <div className="pt-6">
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 bg-red-600 text-white rounded-xl px-6 py-3 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-red-600 text-white rounded-xl px-6 py-3 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -147,14 +147,6 @@ export default function PenaltyRegisterPage() {
                     패널티 등록
                   </>
                 )}
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/admin/customers/penalty')}
-                className="flex-1 bg-gray-300 text-gray-700 rounded-xl px-6 py-3 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                취소
               </button>
             </div>
           </form>

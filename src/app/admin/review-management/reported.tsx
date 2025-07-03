@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { getAdminReviewReportList, processAdminReviewReport } from "@/service/admin/reviewService";
 import { AdminReviewReport, AdminReviewReportListRequest, ReviewReportStatus } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function ReviewReportedPage() {
   const router = useRouter();
@@ -114,12 +116,12 @@ export default function ReviewReportedPage() {
     return (
       <div className="p-8">
         <div className="text-red-600 text-center mb-4">{error}</div>
-        <button 
+        <Button 
           onClick={() => fetchReports()} 
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          variant="default"
         >
           다시 시도
-        </button>
+        </Button>
       </div>
     );
   }
@@ -130,21 +132,22 @@ export default function ReviewReportedPage() {
       
       {/* 상태 필터 */}
       <div className="mb-6 flex gap-4 items-center">
-        <select
+        <Select
           value={statusFilter}
-          onChange={e => {
-            const value = e.target.value as ReviewReportStatus;
-            setStatusFilter(value);
-          }}
-          className="border rounded px-3 py-2"
+          onValueChange={(value) => setStatusFilter(value as ReviewReportStatus)}
         >
-          <option value="PENDING">접수됨</option>
-          <option value="UNDER_REVIEW">검토 중</option>
-          <option value="RESOLVED_KEPT">리뷰 유지</option>
-          <option value="RESOLVED_HIDDEN">리뷰 숨김</option>
-          <option value="RESOLVED_REJECTED">신고 기각</option>
-          <option value="REPORTER_ACCOUNT_INACTIVE">신고자 계정 비활성</option>
-        </select>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="PENDING">접수됨</SelectItem>
+            <SelectItem value="UNDER_REVIEW">검토 중</SelectItem>
+            <SelectItem value="RESOLVED_KEPT">리뷰 유지</SelectItem>
+            <SelectItem value="RESOLVED_HIDDEN">리뷰 숨김</SelectItem>
+            <SelectItem value="RESOLVED_REJECTED">신고 기각</SelectItem>
+            <SelectItem value="REPORTER_ACCOUNT_INACTIVE">신고자 계정 비활성</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* 신고 테이블 */}
@@ -179,34 +182,38 @@ export default function ReviewReportedPage() {
                 <td className="px-4 py-2 border text-center">
                   {report.status === 'PENDING' && (
                     <div className="flex gap-2 justify-center">
-                      <button 
-                        className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                      <Button 
+                        variant="default"
+                        size="sm"
                         onClick={() => handleProcessReport(report.id, 'UNDER_REVIEW')}
                       >
                         검토 시작
-                      </button>
+                      </Button>
                     </div>
                   )}
                   {report.status === 'UNDER_REVIEW' && (
                     <div className="flex gap-2 justify-center">
-                      <button 
-                        className="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600"
+                      <Button 
+                        variant="success"
+                        size="sm"
                         onClick={() => handleProcessReport(report.id, 'RESOLVED_KEPT')}
                       >
                         리뷰 유지
-                      </button>
-                      <button 
-                        className="bg-red-500 text-white px-2 py-1 rounded text-xs hover:bg-red-600"
+                      </Button>
+                      <Button 
+                        variant="destructive"
+                        size="sm"
                         onClick={() => handleProcessReport(report.id, 'RESOLVED_HIDDEN')}
                       >
                         리뷰 숨김
-                      </button>
-                      <button 
-                        className="bg-gray-500 text-white px-2 py-1 rounded text-xs hover:bg-gray-600"
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        size="sm"
                         onClick={() => handleProcessReport(report.id, 'RESOLVED_REJECTED')}
                       >
                         신고 기각
-                      </button>
+                      </Button>
                     </div>
                   )}
                   {!['PENDING', 'UNDER_REVIEW'].includes(report.status) && (
@@ -222,23 +229,25 @@ export default function ReviewReportedPage() {
       {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className="mt-6 flex justify-center gap-2">
-          <button
+          <Button
             onClick={() => fetchReports(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-1 border rounded disabled:opacity-50"
+            variant="outline"
+            size="sm"
           >
             이전
-          </button>
+          </Button>
           <span className="px-3 py-1">
             {currentPage} / {totalPages}
           </span>
-          <button
+          <Button
             onClick={() => fetchReports(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border rounded disabled:opacity-50"
+            variant="outline"
+            size="sm"
           >
             다음
-          </button>
+          </Button>
         </div>
       )}
 

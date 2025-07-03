@@ -185,6 +185,10 @@ const AdminDashboardPage = () => {
         throw new Error('데이터를 불러오는데 실패했습니다.');
       } 
 
+      console.log('Dashboard data received:', data);
+      console.log('Period type:', periodType);
+      console.log('Sales summary:', data.salesSummaryStats);
+      
       setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -389,8 +393,8 @@ const AdminDashboardPage = () => {
           </div>
         </div>
 
-        {/* 메인 통계 카드 그리드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+        {/* 주요 통계 카드 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="총 주문"
             value={dashboardData.salesSummaryStats?.totalOrdersInPeriod || 0}
@@ -399,7 +403,7 @@ const AdminDashboardPage = () => {
             color="bg-blue-500"
           />
           <StatCard
-            title="총 매출"
+            title={periodType === 'DAILY' ? '일일 매출' : '월간 매출'}
             value={dashboardData.salesSummaryStats?.totalRevenueInPeriod?.toLocaleString() || "0"}
             unit="원"
             icon={<DollarSign className="w-6 h-6 text-white" />}

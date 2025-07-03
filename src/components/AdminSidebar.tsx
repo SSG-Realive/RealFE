@@ -103,8 +103,8 @@ export default function AdminSidebar() {
             </Accordion>
           </li>
           <li className="my-2">
-            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/products')}>
-              <Link href="/admin/products" className="flex-1 no-underline text-inherit">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/product-managemnet')}>
+              <Link href="/admin/product-management" className="flex-1 no-underline text-inherit">
               상품
             </Link>
             <button
@@ -118,8 +118,8 @@ export default function AdminSidebar() {
           </li>
           <Accordion open={productOpen}>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, marginLeft: 28, borderLeft: '1px solid #4b5563' }}>
-               <li className="w-full"><Link href="/admin/products/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/products/list')}>전체 상품 조회</Link></li>
-               <li className="w-full"><Link href="/admin/owned-products" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/owned-products')}>관리자 상품 조회</Link></li>
+               <li className="w-full"><Link href="/admin/product-management/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/products/list')}>전체 상품 조회</Link></li>
+               <li className="w-full"><Link href="/admin/product-management/owned-products" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/owned-products')}>관리자 상품 조회</Link></li>
             </ul>
           </Accordion>
           <li className="my-2">
@@ -144,13 +144,13 @@ export default function AdminSidebar() {
           </li>
           <li className="my-2">
             <Link href="/admin/settlement-management" className="block px-4 py-3 rounded text-lg font-semibold hover:bg-teal-600 transition-colors" style={getLinkStyle('/admin/settlement-management')}>
-              정산관리
+              정산
             </Link>
           </li>
           <li className="my-2">
             <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/review-management')}>
               <Link href="/admin/review-management" className="flex-1 no-underline text-inherit">
-                리뷰
+                고객 피드백
               </Link>
               <button
                 aria-label="리뷰 하위 메뉴 열기"

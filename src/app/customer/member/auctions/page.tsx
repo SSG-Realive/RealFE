@@ -1,6 +1,5 @@
 'use client';
 
-import Navbar from '@/components/customer/common/Navbar';
 import AuctionCard from '@/components/customer/auctions/AuctionCard';
 import CategoryFilter from '@/components/customer/auctions/CategoryFilter';
 import DebugPanel from '@/components/customer/auctions/DebugPanel';
@@ -53,7 +52,6 @@ export default function AuctionsPage() {
 
   return (
     <>
-      <Navbar />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: 20 }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
           <h1>경매 목록</h1>

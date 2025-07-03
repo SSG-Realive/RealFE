@@ -16,8 +16,8 @@ export default function WishlistPage() {
     const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
     const [selectedParentCategory, setSelectedParentCategory] = useState<string | null>(null);
     const router = useRouter();
-    const { open, message, handleClose, show } = useDialog()
-    const { confirm, dialog } = useConfirm()
+    const { open, message, handleClose, show } = useDialog();
+    const { confirm, dialog } = useConfirm();
 
     useEffect(() => {
         fetchWishlist()
@@ -45,7 +45,7 @@ export default function WishlistPage() {
 
     const handleDeleteOne = async (e: React.MouseEvent, productId: number) => {
         e.stopPropagation();
-        if (! (await confirm('이 상품을 찜 목록에서 삭제하시겠습니까?'))) return;
+        if (!(await confirm('이 상품을 찜 목록에서 삭제하시겠습니까?'))) return;
         try {
             await toggleWishlist({ productId });
             setProducts((prev) => prev.filter((p) => p.id !== productId));
@@ -57,7 +57,7 @@ export default function WishlistPage() {
 
     const handleDeleteSelected = async () => {
         if (selectedIds.size === 0) return show('삭제할 상품을 선택해주세요.');
-        if (! (await confirm(`${selectedIds.size}개의 상품을 삭제하시겠습니까?`))) return;
+        if (!(await confirm(`${selectedIds.size}개의 상품을 삭제하시겠습니까?`))) return;
         try {
             await Promise.all(Array.from(selectedIds).map((id) => toggleWishlist({ productId: id })));
             setProducts((prev) => prev.filter((p) => !selectedIds.has(p.id)));
@@ -68,12 +68,10 @@ export default function WishlistPage() {
         }
     };
 
-    // 부모 카테고리 목록 (중복 제거 + null 제외)
     const parentCategories = Array.from(
         new Set(products.map((p) => p.parentCategoryName).filter(Boolean))
     ) as string[];
 
-    // 선택된 부모 카테고리 필터링
     const filteredProducts = selectedParentCategory
         ? products.filter((p) => p.parentCategoryName === selectedParentCategory)
         : products;
@@ -82,44 +80,35 @@ export default function WishlistPage() {
 
     return (
         <>
-        {dialog}
-        <GlobalDialog open={open} message={message} onClose={handleClose} />
-            <div className="bg-gray-100 min-h-screen py-8">
+            {dialog}
+            <GlobalDialog open={open} message={message} onClose={handleClose} />
+            <div className="min-h-screen py-8">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">
 
                     {/* 상단 제목 및 버튼 */}
-                    <section className="bg-white rounded-lg shadow p-4">
-                        <h1 className="text-xl text-rose-500 font-semibold mb-10 ml-3 mt-3">찜 목록</h1>
+                    <section className="rounded-lg p-4">
+                        <h1 className="text-xl text-black font-light mb-10 ml-3 mt-3">찜 목록</h1>
 
                         {products.length > 0 && (
                             <>
-                                {/* 카테고리 필터 (박스 폭 맞춤) */}
+                                {/* 카테고리 필터 */}
                                 <div className="relative select-none text-sm text-gray-500 max-w-full px-0 mt-10">
-
-                                    {/* 위쪽 긴 얇은 선 */}
                                     <hr className="absolute top-0 left-0 w-full border-t border-gray-300" />
-
-                                    <div className="relative flex items-center space-x-6 mt-4 py-2select-none text-sm text-gray-500">
-                                        {/* 아래쪽 긴 얇은 선 */}
+                                    <div className="relative flex items-center space-x-6 mt-4 py-2">
                                         <hr className="absolute bottom-0 left-0 w-full border-t border-gray-300" />
-                                        {/* 전체 버튼 */}
                                         <div
                                             onClick={() => setSelectedParentCategory(null)}
                                             className="relative cursor-pointer px-2 py-1"
                                         >
                                             <span
-                                                className={`relative z-10 ${
-                                                selectedParentCategory === null ? 'text-slate-600 font-semibold' : ''
-                                                }`}
+                                                className={`relative z-10 ${selectedParentCategory === null ? 'text-slate-600 font-light' : ''}`}
                                             >
                                                 전체
                                             </span>
-                                            {/* 선택된 항목 아래 짧은 진한 선 */}
                                             {selectedParentCategory === null && (
                                                 <hr className="absolute bottom-0 left-1/2 w-10 border-t border-slate-600 transform -translate-x-1/2" />
                                             )}
                                         </div>
-                                        {/* 동적 카테고리들 */}
                                         {parentCategories.map((name) => (
                                             <div
                                                 key={name}
@@ -127,9 +116,7 @@ export default function WishlistPage() {
                                                 className="relative cursor-pointer px-2 py-1"
                                             >
                                                 <span
-                                                    className={`relative z-10 ${
-                                                    selectedParentCategory === name ? 'text-slate-600 font-semibold' : ''
-                                                    }`}
+                                                    className={`relative z-10 ${selectedParentCategory === name ? 'text-slate-600 font-light' : ''}`}
                                                 >
                                                     {name}
                                                 </span>
@@ -141,27 +128,27 @@ export default function WishlistPage() {
                                     </div>
                                 </div>
 
-                                {/* 개수와 상품 편집 버튼 — 카테고리 아래에 */}
+                                {/* 개수와 편집 버튼 */}
                                 <div className="flex justify-between items-center mt-4 px-4">
                                     <span className="text-sm text-gray-500">
-                                        {/* 전체 포함 항상 표시 */}
-                                        <span className="text-sm text-gray-500 mr-1">
-                                        {selectedParentCategory === null ? '전체' : selectedParentCategory}
+                                        <span className="mr-1">
+                                            {selectedParentCategory === null ? '전체' : selectedParentCategory}
                                         </span>
-                                        <span className="text-rose-500 text-sm">{filteredProducts.length}</span>개
+                                        <span className="text-rose-500">{filteredProducts.length}</span>개
                                     </span>
-                                    <button onClick={toggleEditMode} className="text-sm text-gray-600 bg-white border border-gray-300 px-3 py-1 rounded-md hover:bg-gray-50">
+                                    <button
+                                        onClick={toggleEditMode}
+                                        className="text-sm text-gray-600 border border-gray-300 px-3 py-1 rounded-md hover:bg-gray-50"
+                                    >
                                         {isEditMode ? '편집 취소' : '상품 편집'}
                                     </button>
                                 </div>
                             </>
-
                         )}
                     </section>
 
-
                     {/* 상품 목록 */}
-                    <section className="bg-white rounded-lg shadow p-4">
+                    <section className="rounded-lg p-4">
                         {isEditMode && filteredProducts.length > 0 && (
                             <div className="flex items-center mb-4 pb-2 border-b">
                                 <input
@@ -186,7 +173,7 @@ export default function WishlistPage() {
                                 {filteredProducts.map((p) => (
                                     <li
                                         key={p.id}
-                                        className="flex items-center bg-gray-50 rounded-lg shadow-sm p-4 relative"
+                                        className="flex items-center rounded-lg p-4 relative border border-gray-200"
                                     >
                                         {isEditMode && (
                                             <input
@@ -225,9 +212,9 @@ export default function WishlistPage() {
                 </main>
             </div>
 
-            {/* 선택 삭제 버튼 (편집 모드일 때 하단에 고정) */}
+            {/* 선택 삭제 버튼 */}
             {isEditMode && (
-                <footer className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+                <footer className="fixed bottom-0 left-0 right-0 border-t shadow bg-white/90 backdrop-blur-md">
                     <div className="max-w-xl lg:max-w-4xl mx-auto p-4">
                         <button
                             onClick={handleDeleteSelected}

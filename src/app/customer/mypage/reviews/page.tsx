@@ -10,6 +10,11 @@ import {
     getTrafficLightBgClass
 } from '@/types/admin/review';
 
+
+// 내 리뷰 목록 조회 페이지
+
+// 내 리뷰 목록 조회 페이지
+
 export default function MyReviewPage() {
     const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
     const [loading, setLoading] = useState(true);
@@ -24,6 +29,7 @@ export default function MyReviewPage() {
             })
             .finally(() => setLoading(false));
     }, []);
+
 
     return (
         <div>
@@ -106,6 +112,7 @@ export default function MyReviewPage() {
                                 )}
                             </Link>
                         ))}
+          
                     </div>
                 )}
             </div>

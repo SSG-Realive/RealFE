@@ -80,7 +80,7 @@ export default function AuctionListPage() {
 
     return (
         <section className="mb-10">
-          <h2 className="text-xl font-extrabold mb-4 flex items-center gap-2">
+          <h2 className="text-xl font-light mb-4 flex items-center gap-2">
             {iconMap[title] ?? null}
             {title}
           </h2>

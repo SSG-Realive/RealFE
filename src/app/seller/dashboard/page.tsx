@@ -6,6 +6,7 @@ import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend } from '@/service/seller/sellerService';
+import { getCustomerQnaList } from '@/service/seller/customerQnaService';
 import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySalesDTO } from '@/types/seller/dashboard/sellerDashboardResponse';
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
@@ -24,6 +25,7 @@ export default function SellerDashboardPage() {
   const [salesStats, setSalesStats] = useState<SellerSalesStatsDTO | null>(null);
   const [dailyTrend, setDailyTrend] = useState<DailySalesDTO[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlySalesDTO[]>([]);
+  const [actualUnansweredCount, setActualUnansweredCount] = useState(0); // 실제 미답변 문의 수
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -35,47 +37,111 @@ export default function SellerDashboardPage() {
   };
 
   const fetchDashboardData = async (isRefresh = false) => {
-    try {
+      try {
       if (isRefresh) {
         setRefreshing(true);
       } else {
         setLoading(true);
       }
+        
+        // 기본 대시보드 데이터
+        const dashboardData = await getDashboard();
+        setDashboard(dashboardData);
+
+      // 실제 미답변 문의 수 계산을 위해 QnA 데이터 조회
+      try {
+        console.log('🔍 실제 미답변 문의 수 계산 시작...');
+        const qnaResponse = await getCustomerQnaList({ page: 0, size: 100 }); // 충분히 큰 사이즈로 조회
+        
+        const qnaList = qnaResponse?.content || [];
+        const unansweredCount = qnaList.filter((item: any) => {
+          const qna = item.qna || item;
+          return !(qna.isAnswered || qna.answered === true || qna.answered === 'true');
+        }).length;
+        
+        console.log('📊 QnA 데이터 분석 결과:');
+        console.log('- 전체 QnA 수:', qnaList.length);
+        console.log('- 실제 미답변 수:', unansweredCount);
+        console.log('- 기존 대시보드 값:', dashboardData?.unansweredQnaCount);
+        
+        setActualUnansweredCount(unansweredCount);
+      } catch (qnaError) {
+        console.error('❌ QnA 데이터 조회 실패:', qnaError);
+        // QnA 조회 실패 시 기존 대시보드 값 사용
+        setActualUnansweredCount(dashboardData?.unansweredQnaCount || 0);
+      }
+
+        // 총 매출(전체 누적) 통계
+        const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
+        const statsEndDate = new Date().toISOString().split('T')[0];
+      console.log(`=== 총 매출/주문 통계 조회 ===`);
+      console.log(`조회 기간: ${statsStartDate} ~ ${statsEndDate}`);
+      console.log(`API URL: /seller/dashboard/sales-stats?startDate=${statsStartDate}&endDate=${statsEndDate}`);
       
-      // 기본 대시보드 데이터
-      const dashboardData = await getDashboard();
-      setDashboard(dashboardData);
+      let statsData = null;
+      try {
+        statsData = await getSalesStatistics(statsStartDate, statsEndDate);
+        console.log('✅ 백엔드 응답 성공:', statsData);
+        console.log('응답 데이터 타입:', typeof statsData);
+        console.log('응답 데이터 구조:', Object.keys(statsData || {}));
+        console.log('총 매출 (totalRevenue):', statsData?.totalRevenue);
+        console.log('총 주문 (totalOrders):', statsData?.totalOrders);
+        console.log('총 수수료 (totalFees):', statsData?.totalFees);
+        
+        if (!statsData) {
+          console.warn('⚠️ 응답 데이터가 null/undefined입니다');
+        } else if (statsData.totalRevenue === 0 && statsData.totalOrders === 0) {
+          console.warn('⚠️ 매출과 주문이 모두 0입니다. sales_logs 테이블에 데이터가 없거나 권한 문제일 수 있습니다');
+          console.log('📊 대안: 기본 대시보드 데이터를 확인해보세요');
+          console.log('🔍 판매자 토큰 상태:', localStorage.getItem('sellerToken') ? '존재' : '없음');
+        } else {
+          console.log('✅ 정상적인 매출/주문 데이터 확인됨');
+        }
+      } catch (error: any) {
+        console.error('❌ API 호출 실패:', error);
+        console.error('에러 상태:', error.response?.status);
+        console.error('에러 메시지:', error.response?.statusText);
+        console.error('에러 상세:', error.response?.data);
+        
+        // 에러 발생 시 빈 객체로 설정 (UI가 깨지지 않도록)
+        statsData = {
+          totalRevenue: 0,
+          totalOrders: 0,
+          totalFees: 0,
+          dailySalesTrend: [],
+          monthlySalesTrend: []
+        };
+        console.log('📝 에러로 인해 기본값으로 설정됨:', statsData);
+      }
+      
+      console.log('setSalesStats 호출 전 - statsData:', statsData);
+        setSalesStats(statsData);
+      console.log('setSalesStats 호출 후 - salesStats 상태 업데이트됨');
 
-      // 총 매출(전체 누적) 통계
-      const statsStartDate = '2000-01-01'; // sales_logs의 가장 과거 날짜로 충분히 이전 날짜
-      const statsEndDate = new Date().toISOString().split('T')[0];
-      const statsData = await getSalesStatistics(statsStartDate, statsEndDate);
-      setSalesStats(statsData);
+        // 일별 추이 (최근 30일)
+        const endDate = new Date().toISOString().split('T')[0];
+        const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        const dailyData = await getDailySalesTrend(startDate, endDate);
+        setDailyTrend(dailyData);
 
-      // 일별 추이 (최근 30일)
-      const endDate = new Date().toISOString().split('T')[0];
-      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      const dailyData = await getDailySalesTrend(startDate, endDate);
-      setDailyTrend(dailyData);
+        // 월별 추이 (최근 6개월)
+        const endMonthDate = new Date();
+        const startMonthDate = new Date();
+        startMonthDate.setMonth(endMonthDate.getMonth() - 5);
+        startMonthDate.setDate(1); // 각 월의 1일로 맞추기
+        const startMonthStr = startMonthDate.toISOString().split('T')[0];
+        const endMonthStr = endMonthDate.toISOString().split('T')[0];
+        const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
+        setMonthlyTrend(monthlyData);
 
-      // 월별 추이 (최근 6개월)
-      const endMonthDate = new Date();
-      const startMonthDate = new Date();
-      startMonthDate.setMonth(endMonthDate.getMonth() - 5);
-      startMonthDate.setDate(1); // 각 월의 1일로 맞추기
-      const startMonthStr = startMonthDate.toISOString().split('T')[0];
-      const endMonthStr = endMonthDate.toISOString().split('T')[0];
-      const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
-      setMonthlyTrend(monthlyData);
-
-      setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
-    } catch (err) {
-      console.error('대시보드 정보 가져오기 실패', err);
-    } finally {
-      setLoading(false);
+        setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
+      } catch (err) {
+        console.error('대시보드 정보 가져오기 실패', err);
+      } finally {
+        setLoading(false);
       setRefreshing(false);
-    }
-  };
+      }
+    };
 
   const handleRefresh = () => {
     fetchDashboardData(true);
@@ -242,6 +308,7 @@ export default function SellerDashboardPage() {
             {lastUpdated && (
               <p className="text-sm text-[#6b7280]">마지막 업데이트: {lastUpdated}</p>
             )}
+            <p className="text-xs text-[#6b7280] mt-1">💡 판매 건수는 상품별 개별 판매 기록입니다. 주문 관리의 그룹핑과는 다를 수 있습니다.</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -300,8 +367,9 @@ export default function SellerDashboardPage() {
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-4">
             <DollarSign className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 매출</h2>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 매출 (누적)</h2>
               <p className="text-2xl font-extrabold text-[#374151]">{salesStats?.totalRevenue?.toLocaleString() ?? 0}원</p>
+              <p className="text-xs text-[#6b7280] mt-1">전체 기간 누적 매출액</p>
             </div>
           </section>
           <section
@@ -310,8 +378,9 @@ export default function SellerDashboardPage() {
           >
             <Gavel className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 주문 수</h2>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">총 판매 건수 (누적)</h2>
               <p className="text-2xl font-extrabold text-[#374151]">{salesStats?.totalOrders?.toLocaleString() ?? 0}건</p>
+              <p className="text-xs text-[#6b7280] mt-1">상품별 판매 건수 합계</p>
             </div>
           </section>
           <section
@@ -320,8 +389,9 @@ export default function SellerDashboardPage() {
           >
             <MessageCircle className="w-10 h-10 text-[#6b7280]" />
             <div>
-              <h2 className="text-[#374151] text-sm font-semibold mb-1">미답변 문의</h2>
-              <p className="text-2xl font-extrabold text-[#6b7280]">{dashboard?.unansweredQnaCount ?? 0}건</p>
+              <h2 className="text-[#374151] text-sm font-semibold mb-1">미답변 문의 (전체)</h2>
+              <p className="text-2xl font-extrabold text-[#6b7280]">{actualUnansweredCount}건</p>
+              <p className="text-xs text-[#6b7280] mt-1">실제 미답변 문의 수</p>
             </div>
           </section>
         </div>
@@ -356,18 +426,18 @@ export default function SellerDashboardPage() {
           </section>
           <section className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[#374151]">주문 통계</h3>
+              <h3 className="text-lg font-bold text-[#374151]">판매 통계</h3>
               <BarChart3 className="w-7 h-7 text-[#6b7280] hover:text-[#14b8a6] transition-colors duration-150 cursor-pointer" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">오늘 주문</p>
+                <p className="text-sm text-[#374151] mb-1">오늘 판매</p>
                 <p className="text-xl font-bold text-[#374151]">
                   {dailyTrend.length > 0 ? dailyTrend[dailyTrend.length - 1]?.orderCount || 0 : 0}건
                 </p>
               </div>
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">이번 달 주문</p>
+                <p className="text-sm text-[#374151] mb-1">이번 달 판매</p>
                 <p className="text-xl font-bold text-[#374151]">
                   {monthlyTrendFilled.length > 0 ? monthlyTrendFilled[monthlyTrendFilled.length - 1]?.orderCount || 0 : 0}건
                 </p>

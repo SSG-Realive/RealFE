@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface Qna {
   id: number;
@@ -31,8 +33,8 @@ export default function QnaManagementPage() {
     <div className="p-8">
       <h2 className="text-lg font-bold mb-4">Q&A 관리</h2>
       <form className="flex gap-2 mb-2">
-        <input className="border px-2 py-1 flex-1" placeholder="제목/작성자 검색" value={qnaSearch} onChange={e => setQnaSearch(e.target.value)} />
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" type="button">Search</button>
+        <Input className="flex-1" placeholder="제목/작성자 검색" value={qnaSearch} onChange={e => setQnaSearch(e.target.value)} />
+        <Button variant="default" type="button">Search</Button>
       </form>
       <table className="min-w-full border text-sm">
         <thead>
@@ -54,7 +56,7 @@ export default function QnaManagementPage() {
               <td className="px-2 py-1">{q.created}</td>
               <td className="px-2 py-1">{q.answered ? "답변완료" : "미답변"}</td>
               <td className="px-2 py-1">
-                <button className="text-blue-600 underline" onClick={() => setSelectedQna(q)}>상세</button>
+                <Button variant="link" size="sm" onClick={() => setSelectedQna(q)}>상세</Button>
               </td>
             </tr>
           ))}
@@ -68,7 +70,7 @@ export default function QnaManagementPage() {
             <p><b>작성자:</b> {selectedQna.user}</p>
             <p><b>작성일:</b> {selectedQna.created}</p>
             <p><b>답변여부:</b> {selectedQna.answered ? "답변완료" : "미답변"}</p>
-            <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setSelectedQna(null)}>닫기</button>
+            <Button className="mt-4" variant="default" onClick={() => setSelectedQna(null)}>닫기</Button>
           </div>
         </div>
       )}

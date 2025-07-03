@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Settlement {
   id: string;
@@ -30,7 +33,7 @@ export default function SettlementManagementPage() {
   const [sellerFilter, setSellerFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [amountFilter, setAmountFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
   const router = useRouter();
@@ -94,54 +97,51 @@ export default function SettlementManagementPage() {
               <label htmlFor="sellerFilter" className="block text-sm font-medium text-gray-700 mb-2">
                 판매자 검색
               </label>
-              <input
+              <Input
                 id="sellerFilter"
                 type="text"
                 placeholder="판매자명으로 검색"
                 value={sellerFilter}
                 onChange={e => setSellerFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
             <div>
               <label htmlFor="dateFilter" className="block text-sm font-medium text-gray-700 mb-2">
                 정산일
               </label>
-              <input
+              <Input
                 id="dateFilter"
                 type="date"
                 value={dateFilter}
                 onChange={e => setDateFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
             <div>
               <label htmlFor="amountFilter" className="block text-sm font-medium text-gray-700 mb-2">
                 금액
               </label>
-              <input
+              <Input
                 id="amountFilter"
                 type="text"
                 placeholder="금액으로 검색"
                 value={amountFilter}
                 onChange={e => setAmountFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
             <div>
               <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">
                 상태
               </label>
-              <select
-                id="statusFilter"
-                value={statusFilter}
-                onChange={e => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              >
-                <option value="">전체</option>
-                <option value="Pending">대기중</option>
-                <option value="Completed">완료</option>
-              </select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="전체" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="Pending">대기중</SelectItem>
+                  <SelectItem value="Completed">완료</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -205,12 +205,13 @@ export default function SettlementManagementPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button 
+                        <Button 
                           className="text-blue-600 hover:text-blue-900 underline"
+                          variant="link"
                           onClick={() => router.push(`/admin/settlement-management/${s.id}`)}
                         >
                           상세보기
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -264,16 +265,17 @@ export default function SettlementManagementPage() {
               </div>
               
               <div className="flex gap-2">
-                <button 
-                  className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                <Button 
+                  className="flex-1"
+                  variant="default"
                   onClick={() => router.push(`/admin/settlement-management/${s.id}`)}
                 >
                   상세보기
-                </button>
+                </Button>
                 {s.status === "Pending" && (
-                  <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm">
+                  <Button variant="success" size="sm">
                     정산처리
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
@@ -333,7 +335,7 @@ export default function SettlementManagementPage() {
                 setSellerFilter("");
                 setDateFilter("");
                 setAmountFilter("");
-                setStatusFilter("");
+                setStatusFilter("all");
               }}
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
             >

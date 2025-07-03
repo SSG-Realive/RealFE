@@ -62,7 +62,7 @@ export default function Wishlist() {
                             href="/customer/mypage/wishlist"
                             className="text-blue-500 text-sm hover:underline"
                         >
-                            전체 보기 →
+                            전체
                         </Link>
                     </div>
                 </>

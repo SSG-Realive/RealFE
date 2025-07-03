@@ -30,72 +30,72 @@ export default function SellerQnaPage() {
     };
 
     const fetchData = async (isRefresh = false) => {
-        try {
+            try {
             if (isRefresh) {
                 setRefreshing(true);
             } else {
                 setLoading(true);
             }
             
-            console.log('[QnA 페이지] API 호출 시작');
-            
-            const response = await getCustomerQnaList({ page, size: 10 });
-            console.log('[QnA 페이지] === API 응답 상세 분석 ===');
-            console.log('전체 응답:', response);
-            console.log('응답 타입:', typeof response);
-            console.log('content 존재:', !!response?.content);
-            console.log('content 배열 길이:', response?.content?.length);
-            
-            if (response?.content) {
-                console.log('첫 번째 아이템 구조:', response.content[0]);
-                console.log('첫 번째 아이템 키들:', Object.keys(response.content[0] || {}));
+                console.log('[QnA 페이지] API 호출 시작');
                 
-                // 각 아이템의 구조 분석
-                response.content.forEach((item: any, index: number) => {
-                    console.log(`아이템 ${index}:`, {
-                        hasQna: !!item.qna,
-                        hasProductSummary: !!item.productSummary,
-                        qnaKeys: item.qna ? Object.keys(item.qna) : [],
-                        productKeys: item.productSummary ? Object.keys(item.productSummary) : [],
-                        directKeys: Object.keys(item)
+                const response = await getCustomerQnaList({ page, size: 10 });
+                console.log('[QnA 페이지] === API 응답 상세 분석 ===');
+                console.log('전체 응답:', response);
+                console.log('응답 타입:', typeof response);
+                console.log('content 존재:', !!response?.content);
+                console.log('content 배열 길이:', response?.content?.length);
+                
+                if (response?.content) {
+                    console.log('첫 번째 아이템 구조:', response.content[0]);
+                    console.log('첫 번째 아이템 키들:', Object.keys(response.content[0] || {}));
+                    
+                    // 각 아이템의 구조 분석
+                    response.content.forEach((item: any, index: number) => {
+                        console.log(`아이템 ${index}:`, {
+                            hasQna: !!item.qna,
+                            hasProductSummary: !!item.productSummary,
+                            qnaKeys: item.qna ? Object.keys(item.qna) : [],
+                            productKeys: item.productSummary ? Object.keys(item.productSummary) : [],
+                            directKeys: Object.keys(item)
+                        });
                     });
-                });
-            }
-            
-            setQnaList(response?.content || []);
-            setTotalPages(response?.totalPages || 0);
-            setTotalElements(response?.totalElements || 0);
-            setError('');
-            console.log('[QnA 페이지] 데이터 설정 완료');
-        } catch (err: any) {
-            console.error('=== 고객 QnA 목록 조회 실패 ===');
-            console.error('에러 객체:', err);
-            console.error('에러 메시지:', err.message);
-            console.error('응답 상태:', err.response?.status);
-            console.error('응답 데이터:', err.response?.data);
-            
-            let errorMessage = '고객 QnA 데이터를 불러오는 데 실패했습니다.';
-            
-            if (err.response?.status === 500) {
-                if (err.response?.data?.message?.includes('Duplicate key')) {
-                    errorMessage = '데이터 중복 오류가 발생했습니다. 백엔드팀에 문의해주세요. (Duplicate key error)';
-                } else {
-                    errorMessage = '서버 내부 오류가 발생했습니다. 백엔드팀에 문의해주세요.';
                 }
-            } else if (err.response?.status === 401) {
-                errorMessage = '로그인이 필요합니다.';
-            } else if (err.response?.status === 403) {
-                errorMessage = '접근 권한이 없습니다.';
-            } else if (err.response?.data?.message) {
-                errorMessage = err.response.data.message;
-            }
-            
-            setError(errorMessage);
-        } finally {
-            setLoading(false);
+                
+                setQnaList(response?.content || []);
+                setTotalPages(response?.totalPages || 0);
+                setTotalElements(response?.totalElements || 0);
+                setError('');
+                console.log('[QnA 페이지] 데이터 설정 완료');
+            } catch (err: any) {
+                console.error('=== 고객 QnA 목록 조회 실패 ===');
+                console.error('에러 객체:', err);
+                console.error('에러 메시지:', err.message);
+                console.error('응답 상태:', err.response?.status);
+                console.error('응답 데이터:', err.response?.data);
+                
+                let errorMessage = '고객 QnA 데이터를 불러오는 데 실패했습니다.';
+                
+                if (err.response?.status === 500) {
+                    if (err.response?.data?.message?.includes('Duplicate key')) {
+                        errorMessage = '데이터 중복 오류가 발생했습니다. 백엔드팀에 문의해주세요. (Duplicate key error)';
+                    } else {
+                        errorMessage = '서버 내부 오류가 발생했습니다. 백엔드팀에 문의해주세요.';
+                    }
+                } else if (err.response?.status === 401) {
+                    errorMessage = '로그인이 필요합니다.';
+                } else if (err.response?.status === 403) {
+                    errorMessage = '접근 권한이 없습니다.';
+                } else if (err.response?.data?.message) {
+                    errorMessage = err.response.data.message;
+                }
+                
+                setError(errorMessage);
+            } finally {
+                setLoading(false);
             setRefreshing(false);
-        }
-    };
+            }
+        };
 
     const handleRefresh = () => {
         fetchData(true);
@@ -198,9 +198,10 @@ export default function SellerQnaPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <Clock className="w-8 h-8 text-[#6b7280]" />
-                                <span className="text-[#374151] text-sm font-semibold">답변 대기</span>
+                                <span className="text-[#374151] text-sm font-semibold">답변 대기 (현재 페이지)</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{currentPageUnanswered}건</div>
+                            <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
@@ -258,7 +259,7 @@ export default function SellerQnaPage() {
                                         ? '아직 등록된 고객 문의가 없습니다.' 
                                         : '검색 조건에 맞는 고객 문의가 없습니다.'
                                     }
-                                </p>
+                            </p>
                                 {totalElements === 0 && (
                                     <div className="mt-4 p-4 bg-[#e5e7eb] rounded-lg">
                                         <p className="text-[#374151] text-sm font-medium mb-2">💡 고객 문의가 없는 이유</p>
@@ -363,11 +364,11 @@ export default function SellerQnaPage() {
                                 </button>
                                 
                                 {/* 이전 페이지 */}
-                                <button
+                            <button
                                     onClick={() => setPage(Math.max(0, page - 1))}
-                                    disabled={page === 0}
+                                disabled={page === 0}
                                     className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
-                                >
+                            >
                                     ‹ 이전
                                 </button>
                                 
@@ -434,7 +435,7 @@ export default function SellerQnaPage() {
                                                 className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
                                             >
                                                 {totalPages}
-                                            </button>
+                            </button>
                                         );
                                     }
                                     
@@ -442,11 +443,11 @@ export default function SellerQnaPage() {
                                 })()}
                                 
                                 {/* 다음 페이지 */}
-                                <button
+                            <button
                                     onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
                                     disabled={page === totalPages - 1}
                                     className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
-                                >
+                            >
                                     다음 ›
                                 </button>
                                 
@@ -457,7 +458,7 @@ export default function SellerQnaPage() {
                                     className="px-3 py-2 border border-[#d1d5db] rounded bg-[#f3f4f6] text-[#374151] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#d1d5db] hover:text-[#6b7280] transition-colors"
                                 >
                                     »»
-                                </button>
+                            </button>
                             </div>
                         </div>
                     )}

@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { getAdminReview, updateAdminReview } from "@/service/admin/reviewService";
 import { AdminReview } from "@/types/admin/review";
 import { getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } from "@/types/admin/review";
+import { Button } from "@/components/ui/button";
 
 export default function ReviewDetailPage() {
   const router = useRouter();
@@ -101,18 +102,18 @@ export default function ReviewDetailPage() {
       <div className="p-8">
         <div className="text-red-600 text-center mb-4">{error}</div>
         <div className="flex gap-2 justify-center">
-          <button 
+          <Button 
             onClick={() => fetchReviewDetail()} 
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            variant="default"
           >
             다시 시도
-          </button>
-          <button 
+          </Button>
+          <Button 
             onClick={() => router.push('/admin/review-management/list')} 
-            className="bg-gray-500 text-white px-4 py-2 rounded"
+            variant="outline"
           >
             목록으로
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -123,12 +124,12 @@ export default function ReviewDetailPage() {
       <div className="p-8">
         <div className="text-center text-gray-500">리뷰를 찾을 수 없습니다.</div>
         <div className="text-center mt-4">
-          <button 
+          <Button 
             onClick={() => router.push('/admin/review-management/list')} 
-            className="bg-gray-500 text-white px-4 py-2 rounded"
+            variant="outline"
           >
             목록으로
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -138,12 +139,12 @@ export default function ReviewDetailPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">리뷰 상세</h1>
-        <button 
+        <Button 
           onClick={() => router.push('/admin/review-management/list')}
-          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          variant="outline"
         >
           목록으로
-        </button>
+        </Button>
       </div>
 
       <div className="bg-white rounded-lg shadow-lg p-6">
@@ -221,20 +222,20 @@ export default function ReviewDetailPage() {
         <div className="border-t pt-6">
           <h2 className="text-lg font-semibold mb-4">상태 관리</h2>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => handleStatusChange(false)}
               disabled={updating || !review.isHidden}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+              variant="success"
             >
               정상으로 변경
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => handleStatusChange(true)}
               disabled={updating || review.isHidden}
-              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:opacity-50"
+              variant="outline"
             >
               숨김으로 변경
-            </button>
+            </Button>
           </div>
           {updating && (
             <p className="text-blue-600 mt-2">상태 변경 중...</p>

@@ -50,6 +50,7 @@ export default function PaymentSuccessPage() {
 
                 const checkoutInfo = JSON.parse(checkoutInfoStr);
 
+                
                 // 결제 승인 요청 (amount 제거 - 서버에서 계산)
                 const payRequest: PayRequestDTO = {
                     paymentKey,

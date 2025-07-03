@@ -7,6 +7,7 @@ import { uploadReviewImages, deleteReviewImage } from '@/service/customer/review
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import Navbar from '@/components/customer/common/Navbar';
 import StarRating from '@/components/customer/review/StarRating';
+import Modal from '@/components/Modal';
 
 export default function EditReviewPage() {
   const { id } = useParams();
@@ -24,7 +25,10 @@ export default function EditReviewPage() {
   const [newImages, setNewImages] = useState<File[]>([]); // 새로 업로드할 이미지 파일들
   const [removedImages, setRemovedImages] = useState<string[]>([]); // 삭제 요청 이미지 URL 리스트
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     if (!id) return;
@@ -60,33 +64,37 @@ export default function EditReviewPage() {
     setNewImages((prev) => prev.filter((f) => f !== file));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id || !review) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!id || !review) return;
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
+    const imageUrls = [...existingImages];
 
-      const imageUrls = [...existingImages];
+    await updateReview(Number(id), {
+      content,
+      rating,
+      imageUrls,
+    });
 
-      await updateReview(Number(id), {
-        content,
-        rating,
-        imageUrls,
-      });
+    // ✅ 모달 띄우기
+    setShowSuccess(true);
 
-      // 이미지 변경사항 서버 DB 반영이 필요하면 별도 API 호출 로직 추가
-
-      alert('리뷰가 수정되었습니다.');
+    // ✅ 2초 뒤에 상세 페이지로 이동
+    setTimeout(() => {
       router.push(`/customer/mypage/reviews/${id}`);
-    } catch (err) {
-      console.error(err);
-      alert('리뷰 수정 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    }, 2000);
+
+  } catch (err) {
+    console.error(err);
+    alert('리뷰 수정 중 오류가 발생했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -94,7 +102,16 @@ export default function EditReviewPage() {
 
   return (
     <div>
-      <Navbar />
+      <Modal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="리뷰 수정 완료"
+        message="리뷰가 성공적으로 수정되었습니다."
+        type="success"
+        className="bg-black/30 backdrop-blur-sm"
+        titleClassName="text-blue-900"
+        buttonClassName="bg-blue-600"
+      />
       <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
         <form onSubmit={handleSubmit} className="space-y-6">

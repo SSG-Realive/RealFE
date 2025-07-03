@@ -3,10 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import Navbar from '@/components/customer/common/Navbar';
 import StarRating from '@/components/customer/review/StarRating';
 import { createReview } from '@/service/customer/reviewService';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Modal from '@/components/Modal';
 
 

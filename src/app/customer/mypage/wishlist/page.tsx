@@ -8,6 +8,7 @@ import { ProductListDTO } from '@/types/seller/product/product';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
 import useConfirm from '@/hooks/useConfirm';
+import MyPageLayout from '@/components/layouts/MyPageLayout'; //
 
 export default function WishlistPage() {
     const [products, setProducts] = useState<ProductListDTO[]>([]);
@@ -76,50 +77,50 @@ export default function WishlistPage() {
         ? products.filter((p) => p.parentCategoryName === selectedParentCategory)
         : products;
 
-    if (loading) return <div>로딩 중...</div>;
+    if (loading) {
+        return (
+            <MyPageLayout>
+                <div className="text-center py-20">로딩 중...</div>
+            </MyPageLayout>
+        );
+    }
 
     return (
-        <>
+        <MyPageLayout>
             {dialog}
             <GlobalDialog open={open} message={message} onClose={handleClose} />
-            <div className="min-h-screen py-8">
+
+            <div className="min-h-screen py-0 sm:py-2 lg:py-4">
                 <main className="max-w-xl lg:max-w-4xl mx-auto px-4 space-y-6">
-
-                    {/* 상단 제목 및 버튼 */}
                     <section className="rounded-lg p-4">
-                        <h1 className="text-xl text-black font-light mb-10 ml-3 mt-3">찜 목록</h1>
-
                         {products.length > 0 && (
                             <>
                                 {/* 카테고리 필터 */}
-                                <div className="relative select-none text-sm text-gray-500 max-w-full px-0 mt-10">
-                                    <hr className="absolute top-0 left-0 w-full border-t border-gray-300" />
-                                    <div className="relative flex items-center space-x-6 mt-4 py-2">
-                                        <hr className="absolute bottom-0 left-0 w-full border-t border-gray-300" />
+                                <div className="overflow-x-auto no-scrollbar mt-4 px-4">
+                                    <div className="inline-flex space-x-6 text-sm text-gray-500">
+                                        {/* 전체 버튼 */}
                                         <div
                                             onClick={() => setSelectedParentCategory(null)}
-                                            className="relative cursor-pointer px-2 py-1"
+                                            className="cursor-pointer flex-shrink-0 px-2 py-1 relative"
                                         >
-                                            <span
-                                                className={`relative z-10 ${selectedParentCategory === null ? 'text-slate-600 font-light' : ''}`}
-                                            >
-                                                전체
-                                            </span>
+      <span className={`relative z-10 ${selectedParentCategory === null ? 'text-slate-600 font-light' : ''}`}>
+        전체
+      </span>
                                             {selectedParentCategory === null && (
                                                 <hr className="absolute bottom-0 left-1/2 w-10 border-t border-slate-600 transform -translate-x-1/2" />
                                             )}
                                         </div>
+
+                                        {/* 나머지 카테고리 */}
                                         {parentCategories.map((name) => (
                                             <div
                                                 key={name}
                                                 onClick={() => setSelectedParentCategory(name)}
-                                                className="relative cursor-pointer px-2 py-1"
+                                                className="cursor-pointer flex-shrink-0 px-2 py-1 relative"
                                             >
-                                                <span
-                                                    className={`relative z-10 ${selectedParentCategory === name ? 'text-slate-600 font-light' : ''}`}
-                                                >
-                                                    {name}
-                                                </span>
+        <span className={`relative z-10 ${selectedParentCategory === name ? 'text-slate-600 font-light' : ''}`}>
+          {name}
+        </span>
                                                 {selectedParentCategory === name && (
                                                     <hr className="absolute bottom-0 left-1/2 w-10 border-t border-slate-600 transform -translate-x-1/2" />
                                                 )}
@@ -128,7 +129,7 @@ export default function WishlistPage() {
                                     </div>
                                 </div>
 
-                                {/* 개수와 편집 버튼 */}
+                                {/* 개수 + 편집 */}
                                 <div className="flex justify-between items-center mt-4 px-4">
                                     <span className="text-sm text-gray-500">
                                         <span className="mr-1">
@@ -140,14 +141,14 @@ export default function WishlistPage() {
                                         onClick={toggleEditMode}
                                         className="text-sm text-gray-600 border border-gray-300 px-3 py-1 rounded-md hover:bg-gray-50"
                                     >
-                                        {isEditMode ? '편집 취소' : '상품 편집'}
+                                        {isEditMode ? '편집 취소' : '편집'}
                                     </button>
                                 </div>
                             </>
                         )}
                     </section>
 
-                    {/* 상품 목록 */}
+                    {/* 상품 리스트 */}
                     <section className="rounded-lg p-4">
                         {isEditMode && filteredProducts.length > 0 && (
                             <div className="flex items-center mb-4 pb-2 border-b">
@@ -155,10 +156,7 @@ export default function WishlistPage() {
                                     type="checkbox"
                                     className="w-5 h-5"
                                     onChange={handleSelectAll}
-                                    checked={
-                                        selectedIds.size > 0 &&
-                                        selectedIds.size === filteredProducts.length
-                                    }
+                                    checked={selectedIds.size > 0 && selectedIds.size === filteredProducts.length}
                                 />
                                 <label className="ml-2 text-sm">
                                     전체선택 ({selectedIds.size}/{filteredProducts.length})
@@ -226,6 +224,6 @@ export default function WishlistPage() {
                     </div>
                 </footer>
             )}
-        </>
+        </MyPageLayout>
     );
 }

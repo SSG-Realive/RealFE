@@ -91,7 +91,7 @@ export async function getSellerPublicInfo(productId: number): Promise<publicSell
   }
 }
 
-// 특정 판매자의 리뷰 조회 (추가 또는 기존 함수 수정)
+// 특정 판매자의 리뷰 조회 (수정된 함수)
 export async function getSellerReviews(
   sellerId: number,
   page: number = 0,
@@ -148,5 +148,4 @@ export async function getSellerProducts(
 }
 
 
-//qna
 

@@ -6,9 +6,10 @@ interface ModalProps {
   title: string;
   message: string;
   type: 'success' | 'error';
+  hideButton?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, type }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, type, hideButton = false }) => {
   if (!isOpen) return null;
 
   return (
@@ -20,16 +21,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, message, type }) 
           {title}
         </div>
         <p className="text-gray-700 mb-6">{message}</p>
-        <button
-          onClick={onClose}
-          className={`w-full py-2 px-4 rounded ${
-            type === 'success' 
-              ? 'bg-green-500 hover:bg-green-600' 
-              : 'bg-red-500 hover:bg-red-600'
-          } text-white font-semibold transition-colors`}
-        >
-          확인
-        </button>
+        {!hideButton && (
+          <button
+            onClick={onClose}
+            className={`w-full py-2 px-4 rounded ${
+              type === 'success' 
+                ? 'bg-green-500 hover:bg-green-600' 
+                : 'bg-red-500 hover:bg-red-600'
+            } text-white font-semibold transition-colors`}
+          >
+            확인
+          </button>
+        )}
       </div>
     </div>
   );

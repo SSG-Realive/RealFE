@@ -91,7 +91,7 @@ export async function getSellerPublicInfo(sellerId: number): Promise<publicSelle
   }
 }
 
-// 특정 판매자의 리뷰 조회 (추가 또는 기존 함수 수정)
+// 특정 판매자의 리뷰 조회 (수정된 함수)
 export async function getSellerReviews(
     sellerId: number,
     page: number = 0,
@@ -100,15 +100,49 @@ export async function getSellerReviews(
     direction: string = "DESC"
 ): Promise<{ reviews: ReviewResponseDTO[]; hasMore: boolean }> {
   try {
-    // 백엔드 PageRequestDTO의 page는 1-based이므로 page + 1을 보냅니다.
+    const requestParams = { page: page + 1, size, sort, direction };
+    console.log(`[getSellerReviews] Preparing API call for reviews. URL: /public/seller/${sellerId}/reviews, Params:`, requestParams);
+
     const response = await sellerApi.get(`/public/seller/${sellerId}/reviews`, {
-      params: { page: page + 1, size, sort, direction }
+      params: requestParams
     });
-    const data: ReviewListResponseDTO = response.data;
-    const hasMore = ((data.page) * data.size) < data.totalCount;
-    return { reviews: data.reviews, hasMore };
-  } catch (error) {
-    console.error(`판매자 리뷰 가져오기 오류 (ID: ${sellerId}, 페이지: ${page}):`, error);
+
+    console.log(`[getSellerReviews] API call successful for reviews. Response status: ${response.status}`);
+    const rawData = response.data;
+    console.log(`[getSellerReviews] Raw API Response data:`, rawData); // 이 로그는 여전히 유용합니다.
+
+    let reviewsToReturn: ReviewResponseDTO[] = [];
+    let hasMoreToReturn: boolean = false;
+
+    // ⭐⭐ 여기를 수정합니다! ⭐⭐
+    // 백엔드 응답은 'dtoList' 필드에 실제 리뷰 배열을 포함하고 있습니다.
+    // 'total' 필드가 전체 개수를 나타냅니다.
+    if (rawData && Array.isArray(rawData.dtoList) && typeof rawData.total === 'number') {
+      reviewsToReturn = rawData.dtoList; // 이제 'reviews' 대신 'dtoList' 사용
+      // `hasMore` 계산 로직도 `total` 필드를 사용하여 수정
+      // `rawData.page`는 1-based 페이지 번호이므로, 그대로 사용
+      hasMoreToReturn = (rawData.page * rawData.size) < rawData.total;
+    } else {
+      // 예상치 못한 응답 구조일 경우 경고 로깅
+      console.warn("[getSellerReviews] Unexpected API response structure for reviews. Returning empty array.");
+      console.warn("[getSellerReviews] Raw data that caused the issue:", rawData);
+    }
+
+    console.log(`[getSellerReviews] Extracted Reviews:`, reviewsToReturn);
+    console.log(`[getSellerReviews] Calculated HasMore:`, hasMoreToReturn);
+
+    return { reviews: reviewsToReturn, hasMore: hasMoreToReturn };
+
+  } catch (error: any) {
+    console.error(`[getSellerReviews] Error fetching seller reviews (ID: ${sellerId}, 페이지: ${page}):`, error);
+    if (error.response) {
+      console.error(`[getSellerReviews] Error Response Status: ${error.response.status}`);
+      console.error(`[getSellerReviews] Error Response Data:`, error.response.data);
+    } else if (error.request) {
+      console.error(`[getSellerReviews] No response received:`, error.request);
+    } else {
+      console.error(`[getSellerReviews] Error setting up request:`, error.message);
+    }
     return { reviews: [], hasMore: false };
   }
 }

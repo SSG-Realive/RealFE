@@ -21,11 +21,25 @@ interface DashboardChartProps {
 }
 
 const DashboardChart: React.FC<DashboardChartProps> = ({ data, type, periodType = 'DAILY' }) => {
+
+  
   if (!data || (Array.isArray(data) && data.length === 0)) {
     return <div className="text-gray-500 text-center py-4">데이터가 없습니다.</div>;
   }
   
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF", "#FF4560"];
+  // 대시보드 테마에 맞는 색상 팔레트
+  const COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"];
+  
+  // 매출 전용 그라데이션 색상
+  const SALES_COLORS = {
+    primary: '#10B981',      // Emerald-500 (총 매출 카드와 동일)
+    secondary: '#059669',    // Emerald-600
+    light: '#34D399',        // Emerald-400
+    gradient: {
+      start: '#10B981',
+      end: '#34D399'
+    }
+  };
 
   // 타입 가드 함수
   const isAdminDashboard = (data: AdminDashboardDTO | ProductStats | any[]): data is AdminDashboardDTO => {
@@ -100,120 +114,236 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data, type, periodType 
   let salesOptions: ApexOptions;
   let salesSeries: any[] = [];
 
-  if (type === 'sales' && periodType === 'MONTHLY' && Array.isArray(data)) {
-    // 월별 데이터 객체 배열 처리
+  if (type === 'sales') {
+    // 실제 총 매출 데이터 사용 (총 매출 카드와 동일한 데이터 소스)
+    const totalRevenue = isAdminDashboard(data) ? (data.salesSummaryStats?.totalRevenueInPeriod || 0) : 0;
+    
+    let xAxisCategories: string[];
+    let chartTitle: string;
+    let salesData: number[];
+    let chartType: 'bar' | 'area';
+    
+    if (periodType === 'MONTHLY') {
+      // 백엔드의 dailyRevenueTrend 데이터를 월별로 집계
+      const dailyTrend = isAdminDashboard(data) ? (data.dailyRevenueTrend || []) : [];
+      
+      // 월별 매출 집계
+      const monthlyAggregated = new Map<string, number>();
+      
+      dailyTrend.forEach(item => {
+        if (item.date && item.value) {
+          const date = new Date(item.date);
+          const monthKey = `${date.getFullYear()}년 ${date.getMonth() + 1}월`;
+          const currentAmount = monthlyAggregated.get(monthKey) || 0;
+          monthlyAggregated.set(monthKey, currentAmount + item.value);
+        }
+      });
+      
+      // Map을 배열로 변환하고 날짜순 정렬
+      const monthlyData = Array.from(monthlyAggregated.entries())
+        .map(([label, value]) => ({ label, value }))
+        .sort((a, b) => {
+          // "2024년 7월" 형식을 파싱해서 정렬
+          const parseMonth = (str: string) => {
+            const match = str.match(/(\d{4})년 (\d{1,2})월/);
+            if (!match) return 0;
+            return parseInt(match[1]) * 100 + parseInt(match[2]);
+          };
+          return parseMonth(a.label) - parseMonth(b.label);
+        });
+      
+      if (monthlyData.length > 0) {
+        xAxisCategories = monthlyData.map(d => d.label);
+        salesData = monthlyData.map(d => Math.round(d.value));
+        chartTitle = '월간 매출액';
+        chartType = monthlyData.length > 1 ? 'area' : 'bar';
+      } else {
+        // 데이터가 없으면 현재 월만 표시
+        const currentDate = new Date();
+        const currentMonthLabel = `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`;
+        xAxisCategories = [currentMonthLabel];
+        salesData = [totalRevenue];
+        chartTitle = '월간 매출액';
+        chartType = 'bar';
+      }
+    } else {
+      // 일간은 현재 날짜만
+      xAxisCategories = [new Date().toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })];
+      salesData = [totalRevenue];
+      chartTitle = '일간 매출액';
+      chartType = 'bar';
+    }
+    
     salesOptions = {
       ...baseOptions,
-      chart: { ...baseOptions.chart, type: 'area' },
-      colors: [COLORS[1]],
-      xaxis: {
-        categories: data.map((d: any) => d.month),
+      chart: { ...baseOptions.chart, type: chartType },
+      colors: [SALES_COLORS.primary],
+      xaxis: { 
+        categories: xAxisCategories,
+        labels: {
+          style: {
+            colors: '#6B7280',
+            fontSize: '12px',
+            fontWeight: '500'
+          }
+        }
       },
       yaxis: {
         title: {
-          text: '판매액 (원)',
-          style: { color: '#aaa' }
+          text: '매출액 (원)',
+          style: { 
+            color: '#6B7280',
+            fontSize: '12px',
+            fontWeight: '600'
+          }
+        },
+        labels: {
+          style: {
+            colors: '#6B7280',
+            fontSize: '11px'
+          },
+          formatter: function (val: number) {
+            return val.toLocaleString() + '원';
+          }
         }
       },
-      stroke: { curve: 'smooth', width: 3 },
+      stroke: { 
+        curve: 'smooth', 
+        width: chartType === 'area' ? 3 : 0,
+        colors: [SALES_COLORS.primary]
+      },
       fill: {
-        type: 'gradient',
-        gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] }
+        type: chartType === 'area' ? 'gradient' : 'solid',
+        gradient: { 
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.5,
+          gradientToColors: [SALES_COLORS.light],
+          inverseColors: false,
+          opacityFrom: 0.8,
+          opacityTo: 0.1,
+          stops: [0, 100]
+        }
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 8,
+          columnWidth: '60%',
+          colors: {
+            backgroundBarColors: ['#F3F4F6'],
+            backgroundBarOpacity: 0.3
+          }
+        }
+      },
+      dataLabels: {
+        enabled: chartType === 'bar',
+        style: {
+          fontSize: '11px',
+          fontWeight: 'bold',
+          colors: ['#ffffff']
+        },
+        background: {
+          enabled: true,
+          foreColor: SALES_COLORS.secondary,
+          borderRadius: 4,
+          borderWidth: 0,
+          opacity: 0.9
+        },
+        formatter: function (val: number) {
+          return val > 0 ? val.toLocaleString() + '원' : '0원';
+        }
+      },
+      tooltip: {
+        theme: 'light',
+        style: {
+          fontSize: '12px'
+        },
+        y: {
+          formatter: function (val: number) {
+            return val > 0 ? val.toLocaleString() + '원' : '0원';
+          }
+        }
+      }
+    };
+    
+    salesSeries = [{
+      name: chartTitle,
+      data: salesData,
+    }];
+  } else {
+    // 기본값 - 데이터 형식을 인식하지 못한 경우
+    const today = new Date().toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+    
+    salesOptions = {
+      ...baseOptions,
+      chart: { ...baseOptions.chart, type: 'bar' },
+      colors: [SALES_COLORS.primary],
+      xaxis: { 
+        categories: [today],
+        labels: {
+          style: {
+            colors: '#6B7280',
+            fontSize: '12px',
+            fontWeight: '500'
+          }
+        }
+      },
+      yaxis: {
+        title: {
+          text: '매출액 (원)',
+          style: { 
+            color: '#6B7280',
+            fontSize: '12px',
+            fontWeight: '600'
+          }
+        },
+        labels: {
+          style: {
+            colors: '#6B7280',
+            fontSize: '11px'
+          },
+          formatter: function (val: number) {
+            return val.toLocaleString() + '원';
+          }
+        }
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 8,
+          columnWidth: '60%',
+          colors: {
+            backgroundBarColors: ['#F3F4F6'],
+            backgroundBarOpacity: 0.3
+          }
+        }
+      },
+      dataLabels: {
+        enabled: true,
+        style: {
+          fontSize: '11px',
+          fontWeight: 'bold',
+          colors: ['#ffffff']
+        },
+        formatter: function () {
+          return '0원';
+        }
+      },
+      tooltip: {
+        theme: 'light',
+        style: {
+          fontSize: '12px'
+        },
+        y: {
+          formatter: function () {
+            return '0원';
+          }
+        }
       }
     };
     salesSeries = [{
-      name: '월간 판매액',
-      data: data.map((d: any) => d.totalSalesAmount),
+      name: '매출액',
+      data: [0],
     }];
-  } else if (type === 'sales' && isAdminDashboard(data)) {
-    // dailyRevenueTrend 데이터가 있으면 우선 사용
-    if (data.dailyRevenueTrend && data.dailyRevenueTrend.length > 0) {
-      salesOptions = {
-        ...baseOptions,
-        chart: { ...baseOptions.chart, type: 'area' },
-        colors: [COLORS[1]],
-        xaxis: {
-          categories: data.dailyRevenueTrend.map((item: any) => {
-            const date = new Date(item.date);
-            if (periodType === 'MONTHLY') {
-              return `${date.getFullYear()}. ${date.getMonth() + 1}.`;
-            }
-            return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
-          }),
-        },
-        yaxis: {
-          title: {
-            text: '매출액 (원)',
-            style: { color: '#aaa' }
-          },
-          labels: {
-            formatter: function (val: number) {
-              return val.toLocaleString() + '원';
-            }
-          }
-        },
-        stroke: { curve: 'smooth', width: 3 },
-        fill: {
-          type: 'gradient',
-          gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] }
-        }
-      };
-      salesSeries = [{
-        name: '매출액',
-        data: data.dailyRevenueTrend.map((item: any) => item.value),
-      }];
-    } else {
-      // 기존 일간/기존 데이터 처리 (fallback)
-      salesOptions = {
-        ...baseOptions,
-        chart: { ...baseOptions.chart, type: 'area' },
-        colors: [COLORS[1]],
-        xaxis: {
-          categories: data.productLog?.salesWithCommissions?.map((sale: any) => {
-            const date = new Date(sale.salesLog.soldAt);
-            if (periodType === 'MONTHLY') {
-              return `${date.getFullYear()}. ${date.getMonth() + 1}.`;
-            }
-            return date.toLocaleDateString();
-          }) || [],
-        },
-        yaxis: {
-          title: {
-            text: '판매액 (원)',
-            style: { color: '#aaa' }
-          }
-        },
-        stroke: { curve: 'smooth', width: 3 },
-        fill: {
-          type: 'gradient',
-          gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] }
-        }
-      };
-      salesSeries = [{
-        name: '판매액',
-        data: data.productLog?.salesWithCommissions?.map((sale: any) => sale.salesLog.totalPrice) || [],
-      }];
-    }
-  } else {
-    // 기본값
-    salesOptions = {
-      ...baseOptions,
-      chart: { ...baseOptions.chart, type: 'area' },
-      colors: [COLORS[1]],
-      xaxis: { categories: [] },
-      yaxis: {
-        title: {
-          text: '판매액 (원)',
-          style: { color: '#aaa' }
-        }
-      },
-      stroke: { curve: 'smooth', width: 3 },
-      fill: {
-        type: 'gradient',
-        gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3, stops: [0, 90, 100] }
-      }
-    };
-    salesSeries = [];
   }
 
   // 경매 통계 차트
@@ -392,9 +522,11 @@ const DashboardChart: React.FC<DashboardChartProps> = ({ data, type, periodType 
     data: Object.values(data.categoryStats)
   }] : [];
 
+  // 동적으로 차트 타입 결정 (항상 bar)
+
   const chartMap = {
     member: { options: memberOptions, series: memberSeries, type: 'donut' },
-    sales: { options: salesOptions, series: salesSeries, type: 'area' },
+    sales: { options: salesOptions, series: salesSeries, type: 'bar' },
     auction: { options: auctionOptions, series: auctionSeries, type: 'bar' },
     review: { options: reviewOptions, series: reviewSeries, type: 'donut' },
     product: { options: productOptions, series: productSeries, type: 'donut' },

@@ -7,12 +7,36 @@ import {
     DeliveryStatusUpdateRequest,
 } from '@/types/seller/sellerorder/sellerOrder';
 
+// 주문 검색 조건 인터페이스 추가
+export interface SellerOrderSearchParams {
+    page?: number;
+    size?: number;
+    sort?: string;
+    direction?: 'ASC' | 'DESC';
+    keyword?: string;
+    status?: string;
+}
+
 /**
  * 판매자 주문 목록 조회 (PageResponse 기반)
  * @param searchParams - 페이지, 정렬, 검색 필터 등
  */
-export async function getSellerOrders(): Promise<PageResponseForOrder<SellerOrderResponse>> {
-    const res = await sellerApi.get('/seller/orders');
+export async function getSellerOrders(searchParams: SellerOrderSearchParams = {}): Promise<PageResponseForOrder<SellerOrderResponse>> {
+    const params = new URLSearchParams();
+    
+    // 페이징 파라미터
+    if (searchParams.page !== undefined) params.append('page', searchParams.page.toString());
+    if (searchParams.size !== undefined) params.append('size', searchParams.size.toString());
+    if (searchParams.sort) params.append('sort', searchParams.sort);
+    if (searchParams.direction) params.append('direction', searchParams.direction);
+    
+    // 검색 조건 파라미터
+    if (searchParams.keyword) params.append('keyword', searchParams.keyword);
+    if (searchParams.status) params.append('status', searchParams.status);
+    
+    console.log('🔍 판매자 주문 목록 조회 파라미터:', Object.fromEntries(params));
+    
+    const res = await sellerApi.get(`/seller/orders?${params.toString()}`);
     return res.data;
 }
 

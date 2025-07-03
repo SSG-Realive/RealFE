@@ -1,6 +1,8 @@
+// pages/main/products/[id].tsx
+
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react'; // useMemo 임포트 추가
 import {
   useParams,
   useRouter,
@@ -13,17 +15,22 @@ import {
 } from '@/service/customer/productService';
 import { toggleWishlist } from '@/service/customer/wishlistService';
 import { addToCart } from '@/service/customer/cartService';
-import { fetchReviewsBySeller  } from '@/service/customer/reviewService';
+import { fetchReviewsBySeller } from '@/service/customer/reviewService';
+import { getProductQnaList } from '@/service/customer/customerQnaService';
 
 import ReviewList from '@/components/customer/review/ReviewList';
 import ProductImage from '@/components/ProductImage';
+import QnaList from '@/components/customer/qna/QnaList';
+// ✨ TrafficLightStatusCard 컴포넌트 임포트
+import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
+import { CustomerQnaResponse, CustomerQnaListResponse } from '@/types/customer/qna/customerQnaResponse';
 
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
-import { useAuthStore } from '@/store/customer/authStore';
 import { useGlobalDialog } from '@/app/context/dialogContext';
+import TrafficLightStatusCardforProductDetail from "@/components/seller/TrafficLightStatusCardforProductDetail";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,17 +39,13 @@ export default function ProductDetailPage() {
   const { show } = useGlobalDialog();
 
   const withAuth = async (action: () => Promise<void>) => {
-    if (!useAuthStore.getState().accessToken) {
-      await show('로그인이 필요한 서비스입니다.');
-      router.push(`/customer/member/login?redirectTo=${encodeURIComponent(pathname)}`);
-      return;
-    }
     await action();
   };
 
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [related, setRelated] = useState<ProductListDTO[]>([]);
   const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
+  const [qnas, setQnas] = useState<CustomerQnaResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isWished, setIsWished] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -68,7 +71,15 @@ export default function ProductDetailPage() {
     if (product?.sellerId) {
       fetchReviewsBySeller(product.sellerId).then(setReviews);
     }
-  }, [product]);
+    if (id) {
+      const pid = Number(id);
+      getProductQnaList(pid)
+          .then((res: CustomerQnaListResponse) => setQnas(res.content))
+          .catch((err) => {
+            console.error('Failed to fetch QnAs:', err);
+          });
+    }
+  }, [product, id]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -80,6 +91,17 @@ export default function ProductDetailPage() {
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // ⭐⭐⭐ 새로 추가된 부분: 리뷰 평균 평점 계산
+  const { averageRating, reviewCount } = useMemo(() => {
+    if (!reviews || reviews.length === 0) {
+      return { averageRating: 0, reviewCount: 0 };
+    }
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const avg = totalRating / reviews.length;
+    return { averageRating: parseFloat(avg.toFixed(1)), reviewCount: reviews.length }; // 소수점 한 자리까지
+  }, [reviews]);
+
 
   const handleToggleWishlist = () =>
       withAuth(async () => {
@@ -112,6 +134,12 @@ export default function ProductDetailPage() {
         router.push('/customer/mypage/orders/direct');
       });
 
+  const handleWriteQna = () => {
+    withAuth(async () => {
+      router.push(`/customer/qna/write?productId=${id}`);
+    });
+  };
+
   if (error) return <p className="text-red-500">{error}</p>;
   if (!product) return <p>로딩 중…</p>;
 
@@ -133,6 +161,16 @@ export default function ProductDetailPage() {
               {product.price.toLocaleString()}
               <span className="text-sm ml-1">원</span>
             </p>
+
+            {/* ✨ 여기에 TrafficLightStatusCard를 삽입합니다 */}
+            <div className="mb-6"> {/* 여백을 위한 div 추가 */}
+              <TrafficLightStatusCardforProductDetail
+                  title="상품 평점"
+                  rating={averageRating}
+                  count={reviewCount}
+                  className="mx-auto" // 중앙 정렬을 위해 mx-auto 추가 (필요 시)
+              />
+            </div>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
               <p><span className="font-light">상품상태:</span> {product.status}</p>
@@ -207,6 +245,25 @@ export default function ProductDetailPage() {
               <p className="text-sm text-gray-600">아직 등록된 리뷰가 없습니다.</p>
           )}
         </div>
+
+        {/* --- 상품 QnA 섹션 시작 --- */}
+        <div className="max-w-6xl mx-auto px-4 mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-light">상품 QnA</h2>
+            <button
+                onClick={handleWriteQna}
+                className="px-5 py-2 bg-black text-white rounded-md text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
+            >
+              QnA 작성
+            </button>
+          </div>
+          {qnas.length > 0 ? (
+              <QnaList qnas={qnas} initialDisplayCount={3} />
+          ) : (
+              <p className="text-sm text-gray-600 p-4 border rounded-md shadow-sm bg-white">등록된 QnA가 없습니다.</p>
+          )}
+        </div>
+        {/* --- 상품 QnA 섹션 끝 --- */}
 
         {related.length > 0 && (
             <div className="max-w-6xl mx-auto px-4 mt-8">

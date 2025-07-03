@@ -37,7 +37,11 @@ interface SellerDetailPageProps {
 }
 
 export default async function SellerDetailPage({ params }: SellerDetailPageProps) {
-    const sellerId = parseInt(params.id, 10);
+    // ⭐ 수정된 부분: params.id 직접 접근 경고 해결 ⭐
+    // `params`를 직접 사용해도 대부분의 경우 문제가 없지만,
+    // Next.js의 lint 경고를 없애려면 이렇게 구조분해 할당하는 것이 좋습니다.
+    const { id } = params;
+    const sellerId = parseInt(id, 10);
 
     if (isNaN(sellerId)) {
         return (
@@ -53,6 +57,11 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
         getSellerProducts(sellerId, 0)
     ]);
 
+    // ⭐ 여기에 console.log 추가 (서버 터미널에 출력) ⭐
+    console.log("Seller Info:", seller);
+    console.log("Initial Reviews Response:", initialReviewsResponse);
+    console.log("Initial Products Response:", initialProductsResponse);
+
     if (!seller) {
         return (
             <div className="flex justify-center items-center h-screen text-red-500 text-xl font-light">
@@ -61,10 +70,15 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
         );
     }
 
-    const initialReviews = initialReviewsResponse.reviews;
-    const initialHasMoreReviews = initialReviewsResponse.hasMore;
-    const initialProducts = initialProductsResponse.products;
-    const initialHasMoreProducts = initialProductsResponse.hasMore;
+    // `initialReviewsResponse`의 reviews가 undefined일 수 있으므로 안전하게 처리
+    const initialReviews = initialReviewsResponse?.reviews || [];
+    const initialHasMoreReviews = initialReviewsResponse?.hasMore || false;
+    const initialProducts = initialProductsResponse?.products || [];
+    const initialHasMoreProducts = initialProductsResponse?.hasMore || false;
+
+    // ⭐ 여기에 console.log 추가 (서버 터미널에 출력) ⭐
+    console.log("Initial Reviews Array (after processing):", initialReviews);
+    console.log("Initial Products Array (after processing):", initialProducts);
 
     const displayAverageRatingPercentile = (seller.averageRating / 5) * 100;
     const ratingColorClass = getRatingColor(displayAverageRatingPercentile);

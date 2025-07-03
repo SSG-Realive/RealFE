@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle } from 'lucide-react';
+import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
 import { getMyProducts, getMyProductStats } from '@/service/seller/productService';
@@ -42,7 +42,7 @@ export default function ProductListPage() {
   // 상품 상태 매핑 함수 - 실제 판매 상태 기반으로 수정
   const getProductSalesStatus = (product: ProductListItem) => {
     if (product.stock === 0) return { text: '품절', color: 'bg-red-100 text-red-800' };
-    if (!product.active) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
+    if (!product.isActive) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
     return { text: '판매중', color: 'bg-green-100 text-green-800' };
   };
 
@@ -123,13 +123,25 @@ export default function ProductListPage() {
         <div className="flex-1 w-full h-full px-4 py-8">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl md:text-2xl font-bold text-[#0f766e]">상품 관리</h1>
-            <button
-              onClick={handleRegisterClick}
-              className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
-            >
-              <Plus className="w-5 h-5" />
-              상품 등록
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  fetchProductList(currentPage);
+                  fetchProductStats();
+                }}
+                className="inline-flex items-center gap-2 bg-[#e5e7eb] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#d1d5db] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+              >
+                <RefreshCw className="w-5 h-5" />
+                새로고침
+              </button>
+              <button
+                onClick={handleRegisterClick}
+                className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+              >
+                <Plus className="w-5 h-5" />
+                상품 등록
+              </button>
+            </div>
           </div>
 
           {/* 상단 통계 카드 */}

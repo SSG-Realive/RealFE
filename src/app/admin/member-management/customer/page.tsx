@@ -2,7 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/apiClient';
-import { Users, Search, Filter, RefreshCw, UserCheck, UserX, ChevronDown } from 'lucide-react';
+import { Users, Search, Filter, RefreshCw, UserCheck, UserX, ChevronDown, AlertTriangle } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Customer {
   id: number;
@@ -20,6 +25,14 @@ interface Seller {
   image?: string;
 }
 
+interface Penalty {
+  id: number;
+  customerId: number;
+  points: number;
+  reason: string;
+  createdAt: string;
+}
+
 interface ApiResponse {
   data: {
     data: {
@@ -35,8 +48,10 @@ interface ApiResponse {
 const CustomerListPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [sellers, setSellers] = useState<Seller[]>([]);
+  const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("all");
+  const [penaltySort, setPenaltySort] = useState("all");
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,6 +97,60 @@ const CustomerListPage: React.FC = () => {
     }
   };
 
+  // 패널티 데이터 로딩
+  const fetchPenalties = async () => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
+      const response = await adminApi.get('/admin/penalties?userType=CUSTOMER&page=0&size=1000', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      const penaltiesData = response.data?.data?.content || response.data?.content || [];
+      setPenalties(penaltiesData);
+    } catch (err) {
+      console.error('패널티 데이터 로딩 실패:', err);
+      setPenalties([]);
+    }
+  };
+
+  // 고객의 총 패널티 점수 계산
+  const getCustomerPenaltyPoints = (customerId: number) => {
+    const customerPenalties = penalties.filter(p => p.customerId === customerId);
+    return customerPenalties.reduce((total, penalty) => total + (penalty.points || 0), 0);
+  };
+
+  // 패널티 뱃지 컴포넌트
+  const getPenaltyBadge = (customerId: number) => {
+    const totalPoints = getCustomerPenaltyPoints(customerId);
+    
+    if (totalPoints === 0) {
+      return <Badge variant="secondary">패널티 없음</Badge>;
+    } else if (totalPoints <= 20) {
+      return <Badge variant="warning">{totalPoints}점</Badge>;
+    } else if (totalPoints <= 50) {
+      return <Badge variant="destructive">{totalPoints}점</Badge>;
+    } else {
+      return <Badge variant="destructive" className="bg-red-800">{totalPoints}점</Badge>;
+    }
+  };
+
+  // 패널티 점수에 따른 고객 필터링 및 정렬
+  const getFilteredAndSortedCustomers = () => {
+    // 서버에서 이미 필터링된 데이터를 받아오므로, 클라이언트에서는 필터링만 수행
+    let filtered = [...customers];
+
+    // 패널티 필터링 (클라이언트 사이드)
+    if (penaltySort === 'has') {
+      filtered = filtered.filter(c => getCustomerPenaltyPoints(c.id) > 0);
+    } else if (penaltySort === 'none') {
+      filtered = filtered.filter(c => getCustomerPenaltyPoints(c.id) === 0);
+    }
+
+    return filtered;
+  };
+
   // 데이터 로딩
   const fetchCustomers = async (page = 0, reset = true) => {
     try {
@@ -100,7 +169,8 @@ const CustomerListPage: React.FC = () => {
       });
       
       if (search.trim()) params.append('searchTerm', search.trim());
-      if (status) params.append('isActive', status === 'Active' ? 'true' : 'false');
+      if (status !== 'all') params.append('isActive', status === 'Active' ? 'true' : 'false');
+      // 패널티 정렬은 클라이언트에서 처리하므로 서버에 전송하지 않음
 
       const response: ApiResponse = await adminApi.get(`/admin/users?${params.toString()}`);
       
@@ -133,9 +203,16 @@ const CustomerListPage: React.FC = () => {
     }
   };
 
+  // 초기 로딩
   useEffect(() => {
     fetchCustomers(0, true);
-    fetchTotalStats(); // 전체 통계도 함께 로딩
+    fetchTotalStats();
+    fetchPenalties();
+  }, []);
+
+  // 검색과 상태 필터 변경 시 데이터 다시 로딩
+  useEffect(() => {
+    fetchCustomers(0, true);
   }, [search, status]);
 
   // 상태 토글 핸들러
@@ -169,6 +246,11 @@ const CustomerListPage: React.FC = () => {
     inactive: customers.filter(c => !c.is_active).length
   };
 
+  // 상태 뱃지 shadcn 적용
+  const getStatusBadge = (isActive: boolean) => (
+    <Badge variant={isActive ? "success" : "destructive"}>{isActive ? "활성" : "비활성"}</Badge>
+  );
+
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
     return null;
   }
@@ -189,7 +271,7 @@ const CustomerListPage: React.FC = () => {
           </div>
 
           {/* 통계 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -231,228 +313,150 @@ const CustomerListPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-orange-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">패널티 고객</p>
+                  <p className="text-2xl font-bold text-orange-600">
+                    {customers.filter(c => getCustomerPenaltyPoints(c.id) > 0).length.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* 필터 및 검색 */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="이름 또는 이메일로 검색하세요..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                />
-              </div>
+        {/* 검색/필터 영역 */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">검색</label>
+              <Input
+                type="text"
+                placeholder="이름, 이메일로 검색"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full"
+              />
             </div>
-            
-            <div className="lg:w-64">
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white transition-all"
-                >
-                  <option value="">전체 상태</option>
-                  <option value="Active">활성 고객</option>
-                  <option value="Blocked">정지 고객</option>
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">활성 상태</label>
+              <Select value={status} onValueChange={(value) => setStatus(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="활성 상태 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">모든 상태</SelectItem>
+                  <SelectItem value="Active">활성 고객</SelectItem>
+                  <SelectItem value="Inactive">비활성 고객</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            
-
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">패널티 상태</label>
+              <Select value={penaltySort} onValueChange={(value) => setPenaltySort(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="패널티 상태 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">모든 고객</SelectItem>
+                  <SelectItem value="has">패널티 있음</SelectItem>
+                  <SelectItem value="none">패널티 없음</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Button 
+                variant="outline" 
+                onClick={() => fetchCustomers(0, true)} 
+                disabled={loading}
+                className="w-full"
+              >
+                새로고침
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* 고객 목록 */}
+        {/* 테이블 */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          {loading && customers.length === 0 ? (
+          {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">고객 정보를 불러오는 중...</p>
               </div>
             </div>
-          ) : error ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-center">
-                <div className="text-red-500 text-lg font-semibold mb-2">오류가 발생했습니다</div>
-                <div className="text-gray-600 mb-6">{error}</div>
-                <button
-                  onClick={() => fetchCustomers(0, true)}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-                >
-                  다시 시도
-                </button>
-              </div>
-            </div>
-          ) : customers.length === 0 ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-center">
-                <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <div className="text-gray-500 text-lg font-medium mb-2">고객이 없습니다</div>
-                <div className="text-gray-400 text-sm">
-                  {search || status ? '검색 조건을 변경해보세요.' : '등록된 고객이 없습니다.'}
-                </div>
-              </div>
-            </div>
           ) : (
-            <>
-              {/* 데스크탑 테이블 */}
-              <div className="hidden lg:block overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">고객 정보</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">이메일</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">상태</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">액션</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {customers.map((customer) => (
-                      <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={customer.image || '/images/default-profile.svg'}
-                              alt={`${customer.name}의 프로필`}
-                              className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = '/images/placeholder.png';
-                              }}
-                            />
-                            <div>
-                              <div className="font-semibold text-gray-900">{customer.name}</div>
-                              <div className="text-sm text-gray-500">ID: {customer.id}</div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이메일</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">패널티</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">액션</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {getFilteredAndSortedCustomers().map(customer => (
+                    <tr key={customer.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-sm font-medium text-gray-700">{customer.name?.charAt(0) || '?'}</span>
                             </div>
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-gray-900">{customer.email}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
-                            customer.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {customer.is_active ? '활성' : '정지'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => handleToggleActive(customer)}
-                            disabled={updatingId === customer.id}
-                            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all ${
-                              customer.is_active
-                                ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
-                                : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white'
-                            } ${updatingId === customer.id ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          >
-                            {updatingId === customer.id ? (
-                              <>
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                처리중
-                              </>
-                            ) : (
-                              customer.is_active ? '정지' : '복구'
-                            )}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* 모바일 카드 */}
-              <div className="lg:hidden divide-y divide-gray-100">
-                {customers.map((customer) => (
-                  <div key={customer.id} className="p-6">
-                    <div className="flex items-start gap-4">
-                      <img
-                        src={customer.image || '/images/default-profile.svg'}
-                        alt={`${customer.name}의 프로필`}
-                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200 flex-shrink-0"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/images/placeholder.png';
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-gray-900 truncate">{customer.name}</h3>
-                            <p className="text-sm text-gray-500">ID: {customer.id}</p>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{customer.name}</div>
                           </div>
-                          <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
-                            customer.is_active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {customer.is_active ? '활성' : '정지'}
-                          </span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-3 truncate">{customer.email}</p>
-                        <button
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">{customer.email}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        {getPenaltyBadge(customer.id)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(customer.is_active)}</td>
+                      <td className="px-6 py-4 text-center">
+                        <Button
+                          size="sm"
+                          variant={customer.is_active ? "destructive" : "success"}
                           onClick={() => handleToggleActive(customer)}
                           disabled={updatingId === customer.id}
-                          className={`w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all ${
-                            customer.is_active
-                              ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white'
-                              : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 text-white'
-                          } ${updatingId === customer.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          {updatingId === customer.id ? (
-                            <>
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                              처리중
-                            </>
-                          ) : (
-                            customer.is_active ? '정지' : '복구'
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* 더 불러오기 버튼 */}
-              {hasMore && (
-                <div className="flex justify-center py-8">
-                  <button
-                    onClick={loadMore}
-                    disabled={loadingMore}
-                    className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    {loadingMore ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        더 불러오는 중...
-                      </>
-                    ) : (
-                      <>더 불러오기 ({customers.length}/{totalElements})</>
-                    )}
-                  </button>
-                </div>
+                          {customer.is_active ? <UserX className="w-4 h-4 mr-1" /> : <UserCheck className="w-4 h-4 mr-1" />}
+                          {customer.is_active ? "비활성화" : "활성화"}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {customers.length === 0 && (
+                <div className="text-center py-12 text-gray-500">데이터가 없습니다</div>
               )}
-
-              {/* 모든 데이터 로드 완료 */}
-              {!hasMore && customers.length > 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  모든 고객을 불러왔습니다 ({customers.length}명)
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
+
+        {/* 더 불러오기 버튼 */}
+        {hasMore && !loading && (
+          <div className="flex justify-center mt-6">
+            <Button variant="outline" onClick={loadMore} disabled={loadingMore}>
+              {loadingMore ? "불러오는 중..." : "더 불러오기"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

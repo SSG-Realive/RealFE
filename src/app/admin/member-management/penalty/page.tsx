@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import apiClient from '@/lib/apiClient';
 import { AlertTriangle, Search, Plus, Eye } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface Penalty {
   id: string;
@@ -142,23 +144,24 @@ export default function PenaltyListPage() {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
+                <Input
                   type="text"
                   placeholder="사용자 ID 또는 사유로 검색하세요..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  className="w-full pl-10"
                 />
               </div>
             </div>
             
-            <button
-              className="lg:w-auto w-full px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all flex items-center justify-center gap-2"
+            <Button
+              className="lg:w-auto w-full"
+              variant="destructive"
               onClick={() => router.push('/admin/member-management/penalty/register')}
             >
               <Plus className="w-5 h-5" />
               패널티 등록
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -222,13 +225,14 @@ export default function PenaltyListPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button
+                          <Button
                             onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
-                            className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
+                            variant="link"
+                            size="sm"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             상세보기
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -256,13 +260,14 @@ export default function PenaltyListPage() {
                            })() : '-'}
                          </p>
                       </div>
-                      <button
+                      <Button
                         onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
-                        className="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-colors"
+                        variant="link"
+                        size="sm"
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         상세보기
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 ))}

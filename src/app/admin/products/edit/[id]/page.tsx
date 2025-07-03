@@ -1,6 +1,9 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const dummyProducts = [
   { id: 1, name: "무선 마우스", category: "전자기기", price: 25000, stock: 12, createdAt: "2024-03-01", status: "판매중", productImage: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=facearea&w=80&h=80" },
@@ -43,31 +46,36 @@ export default function ProductEditPage() {
       <form onSubmit={handleSave} className="space-y-4">
         <div>
           <label className="block mb-1 font-medium">상품명</label>
-          <input className="border rounded px-3 py-2 w-full" value={name} onChange={e => setName(e.target.value)} required />
+          <Input value={name} onChange={e => setName(e.target.value)} required />
         </div>
         <div>
           <label className="block mb-1 font-medium">카테고리</label>
-          <input className="border rounded px-3 py-2 w-full" value={category} onChange={e => setCategory(e.target.value)} required />
+          <Input value={category} onChange={e => setCategory(e.target.value)} required />
         </div>
         <div>
           <label className="block mb-1 font-medium">가격</label>
-          <input type="number" className="border rounded px-3 py-2 w-full" value={price} onChange={e => setPrice(Number(e.target.value))} required />
+          <Input type="number" value={price} onChange={e => setPrice(Number(e.target.value))} required />
         </div>
         <div>
           <label className="block mb-1 font-medium">재고</label>
-          <input type="number" className="border rounded px-3 py-2 w-full" value={stock} onChange={e => setStock(Number(e.target.value))} required />
+          <Input type="number" value={stock} onChange={e => setStock(Number(e.target.value))} required />
         </div>
         <div>
           <label className="block mb-1 font-medium">상태</label>
-          <select className="border rounded px-3 py-2 w-full" value={status} onChange={e => setStatus(e.target.value as any)}>
-            <option value="판매중">판매중</option>
-            <option value="품절">품절</option>
-            <option value="숨김">숨김</option>
-          </select>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="판매중">판매중</SelectItem>
+              <SelectItem value="품절">품절</SelectItem>
+              <SelectItem value="숨김">숨김</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="block mb-1 font-medium">상품 이미지</label>
-          <input type="file" accept="image/*" onChange={e => {
+          <Input type="file" accept="image/*" onChange={e => {
             if (e.target.files && e.target.files[0]) {
               setImageFile(e.target.files[0]);
               setImage(URL.createObjectURL(e.target.files[0]));
@@ -75,11 +83,13 @@ export default function ProductEditPage() {
           }} />
           {image && <img src={image} alt="미리보기" className="w-24 h-24 rounded object-cover mt-2" />}
         </div>
-        <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">저장</button>
+        <Button type="submit" className="w-full" variant="default">
+          저장
+        </Button>
       </form>
-      <button className="mt-4 px-4 py-2 bg-gray-500 text-white rounded" onClick={() => router.push('/admin/products')}>
+      <Button className="mt-4" variant="outline" onClick={() => router.push('/admin/products')}>
         목록으로
-      </button>
+      </Button>
     </div>
   );
 } 

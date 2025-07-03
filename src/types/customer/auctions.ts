@@ -71,3 +71,21 @@ export interface GetAuctionsParams {
   sort?: string; // 정렬 파라미터 (예: 'endTime,asc')
   status?: string; // 상태별 조회 (예: 'PROCEEDING')
 }
+
+export interface WonAuction {
+  auctionId: number;       // id -> auctionId
+  productName: string;
+  productImageUrl: string; // thumbnailUrl -> productImageUrl
+  winningBidPrice: number; // finalBidPrice -> winningBidPrice
+  auctionEndTime: string;  // auctionEndDate -> auctionEndTime
+}
+
+export interface WonAuctionState {
+  auctions: WonAuction[];
+  page: number;
+  hasNext: boolean;
+  loading: boolean;
+  error: string | null;
+  fetchWonAuctions: () => Promise<void>;
+  reset: () => void;
+}

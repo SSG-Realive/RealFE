@@ -104,7 +104,7 @@ export default function AdminSidebar() {
           </li>
           <li className="my-2">
             <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/product-managemnet')}>
-              <Link href="/admin/products" className="flex-1 no-underline text-inherit">
+              <Link href="/admin/product-management" className="flex-1 no-underline text-inherit">
               상품
             </Link>
             <button

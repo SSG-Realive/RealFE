@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Filter, Package, DollarSign, Calendar, Eye } from 'lucide-react';
+import { Search, Filter, Package, DollarSign, Calendar, Eye, TrendingUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/apiClient';
+import OwnedProductDetailModal from '@/components/admin/OwnedProductDetailModal';
 
 interface Product {
   id: number;
@@ -18,6 +19,9 @@ interface Product {
   purchasePrice?: number;
   purchasedAt?: string;
   isAuctioned?: boolean;
+  width?: number;
+  depth?: number;
+  height?: number;
 }
 
 interface Category {
@@ -63,7 +67,6 @@ export default function AdminOwnedProductsPage() {
   // 필터 상태
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
   const [auctionStatus, setAuctionStatus] = useState<string>('all');
   
   // 계층형 카테고리 드롭다운을 위한 상태
@@ -73,6 +76,10 @@ export default function AdminOwnedProductsPage() {
     childCategories: Map<number, Category[]>;
     categoryMap: Map<number, Category>;
   } | null>(null);
+
+  // 모달 상태
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -104,8 +111,6 @@ export default function AdminOwnedProductsPage() {
       const params = new URLSearchParams();
       if (searchKeyword) params.append('keyword', searchKeyword);
       if (selectedCategory) params.append('categoryId', selectedCategory.toString());
-      if (priceRange.min) params.append('minPrice', priceRange.min);
-      if (priceRange.max) params.append('maxPrice', priceRange.max);
       if (auctionStatus !== 'all') params.append('isAuctioned', auctionStatus === 'true' ? 'true' : 'false');
       params.append('size', '100'); // 충분한 데이터 로드
 
@@ -130,25 +135,39 @@ export default function AdminOwnedProductsPage() {
   const clearFilters = () => {
     setSearchKeyword('');
     setSelectedCategory(null);
-    setPriceRange({ min: '', max: '' });
     setAuctionStatus('all');
     setSelectedParentCategory(null);
     fetchProducts();
   };
 
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleAuctionCreated = () => {
+    // 경매 등록 후 상품 목록 새로고침
+    fetchProducts();
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'bg-green-100 text-green-800';
-      case 'INACTIVE': return 'bg-red-100 text-red-800';
-      case 'SOLD_OUT': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'ACTIVE': return 'bg-green-500 text-white';
+      case 'INACTIVE': return 'bg-red-500 text-white';
+      case 'SOLD_OUT': return 'bg-gray-500 text-white';
+      default: return 'bg-gray-500 text-white';
     }
   };
 
   const getAuctionStatusColor = (isAuctioned: boolean | undefined) => {
     return isAuctioned 
-      ? 'bg-blue-100 text-blue-800' 
-      : 'bg-yellow-100 text-yellow-800';
+      ? 'bg-blue-500 text-white' 
+      : 'bg-yellow-500 text-white';
   };
 
   const filtered = products.filter(product => {
@@ -161,19 +180,17 @@ export default function AdminOwnedProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow p-6">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/3"></div>
-                </div>
-              ))}
-            </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-gray-400 rounded-full animate-spin mx-auto" style={{ animationDelay: '0.5s' }}></div>
+          </div>
+          <p className="text-gray-600 text-lg font-medium">매입 상품을 불러오는 중...</p>
+          <div className="mt-4 flex justify-center space-x-2">
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
           </div>
         </div>
       </div>
@@ -181,22 +198,37 @@ export default function AdminOwnedProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* 헤더 */}
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* 헤더 섹션 */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">관리자 매입 상품</h1>
-          <p className="text-gray-600">관리자가 매입한 상품들을 조회하고 관리할 수 있습니다.</p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-16 h-16 bg-gray-800 rounded-2xl flex items-center justify-center shadow-lg">
+                  <TrendingUp className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-gray-800">
+                  관리자 매입 상품
+                </h1>
+                <p className="text-gray-600 text-lg mt-2">
+                  관리자가 매입한 상품들을 조회하고 관리할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* 필터 섹션 */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <h2 className="text-lg font-semibold text-gray-900">필터</h2>
+        <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6 mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Filter className="w-5 h-5 text-gray-600" />
+            <h2 className="text-lg font-semibold text-gray-800">필터</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             {/* 검색어 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">검색어</label>
@@ -207,7 +239,7 @@ export default function AdminOwnedProductsPage() {
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
                   placeholder="상품명 검색..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 />
               </div>
             </div>
@@ -224,7 +256,7 @@ export default function AdminOwnedProductsPage() {
                     setSelectedParentCategory(parentId);
                     setSelectedCategory(null); // 하위 카테고리 선택 초기화
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 >
                   <option value="">전체 카테고리</option>
                   {categoryHierarchy?.rootCategories.map(category => (
@@ -239,7 +271,7 @@ export default function AdminOwnedProductsPage() {
                   <select
                     value={selectedCategory || ""}
                     onChange={(e) => setSelectedCategory(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-blue-50"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent bg-gray-100"
                   >
                     <option value="">전체 {categoryHierarchy.categoryMap.get(selectedParentCategory)?.name}</option>
                     {categoryHierarchy.childCategories.get(selectedParentCategory)?.map(category => (
@@ -252,7 +284,7 @@ export default function AdminOwnedProductsPage() {
                 
                 {/* 선택된 카테고리 표시 */}
                 {selectedCategory && (
-                  <div className="text-sm text-blue-600 bg-blue-50 px-3 py-2 rounded-md">
+                  <div className="text-sm text-gray-600 bg-gray-100 px-3 py-2 rounded-xl">
                     선택된 카테고리: {categories.find(c => c.id === selectedCategory)?.name}
                   </div>
                 )}
@@ -265,7 +297,7 @@ export default function AdminOwnedProductsPage() {
               <select
                 value={auctionStatus}
                 onChange={(e) => setAuctionStatus(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
               >
                 <option value="all">전체</option>
                 <option value="true">경매 등록</option>
@@ -274,40 +306,19 @@ export default function AdminOwnedProductsPage() {
             </div>
           </div>
 
-          {/* 가격 범위 - 별도 행으로 분리 */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">가격 범위</label>
-            <div className="flex gap-2 max-w-md">
-              <input
-                type="number"
-                value={priceRange.min}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                placeholder="최소 가격"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              <span className="self-center text-gray-500">~</span>
-              <input
-                type="number"
-                value={priceRange.max}
-                onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                placeholder="최대 가격"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
 
           {/* 필터 버튼 */}
           <div className="flex gap-3">
             <button
               onClick={handleSearch}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="bg-gray-800 text-white px-6 py-2 rounded-xl hover:bg-gray-700 transition-colors flex items-center gap-2"
             >
               <Search className="w-4 h-4" />
               검색
             </button>
             <button
               onClick={clearFilters}
-              className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+              className="bg-gray-200 text-gray-700 px-6 py-2 rounded-xl hover:bg-gray-300 transition-colors"
             >
               필터 초기화
             </button>
@@ -315,14 +326,14 @@ export default function AdminOwnedProductsPage() {
         </div>
 
         {/* 결과 통계 */}
-        <div className="mb-6">
-          <div className="bg-white rounded-lg shadow p-4">
+        <div className="mb-8">
+          <div className="bg-gray-50 rounded-3xl border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-gray-600">총 매입 상품: </span>
-                <span className="font-semibold text-lg text-blue-600">{filtered.length}개</span>
+                <span className="font-bold text-2xl text-gray-800">{filtered.length}개</span>
               </div>
-              <div className="flex gap-4 text-sm text-gray-600">
+              <div className="flex gap-6 text-sm text-gray-600">
                 <span>경매 등록: {filtered.filter(p => p.isAuctioned === true).length}개</span>
                 <span>경매 미등록: {filtered.filter(p => p.isAuctioned === false).length}개</span>
               </div>
@@ -333,14 +344,16 @@ export default function AdminOwnedProductsPage() {
         {/* 상품 목록 */}
         {error ? (
           <div className="text-center py-12">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">오류가 발생했습니다</h3>
-            <p className="text-gray-600">{error}</p>
+            <div className="w-32 h-32 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Package className="w-16 h-16 text-red-500" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">오류가 발생했습니다</h3>
+            <p className="text-gray-600 text-lg">{error}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filtered.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={product.id} className="bg-gray-50 rounded-3xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 {/* 상품 이미지 */}
                 <div className="aspect-square bg-gray-200 relative">
                   {product.thumbnailUrl ? (
@@ -354,43 +367,59 @@ export default function AdminOwnedProductsPage() {
                       <Package className="w-12 h-12 text-gray-400" />
                     </div>
                   )}
-                  <div className="absolute top-2 right-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getAuctionStatusColor(product.isAuctioned)}`}>
+                  <div className="absolute top-3 right-3">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${getAuctionStatusColor(product.isAuctioned)}`}>
                       {product.isAuctioned === true ? '경매 등록' : '미등록'}
                     </span>
                   </div>
                 </div>
 
                 {/* 상품 정보 */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{product.name}</h3>
+                <div className="p-6">
+                  <h3 className="font-bold text-gray-800 mb-3 line-clamp-2 text-lg">{product.name}</h3>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm">
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center gap-3 text-sm">
                       <Package className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-600">{product.categoryName}</span>
+                      <span className="text-gray-600 w-16">카테고리:</span>
+                      <span className="font-medium text-gray-800">{product.categoryName}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-3 text-sm">
                       <DollarSign className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-600">매입가:</span>
-                      <span className="font-medium text-blue-600">
+                      <span className="text-gray-600 w-16">매입가:</span>
+                      <span className="font-bold text-green-600">
                         {product.purchasePrice ? product.purchasePrice.toLocaleString() : 'N/A'}원
                       </span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-3 text-sm">
                       <Calendar className="w-4 h-4 text-gray-500" />
-                      <span className="text-gray-600">매입일:</span>
-                      <span className="font-medium">
+                      <span className="text-gray-600 w-16">매입일:</span>
+                      <span className="font-medium text-gray-800">
                         {product.purchasedAt ? new Date(product.purchasedAt).toLocaleDateString() : 'N/A'}
                       </span>
                     </div>
+
+                    {(product.width || product.depth || product.height) && (
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-4 h-4 flex items-center justify-center">
+                          <div className="w-3 h-3 border border-gray-400 rounded-sm"></div>
+                        </div>
+                        <span className="text-gray-600 w-16">사이즈:</span>
+                        <span className="font-medium text-gray-800">
+                          {product.width && `${product.width}W`}
+                          {product.depth && ` × ${product.depth}D`}
+                          {product.height && ` × ${product.height}H`}cm
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
-                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-1 text-sm"
+                      onClick={() => handleProductClick(product)}
+                      className="flex-1 bg-gray-800 text-white py-3 px-4 rounded-xl hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 font-medium"
                     >
                       <Eye className="w-4 h-4" />
                       상세 보기
@@ -405,19 +434,29 @@ export default function AdminOwnedProductsPage() {
         {/* 결과가 없을 때 */}
         {filtered.length === 0 && !loading && !error && (
           <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">📦</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">매입한 상품이 없습니다</h3>
-            <p className="text-gray-600 mb-4">
+            <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Package className="w-16 h-16 text-gray-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">매입한 상품이 없습니다</h3>
+            <p className="text-gray-600 text-lg mb-8">
               검색 조건을 변경하거나 필터를 초기화해보세요.
             </p>
             <button 
               onClick={clearFilters}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+              className="bg-gray-800 text-white px-8 py-3 rounded-xl hover:bg-gray-700 transition-colors font-medium"
             >
               필터 초기화
             </button>
           </div>
         )}
+
+        {/* 상품 상세 모달 */}
+        <OwnedProductDetailModal
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          onAuctionCreated={handleAuctionCreated}
+        />
       </div>
     </div>
   );

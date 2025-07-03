@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/apiClient';
-import { Users, Search, Filter, RefreshCw, UserCheck, UserX, ChevronDown, AlertTriangle } from 'lucide-react';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Users, UserCheck, UserX, AlertTriangle } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -47,7 +46,6 @@ interface ApiResponse {
 
 const CustomerListPage: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [sellers, setSellers] = useState<Seller[]>([]);
   const [penalties, setPenalties] = useState<Penalty[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("all");
@@ -132,7 +130,7 @@ const CustomerListPage: React.FC = () => {
     } else if (totalPoints <= 50) {
       return <Badge variant="destructive">{totalPoints}점</Badge>;
     } else {
-      return <Badge variant="destructive" className="bg-red-800">{totalPoints}점</Badge>;
+      return <Badge variant="destructive" className="bg-red-600 text-white">{totalPoints}점</Badge>;
     }
   };
 
@@ -248,7 +246,7 @@ const CustomerListPage: React.FC = () => {
 
   // 상태 뱃지 shadcn 적용
   const getStatusBadge = (isActive: boolean) => (
-    <Badge variant={isActive ? "success" : "destructive"}>{isActive ? "활성" : "비활성"}</Badge>
+    <Badge variant={isActive ? "success" : "destructive"} className={isActive ? "" : "text-white"}>{isActive ? "활성" : "비활성"}</Badge>
   );
 
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
@@ -402,7 +400,7 @@ const CustomerListPage: React.FC = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이메일</th>
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">패널티</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">액션</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">정지</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">

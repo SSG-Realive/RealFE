@@ -1,7 +1,5 @@
 'use client';
 
-import { getTrafficLightText } from '@/types/admin/review';
-
 interface TrafficLightStatusCardProps {
   title: string;
   rating: number;
@@ -9,11 +7,33 @@ interface TrafficLightStatusCardProps {
   className?: string;
 }
 
-function getCircleColor(rating: number) {
-  if (rating <= 2 && rating > 0) return '#ef4444'; // 빨강
-  if (rating === 3) return '#facc15'; // 노랑
-  if (rating >= 4) return '#22c55e'; // 초록
-  return '#d1d5db'; // 회색
+function getCircleColor(rating: number, reviewCount: number) {
+  // 리뷰 없음
+  if (reviewCount === 0) return '#d1d5db'; // 회색
+  
+  // 신규 판매자 보호 (1~4개)
+  if (reviewCount < 5) return '#facc15'; // 노랑 고정
+  
+  // 5개 이상부터 실제 평점 적용
+  if (rating >= 0.1 && rating <= 2.0) return '#ef4444'; // 빨강 (0.1~2.0)
+  if (rating >= 2.1 && rating <= 3.5) return '#facc15'; // 노랑 (2.1~3.5)
+  if (rating >= 3.6 && rating <= 5.0) return '#22c55e'; // 초록 (3.6~5.0)
+  return '#d1d5db'; // 회색 (예외 상황)
+}
+
+function getStatusText(rating: number, reviewCount: number) {
+  // 리뷰 없음
+  if (reviewCount === 0) return '평가없음';
+  
+  // 신규 판매자 보호 (1~4개)
+  if (reviewCount < 5) return '신규판매자';
+  
+  // 5개 이상부터 실제 평점 적용
+  if (rating === 5.0) return '최고'; // 완벽한 5점
+  if (rating >= 0.1 && rating <= 2.0) return '부정적'; // 빨강 구간
+  if (rating >= 2.1 && rating <= 3.5) return '보통'; // 노랑 구간
+  if (rating >= 3.6 && rating < 5.0) return '긍정적'; // 초록 구간
+  return '평가없음'; // 예외 상황
 }
 
 export default function TrafficLightStatusCard({ 
@@ -32,7 +52,7 @@ export default function TrafficLightStatusCard({
               cx="28"
               cy="28"
               r="24"
-              fill={getCircleColor(rating)}
+              fill={getCircleColor(rating, count ?? 0)}
               stroke="#d6ccc2"
               strokeWidth="4"
               style={{ filter: isNoReview ? 'grayscale(1)' : 'drop-shadow(0 0 8px #fff)' }}
@@ -40,7 +60,7 @@ export default function TrafficLightStatusCard({
           </svg>
         </span>
         <div className="text-lg font-bold text-[#374151] mb-1">{title}</div>
-        <div className="text-xl font-extrabold text-[#374151] mb-1">{isNoReview ? '평가 없음' : getTrafficLightText(rating)}</div>
+        <div className="text-xl font-extrabold text-[#374151] mb-1">{isNoReview ? '평가 없음' : getStatusText(rating, count ?? 0)}</div>
         <div className="text-sm text-[#a89f91] mt-1">리뷰 {count ?? 0}건</div>
       </div>
     </div>

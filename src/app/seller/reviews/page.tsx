@@ -52,6 +52,8 @@ export default function SellerReviewPage() {
     const fetchReviews = async () => {
         try {
             setLoading(true);
+            console.log('🚀 리뷰 데이터 조회 시작...');
+            
             const filters: ReviewFilterOptions = {
                 productName: filterProductName || undefined,
                 rating: filterRating,
@@ -63,13 +65,23 @@ export default function SellerReviewPage() {
                 getSellerReviewStatistics()
             ]);
             
+            console.log('📊 받은 리뷰 데이터:', reviewsData);
+            console.log('📈 받은 통계 데이터:', statsData);
+            
             setReviews(reviewsData.reviews);
             setTotalCount(reviewsData.totalCount);
             setStatistics(statsData);
             setError(null);
-        } catch (err) {
-            console.error('리뷰 데이터 조회 실패:', err);
-            setError('리뷰 데이터를 불러오는 데 실패했습니다.');
+        } catch (err: any) {
+            console.error('🚨 리뷰 데이터 조회 실패:', err);
+            console.error('🔍 에러 상세:', {
+                message: err?.message,
+                status: err?.response?.status,
+                statusText: err?.response?.statusText,
+                url: err?.config?.url,
+                method: err?.config?.method
+            });
+            setError(`리뷰 데이터를 불러오는 데 실패했습니다. (${err?.response?.status || 'Network Error'})`);
         } finally {
             setLoading(false);
         }

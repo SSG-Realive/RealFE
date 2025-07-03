@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient';
+import { sellerApi } from '@/lib/apiClient';
 import { SellerReviewListResponse, SellerReviewStatistics, ReviewFilterOptions } from '@/types/seller/review';
 
 // 판매자의 리뷰 목록 조회
@@ -19,12 +19,17 @@ export const getSellerReviews = async (
     params.sortBy = filters.sortBy;
   }
 
-  const response = await apiClient.get('/api/seller/reviews', { params });
+  console.log('🔍 리뷰 API 호출:', { url: '/seller/reviews', params });
+  const response = await sellerApi.get('/seller/reviews', { params });
+  console.log('✅ 리뷰 API 응답:', response.data);
+  
   return response.data;
 };
 
 // 판매자의 리뷰 통계 조회
 export const getSellerReviewStatistics = async (): Promise<SellerReviewStatistics> => {
-  const response = await apiClient.get('/api/seller/reviews/statistics');
+  console.log('🔍 리뷰 통계 API 호출:', { url: '/seller/reviews/statistics' });
+  const response = await sellerApi.get('/seller/reviews/statistics');
+  console.log('✅ 리뷰 통계 API 응답:', response.data);
   return response.data;
 }; 

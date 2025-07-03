@@ -9,7 +9,7 @@ export interface SellerReviewResponse {
   rating: number;
   content: string;
   imageUrls: string[];
-  createdAt: string;
+  createdAt: string; // LocalDateTime이 JSON에서 string으로 변환됨
   isHidden: boolean;
 }
 

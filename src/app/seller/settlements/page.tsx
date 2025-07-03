@@ -257,7 +257,8 @@ export default function SellerSettlementPage() {
             console.log('=== 정산 데이터 가공 시작 ===');
             console.log('입력된 정산 목록:', payoutList);
             
-            const dailyData: DailySettlementItem[] = [];
+            // 날짜별로 데이터를 그룹핑할 맵
+            const dailyDataMap: { [date: string]: DailySettlementItem } = {};
             
             for (const payout of payoutList) {
                 console.log(`정산 ID ${payout.id} 처리 중...`, {
@@ -278,7 +279,7 @@ export default function SellerSettlementPage() {
                         }))
                     });
                     
-                    // 각 salesDetail을 개별 항목으로 처리
+                    // 각 salesDetail을 날짜별로 그룹핑
                     detail.salesDetails.forEach((saleDetail, index) => {
                         const saleDate = saleDetail.salesLog.soldAt.split('T')[0]; // YYYY-MM-DD 형식으로 변환
                         console.log(`판매 건 ${index + 1}:`, {
@@ -303,60 +304,66 @@ export default function SellerSettlementPage() {
                         
                         console.log(`판매 건 ${index + 1} 포함됨:`, saleDate);
                         
-                        dailyData.push({
-                            id: `${payout.id}_${saleDate}_${index}`, // 고유 ID 생성 (건별)
-                            originalPayoutId: payout.id,
-                            sellerId: payout.sellerId,
-                            date: saleDate,
-                            periodStart: saleDate,
-                            periodEnd: saleDate,
-                            totalSales: saleDetail.salesLog.totalPrice, // 개별 주문 금액
-                            totalCommission: saleDetail.commissionLog.commissionAmount, // 개별 수수료
-                            payoutAmount: saleDetail.salesLog.totalPrice - saleDetail.commissionLog.commissionAmount, // 개별 지급액
-                            processedAt: payout.processedAt,
-                            salesCount: 1, // 개별 건이므로 항상 1
-                            salesDetails: [saleDetail], // 해당 건의 상세 내역
-                            // 추가 정보
-                            productId: saleDetail.salesLog.productId,
-                            customerId: saleDetail.salesLog.customerId,
-                            quantity: saleDetail.salesLog.quantity,
-                            unitPrice: saleDetail.salesLog.unitPrice,
-                            orderItemId: saleDetail.salesLog.orderItemId,
-                            soldAt: saleDetail.salesLog.soldAt
-                        });
+                        // 날짜별로 데이터 합산
+                        if (!dailyDataMap[saleDate]) {
+                            dailyDataMap[saleDate] = {
+                                id: `daily_${saleDate}`,
+                                originalPayoutId: payout.id,
+                                sellerId: payout.sellerId,
+                                date: saleDate,
+                                periodStart: saleDate,
+                                periodEnd: saleDate,
+                                totalSales: 0,
+                                totalCommission: 0,
+                                payoutAmount: 0,
+                                processedAt: payout.processedAt,
+                                salesCount: 0,
+                                salesDetails: [] // 해당 날짜의 모든 상세 내역
+                            };
+                        }
+                        
+                        // 날짜별 합계 누적
+                        dailyDataMap[saleDate].totalSales += saleDetail.salesLog.totalPrice;
+                        dailyDataMap[saleDate].totalCommission += saleDetail.commissionLog.commissionAmount;
+                        dailyDataMap[saleDate].payoutAmount += (saleDetail.salesLog.totalPrice - saleDetail.commissionLog.commissionAmount);
+                        dailyDataMap[saleDate].salesCount += 1;
+                        dailyDataMap[saleDate].salesDetails.push(saleDetail);
                     });
                 } catch (detailError) {
                     console.error(`정산 상세 조회 실패 (ID: ${payout.id}):`, detailError);
                     // 상세 조회 실패 시 원본 데이터를 하루 단위로 변환
-                    dailyData.push({
-                        id: `${payout.id}_${payout.periodStart}_fallback`,
-                        originalPayoutId: payout.id,
-                        sellerId: payout.sellerId,
-                        date: payout.periodStart,
-                        periodStart: payout.periodStart,
-                        periodEnd: payout.periodEnd,
-                        totalSales: payout.totalSales,
-                        totalCommission: payout.totalCommission,
-                        payoutAmount: payout.payoutAmount,
-                        processedAt: payout.processedAt,
-                        salesCount: 1,
-                        salesDetails: []
-                    });
+                    const fallbackDate = payout.periodStart;
+                    if (!dailyDataMap[fallbackDate]) {
+                        dailyDataMap[fallbackDate] = {
+                            id: `daily_${fallbackDate}_fallback`,
+                            originalPayoutId: payout.id,
+                            sellerId: payout.sellerId,
+                            date: fallbackDate,
+                            periodStart: fallbackDate,
+                            periodEnd: payout.periodEnd,
+                            totalSales: payout.totalSales,
+                            totalCommission: payout.totalCommission,
+                            payoutAmount: payout.payoutAmount,
+                            processedAt: payout.processedAt,
+                            salesCount: 1,
+                            salesDetails: []
+                        };
+                    }
                 }
             }
             
-            // 날짜순, 시간순으로 정렬 (최신순)
-            dailyData.sort((a, b) => {
-                const dateA = new Date(a.soldAt || a.date).getTime();
-                const dateB = new Date(b.soldAt || b.date).getTime();
+            // 맵을 배열로 변환하고 날짜순 정렬 (최신순)
+            const dailyData = Object.values(dailyDataMap).sort((a, b) => {
+                const dateA = new Date(a.date).getTime();
+                const dateB = new Date(b.date).getTime();
                 return dateB - dateA;
             });
             
-            console.log('판매일별 + 건별로 분리된 정산 데이터:', dailyData);
+            console.log('날짜별로 합산된 정산 데이터:', dailyData);
             setDailyPayouts(dailyData);
             
         } catch (error) {
-            console.error('판매일별 + 건별 정산 데이터 생성 실패:', error);
+            console.error('날짜별 합산 정산 데이터 생성 실패:', error);
             setDailyPayouts([]);
         }
     };
@@ -367,25 +374,10 @@ export default function SellerSettlementPage() {
     const totalCommission = dailyPayouts.reduce((sum, item) => sum + item.totalCommission, 0);
     const totalPayout = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
 
-    // 정산 상태별 통계 계산
-    const getSettlementStatus = (item: any) => {
-        const saleDate = new Date(item.soldAt || item.date);
-        const settlementDate = new Date(saleDate);
-        settlementDate.setDate(saleDate.getDate() + 7);
-        const today = new Date();
-        
-        if (settlementDate < today) return 'completed'; // 정산 완료
-        if (settlementDate.toDateString() === today.toDateString()) return 'today'; // 오늘 정산
-        return 'pending'; // 정산 대기
-    };
-
-    const pendingSettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'pending');
-    const todaySettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'today');
-    const completedSettlements = dailyPayouts.filter(item => getSettlementStatus(item) === 'completed');
-
-    const pendingAmount = pendingSettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
-    const todayAmount = todaySettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
-    const completedAmount = completedSettlements.reduce((sum, item) => sum + item.payoutAmount, 0);
+    // 배송 완료된 주문만 정산 대상 - 즉시 정산 완료 처리
+    // 모든 데이터는 이미 배송 완료 후 정산된 상태
+    const completedSettlements = dailyPayouts; // 모든 정산이 완료된 상태
+    const completedAmount = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
 
     if (checking || loading) {
         return (
@@ -406,56 +398,38 @@ export default function SellerSettlementPage() {
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
                     <div className="mb-6">
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리 (주문별)</h1>
+                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리 (날짜별)</h1>
                         {filterType === 'date' && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'} - 해당 날짜에 판매된 각 주문의 정산 내역
+                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'} - 배송 완료된 주문만 즉시 정산
                             </p>
                         )}
                         {filterType === 'period' && filterFrom && filterTo && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                조회 기간: {filterFrom} ~ {filterTo} - 해당 기간에 판매된 각 주문의 정산 내역
+                                조회 기간: {filterFrom} ~ {filterTo} - 배송 완료된 주문만 즉시 정산
                             </p>
                         )}
                         {filterType === 'all' && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                전체 기간 조회 - 모든 판매 주문의 정산 내역
+                                전체 기간 조회 - 배송 완료된 주문만 즉시 정산
                             </p>
                         )}
                     </div>
 
                     {/* 상단 통계 카드 */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                            <div className="flex items-center gap-3 mb-2">
-                                <Clock className="w-8 h-8 text-blue-600" />
-                                <span className="text-[#374151] text-sm font-semibold">정산 대기</span>
-                            </div>
-                            <div className="text-2xl font-bold text-blue-600">{pendingSettlements.length}건</div>
-                            <div className="text-sm font-semibold text-blue-600">{pendingAmount.toLocaleString()}원</div>
-                            <div className="text-xs text-[#6b7280] mt-1">앞으로 정산 예정</div>
-                        </section>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <CheckCircle className="w-8 h-8 text-green-600" />
-                                <span className="text-[#374151] text-sm font-semibold">오늘 정산</span>
+                                <span className="text-[#374151] text-sm font-semibold">정산 건수</span>
                             </div>
-                            <div className="text-2xl font-bold text-green-600">{todaySettlements.length}건</div>
-                            <div className="text-sm font-semibold text-green-600">{todayAmount.toLocaleString()}원</div>
-                            <div className="text-xs text-[#6b7280] mt-1">오늘 정산 처리</div>
+                            <div className="text-2xl font-bold text-green-600">{completedSettlements.length}건</div>
+                            <div className="text-sm font-semibold text-green-600">{completedAmount.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">배송 완료시 즉시 정산</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
-                                <DollarSign className="w-8 h-8 text-gray-600" />
-                                <span className="text-[#374151] text-sm font-semibold">정산 완료</span>
-                            </div>
-                            <div className="text-2xl font-bold text-gray-600">{completedSettlements.length}건</div>
-                            <div className="text-sm font-semibold text-gray-600">{completedAmount.toLocaleString()}원</div>
-                            <div className="text-xs text-[#6b7280] mt-1">이미 정산됨</div>
-                        </section>
-                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-                            <div className="flex items-center gap-3 mb-2">
-                                <TrendingUp className="w-8 h-8 text-[#6b7280]" />
+                                <DollarSign className="w-8 h-8 text-[#374151]" />
                                 <span className="text-[#374151] text-sm font-semibold">총 정산액</span>
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
@@ -465,101 +439,19 @@ export default function SellerSettlementPage() {
                                 {filterType === 'all' && '전체 기간'}
                             </div>
                         </section>
+                        <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
+                            <div className="flex items-center gap-3 mb-2">
+                                <TrendingUp className="w-8 h-8 text-blue-600" />
+                                <span className="text-[#374151] text-sm font-semibold">평균 정산액</span>
+                            </div>
+                            <div className="text-2xl font-bold text-blue-600">
+                                {completedSettlements.length > 0 ? Math.round(completedAmount / completedSettlements.length).toLocaleString() : 0}원
+                            </div>
+                            <div className="text-xs text-[#6b7280] mt-1">건당 평균 지급액</div>
+                        </section>
                     </div>
 
-                    {/* 정산 예정 현황 (대기 중인 정산이 있을 때만 표시) */}
-                    {pendingSettlements.length > 0 && (
-                        <div className="mb-8">
-                            <h2 className="text-lg font-bold text-[#374151] mb-4 flex items-center gap-2">
-                                <Calendar className="w-5 h-5" />
-                                정산 예정 현황
-                                <span className="text-sm font-normal text-[#6b7280]">({pendingSettlements.length}건 대기 중)</span>
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {(() => {
-                                    // 정산 예정일별로 그룹핑
-                                    const groupedByDate = pendingSettlements.reduce((acc: any, item) => {
-                                        const saleDate = new Date(item.soldAt || item.date);
-                                        const settlementDate = new Date(saleDate);
-                                        settlementDate.setDate(saleDate.getDate() + 7);
-                                        const dateKey = `${settlementDate.getFullYear()}-${String(settlementDate.getMonth() + 1).padStart(2, '0')}-${String(settlementDate.getDate()).padStart(2, '0')}`;
-                                        
-                                        if (!acc[dateKey]) {
-                                            acc[dateKey] = {
-                                                date: dateKey,
-                                                dateObj: settlementDate,
-                                                items: [],
-                                                totalAmount: 0,
-                                                count: 0
-                                            };
-                                        }
-                                        
-                                        acc[dateKey].items.push(item);
-                                        acc[dateKey].totalAmount += item.payoutAmount;
-                                        acc[dateKey].count += 1;
-                                        
-                                        return acc;
-                                    }, {});
-                                    
-                                    // 날짜순으로 정렬
-                                    const sortedGroups = Object.values(groupedByDate).sort((a: any, b: any) => 
-                                        a.dateObj.getTime() - b.dateObj.getTime()
-                                    );
-                                    
-                                    return sortedGroups.slice(0, 8).map((group: any) => { // 최대 8개까지만 표시
-                                        const today = new Date();
-                                        const daysFromToday = Math.ceil((group.dateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                                        
-                                        return (
-                                            <div key={group.date} className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 hover:bg-blue-100 transition-colors">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="text-sm font-semibold text-blue-800">
-                                                        {group.date}
-                                                    </div>
-                                                    <div className="text-xs text-blue-600 bg-blue-200 px-2 py-1 rounded">
-                                                        {daysFromToday === 0 ? '오늘' : 
-                                                         daysFromToday === 1 ? '내일' : 
-                                                         daysFromToday > 0 ? `${daysFromToday}일 후` : 
-                                                         `${Math.abs(daysFromToday)}일 지남`}
-                                                    </div>
-                                                </div>
-                                                <div className="text-lg font-bold text-blue-700">
-                                                    {group.totalAmount.toLocaleString()}원
-                                                </div>
-                                                <div className="text-sm text-blue-600">
-                                                    {group.count}건의 정산 예정
-                                                </div>
-                                                {group.count > 3 && (
-                                                    <div className="text-xs text-blue-500 mt-1">
-                                                        상품 {group.count}개의 정산
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    });
-                                })()}
-                            </div>
-                            {(() => {
-                                // 정산 예정일 개수 계산
-                                const uniqueDates = new Set();
-                                pendingSettlements.forEach(item => {
-                                    const saleDate = new Date(item.soldAt || item.date);
-                                    const settlementDate = new Date(saleDate);
-                                    settlementDate.setDate(saleDate.getDate() + 7);
-                                    const dateKey = `${settlementDate.getFullYear()}-${String(settlementDate.getMonth() + 1).padStart(2, '0')}-${String(settlementDate.getDate()).padStart(2, '0')}`;
-                                    uniqueDates.add(dateKey);
-                                });
-                                
-                                return uniqueDates.size > 8 && (
-                                    <div className="mt-4 text-center">
-                                        <div className="text-sm text-[#6b7280]">
-                                            총 {uniqueDates.size}개의 정산 예정일이 있습니다. 하단 표에서 전체 내역을 확인하세요.
-                                        </div>
-                                    </div>
-                                );
-                            })()}
-                        </div>
-                    )}
+
 
                     {/* 필터 섹션 */}
                     <div className="bg-[#f3f4f6] p-4 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
@@ -692,10 +584,10 @@ export default function SellerSettlementPage() {
                                         <h4 className="font-semibold text-blue-800 mb-1">주문별 정산 데이터 안내</h4>
                                         <p className="text-blue-700 text-sm">
                                             {filterType === 'date' 
-                                                ? `${filterDate} 날짜에 판매된 각 주문의 정산 내역입니다. 각 행은 개별 주문을 나타내며, "상세 보기"를 클릭하여 해당 주문의 상세 정보를 확인할 수 있습니다.`
-                                                : '각 행은 개별 주문을 나타내며, "상세 보기"를 클릭하여 해당 주문의 상세 정보를 확인할 수 있습니다.'
+                                                ? `${filterDate} 날짜별 정산 내역입니다. 각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.`
+                                                : '각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.'
                                             } 
-                                            모든 주문 정보가 정확하게 표시됩니다.
+                                            배송 완료된 주문만 즉시 정산 처리됩니다.
                                         </p>
                                     </div>
                                 </div>
@@ -705,50 +597,25 @@ export default function SellerSettlementPage() {
                             <table className="min-w-full divide-y divide-[#d1d5db]">
                                 <thead className="bg-[#f3f4f6]">
                                     <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매일시</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상품ID</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">고객ID</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수량/단가</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매일</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매건수</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">총 매출</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수수료</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">지급액</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">정산 처리일</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상세보기</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                                         {dailyPayouts.map((item) => {
-                                            const status = getSettlementStatus(item);
-                                            const rowBgClass = 
-                                                status === 'pending' ? 'bg-blue-50 hover:bg-blue-100' :
-                                                status === 'today' ? 'bg-green-50 hover:bg-green-100' :
-                                                'bg-gray-50 hover:bg-gray-100';
-                                            
                                             return (
-                                                <tr key={item.id} className={`${rowBgClass} transition-colors`}>
+                                                <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
-                                                        <div>
-                                                            <div className="font-semibold">
-                                                                {item.date} {item.date === getTodayDate() && '(오늘)'}
-                                                            </div>
-                                                            <div className="text-xs text-[#6b7280]">
-                                                                {item.soldAt ? item.soldAt.split('T')[1]?.split('.')[0] : '-'}
-                                                            </div>
+                                                        <div className="font-semibold">
+                                                            {item.date} {item.date === getTodayDate() && '(오늘)'}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                        {item.productId || '-'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                        {item.customerId || '-'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                        <div>
-                                                            <div>{item.quantity || '-'}개</div>
-                                                            <div className="text-xs text-[#6b7280]">
-                                                                {item.unitPrice ? `${item.unitPrice.toLocaleString()}원` : '-'}
-                                                            </div>
-                                                        </div>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
+                                                        {item.salesCount}건
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
                                                 {item.totalSales.toLocaleString()}원
@@ -759,46 +626,10 @@ export default function SellerSettlementPage() {
                                             <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
                                                 {item.payoutAmount.toLocaleString()}원
                                             </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                        <div className="flex items-center justify-center gap-2">
-                                                            {status === 'pending' && <Clock className="w-4 h-4 text-blue-600" />}
-                                                            {status === 'today' && <CheckCircle className="w-4 h-4 text-green-600" />}
-                                                            {status === 'completed' && <DollarSign className="w-4 h-4 text-gray-600" />}
-                                                            <div className="text-sm text-[#374151]">
-                                                                {(() => {
-                                                                    // 정산 처리일 계산: 판매일 + 7일
-                                                                    const saleDate = new Date(item.soldAt || item.date);
-                                                                    const settlementDate = new Date(saleDate);
-                                                                    settlementDate.setDate(saleDate.getDate() + 7);
-                                                                    
-                                                                    // 오늘 날짜와 비교
-                                                                    const today = new Date();
-                                                                    const isToday = settlementDate.toDateString() === today.toDateString();
-                                                                    const isPast = settlementDate < today;
-                                                                    const isFuture = settlementDate > today;
-                                                                    
-                                                                    return (
-                                                                        <div className={`${
-                                                                            isToday ? 'text-green-600 font-semibold' : 
-                                                                            isPast ? 'text-gray-600' : 
-                                                                            'text-blue-600'
-                                                                        }`}>
-                                                                            {settlementDate.getFullYear()}-{String(settlementDate.getMonth() + 1).padStart(2, '0')}-{String(settlementDate.getDate()).padStart(2, '0')}
-                                                                            {isToday && ' (오늘)'}
-                                                                            {isFuture && ' (예정)'}
-                                                                        </div>
-                                                                    );
-                                                                })()}
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-xs text-[#6b7280]">
-                                                            판매일 + 7일
-                                                        </div>
-                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <button
                                                             onClick={() => {
-                                                                // 개별 주문 상세 데이터를 모달에 표시
+                                                                // 해당 날짜의 상세 데이터를 모달에 표시
                                                                 const mockDetail = {
                                                                     payoutInfo: {
                                                                         id: item.originalPayoutId,
@@ -833,7 +664,9 @@ export default function SellerSettlementPage() {
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-[#f3f4f6] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto border-2 border-[#d1d5db]">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-xl font-bold text-[#374151]">정산 상세 정보</h3>
+                                    <h3 className="text-xl font-bold text-[#374151]">
+                                        {selectedPayout.payoutInfo.periodStart} 날짜별 정산 상세 내역
+                                    </h3>
                                     <button
                                         onClick={() => setSelectedPayout(null)}
                                         className="text-[#374151] hover:text-[#b94a48]"

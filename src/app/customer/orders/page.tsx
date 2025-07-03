@@ -127,7 +127,7 @@ export default function OrderListPage() {
 
     return (
         <div>
-            <Navbar/>
+            {/* <Navbar/> */}
         <div className="container order-list-page">
             <h1>주문 내역</h1>
 

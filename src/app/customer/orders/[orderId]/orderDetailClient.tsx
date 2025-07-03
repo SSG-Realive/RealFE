@@ -97,7 +97,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (loading) {
         return (
             <div>
-                <Navbar/>
+                {/* <Navbar/> */}
                 <div className="container mx-auto p-4 text-center font-inter">
                     <p>주문 정보를 불러오는 중...</p>
                 </div>
@@ -108,7 +108,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (error) {
         return (
             <div>
-                <Navbar/>
+                {/* <Navbar/> */}
                 <div className="container mx-auto p-4 font-inter">
 
                     <h1 className="text-3xl font-light mb-6 text-center text-gray-800">
@@ -129,7 +129,7 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (!orderData) {
         return (
             <div>
-                <Navbar/>
+                {/* <Navbar/> */}
 
                 <div className="container mx-auto p-4 text-center text-gray-700 font-inter">
 
@@ -143,8 +143,8 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     // --- 주문 상세 정보 UI 렌더링 (기존과 동일) ---
     return (
         <div>
-            <Navbar/>
-            <div className="container mx-auto p-4 bg-gray-50 min-h-screen font-inter">
+            {/* <Navbar/> */}
+            <div className="container mx-auto p-4 max-w-screen-lg bg-gray-50 min-h-screen font-inter">
 
                 <h1 className="text-4xl font-light mb-8 text-center text-gray-900 leading-tight">
                     주문 상세 정보
@@ -182,73 +182,73 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
                     </p>
                 </div>
 
+                {/* 주문 상품 목록 */}
                 <div className="bg-white shadow-xl rounded-lg p-8 border border-gray-200">
                     <h2 className="text-3xl font-light mb-6 text-gray-800 border-b pb-3">주문 상품 목록</h2>
                     {orderData.orderItems.length === 0 ? (
                         <p className="text-lg text-gray-600 text-center py-4">주문된 상품이 없습니다.</p>
                     ) : (
-                        <div className="space-y-6">
-                            {orderData.orderItems.map((item) => (
-                                <div key={item.productId} className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    <div className="flex-shrink-0">
-                                        <img
-                                            // item.imageUrl이 유효하면 해당 URL 사용, 그렇지 않으면 대체 이미지 경로 사용
-                                            src={item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.trim() !== ''
-                                                ? item.imageUrl
-                                                : '/images/placeholder.png' // public/images/no-image.png 파일이 있어야 합니다.
-                                            }
-                                            alt={item.productName || "상품 이미지"} // alt 속성 추가
-                                            width={96}
-                                            height={96}
-                                            className="rounded-lg object-cover w-24 h-24"
-                                            onError={(e) => {
-                                                // 이미지 로드 실패 시 무조건 로컬 대체 이미지로 변경하고 onError 핸들러 제거
-                                                e.currentTarget.src = '/images/placeholder.png';
-                                                e.currentTarget.onerror = null; // 이것이 무한 루프 방지 핵심입니다.
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="flex-grow text-center md:text-left">
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h3>
-                                        <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
-                                        <p className="text-xl font-light text-blue-700">{item.price.toLocaleString()}원</p>
-                                        <button
-                                            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
-                                            onClick={() =>
-                                                router.push(`/customer/reviews/new?orderId=${orderData.orderId}&sellerId=${item.sellerId}`)}
-                                        >
-                                            리뷰 작성
-                                        </button>
-                                    </div>
+                        // 🔽 판매자 기준으로 그룹핑
+                        Object.entries(
+                            orderData.orderItems.reduce((acc, item) => {
+                                if (!acc[item.sellerId]) {
+                                    acc[item.sellerId] = {
+                                        sellerName: item.sellerName,
+                                        items: []
+                                    };
+                                }
+                                acc[item.sellerId].items.push(item);
+                                return acc;
+                            }, {} as Record<string, { sellerName: string; items: OrderItemResponseDTO[] }>)
+                        ).map(([sellerId, { sellerName, items }]) => (
+                            <div key={sellerId} className="mb-8">
+                                <h3 className="text-2xl font-semibold text-gray-700 mb-4 border-b pb-2">
+                                    🏬 판매자: {sellerName}
+                                </h3>
+                                <div className="space-y-6">
+                                    {items.map((item) => (
+                                        <div key={item.productId} className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 p-4 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                                            <div className="flex-shrink-0">
+                                                <img
+                                                    src={item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.trim() !== ''
+                                                        ? item.imageUrl
+                                                        : '/images/placeholder.png'}
+                                                    alt={item.productName || "상품 이미지"}
+                                                    width={96}
+                                                    height={96}
+                                                    className="rounded-lg object-cover w-24 h-24"
+                                                    onError={(e) => {
+                                                        e.currentTarget.src = '/images/placeholder.png';
+                                                        e.currentTarget.onerror = null;
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="flex-grow text-center md:text-left">
+                                                <h4 className="text-xl font-semibold text-gray-800 mb-1">{item.productName}</h4>
+                                                <p className="text-lg text-gray-600 mb-1">{item.quantity}개</p>
+                                                <p className="text-xl font-light text-blue-700">{item.price.toLocaleString()}원</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {/* 🔽 해당 판매자에 대한 리뷰가 작성되지 않았을 경우만 버튼 표시 */}
+                                    {!items[0].reviewWritten && (
+                                        <div className="text-center mt-4">
+                                            <button
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                                                onClick={() =>
+                                                    router.push(`/customer/reviews/new?orderId=${orderData.orderId}&sellerId=${sellerId}`)
+                                                }
+                                            >
+                                                ✍️ 리뷰 작성하기
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        ))
                     )}
                 </div>
 
-                {/* 네비게이션 버튼 추가 */}
-                <div className="bg-white shadow-xl rounded-lg p-6 mt-8 border border-gray-200">
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <button
-                            onClick={() => router.push('/customer/orders')}
-                            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-semibold"
-                        >
-                            📋 주문 목록으로 가기
-                        </button>
-                        <button
-                            onClick={() => router.push('/main')}
-                            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-semibold"
-                        >
-                            🛍️ 쇼핑 계속하기
-                        </button>
-                        <button
-                            onClick={() => router.back()}
-                            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200 font-semibold"
-                        >
-                            ⬅️ 이전 페이지로
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     );

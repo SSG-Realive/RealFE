@@ -76,42 +76,46 @@ export async function getSellerPublicInfoList(startDate: string, endDate: string
 }
 
 // 특정 판매자의 공개 프로필 정보 조회 (새로 추가)
-export async function getSellerPublicInfo(sellerId: number): Promise<publicSellerInfoResponseDTO | null> {
+export async function getSellerPublicInfo(productId: number): Promise<publicSellerInfoResponseDTO | null> {
   try {
-    const response = await sellerApi.get(`/public/seller/by-product/${sellerId}`);
+    const response = await sellerApi.get(`/public/seller/by-product/${productId}`);
     return response.data;
   } catch (error: any) {
     // 404 에러 등 특정 HTTP 상태 코드 처리
     if (error.response && error.response.status === 404) {
-      console.warn(`판매자 ID ${sellerId}의 공개 정보를 찾을 수 없습니다.`);
+      console.warn(`판매자 ID ${productId}의 공개 정보를 찾을 수 없습니다.`);
       return null;
     }
-    console.error(`판매자 공개 정보 가져오기 오류 (ID: ${sellerId}):`, error);
+    console.error(`판매자 공개 정보 가져오기 오류 (ID: ${productId}):`, error);
     throw error; // 다른 오류는 다시 던져서 상위 컴포넌트에서 처리
   }
 }
 
 // 특정 판매자의 리뷰 조회 (추가 또는 기존 함수 수정)
 export async function getSellerReviews(
-    sellerId: number,
-    page: number = 0,
-    size: number = 5,
-    sort: string = "createdAt",
-    direction: string = "DESC"
+  sellerId: number,
+  page: number = 0,
+  size: number = 5,
+  sort: string = "createdAt",
+  direction: string = "DESC"
 ): Promise<{ reviews: ReviewResponseDTO[]; hasMore: boolean }> {
   try {
-    // 백엔드 PageRequestDTO의 page는 1-based이므로 page + 1을 보냅니다.
     const response = await sellerApi.get(`/public/seller/${sellerId}/reviews`, {
-      params: { page: page + 1, size, sort, direction }
+      params: { page: page + 1, size, sort, direction },
     });
-    const data: ReviewListResponseDTO = response.data;
-    const hasMore = ((data.page) * data.size) < data.totalCount;
-    return { reviews: data.reviews, hasMore };
+
+    const data = response.data;
+    const reviews = data.dtoList || []; // ✅ dtoList로 변경
+    const hasMore = (page + 1) * size < data.total;
+
+    return { reviews, hasMore };
   } catch (error) {
     console.error(`판매자 리뷰 가져오기 오류 (ID: ${sellerId}, 페이지: ${page}):`, error);
     return { reviews: [], hasMore: false };
   }
 }
+
+
 
 // 특정 판매자의 상품 조회 (추가 또는 기존 함수 수정)
 export async function getSellerProducts(
@@ -121,19 +125,28 @@ export async function getSellerProducts(
     orderBy: string = "createdAt",
     order: string = "desc"
 ): Promise<{ products: ProductListDTO[]; hasMore: boolean }> {
-  try {
-    // 백엔드 PageRequestDTO의 page는 1-based이므로 page + 1을 보냅니다.
-    const response = await sellerApi.get(`/public/seller/${sellerId}/products`, {
-      params: { page: page + 1, size, orderBy, order }
-    });
-    const data: { dtoList: ProductListDTO[]; total: number; pageCount: number; } = response.data;
-    const hasMore = ((page + 1) * size) < data.total;
-    return { products: data.dtoList, hasMore };
-  } catch (error) {
-    console.error(`판매자 상품 가져오기 오류 (ID: ${sellerId}, 페이지: ${page}):`, error);
-    return { products: [], hasMore: false };
-  }
+    try {
+        const response = await sellerApi.get(`/public/seller/${sellerId}/products`, {
+            params: { page: page + 1, size, orderBy, order }
+        });
+
+        const data = response.data as Partial<{
+            dtoList: ProductListDTO[];
+            total: number;
+            pageCount: number;
+        }>;
+
+        const products: ProductListDTO[] = Array.isArray(data.dtoList) ? data.dtoList : [];
+        const hasMore: boolean = ((page + 1) * size) < (data.total ?? 0);
+        console.log("📦 상품 API 응답 데이터:", response.data);
+
+        return { products, hasMore };
+    } catch (error) {
+        console.error(`판매자 상품 가져오기 오류 (ID: ${sellerId}, 페이지: ${page}):`, error);
+        return { products: [], hasMore: false };
+    }
 }
+
 
 //qna
 

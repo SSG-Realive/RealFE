@@ -1,129 +1,117 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Navbar from '@/components/customer/common/Navbar';
+import StarRating from '@/components/customer/review/StarRating';
+import { createReview } from '@/service/customer/reviewService';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Modal from '@/components/Modal';
 
-// 
+
+
 
 function ReviewPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-    const orderIdParam = searchParams.get('orderId');
-    const sellerIdParam = searchParams.get('sellerId');
+  const orderIdParam = searchParams.get('orderId');
+  const sellerIdParam = searchParams.get('sellerId');
 
-    const [orderId, setOrderId] = useState<number | null>(null);
-    const [sellerId, setSellerId] = useState<number | null>(null);
+  const [orderId, setOrderId] = useState<number | null>(null);
+  const [sellerId, setSellerId] = useState<number | null>(null);
+  const [rating, setRating] = useState<number>(5);
+  const [tempRating, setTempRating] = useState<number | null>(null);
+  const [content, setContent] = useState('');
+  const [images, setImages] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [alreadyReviewed, setAlreadyReviewed] = useState<boolean | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-    const [rating, setRating] = useState<number>(5);
-    const [content, setContent] = useState('');
-    const [images, setImages] = useState<File[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState('');
 
-    const [alreadyReviewed, setAlreadyReviewed] = useState<boolean | null>(null); // 중복 여부
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 토큰을 안전하게 가져오고 파싱하는 함수
-    const getAccessToken = () => {
-        let pureAccessToken = null;
-        try {
-            const storedData = localStorage.getItem('auth-storage'); // 'auth-storage' 키 사용
-            console.log('localStorage에서 가져온 raw 데이터 (auth-storage):', storedData);
+  const getAccessToken = () => {
+    try {
+      const stored = localStorage.getItem('auth-storage');
+      return stored ? JSON.parse(stored)?.state?.accessToken : null;
+    } catch {
+      return null;
+    }
+  };
 
-            if (storedData) {
-                const parsedData = JSON.parse(storedData); // JSON 문자열 파싱
-                // JSON 구조가 {"state":{"accessToken":"..."}} 형태라고 가정합니다.
-                pureAccessToken = parsedData?.state?.accessToken;
-            }
-        } catch (e) {
-            console.error('localStorage 데이터 파싱 오류:', e);
-            pureAccessToken = null; // 파싱 실패 시 토큰 없음으로 처리
-        }
-        console.log('추출된 순수 JWT Access Token:', pureAccessToken);
-        return pureAccessToken;
-    };
+  useEffect(() => {
+    if (alreadyReviewed) {
+      // 이미 리뷰를 작성했다면 주문 목록 페이지로 리디렉션
+      router.replace('/customer/orders');
+    }
+  }, [alreadyReviewed, router]);
 
-    // 초기 로딩 및 리뷰 중복 체크
-    useEffect(() => {
-        if (orderIdParam && sellerIdParam) {
-            const parsedOrderId = Number(orderIdParam);
-            const parsedSellerId = Number(sellerIdParam);
-            setOrderId(parsedOrderId);
-            setSellerId(parsedSellerId);
 
-            // Access Token 가져오기
-            const accessToken = getAccessToken(); // 함수 호출
+  useEffect(() => {
+    if (orderIdParam && sellerIdParam) {
+      const parsedOrderId = Number(orderIdParam);
+      const parsedSellerId = Number(sellerIdParam);
+      setOrderId(parsedOrderId);
+      setSellerId(parsedSellerId);
 
-            const headers: Record<string, string> = {
-                'Content-Type': 'application/json', // 명시적 Content-Type
-            };
+      const accessToken = getAccessToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      };
 
-            if (accessToken) {
-                headers.Authorization = `Bearer ${accessToken}`; // 순수 Access Token 사용
-            }
-            console.log('최종 요청 헤더:', headers);
-
-            // 중복 체크 API 호출
-            axios
-                .get('http://localhost:8080/api/customer/reviews/check-exists', {
-                    params: {
-                        orderId: parsedOrderId,
-                        sellerId: parsedSellerId,
-                    },
-                    withCredentials: true,
-                    headers: headers,
-                })
-                .then((res) => {
-                    setAlreadyReviewed(res.data.exists);
-                })
-                .catch((err) => {
-                    console.error('중복 체크 실패:', err);
-                    setAlreadyReviewed(null);
-                    console.error('상세 에러 객체:', err);
-                    // 401 Unauthorized 에러라면 로그인 페이지로 리디렉션 등을 고려할 수 있습니다.
-                    if (axios.isAxiosError(err) && err.response?.status === 401) {
-                        alert('로그인이 필요하거나 세션이 만료되었습니다.');
-                        router.push('/login'); // 로그인 페이지 경로로 변경하세요.
-                    }
-                });
-        }
-    }, [orderIdParam, sellerIdParam, router]); // router를 의존성 배열에 추가
+      axios
+        .get('http://localhost:8080/api/customer/reviews/check-exists', {
+          params: { orderId: parsedOrderId, sellerId: parsedSellerId },
+          headers,
+          withCredentials: true,
+        })
+        .then((res) => setAlreadyReviewed(res.data.exists))
+        .catch((err) => {
+          if (axios.isAxiosError(err) && err.response?.status === 401) {
+            alert('로그인이 필요합니다.');
+            router.push('/login');
+          } else {
+            setAlreadyReviewed(null);
+          }
+        });
+    }
+  }, [orderIdParam, sellerIdParam]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        setImages(Array.from(e.target.files));
+    e.target.files && setImages((prev) => [...prev, ...Array.from(e.target.files!)]);
     };
 
-    const uploadImages = async () => {
-        const urls: string[] = [];
-        const accessToken = getAccessToken(); // 이미지 업로드 시에도 토큰 필요
 
-        for (const file of images) {
-            const formData = new FormData();
-            formData.append('file', file);
-            try {
-                const uploadHeaders: Record<string, string> = {
-                    'Content-Type': 'multipart/form-data',
-                };
-                if (accessToken) {
-                    uploadHeaders.Authorization = `Bearer ${accessToken}`;
-                }
+  const handleRemoveImage = (file: File) => {
+    setImages((prev) => prev.filter((f) => f !== file));
+  };
 
-                // 주의: /api/uploads가 Next.js rewrites 규칙에 의해 백엔드로 전달되거나
-                // Next.js API Route로 직접 처리되는지 확인해야 합니다.
-                // 만약 백엔드로 직접 보내야 한다면 'http://localhost:8080/uploads'로 변경하세요.
-                const res = await axios.post('/api/uploads', formData, {
-                    headers: uploadHeaders,
-                });
-                urls.push(res.data.url);
-            } catch (err) {
-                console.error('이미지 업로드 실패:', err);
-            }
-        }
-        return urls;
-    };
+  const uploadImages = async (): Promise<string[]> => {
+    const urls: string[] = [];
+    const accessToken = getAccessToken();
+
+    for (const file of images) {
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const res = await axios.post('http://localhost:8080/api/customer/reviews/images', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+          },
+        });
+        urls.push(res.data.url); // 응답 구조에 따라 조정
+      } catch (err) {
+        console.error('이미지 업로드 실패:', err);
+      }
+    }
+
+    return urls;
+  };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,9 +119,11 @@ function ReviewPage() {
             setMessage('주문 ID 또는 판매자 ID가 누락되었습니다.');
             return;
         }
+
         setLoading(true);
         try {
             const uploadedUrls = await uploadImages();
+
             const payload = {
                 orderId,
                 sellerId,
@@ -142,115 +132,112 @@ function ReviewPage() {
                 imageUrls: uploadedUrls,
             };
 
-            const accessToken = getAccessToken(); // 리뷰 등록 시에도 토큰 필요
+            await createReview(payload);
 
-            const submitHeaders: Record<string, string> = {
-                'Content-Type': 'application/json',
-            };
-            if (accessToken) {
-                submitHeaders.Authorization = `Bearer ${accessToken}`;
-            }
+            // ✅ 성공 메시지 띄우기
+            setShowSuccess(true);
 
-            // 주의: /api/reviews가 Next.js rewrites 규칙에 의해 백엔드로 전달되거나
-            // Next.js API Route로 직접 처리되는지 확인해야 합니다.
-            // 이전 에러에서 /api/reviews/check-exists를 'http://localhost:8080/api/reviews/check-exists'로 변경하여 해결했으므로,
-            // 여기도 'http://localhost:8080/api/reviews'로 변경하는 것이 일관성 있습니다.
-            await axios.post('http://localhost:8080/api/customer/reviews', payload, { // <-- 이 부분을 직접 백엔드 주소로 변경
-                headers: submitHeaders,
-            });
-            setMessage('리뷰가 성공적으로 등록되었습니다.');
-            router.push('/customer/reviews/my');
+            // ✅ 2초 후 이동
+            setTimeout(() => {
+              router.push(`/customer/orders/${orderId}`);
+            }, 2000);
         } catch (error) {
             console.error('리뷰 등록 실패:', error);
             setMessage('리뷰 등록 중 오류가 발생했습니다.');
-            if (axios.isAxiosError(error) && error.response) {
-                console.error('리뷰 등록 백엔드 응답 데이터:', error.response.data);
-                if (error.response.status === 401) {
-                    alert('로그인이 필요하거나 세션이 만료되었습니다.');
-                    router.push('/login'); // 로그인 페이지 경로로 변경하세요.
-                }
+
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                alert('로그인이 필요하거나 세션이 만료되었습니다.');
+                router.push('/login');
             }
         } finally {
             setLoading(false);
         }
     };
 
-    // 중복 여부 확인 중
-    if (alreadyReviewed === null) {
-        return <p className="text-center py-10">리뷰 정보를 확인 중입니다...</p>;
-    }
+  // if (alreadyReviewed === null) return <p className="text-center py-10 ">리뷰 정보를 확인 중...</p>;
+  // if (alreadyReviewed)
+  //   return (
+  //     <div className="container max-w-xl mx-auto py-10">
+  //       <Navbar />
+  //       <h1 className="text-2xl font-light mb-4">리뷰 작성 불가</h1>
+  //       <p>이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
+  //       <button
+  //         className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
+  //         onClick={() => router.push(`/customer/orders`)}
+  //       >
+  //         내 리뷰 보기
+  //       </button>
+  //     </div>
+  //   );
 
-    // 이미 리뷰 작성된 경우
-    if (alreadyReviewed) {
-        return (
-            <div className="container max-w-xl mx-auto py-10">
-                <Navbar/>
-                <h1 className="text-2xl font-light mb-4">리뷰 작성 불가</h1>
-                <p>이미 이 주문에 대한 리뷰를 작성하셨습니다.</p>
-                <button
-                    className="mt-4 bg-gray-500 text-white px-4 py-2 rounded"
-                    onClick={() => router.push('/customer/reviews/my')}
-                >
-                    내 리뷰 보기
-                </button>
-            </div>
-        );
-    }
+  return (
+    <div className="container max-w-xl mx-auto py-10 px-6 bg-blue-50 rounded-md shadow-md py-16">
+    {/* <Navbar /> */}
+    <h1 className="text-3xl font-semibold mb-6 text-blue-900">리뷰 작성</h1>
 
-    // 리뷰 작성 폼
-    return (
-        <div className="container max-w-xl mx-auto py-10">
-            <Navbar/>
-            <h1 className="text-2xl font-light mb-6">리뷰 작성</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block mb-1">평점 (0.5 단위)</label>
-                    <select
-                        value={rating}
-                        onChange={(e) => setRating(Number(e.target.value))}
-                        className="w-full border rounded px-3 py-2"
-                        required
-                    >
-                        {[...Array(9)].map((_, i) => {
-                            const val = (i + 2) / 2;
-                            return (
-                                <option key={val} value={val}>
-                                    {val}점
-                                </option>
-                            );
-                        })}
-                    </select>
-                </div>
-                <div>
-                    <label className="block mb-1">내용</label>
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full border rounded px-3 py-2 h-32"
-                        required
-                    ></textarea>
-                </div>
-                <div>
-                    <label className="block mb-1">이미지 첨부</label>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                        className="block"
-                    />
-                </div>
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    {loading ? '등록 중...' : '리뷰 등록'}
-                </button>
-                {message && <p className="mt-2 text-red-500">{message}</p>}
-            </form>
+    <Modal
+      isOpen={showSuccess}
+      onClose={() => setShowSuccess(false)}
+      title="리뷰 등록 완료"
+      message="리뷰가 성공적으로 등록되었습니다."
+      type="success"
+      className="bg-black/30 backdrop-blur-sm"
+      titleClassName="text-blue-900"
+      buttonClassName="bg-blue-600 "
+    />
+
+
+    <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 별점 */}
+        <div>
+        <label className="block font-semibold text-gray-700 mb-2">
+            평점: {(tempRating ?? rating).toFixed(1)}점
+        </label>
+        <StarRating
+            rating={rating}
+            setRating={setRating}
+            setTempRating={setTempRating}
+        />
         </div>
-    );
+
+        {/* 내용 */}
+        <div>
+        <label className="block font-semibold text-gray-700 mb-2">리뷰 내용</label>
+        <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 min-h-[140px]"
+            placeholder="상품에 대한 솔직한 후기를 남겨주세요."
+        />
+        </div>
+
+        {/* 이미지 업로드 */}
+        <div>
+        <label className="block font-semibold text-gray-700 mb-2">이미지 첨부</label>
+        <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+            className="block w-full border rounded-md text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
+        />
+        </div>
+
+        {/* 제출 버튼 */}
+        <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold"
+        >
+        {loading ? '등록 중...' : '리뷰 등록'}
+        </button>
+
+        {/* 메시지 */}
+        {message && <p className="text-red-500 text-sm mt-2">{message}</p>}
+    </form>
+    </div>
+
+  );
 }
 
 export default ReviewPage;

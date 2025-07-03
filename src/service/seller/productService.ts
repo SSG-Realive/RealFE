@@ -70,9 +70,9 @@ export async function getProductDetail(id: number): Promise<ProductDetail> {
  */
 export async function getMyProducts(searchParams: Record<string, any> = {}): Promise<PageResponse<ProductListItem>> {
     const query = buildSearchParams(searchParams); // ✅ 빈 값 빼고 쿼리스트링 구성
-    console.log('→ 최종 요청 URL:', `/seller/products?${query}`); // 디버그 확인용
+  console.log('→ 최종 요청 URL:', `/seller/products?${query}`); // 디버그 확인용
 
-    const res = await sellerApi.get(`/seller/products?${query}`);
+  const res = await sellerApi.get(`/seller/products?${query}`);
     const data = res.data;
     
     // 백엔드에서 active로 오는 필드를 isActive로 변환

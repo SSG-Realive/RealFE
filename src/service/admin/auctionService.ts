@@ -89,5 +89,11 @@ export const adminBidService = {
   async getBidsByCustomer(customerId: number, page = 0, size = 20): Promise<PageResponse<BidResponseDTO>> {
     const response = await adminApi.get(`${BASE_URL}/bids/customer/${customerId}?page=${page}&size=${size}`);
     return response.data.data;
+  },
+
+  // 전체 입찰 내역 조회 (최신순)
+  async getAllBids(page = 0, size = 20): Promise<PageResponse<BidResponseDTO>> {
+    const response = await adminApi.get(`${BASE_URL}/bids?page=${page}&size=${size}`);
+    return response.data.data;
   }
 }; 

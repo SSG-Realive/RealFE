@@ -62,16 +62,19 @@ export default function FeaturedSellersSection() {
     }, []);
 
     const handleToggleWishlist = async (productId: number) => {
-        const current = likedMap[productId] ?? false;
-        setLikedMap(prev => ({ ...prev, [productId]: !current }));
-        try {
-            const result = await toggleWishlist({ productId });
-            setLikedMap(prev => ({ ...prev, [productId]: result }));
-        } catch (error) {
-            console.error('찜 실패:', error);
-            setLikedMap(prev => ({ ...prev, [productId]: current }));
-            alert('찜 처리 중 오류가 발생했습니다.');
-        }
+        await withAuth(async () => {
+            const current = likedMap[productId] ?? false;
+            setLikedMap(prev => ({ ...prev, [productId]: !current }));
+            try {
+                const result = await toggleWishlist({ productId });
+                setLikedMap(prev => ({ ...prev, [productId]: result }));
+                show(result ? '찜한 상품에 추가되었습니다.' : '찜 목록에서 제거되었습니다.');
+            } catch (error) {
+                console.error('찜 실패:', error);
+                setLikedMap(prev => ({ ...prev, [productId]: current }));
+                show('찜 처리 중 오류가 발생했습니다.');
+            }
+        });
     };
 
     const handleAddToCart = async (productId: number) => {

@@ -551,7 +551,7 @@ const AdminDashboardPage = () => {
                 </div>
               ) : (
                 <DashboardChart
-                  data={periodType === 'MONTHLY' ? monthlySalesData : dashboardData}
+                  data={dashboardData}
                   type="sales"
                   periodType={periodType}
                 />

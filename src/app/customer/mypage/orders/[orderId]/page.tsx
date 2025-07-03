@@ -1,4 +1,4 @@
-// src/app/customer/orders/[orderId]/page.tsx
+// src/app/customer/mypage/orders/[orderId]/page.tsx
 // 이 파일은 서버 컴포넌트입니다.
 
 import OrderDetailClient from './orderDetailClient'; // 클라이언트 컴포넌트 임포트

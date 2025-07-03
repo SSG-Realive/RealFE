@@ -1,4 +1,4 @@
-/* src/app/customer/orders/OrderListPage.css */
+/* src/app/customer/mypage/orders/OrderListPage.css */
 
 .container {
     max-width: 800px;
@@ -173,9 +173,9 @@
 }
 
 .page-button.active {
-    background-color: #3b82f6;
+    background-color: black;
     color: white;
-    border-color: #3b82f6;
+    border-color: black;
 }
 
 .page-button:hover:not(:disabled):not(.active) { /* 활성화되지 않은 버튼에만 hover 적용 */

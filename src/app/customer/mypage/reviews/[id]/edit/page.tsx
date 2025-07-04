@@ -3,10 +3,13 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchReviewDetail, updateReview } from '@/service/customer/reviewService';
-import { uploadReviewImages, deleteReviewImage } from '@/service/customer/reviewImageService'; // 이미지 API 함수
+
 import { ReviewResponseDTO } from '@/types/customer/review/review';
 import StarRating from '@/components/customer/review/StarRating';
-import { useGlobalDialog } from '@/app/context/dialogContext';
+import Modal from '@/components/Modal';
+import { uploadReviewImages } from '@/service/customer/reviewImageService';
+
+
 
 export default function EditReviewPage() {
   const { id } = useParams();
@@ -15,14 +18,16 @@ export default function EditReviewPage() {
   const [review, setReview] = useState<ReviewResponseDTO | null>(null);
   const [content, setContent] = useState('');
   const [rating, setRating] = useState(5);
-  const [tempRating, setTempRating] = useState<number | null>(null); 
+  const [tempRating, setTempRating] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const {show} = useGlobalDialog();
-  // 이미지 관리
-  const [existingImages, setExistingImages] = useState<string[]>([]); // 서버에 저장된 기존 이미지 URL 리스트
-  const [newImages, setNewImages] = useState<File[]>([]); // 새로 업로드할 이미지 파일들
-  const [removedImages, setRemovedImages] = useState<string[]>([]); // 삭제 요청 이미지 URL 리스트
+
+  // 이미지 상태 관리
+  const [existingImages, setExistingImages] = useState<string[]>([]); // DB에 저장된 기존 이미지 URL
+  const [newImages, setNewImages] = useState<File[]>([]); // 새로 추가할 이미지 파일들
+  const [removedImages, setRemovedImages] = useState<string[]>([]); // 삭제된 기존 이미지 URL들 (DB 반영용)
+
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,23 +44,27 @@ export default function EditReviewPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // 새 이미지 파일 선택 시 처리
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 새 이미지 파일 선택 처리
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    console.log('files:', files);
     if (files && files.length > 0) {
-        setNewImages((prev) => [...prev, ...Array.from(files)]);
+      const arrFiles = Array.from(files);
+      console.log('Array.from(files):', arrFiles);
+      setNewImages((prev) => [...prev, ...arrFiles]);
     }
     e.target.value = '';
-    };
+  };
 
 
-  // 기존 이미지 삭제 처리
+
+  // 기존 이미지 삭제 (프론트에서만 삭제 표시)
   const handleRemoveExistingImage = (url: string) => {
     setExistingImages((prev) => prev.filter((img) => img !== url));
     setRemovedImages((prev) => [...prev, url]);
   };
 
-  // 새 이미지 미리보기 삭제 처리
+  // 새로 추가한 이미지 미리보기 삭제
   const handleRemoveNewImage = (file: File) => {
     setNewImages((prev) => prev.filter((f) => f !== file));
   };
@@ -67,37 +76,38 @@ export default function EditReviewPage() {
     try {
       setLoading(true);
 
-      // 1. 삭제 요청된 이미지 서버에서 삭제 API 호출
-      await Promise.all(
-        removedImages.map((url) => deleteReviewImage(url))
-      );
+      console.log('기존 이미지:', existingImages);
+      console.log('삭제된 이미지:', removedImages);
+      console.log('새로 추가한 이미지 파일들:', newImages);
 
-      // 2. 새 이미지 업로드 (uploadReviewImages가 이미지 URL 배열 반환)
-      const uploadedUrls = await uploadReviewImages(Number(id), newImages);
+      const uploadedUrls = await uploadReviewImages(newImages, Number(id));
+      console.log('업로드 완료된 이미지 URL들:', uploadedUrls);
 
-      const imageUrls = [...existingImages, ...uploadedUrls];
+      const filteredExisting = existingImages.filter((url) => !removedImages.includes(url));
+      console.log('삭제 제외된 기존 이미지들:', filteredExisting);
 
-      // 3. 기존 남은 이미지 + 새 업로드된 이미지 모두 합침
-      const finalImageUrls = [...existingImages, ...uploadedUrls];
+      const finalImageUrls = [...filteredExisting, ...uploadedUrls];
+      console.log('서버에 전송할 최종 이미지 URL 목록:', finalImageUrls);
 
-      // 4. 리뷰 본문 및 평점 수정 API 호출 (이미지는 별도로 저장한다고 가정)
       await updateReview(Number(id), {
         content,
         rating,
-        imageUrls,
+        imageUrls: finalImageUrls,
       });
 
-      // 이미지 변경사항 서버 DB 반영이 필요하면 별도 API 호출 로직 추가
-
-      show('리뷰가 수정되었습니다.');
-      router.push(`/customer/mypage/reviews/${id}`);
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.push(`/customer/mypage/reviews/${id}`);
+      }, 2000);
     } catch (err) {
       console.error(err);
-      show('리뷰 수정 중 오류가 발생했습니다.');
+      alert('리뷰 수정 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
+
+
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -105,16 +115,25 @@ export default function EditReviewPage() {
 
   return (
     <div>
+      <Modal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title="리뷰 수정 완료"
+        message="리뷰가 성공적으로 수정되었습니다."
+        type="success"
+        className="bg-black/30 backdrop-blur-sm"
+        titleClassName="text-blue-900"
+        buttonClassName="bg-blue-600"
+      />
       <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-        <label className="block font-semibold mb-2 text-gray-700">
-            별점: {(tempRating ?? rating).toFixed(1)}점
-        </label>
-        <StarRating rating={rating} setRating={setRating} setTempRating={setTempRating} />
-        </div>
-
+          <div>
+            <label className="block font-semibold mb-2 text-gray-700">
+              별점: {(tempRating ?? rating).toFixed(1)}점
+            </label>
+            <StarRating rating={rating} setRating={setRating} setTempRating={setTempRating} />
+          </div>
 
           <div>
             <label className="block font-semibold mb-2 text-gray-700">리뷰 내용</label>
@@ -126,43 +145,56 @@ export default function EditReviewPage() {
             />
           </div>
 
-          {/* <div>
-            <label className="block font-semibold mb-2 text-gray-700">기존 이미지</label>
-            <div className="flex flex-wrap gap-3 mb-4">
+          {/* 이미지 업로드 및 미리보기 */}
+          <div>
+            <label className="block font-semibold mb-2 text-gray-700">이미지 첨부</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className="block w-full border rounded-md text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
+            />
+          </div>
+
+          {/* 기존 이미지 미리보기 및 삭제 버튼 */}
+          {existingImages.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-2">
               {existingImages.map((url) => (
                 <div key={url} className="relative w-24 h-24 border rounded overflow-hidden">
-                  <img src={`${process.env.NEXT_PUBLIC_API_ROOT_URL ?? ''}${url}`} alt="기존 리뷰 이미지" className="object-cover w-full h-full" />
+                  <img
+                    src={url}
+                    alt="기존 리뷰 이미지"
+                    className="object-cover w-full h-full"
+                  />
                   <button
                     type="button"
                     onClick={() => handleRemoveExistingImage(url)}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-1 text-xs"
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-800"
+                    title="이미지 삭제"
                   >
                     ×
                   </button>
                 </div>
               ))}
-              {existingImages.length === 0 && <p className="text-gray-500">이미지가 없습니다.</p>}
             </div>
+          )}
 
-            <label className="block font-semibold mb-2 text-gray-700">새 이미지 추가</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              className="mb-4"
-            />
-            <div className="flex flex-wrap gap-3">
+          {/* 새로 추가된 이미지 미리보기 및 삭제 버튼 */}
+          {newImages.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-2">
               {newImages.map((file) => {
                 const objectUrl = URL.createObjectURL(file);
+                const key = file.name + '_' + file.lastModified; // 좀 더 고유하게
                 return (
-                  <div key={file.name + file.size} className="relative w-24 h-24 border rounded overflow-hidden">
-                    <img src={objectUrl} alt="새 이미지 미리보기" className="object-cover w-full h-full" />
+                  <div key={key} className="relative w-24 h-24 border rounded overflow-hidden">
+                    <img src={objectUrl} alt="새 리뷰 이미지" className="object-cover w-full h-full" />
                     <button
                       type="button"
                       onClick={() => handleRemoveNewImage(file)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-1 text-xs"
+                      className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-800"
+                      title="이미지 삭제"
                     >
                       ×
                     </button>
@@ -170,13 +202,14 @@ export default function EditReviewPage() {
                 );
               })}
             </div>
-          </div> */}
+          )}
 
           <button
             type="submit"
-            className="px-6 py-3 bg-teal-700 text-white rounded hover:bg-teal-800 transition-colors duration-200"
+            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-600"
+            disabled={loading}
           >
-            저장
+            {loading ? '저장 중...' : '저장'}
           </button>
         </form>
       </div>

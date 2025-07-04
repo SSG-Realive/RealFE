@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link  from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -34,7 +33,7 @@ function BidCard({
 
   return (
     <div
-      onClick={() => router.push(`/customer/auctions/${bid.auctionId}`)}
+      onClick={() => router.push(`/auctions/${bid.auctionId}`)}
       className="flex gap-4 p-4 border rounded-lg hover:shadow transition
                  cursor-pointer"
     >

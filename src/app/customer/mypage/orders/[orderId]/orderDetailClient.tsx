@@ -96,10 +96,10 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     // --- 로딩, 에러, 데이터 없음 상태에 따른 UI 렌더링 ---
     if (loading) {
         return (
-            <div>
-                {/* <Navbar/> */}
-                <div className="container mx-auto p-4 text-center font-inter">
-                    <p>주문 정보를 불러오는 중...</p>
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-lg">주문 정보를 불러오는 중...</p>
                 </div>
             </div>
         );
@@ -108,7 +108,6 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     if (error) {
         return (
             <div>
-                {/* <Navbar/> */}
                 <div className="container mx-auto p-4 font-inter">
 
                     <h1 className="text-3xl font-light mb-6 text-center text-gray-800">

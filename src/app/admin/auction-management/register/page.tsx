@@ -1,4 +1,5 @@
 "use client";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 import React, { useState } from "react";
 
 export default function AuctionRegisterPage() {
@@ -11,6 +12,7 @@ export default function AuctionRegisterPage() {
     endDate: "",
     description: ""
   });
+  const {show} = useGlobalDialog();
 
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
     window.location.replace('/admin/login');
@@ -31,10 +33,10 @@ export default function AuctionRegisterPage() {
     try {
       // TODO: 실제 API 연동 필요
       // await adminAuctionService.createAuction(form);
-      alert("경매 등록 기능은 백엔드 API 연동이 필요합니다.\n현재 입력값: " + JSON.stringify(form, null, 2));
+      show("경매 등록 기능은 백엔드 API 연동이 필요합니다.\n현재 입력값: " + JSON.stringify(form, null, 2));
     } catch (error) {
       console.error('경매 등록 실패:', error);
-      alert('경매 등록에 실패했습니다.');
+      show('경매 등록에 실패했습니다.');
     }
   };
 

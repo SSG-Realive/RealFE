@@ -156,103 +156,108 @@ export default function AuctionDetailPage() {
   /* -------------------------------------------------- */
   /* UI */
   return (
-    <>
-      {dialog}
-      <GlobalDialog open={open} message={message} onClose={handleClose} />
+      <>
+        {dialog}
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
 
-      <div className="container mx-auto p-4 md:p-8">
-        {/* ---------- 상단 ---------- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          {/* 이미지 */}
-          <div>
-            <div className="bg-gray-100 rounded-lg overflow-hidden aspect-square">
-              <img
-                src={auction.adminProduct?.imageUrl || '/images/placeholder.png'}
-                alt={auction.adminProduct?.productName || '상품 이미지'}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </div>
-
-          {/* 정보 + 입찰 */}
-          <div className="flex flex-col space-y-4">
-            <h1 className="text-3xl font-light">{auction.adminProduct?.productName}</h1>
-
-            <div className="border-t pt-4 mt-4 text-lg space-y-1">
-              <p>시작가: <span className="font-light">{auction.startPrice.toLocaleString()}원</span></p>
-              <p className="text-2xl text-red-600">
-                현재가: <span className="font-light">{currentPrice.toLocaleString()}원</span>
-              </p>
-              {tickSize && <p className="text-sm text-gray-600">입찰 단위: {tickSize.toLocaleString()}원</p>}
-              <p className="text-sm text-gray-500">경매 종료: {new Date(auction.endTime).toLocaleString()}</p>
+        <div className="container mx-auto p-4 md:p-6 text-sm">
+          {/* ---------- 상단 ---------- */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            {/* 이미지 */}
+            <div>
+              <div className="bg-gray-100 overflow-hidden aspect-[4/3] max-h-[400px]">
+                <img
+                    src={auction.adminProduct?.imageUrl || '/images/placeholder.png'}
+                    alt={auction.adminProduct?.productName || '상품 이미지'}
+                    className="w-full h-full object-contain"
+                />
+              </div>
             </div>
 
-            {/* 입찰 폼 */}
-            <form onSubmit={handleBidSubmit} className="space-y-3 pt-4">
-              <h2 className="text-xl font-light">입찰하기</h2>
-              <input
-                type="number"
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                placeholder={
-                  tickSize ? `최소 ${minBid.toLocaleString()}원` : '입찰 금액 입력'
-                }
-                min={minBid}
-                step={tickSize || 1}
-                className="w-full px-4 py-2 border rounded-md focus:outline-none
-                           focus:ring-2 focus:ring-indigo-500"
-                required
-              />
-              {helperText && <p className="text-sm text-red-500">{helperText}</p>}
+            {/* 정보 + 입찰 */}
+            <div className="flex flex-col space-y-3">
+              <h1 className="text-xl font-light">{auction.adminProduct?.productName}</h1>
 
-              <button
-                type="submit"
-                disabled={btnDisabled}
-                className="w-full bg-indigo-600 text-white font-light py-3 rounded-md
-                           hover:bg-indigo-700 disabled:bg-gray-400"
-              >
-                {isLeading
-                  ? '최고 입찰자입니다'
-                  : auction.status === 'PROCEEDING'
-                    ? '입찰하기'
-                    : '경매 종료'}
-              </button>
-            </form>
-
-            {/* 입찰 내역 */}
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-light mb-2">입찰 내역</h3>
-              <ul className="space-y-2 max-h-60 overflow-y-auto">
-                {bids.length ? (
-                  bids.map((b) => (
-                    <li
-                      key={b.id}
-                      className={`flex justify-between p-2 rounded
-                        ${b.customerId === myId ? 'bg-blue-50' : 'bg-gray-50'}`}
-                    >
-                      <span>{b.customerName || `사용자 ${b.customerId}`}</span>
-                      <span className="font-light">{b.bidPrice.toLocaleString()}원</span>
-                      <span className="text-sm text-gray-500">
-                        {new Date(b.bidTime).toLocaleTimeString()}
-                      </span>
-                    </li>
-                  ))
-                ) : (
-                  <p className="text-gray-500">아직 입찰 내역이 없습니다.</p>
+              <div className="space-y-2 text-base">
+                <p>
+                  시작가: <span className="font-light">{auction.startPrice.toLocaleString()}원</span>
+                </p>
+                <p className="text-base font-semibold text-black-600">
+                  현재가: <span className="font-semibold">{currentPrice.toLocaleString()}원</span>
+                </p>
+                {tickSize && (
+                    <p className="text-sm text-gray-600">입찰 단위: {tickSize.toLocaleString()}원</p>
                 )}
-              </ul>
+                <p className="text-sm text-gray-500 mb-4">
+                  경매 종료: {new Date(auction.endTime).toLocaleString()}
+                </p>
+              </div>
+
+              {/* 입찰 폼 */}
+              <form onSubmit={handleBidSubmit} className="space-y-3">
+                <h2 className="text-base font-light">입찰하기</h2>
+                <input
+                    type="number"
+                    value={bidAmount}
+                    onChange={(e) => setBidAmount(e.target.value)}
+                    placeholder={
+                      tickSize ? `최소 ${minBid.toLocaleString()}원` : '입찰 금액 입력'
+                    }
+                    min={minBid}
+                    step={tickSize || 1}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                />
+                {helperText && <p className="text-xs text-red-500">{helperText}</p>}
+
+                <button
+                    type="submit"
+                    disabled={btnDisabled}
+                    className="w-full bg-black text-white font-light py-2 rounded-none hover:bg-gray-800 disabled:bg-gray-400"
+                >
+                  {isLeading
+                      ? '최고 입찰자입니다'
+                      : auction.status === 'PROCEEDING'
+                          ? '입찰하기'
+                          : '경매 종료'}
+                </button>
+              </form>
+
+              {/* 입찰 내역 */}
+              <div className="mt-6">
+                <h3 className="text-base font-light mb-1">입찰 내역</h3>
+                <ul className="space-y-2 max-h-60 overflow-y-auto mt-2">
+                {bids.length ? (
+                      bids.map((b) => (
+                          <li
+                              key={b.id}
+                              className={`flex justify-between p-2 text-sm border border-gray-200 rounded-md ${
+                                  b.customerId === myId ? 'bg-white' : 'bg-gray-50'
+                              }`}
+                          >
+                            <span>{b.customerName || `사용자 ${b.customerId}`}</span>
+                            <span className="font-light">{b.bidPrice.toLocaleString()}원</span>
+                            <span className="text-gray-500 text-xs">
+                      {new Date(b.bidTime).toLocaleTimeString()}
+                    </span>
+                          </li>
+                      ))
+                  ) : (
+                      <p className="text-gray-500 text-sm">아직 입찰 내역이 없습니다.</p>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* ---------- 다른 경매 ---------- */}
-        {otherAuctions.length > 0 && (
-          <section className="mt-16">
-            <h2 className="text-2xl font-light mb-4">진행중인 다른 경매</h2>
-            <AuctionCard auctions={otherAuctions} />
-          </section>
-        )}
-      </div>
-    </>
+          {/* ---------- 다른 경매 ---------- */}
+          {otherAuctions.length > 0 && (
+              <section className="mt-10">
+                <h2 className="text-base font-light mb-3">진행중인 다른 경매</h2>
+                <AuctionCard auctions={otherAuctions} />
+              </section>
+          )}
+        </div>
+      </>
   );
 }

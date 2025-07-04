@@ -12,6 +12,7 @@ import {
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { User, Mail, Phone, Key, Edit3 } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerMePage() {
   const checking = useSellerAuthGuard();
@@ -24,7 +25,7 @@ export default function SellerMePage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // 로딩 상태는 true로 시작
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+  const {show} = useGlobalDialog();
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -73,7 +74,7 @@ export default function SellerMePage() {
       setName(updatedData.name);
       setPhone(updatedData.phone);
       
-      alert('프로필이 성공적으로 수정되었습니다.');
+      await show('프로필이 성공적으로 수정되었습니다.');
       router.push('/seller/dashboard');
     } catch (err: any) {
       console.error('프로필 수정 실패', err);

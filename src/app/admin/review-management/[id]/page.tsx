@@ -5,6 +5,7 @@ import { getAdminReview, updateAdminReview } from "@/service/admin/reviewService
 import { AdminReview } from "@/types/admin/review";
 import { getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } from "@/types/admin/review";
 import { Button } from "@/components/ui/button";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReviewDetailPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function ReviewDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
+  const {show} = useGlobalDialog();
 
   // 리뷰 상세 조회
   const fetchReviewDetail = async () => {
@@ -64,11 +66,11 @@ export default function ReviewDetailPage() {
     try {
       setUpdating(true);
       await updateAdminReview(reviewId, isHidden);
-      alert('상태가 변경되었습니다.');
+      show('상태가 변경되었습니다.');
       fetchReviewDetail(); // 상세 정보 새로고침
     } catch (err: any) {
       console.error('상태 변경 실패:', err);
-      alert(err.message || '상태 변경에 실패했습니다.');
+      show(err.message || '상태 변경에 실패했습니다.');
     } finally {
       setUpdating(false);
     }

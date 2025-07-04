@@ -1,188 +1,245 @@
+// src/app/customer/mypage/orders/new/page.tsx (무한 루프 방지 최종안)
 'use client';
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import { useCartStore } from '@/store/customer/useCartStore';
 import { fetchMyProfile } from '@/service/customer/customerService';
 import { loadTossPayments, DEFAULT_CONFIG } from '@/service/order/tossPaymentService';
-import type { CartItem } from '@/types/customer/cart/cart';
 import type { MemberReadDTO } from '@/types/customer/member/member';
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
-
-const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY as string;
+import AddressInput, { parseAddress } from '@/components/customer/join/AddressInput';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 export default function NewOrderPage() {
-    const router = useRouter();
-    const { id: customerId, userName: initialName } = useAuthStore();
-    const cartItems = useCartStore((state) => state.itemsForCheckout);
+  const router = useRouter();
+  const { id: customerId, userName: initialName } = useAuthStore();
+  const cartItems = useCartStore((s) => s.itemsForCheckout);
 
-    const [userProfile, setUserProfile] = useState<MemberReadDTO | null>(null);
-    const [shippingInfo, setShippingInfo] = useState({ receiverName: '', phone: '', address: '' });
-    const [deliveryAddress, setDeliveryAddress] = useState<string>('');
-    const [phone, setPhone] = useState<string>('');
-    const [receiverName, setReceiverName] = useState<string>('');
-    const tossPaymentsRef = useRef<any>(null);
-    const { open, message, handleClose, show } = useDialog();
+  const [userProfile, setUserProfile] = useState<MemberReadDTO | null>(null);
+  const [shippingInfo, setShippingInfo] = useState({
+    receiverName: '',
+    phone: '',
+    address: '',
+  });
+  const tossPaymentsRef = useRef<any>(null);
+  const { open, message, handleClose, show } = useDialog();
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-    // 사용자 정보 로딩 및 장바구니 유효성 검사
-    useEffect(() => {
-        if (cartItems.length === 0) {
-            show("결제할 상품 정보가 없습니다. 장바구니 페이지로 돌아갑니다.");
-            router.replace('/customer/cart');
-            return;
-        }
+  // ✅ [수정] useCallback으로 감싸서 안정적인 함수로 만듭니다.
+  // useEffect의 의존성 배열에 사용될 함수들은 재생성되지 않도록 처리해야 합니다.
+  const showStable = useCallback(show, []);
+  const routerStable = useRouter(); // next/navigation의 useRouter는 이미 안정적이지만, 명시적으로 분리
 
-        fetchMyProfile().then(profile => {
-            setUserProfile(profile);
-            setShippingInfo({
-                receiverName: profile.name || '',
-                phone: profile.phone || '',
-                address: profile.address || '',
-            });
-        }).catch(err => console.error("사용자 정보 조회 실패:", err));
-    }, [cartItems, router]);
-
-    // 최종 결제 금액 계산
-    const { totalProductPrice, deliveryFee, finalAmount } = useMemo(() => {
-        if (cartItems.length === 0) {
-            return { totalProductPrice: 0, deliveryFee: 0, finalAmount: 0 };
-        }
-        const totalProductPrice = cartItems.reduce((sum, item) => sum + item.productPrice * item.quantity, 0);
-        const deliveryFee = 3000; // TODO: 실제 배송비 정책 적용
-        const finalAmount = totalProductPrice + deliveryFee;
-        return { totalProductPrice, deliveryFee, finalAmount };
-    }, [cartItems]);
-
-    // 토스페이먼츠 기본 SDK 초기화 (바로결제와 동일한 방식)
-    useEffect(() => {
-        if (!userProfile || !customerId || finalAmount === 0) return;
-
-        const initializeTossPayments = async () => {
-            try {
-                console.log('토스페이먼츠 기본 SDK 초기화 시작...', { customerId, finalAmount });
-
-                // 토스페이먼츠 객체 생성 (바로결제와 동일)
-                if (!(window as any).TossPayments) {
-                    const tossPayments = await loadTossPayments(DEFAULT_CONFIG.CLIENT_KEY);
-                    tossPaymentsRef.current = tossPayments;
-                } else {
-                    const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
-                    tossPaymentsRef.current = tossPayments;
-                }
-
-                console.log('토스페이먼츠 기본 SDK 초기화 완료');
-
-            } catch (error: any) {
-                console.error("토스페이먼츠 기본 SDK 초기화 실패:", error);
-            }
-        };
-
-        initializeTossPayments();
-    }, [userProfile, customerId, finalAmount]);
-
-    // 배송지 정보 변경 핸들러
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setShippingInfo(prev => ({ ...prev, [name]: value }));
-    };
-
-    // 결제하기 버튼 핸들러 (바로결제와 동일한 방식)
-    const handlePayment = async () => {
-        const tossPayments = tossPaymentsRef.current;
-        if (!tossPayments || !userProfile) {
-            show("결제 시스템이 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
-            return;
-        }
-
-        if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
-            show("배송지 정보를 모두 입력해주세요.");
-            return;
-        }
-
-        const checkoutInfo = {
-            orderItems: cartItems.map(item => ({ productId: item.productId, quantity: item.quantity })),
-            shippingInfo: shippingInfo,
-        };
-        sessionStorage.setItem('checkout_info', JSON.stringify(checkoutInfo));
-
-        const orderName = cartItems.length > 1
-            ? `${cartItems[0].productName} 외 ${cartItems.length - 1}건`
-            : cartItems[0].productName;
-
-        const orderId = `cart_${new Date().getTime()}`;
-
-        try {
-            // 바로결제와 동일한 방식으로 결제 요청
-            await tossPayments.requestPayment('카드', {
-                amount: finalAmount,
-                orderId: orderId,
-                orderName: orderName,
-                customerName: userProfile.name || initialName || '고객',
-                successUrl: `${window.location.origin}/customer/mypage/orders/success`,
-                failUrl: `${window.location.origin}/customer/mypage/orders/fail`,
-            });
-        } catch (error) {
-            console.error("결제 요청 실패:", error);
-            show("결제에 실패했습니다. 다시 시도해주세요.");
-        }
-    };
-
-    if (!userProfile) {
-        return <div className="flex justify-center items-center h-screen">주문 정보를 준비 중입니다...</div>;
+  /* ─────── 사용자·장바구니 검증 ─────── */
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      showStable('결제할 상품이 없습니다. 장바구니로 이동합니다.').then(() => {
+        routerStable.replace('/customer/cart');
+      });
+      return;
     }
 
-    return (
-        <>
-            <GlobalDialog open={open} message={message} onClose={handleClose} />
-            <div className="bg-white min-h-screen pb-24 lg:pb-0">
+    fetchMyProfile()
+      .then((p) => {
+        setUserProfile(p);
+        setShippingInfo({
+          receiverName: p.name || '',
+          phone: p.phone || '',
+          address: p.address || '',
+        });
+      })
+      .catch((e) => console.error('프로필 조회 실패:', e));
+  }, [cartItems, routerStable, showStable]);
 
-                <main className="max-w-7xl mx-auto px-4 lg:px-8 py-8">
-                    <div className="space-y-6">
-                        <section className="bg-white p-6 rounded-lg shadow-sm">
-                            <h2 className="text-lg font-light mb-4">배송지</h2>
-                            <div className="space-y-3">
-                                <div><label className="text-sm font-light text-gray-700">받는 분</label><input type="text" name="receiverName" value={shippingInfo.receiverName} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                                <div><label className="text-sm font-light text-gray-700">연락처</label><input type="text" name="phone" value={shippingInfo.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                                <div><label className="text-sm font-light text-gray-700">주소</label><input type="text" name="address" value={shippingInfo.address} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" /></div>
-                            </div>
-                        </section>
-
-                        <section className="bg-white p-6 rounded-lg shadow-sm">
-                            <h2 className="text-lg font-light mb-4">주문 상품</h2>
-                            <div className="space-y-4">
-                                {cartItems.map(item => (
-                                    <div key={item.cartItemId} className="flex items-start space-x-4">
-                                        <img src={item.imageThumbnailUrl || '/default-image.png'} alt={item.productName} className="w-20 h-20 object-cover rounded-md flex-shrink-0" />
-                                        <div className="flex-grow"><p className="font-light">{item.productName}</p><p className="text-sm text-gray-500">수량: {item.quantity}개</p></div>
-                                        <p className="font-light whitespace-nowrap">{(item.productPrice * item.quantity).toLocaleString()}원</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
-
-                        <section className="bg-white p-6 rounded-lg shadow-sm">
-                            <h3 className="text-lg font-light mb-4">결제 금액</h3>
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-sm"><span>총 상품금액</span><span>{totalProductPrice.toLocaleString()}원</span></div>
-                                <div className="flex justify-between text-sm"><span>배송비</span><span>+ {deliveryFee.toLocaleString()}원</span></div>
-                                <div className="border-t my-2"></div>
-                                <div className="flex justify-between font-light text-base"><span>최종 결제 금액</span><span>{finalAmount.toLocaleString()}원</span></div>
-                            </div>
-                            <button
-                                className="w-full bg-black text-white font-light py-3 mt-4 rounded-none hover:bg-gray-800 transition-colors"
-                                onClick={handlePayment}
-                                disabled={cartItems.length === 0}
-                            >
-                                {finalAmount.toLocaleString()}원 결제하기
-                            </button>
-                        </section>
-                    </div>
-                </main>
-            </div>
-        </>
+  /* ─────── 최종 금액 계산 ─────── */
+  const { totalProductPrice, deliveryFee, finalAmount } = useMemo(() => {
+    const productTotal = cartItems.reduce(
+      (sum, i) => sum + i.productPrice * i.quantity,
+      0,
     );
+    const fee = cartItems.length ? 3000 : 0;
+    return {
+      totalProductPrice: productTotal,
+      deliveryFee: fee,
+      finalAmount: productTotal + fee,
+    };
+  }, [cartItems]);
+
+  /* ─────── TossPayments SDK 초기화 ─────── */
+  useEffect(() => {
+    if (!userProfile || !customerId || !finalAmount) return;
+    (async () => {
+      try {
+        if (!(window as any).TossPayments)
+          tossPaymentsRef.current = await loadTossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+        else tossPaymentsRef.current = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
+      } catch (e) {
+        console.error('TossPayments init 실패:', e);
+      }
+    })();
+  }, [userProfile, customerId, finalAmount]);
+
+  /* ─────── 입력 핸들러 (모두 useCallback 적용) ─────── */
+  const handleBasicChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingInfo((p) => ({ ...p, [name]: value }));
+  }, []);
+
+  const handleAddressChange = useCallback((full: string) => {
+    setShippingInfo(prev => ({ ...prev, address: full }));
+  }, []);
+
+  const defaultAddrObj = useMemo(() => {
+    return parseAddress(shippingInfo.address);
+  }, [shippingInfo.address]);
+
+  /* ─────── 실제 결제 요청 ─────── */
+  const requestPayment = useCallback(async () => {
+    const toss = tossPaymentsRef.current;
+    if (!toss || !userProfile) {
+      show('결제 시스템이 준비되지 않았습니다.');
+      return;
+    }
+
+    sessionStorage.setItem(
+      'checkout_info',
+      JSON.stringify({
+        orderItems: cartItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        shippingInfo,
+      }),
+    );
+
+    const orderName =
+      cartItems.length > 1
+        ? `${cartItems[0].productName} 외 ${cartItems.length - 1}건`
+        : cartItems[0].productName;
+
+    try {
+      await toss.requestPayment('카드', {
+        amount: finalAmount,
+        orderId: `cart_${Date.now()}`,
+        orderName,
+        customerName: userProfile.name || initialName || '고객',
+        successUrl: `${location.origin}/customer/mypage/orders/success`,
+        failUrl: `${location.origin}/customer/mypage/orders/fail`,
+      });
+    } catch (e) {
+      console.error('requestPayment error:', e);
+      show('결제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  }, [cartItems, finalAmount, initialName, shippingInfo, show, userProfile]);
+  
+  /* ─────── 결제 버튼 클릭 ─────── */
+  const handlePaymentClick = useCallback(() => {
+    if (!shippingInfo.receiverName || !shippingInfo.phone || !shippingInfo.address) {
+      show('배송지 정보를 모두 입력해 주세요.');
+      return;
+    }
+    setConfirmOpen(true);
+  }, [shippingInfo, show]);
+
+
+  /* ─────── 로딩 표시 ─────── */
+  if (!userProfile)
+    return <div className="flex h-screen items-center justify-center">주문 정보를 준비 중입니다...</div>;
+
+  /* ─────── UI 렌더 ─────── */
+  return (
+    <>
+      <GlobalDialog open={open} message={message} onClose={handleClose} />
+      <ConfirmDialog
+        open={confirmOpen}
+        message={`${finalAmount.toLocaleString()}원을 결제하시겠습니까?`}
+        onResolve={(ok) => {
+          setConfirmOpen(false);
+          if (ok) requestPayment();
+        }}
+      />
+
+      <div className="min-h-screen bg-white pb-24 lg:pb-0">
+        <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
+          <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
+          <div className="space-y-6">
+            {/* ── 배송지 ── */}
+            <section className="rounded-lg bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-lg font-light">배송지</h2>
+              <div className="space-y-3">
+                <input
+                  name="receiverName"
+                  value={shippingInfo.receiverName}
+                  onChange={handleBasicChange}
+                  placeholder="받는 분"
+                  className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                />
+                <input
+                  name="phone"
+                  value={shippingInfo.phone}
+                  onChange={handleBasicChange}
+                  placeholder="연락처"
+                  className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                />
+                <AddressInput
+                  onAddressChange={handleAddressChange}
+                  defaultAddress={defaultAddrObj}
+                />
+              </div>
+            </section>
+
+            {/* ── 주문 상품 ── */}
+            <section className="rounded-lg bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-lg font-light">주문 상품</h2>
+              <div className="space-y-4">
+                {cartItems.map((item) => (
+                  <div key={item.cartItemId} className="flex items-start space-x-4">
+                    <img
+                      src={item.imageThumbnailUrl || '/default-image.png'}
+                      alt={item.productName}
+                      className="h-20 w-20 flex-shrink-0 rounded-md object-cover"
+                    />
+                    <div className="flex-grow">
+                      <p className="font-light">{item.productName}</p>
+                      <p className="text-sm text-gray-500">수량: {item.quantity}</p>
+                    </div>
+                    <p className="whitespace-nowrap font-light">
+                      {(item.productPrice * item.quantity).toLocaleString()}원
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── 결제 금액 ── */}
+            <section className="rounded-lg bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-light">결제 금액</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>총 상품금액</span>
+                  <span>{totalProductPrice.toLocaleString()}원</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>배송비</span>
+                  <span>+ {deliveryFee.toLocaleString()}원</span>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between text-base font-light">
+                  <span>최종 결제 금액</span>
+                  <span>{finalAmount.toLocaleString()}원</span>
+                </div>
+              </div>
+              <button
+                onClick={handlePaymentClick}
+                disabled={cartItems.length === 0}
+                className="mt-4 w-full rounded-none bg-black py-3 font-light text-white hover:bg-gray-800 disabled:opacity-50"
+              >
+                {finalAmount.toLocaleString()}원 결제하기
+              </button>
+            </section>
+          </div>
+        </main>
+      </div>
+    </>
+  );
 }
-
-

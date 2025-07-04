@@ -5,9 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { fetchReviewDetail, updateReview } from '@/service/customer/reviewService';
 import { uploadReviewImages, deleteReviewImage } from '@/service/customer/reviewImageService'; // 이미지 API 함수
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-import Navbar from '@/components/customer/common/Navbar';
 import StarRating from '@/components/customer/review/StarRating';
-import Modal from '@/components/Modal';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function EditReviewPage() {
   const { id } = useParams();
@@ -19,16 +18,13 @@ export default function EditReviewPage() {
   const [tempRating, setTempRating] = useState<number | null>(null); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const {show} = useGlobalDialog();
   // 이미지 관리
   const [existingImages, setExistingImages] = useState<string[]>([]); // 서버에 저장된 기존 이미지 URL 리스트
   const [newImages, setNewImages] = useState<File[]>([]); // 새로 업로드할 이미지 파일들
   const [removedImages, setRemovedImages] = useState<string[]>([]); // 삭제 요청 이미지 URL 리스트
 
-  const [showSuccess, setShowSuccess] = useState(false);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-
 
   useEffect(() => {
     if (!id) return;
@@ -64,37 +60,44 @@ export default function EditReviewPage() {
     setNewImages((prev) => prev.filter((f) => f !== file));
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!id || !review) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !review) return;
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const imageUrls = [...existingImages];
+      // 1. 삭제 요청된 이미지 서버에서 삭제 API 호출
+      await Promise.all(
+        removedImages.map((url) => deleteReviewImage(url))
+      );
 
-    await updateReview(Number(id), {
-      content,
-      rating,
-      imageUrls,
-    });
+      // 2. 새 이미지 업로드 (uploadReviewImages가 이미지 URL 배열 반환)
+      const uploadedUrls = await uploadReviewImages(Number(id), newImages);
 
-    // ✅ 모달 띄우기
-    setShowSuccess(true);
+      const imageUrls = [...existingImages, ...uploadedUrls];
 
-    // ✅ 2초 뒤에 상세 페이지로 이동
-    setTimeout(() => {
+      // 3. 기존 남은 이미지 + 새 업로드된 이미지 모두 합침
+      const finalImageUrls = [...existingImages, ...uploadedUrls];
+
+      // 4. 리뷰 본문 및 평점 수정 API 호출 (이미지는 별도로 저장한다고 가정)
+      await updateReview(Number(id), {
+        content,
+        rating,
+        imageUrls,
+      });
+
+      // 이미지 변경사항 서버 DB 반영이 필요하면 별도 API 호출 로직 추가
+
+      show('리뷰가 수정되었습니다.');
       router.push(`/customer/mypage/reviews/${id}`);
-    }, 2000);
-
-  } catch (err) {
-    console.error(err);
-    alert('리뷰 수정 중 오류가 발생했습니다.');
-  } finally {
-    setLoading(false);
-  }
-};
-
+    } catch (err) {
+      console.error(err);
+      show('리뷰 수정 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -102,16 +105,6 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <div>
-      <Modal
-        isOpen={showSuccess}
-        onClose={() => setShowSuccess(false)}
-        title="리뷰 수정 완료"
-        message="리뷰가 성공적으로 수정되었습니다."
-        type="success"
-        className="bg-black/30 backdrop-blur-sm"
-        titleClassName="text-blue-900"
-        buttonClassName="bg-blue-600"
-      />
       <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -133,9 +126,55 @@ const handleSubmit = async (e: React.FormEvent) => {
             />
           </div>
 
+          {/* <div>
+            <label className="block font-semibold mb-2 text-gray-700">기존 이미지</label>
+            <div className="flex flex-wrap gap-3 mb-4">
+              {existingImages.map((url) => (
+                <div key={url} className="relative w-24 h-24 border rounded overflow-hidden">
+                  <img src={`${process.env.NEXT_PUBLIC_API_ROOT_URL ?? ''}${url}`} alt="기존 리뷰 이미지" className="object-cover w-full h-full" />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingImage(url)}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-1 text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              {existingImages.length === 0 && <p className="text-gray-500">이미지가 없습니다.</p>}
+            </div>
+
+            <label className="block font-semibold mb-2 text-gray-700">새 이미지 추가</label>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className="mb-4"
+            />
+            <div className="flex flex-wrap gap-3">
+              {newImages.map((file) => {
+                const objectUrl = URL.createObjectURL(file);
+                return (
+                  <div key={file.name + file.size} className="relative w-24 h-24 border rounded overflow-hidden">
+                    <img src={objectUrl} alt="새 이미지 미리보기" className="object-cover w-full h-full" />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveNewImage(file)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full px-1 text-xs"
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div> */}
+
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-900  text-white rounded hover:bg-blue-600"
+            className="px-6 py-3 bg-teal-700 text-white rounded hover:bg-teal-800 transition-colors duration-200"
           >
             저장
           </button>

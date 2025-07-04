@@ -19,6 +19,7 @@ import {
   Plus,
   Search
 } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerAdminQnaPage() {
   const checking = useSellerAuthGuard();
@@ -31,7 +32,7 @@ export default function SellerAdminQnaPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const {show} = useGlobalDialog();
   // 폼 상태
   const [form, setForm] = useState<AdminInquiryRequest>({
     title: '',
@@ -78,7 +79,7 @@ export default function SellerAdminQnaPage() {
     e.preventDefault();
     
     if (!form.title.trim() || !form.content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
+      show('제목과 내용을 모두 입력해주세요.');
       return;
     }
 
@@ -92,11 +93,11 @@ export default function SellerAdminQnaPage() {
         content: ''
       });
       
-      alert('문의가 성공적으로 등록되었습니다.');
+      show('문의가 성공적으로 등록되었습니다.');
       fetchInquiries(0); // 목록 새로고침
     } catch (err: any) {
       console.error('문의 등록 실패:', err);
-      alert('문의 등록에 실패했습니다.');
+      show('문의 등록에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }

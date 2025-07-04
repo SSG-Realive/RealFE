@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 interface Customer {
   id: number;
@@ -63,6 +64,7 @@ const CustomerListPage: React.FC = () => {
     inactive: 0
   });
   const router = useRouter();
+  const {show} = useGlobalDialog();
 
   // 인증 체크
   useEffect(() => {
@@ -231,7 +233,7 @@ const CustomerListPage: React.FC = () => {
       // 상태 변경 후 전체 통계 다시 로딩
       fetchTotalStats();
     } catch (err: any) {
-      alert(`상태 변경 실패: ${err?.response?.data?.message || err?.message || '알 수 없는 오류'}`);
+      show(`상태 변경 실패: ${err?.response?.data?.message || err?.message || '알 수 없는 오류'}`);
     } finally {
       setUpdatingId(null);
     }

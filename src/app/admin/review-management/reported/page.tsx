@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getAdminReviewReportList, processAdminReviewReport } from "@/service/admin/reviewService";
 import { AdminReviewReport, ReviewReportStatus, AdminReviewReportListRequest } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReviewReportedPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function ReviewReportedPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<ReviewReportStatus>('');
+  const {show} = useGlobalDialog();
 
   useEffect(() => {
     if (!accessToken) {
@@ -74,7 +76,7 @@ export default function ReviewReportedPage() {
         router.replace('/admin/login');
         return;
       }
-      alert(err.message || "신고 처리에 실패했습니다.");
+      show(err.message || "신고 처리에 실패했습니다.");
     }
   };
 

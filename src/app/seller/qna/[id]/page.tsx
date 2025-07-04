@@ -8,6 +8,7 @@ import SellerHeader from '@/components/seller/SellerHeader';
 import SellerSidebar from '@/components/seller/SellerSidebar';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { User, Package, MessageCircle, CheckCircle, Clock } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerQnaDetailPage() {
     const params = useParams();
@@ -20,7 +21,7 @@ export default function SellerQnaDetailPage() {
     const [loading, setLoading] = useState(true);
     const [answer, setAnswer] = useState('');
     const [submitting, setSubmitting] = useState(false);
-
+    const {show} = useGlobalDialog();
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -50,7 +51,7 @@ export default function SellerQnaDetailPage() {
 
     const handleSubmitAnswer = async () => {
         if (!answer.trim()) {
-            alert('답변 내용을 입력해주세요.');
+            show('답변 내용을 입력해주세요.');
             return;
         }
 
@@ -61,11 +62,11 @@ export default function SellerQnaDetailPage() {
             const res = await getCustomerQnaDetail(id);
             setQna((res as any).qna);
             setAnswer('');
-            alert('답변이 등록되었습니다.');
+            show('답변이 등록되었습니다.');
             // router.replace('/seller/qna'); // 이 줄을 제거하여 상세 페이지에 머물도록 함
         } catch (err) {
             console.error('답변 등록 실패:', err);
-            alert('답변 등록에 실패했습니다.');
+            show('답변 등록에 실패했습니다.');
         } finally {
             setSubmitting(false);
         }

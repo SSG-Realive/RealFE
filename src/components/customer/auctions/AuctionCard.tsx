@@ -45,7 +45,7 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
                 </p>
 
                 {/* 현재가 */}
-                <p className="text-sm font-light text-red-500 mt-0.5">
+                <p className="text-sm font-bold text-black-500 mt-0.5">
                     현재가 {currentPrice?.toLocaleString()}
                     <span className="ml-1 text-xs">원</span>
                 </p>

@@ -9,6 +9,7 @@ import { ProductDetail } from '@/types/seller/product/product';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { ArrowLeft, Package, Tag, DollarSign, Layers, Ruler, Image, Video, Save, AlertCircle } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ProductEditPage() {
     const checking = useSellerAuthGuard();
@@ -24,7 +25,7 @@ export default function ProductEditPage() {
     const [subImages, setSubImages] = useState<FileList | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const {show} = useGlobalDialog(); 
     useEffect(() => {
         if (checking) return;
         if (!productId) return;
@@ -94,7 +95,7 @@ export default function ProductEditPage() {
 
         // 카테고리 필수 체크
         if (!form.categoryId || form.categoryId === 0) {
-            alert('카테고리를 선택해주세요.');
+            show('카테고리를 선택해주세요.');
             return;
         }
 
@@ -145,7 +146,7 @@ export default function ProductEditPage() {
             console.log('API 호출 시작...');
             await updateProduct(Number(productId), formData);
             console.log('상품 수정 성공!');
-            alert('상품이 수정되었습니다.');
+            await show('상품이 수정되었습니다.');
             router.push('/seller/products');
         } catch (err: any) {
             console.error('=== 상품 수정 실패 ===');
@@ -172,7 +173,7 @@ export default function ProductEditPage() {
             }
             
             setError(errorMessage);
-            alert(`수정 실패: ${errorMessage}`);
+            show(`수정 실패: ${errorMessage}`);
         }
     };
 
@@ -400,7 +401,7 @@ export default function ProductEditPage() {
                                             
                                             // 재고가 0인 상태에서 활성화하려고 할 때만 경고
                                             if (form.stock === 0 && e.target.checked) {
-                                                alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.\n재고를 먼저 추가해주세요.');
+                                                show('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.\n재고를 먼저 추가해주세요.');
                                                 console.log('재고 0으로 인한 활성화 차단');
                                                 return;  // 체크 방지
                                             }

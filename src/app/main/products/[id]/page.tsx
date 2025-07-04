@@ -157,19 +157,6 @@ export default function ProductDetailPage() {
               {product.price.toLocaleString()}
               <span className="text-sm ml-1">원</span>
             </p>
-
-            {/* TrafficLightStatusCardforProductDetail를 absolute로 배치 및 top 값 조정 */}
-            {/* top 값을 조정하여 카드의 윗부분이 가격 라인과 일치하도록 합니다. */}
-            {/* 64px는 h1(2xl) + mb-2 + p(sm) + mb-4 를 대략적으로 합산한 값입니다. 실제 렌더링에 따라 조정이 필요할 수 있습니다. */}
-            <div className="absolute top-[64px] right-0 z-10"> {/* top 값 조정 */}
-              <TrafficLightStatusCardforProductDetail
-                  title="상품 평점"
-                  rating={averageRating}
-                  count={reviewCount}
-              />
-            </div>
-
-            {/* 상품 정보 부분 (줄 바꿈 방지를 위해 whitespace-nowrap 유지) */}
             <div className="mb-6 space-y-2 text-sm text-gray-700">
               <p className="whitespace-nowrap"><span className="font-normal">상품상태:</span> {product.status}</p>
               <p className="whitespace-nowrap"><span className="font-normal">재고:</span> {product.stock}개</p>
@@ -180,7 +167,19 @@ export default function ProductDetailPage() {
                   <p className="whitespace-nowrap"><span className="font-normal">카테고리:</span> {product.categoryName}</p>
               )}
               {product.sellerName && (
-                  <p className="whitespace-nowrap"><span className="font-normal">판매자:</span> {product.sellerName}</p>
+                <p className="cursor-pointer hover:underline text-blue-600"
+                  onClick={() => router.push(`/main/seller/${product.id}`)}>
+                  <span className="font-light text-gray-700">판매자:</span> {product.sellerName}
+
+                  <div className="mb-6"> {/* 여백을 위한 div 추가 */}
+                    <TrafficLightStatusCardforProductDetail
+                        title="상품 평점"
+                        rating={averageRating}
+                        count={reviewCount}
+                        className="mx-auto" // 중앙 정렬을 위해 mx-auto 추가 (필요 시)
+                    />
+                  </div>
+                </p>
               )}
             </div>
 
@@ -236,7 +235,8 @@ export default function ProductDetailPage() {
         </div>
 
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-lg font-light mb-4">판매자 리뷰</h2>
+          <h2 className="text-lg font-light text-gray-600 mb-4">판매자 리뷰</h2>
+
           {reviews.length > 0 ? (
               <ReviewList reviews={reviews} />
           ) : (
@@ -247,7 +247,7 @@ export default function ProductDetailPage() {
         {/* --- 상품 QnA 섹션 시작 --- */}
         <div className="max-w-6xl mx-auto px-4 mt-8">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-light">상품 QnA</h2>
+            <h2 className="text-lg font-light text-gray-600">상품 QnA</h2>
             <button
                 onClick={handleWriteQna}
                 className="px-5 py-2 bg-black text-white rounded-md text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
@@ -265,13 +265,15 @@ export default function ProductDetailPage() {
 
         {related.length > 0 && (
             <div className="max-w-6xl mx-auto px-4 mt-8">
-              <h2 className="text-lg font-light mb-4">추천상품</h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
+              <h2 className="text-lg font-light text-gray-600 mb-4">추천상품</h2>
+
+              {/* 슬라이더 형식으로 수정 */}
+              <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                 {related.map((item) => (
                     <div
                         key={item.id}
                         onClick={() => router.push(`/main/products/${item.id}`)}
-                        className="cursor-pointer bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition"
+                        className="cursor-pointer bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition flex-shrink-0 w-44"
                     >
                       <img
                           src={item.imageThumbnailUrl ?? '/default-thumbnail.png'}
@@ -280,7 +282,9 @@ export default function ProductDetailPage() {
                       />
                       <div className="p-3">
                         <p className="text-sm font-light truncate text-black">{item.name}</p>
-                        <p className="text-sm font-light mt-1 text-black">{item.price.toLocaleString()}원</p>
+                        <p className="text-sm font-light mt-1 text-black">
+                          {item.price.toLocaleString()}원
+                        </p>
                       </div>
                     </div>
                 ))}

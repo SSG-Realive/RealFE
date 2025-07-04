@@ -63,7 +63,7 @@ export default function EditReviewPage() {
 
     try {
       setLoading(true);
-      const uploadedUrls = await uploadReviewImages(Number(id), newImages);
+      const uploadedUrls = await uploadReviewImages(newImages, Number(id));
       const filteredExisting = existingImages.filter((url) => !removedImages.includes(url));
       const finalImageUrls = [...filteredExisting, ...uploadedUrls];
 

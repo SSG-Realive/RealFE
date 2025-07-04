@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/apiClient';
 import { Users, Search, Filter, UserCheck, UserX, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Seller {
   id: number;
@@ -14,6 +15,9 @@ interface Seller {
   image?: string;
   is_approved: boolean;
   is_active: boolean;
+  businessNumber?: string;
+  createdAt?: string;
+  created?: string;
 }
 
 interface ApiResponse {
@@ -35,6 +39,20 @@ interface ErrorResponse {
   message?: string;
 }
 
+interface SellerDetail {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  businessNumber: string;
+  isApproved: boolean;
+  approvedAt: string;
+  isActive: boolean;
+  createdAt: string;
+  created?: string;
+  updatedAt: string;
+}
+
 const AdminSellersPage: React.FC = () => {
   const [sellers, setSellers] = useState<Seller[]>([]);
   const [search, setSearch] = useState("");
@@ -43,6 +61,9 @@ const AdminSellersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [selectedSeller, setSelectedSeller] = useState<SellerDetail | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [totalStats, setTotalStats] = useState({
     total: 0,
     active: 0,
@@ -164,6 +185,21 @@ const AdminSellersPage: React.FC = () => {
     }
   }, [fetchTotalStats]);
 
+  // 상세조회 핸들러
+  const handleViewDetail = async (sellerId: number) => {
+    try {
+      setDetailLoading(true);
+      const response = await adminApi.get(`/admin/users/sellers/${sellerId}`);
+      setSelectedSeller(response.data.data);
+      setIsDetailModalOpen(true);
+    } catch (err) {
+      const error = err as ErrorResponse;
+      alert(`상세 정보 조회 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   // 승인/거절 핸들러
   const handleApproval = useCallback(async (seller: Seller, approved: boolean) => {
     try {
@@ -196,15 +232,12 @@ const AdminSellersPage: React.FC = () => {
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   }, []);
-
-  const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value);
   }, []);
-
-  const handleActiveFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+  useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     setActiveFilter(e.target.value);
   }, []);
-
   if (typeof window !== 'undefined' && !localStorage.getItem('adminToken')) {
     return null;
   }
@@ -391,9 +424,12 @@ const AdminSellersPage: React.FC = () => {
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">판매자 정보</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">이메일</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">사업자번호</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">가입일</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">승인 상태</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">활성 상태</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">액션</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">상세</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -417,6 +453,17 @@ const AdminSellersPage: React.FC = () => {
                         </td>
                         <td className="px-6 py-4">
                           <div className="text-gray-900">{seller.email}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-gray-900">{seller.businessNumber || '-'}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-gray-900">
+                            {(seller.createdAt || seller.created) ? 
+                              new Date(seller.createdAt || seller.created || '').toLocaleDateString() : 
+                              '-'
+                            }
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-center">
                           <span className={`inline-flex items-center px-3 py-1 text-sm font-medium rounded-full ${
@@ -475,6 +522,16 @@ const AdminSellersPage: React.FC = () => {
                             </Button>
                           </div>
                         </td>
+                        <td className="px-6 py-4 text-center">
+                          <Button
+                            onClick={() => handleViewDetail(seller.id)}
+                            disabled={detailLoading}
+                            variant="outline"
+                            size="sm"
+                          >
+                            상세
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -517,8 +574,20 @@ const AdminSellersPage: React.FC = () => {
                             </span>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-3 truncate">{seller.email}</p>
+                        <p className="text-sm text-gray-600 mb-2 truncate">{seller.email}</p>
+                        <div className="text-sm text-gray-500 mb-3 space-y-1">
+                          <div>사업자번호: {seller.businessNumber || '-'}</div>
+                          <div>가입일: {(seller.createdAt || seller.created) ? new Date(seller.createdAt || seller.created || '').toLocaleDateString() : '-'}</div>
+                        </div>
                         <div className="flex flex-wrap gap-2">
+                          <Button
+                            onClick={() => handleViewDetail(seller.id)}
+                            disabled={detailLoading}
+                            variant="outline"
+                            size="sm"
+                          >
+                            상세
+                          </Button>
                           {!seller.is_approved && (
                             <>
                               <Button
@@ -563,6 +632,62 @@ const AdminSellersPage: React.FC = () => {
             </>
           )}
         </div>
+
+        {/* 상세조회 모달 */}
+        <Dialog open={isDetailModalOpen} onOpenChange={setIsDetailModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>판매자 상세 정보</DialogTitle>
+            </DialogHeader>
+            {selectedSeller && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">이름</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">이메일</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">전화번호</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.phone || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">사업자번호</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.businessNumber || '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">승인 상태</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.isApproved ? '승인됨' : '승인 대기'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">계정 상태</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.isActive ? '활성' : '비활성'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">승인일</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.approvedAt ? new Date(selectedSeller.approvedAt).toLocaleString() : '-'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">가입일</label>
+                    <p className="text-sm text-gray-900">
+                      {(selectedSeller.createdAt || selectedSeller.created) ? 
+                        new Date(selectedSeller.createdAt || selectedSeller.created || '').toLocaleString() : 
+                        '-'
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">최종 수정일</label>
+                    <p className="text-sm text-gray-900">{selectedSeller.updatedAt ? new Date(selectedSeller.updatedAt).toLocaleString() : '-'}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

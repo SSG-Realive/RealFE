@@ -100,10 +100,10 @@ export default function SellerSettlementPage() {
             if (res && res.length > 0) {
                 console.log('📊 모든 응답 데이터의 기간 정보:');
                 res.forEach((item, index) => {
-                    console.log(`데이터 ${index + 1}:`, {
-                        id: item.id,
-                        periodStart: item.periodStart,
-                        periodEnd: item.periodEnd,
+                        console.log(`데이터 ${index + 1}:`, {
+                            id: item.id,
+                            periodStart: item.periodStart,
+                            periodEnd: item.periodEnd,
                         sellerId: item.sellerId,
                         inRange: item.periodStart >= from && item.periodEnd <= to ? '✅' : '❌'
                     });
@@ -125,9 +125,9 @@ export default function SellerSettlementPage() {
             
             // 요약 정보도 함께 조회
             try {
-                const summaryRes = await getSellerSettlementSummary(from, to);
-                console.log('요약 정보:', summaryRes);
-                setSummary(summaryRes);
+            const summaryRes = await getSellerSettlementSummary(from, to);
+            console.log('요약 정보:', summaryRes);
+            setSummary(summaryRes);
             } catch (summaryErr) {
                 console.error('요약 정보 조회 실패:', summaryErr);
                 setSummary(null);
@@ -200,7 +200,7 @@ export default function SellerSettlementPage() {
         
         if (type === 'all') {
             // 전체 조회 즉시 실행
-            fetchAll();
+        fetchAll();
         }
         // 기간별은 useEffect에서 자동으로 처리됨
     };

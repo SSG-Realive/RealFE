@@ -67,3 +67,22 @@ export async function updateDeliveryStatus(
 export async function cancelOrderDelivery(orderId: number): Promise<void> {
     await sellerApi.patch(`/seller/orders/${orderId}/cancel`);
 }
+
+// 주문 통계 타입 정의
+export interface OrderStatistics {
+    totalOrders: number;
+    preparingOrders: number;
+    inProgressOrders: number;
+    completedOrders: number;
+}
+
+/**
+ * 판매자 주문 통계 조회
+ * @returns OrderStatistics - 전체/배송준비/배송중/완료 주문 수
+ */
+export async function getOrderStatistics(): Promise<OrderStatistics> {
+    console.log('📊 주문 통계 API 호출 시작');
+    const res = await sellerApi.get('/seller/orders/statistics');
+    console.log('📊 주문 통계 응답:', res.data);
+    return res.data;
+}

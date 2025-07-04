@@ -47,11 +47,16 @@ export default function EditReviewPage() {
   // 새 이미지 파일 선택 처리
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    console.log('files:', files);
     if (files && files.length > 0) {
-      setNewImages((prev) => [...prev, ...Array.from(files)]);
+      const arrFiles = Array.from(files);
+      console.log('Array.from(files):', arrFiles);
+      setNewImages((prev) => [...prev, ...arrFiles]);
     }
-    e.target.value = ''; // 동일 파일 재선택 허용 위해 초기화
+    e.target.value = '';
   };
+
+
 
   // 기존 이미지 삭제 (프론트에서만 삭제 표시)
   const handleRemoveExistingImage = (url: string) => {
@@ -71,13 +76,19 @@ export default function EditReviewPage() {
     try {
       setLoading(true);
 
-      // 새 이미지 S3 업로드
+      console.log('기존 이미지:', existingImages);
+      console.log('삭제된 이미지:', removedImages);
+      console.log('새로 추가한 이미지 파일들:', newImages);
+
       const uploadedUrls = await uploadReviewImages(newImages, Number(id));
+      console.log('업로드 완료된 이미지 URL들:', uploadedUrls);
 
-      // 최종 이미지 리스트는 기존 이미지 중 삭제하지 않은 것 + 새로 업로드한 이미지
-      const finalImageUrls = [...existingImages, ...uploadedUrls];
+      const filteredExisting = existingImages.filter((url) => !removedImages.includes(url));
+      console.log('삭제 제외된 기존 이미지들:', filteredExisting);
 
-      // 리뷰 수정 API 호출
+      const finalImageUrls = [...filteredExisting, ...uploadedUrls];
+      console.log('서버에 전송할 최종 이미지 URL 목록:', finalImageUrls);
+
       await updateReview(Number(id), {
         content,
         rating,
@@ -85,7 +96,6 @@ export default function EditReviewPage() {
       });
 
       setShowSuccess(true);
-
       setTimeout(() => {
         router.push(`/customer/mypage/reviews/${id}`);
       }, 2000);
@@ -96,6 +106,8 @@ export default function EditReviewPage() {
       setLoading(false);
     }
   };
+
+
 
   if (loading) return <div>로딩 중...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -174,13 +186,10 @@ export default function EditReviewPage() {
             <div className="flex flex-wrap gap-3 mt-2">
               {newImages.map((file) => {
                 const objectUrl = URL.createObjectURL(file);
+                const key = file.name + '_' + file.lastModified; // 좀 더 고유하게
                 return (
-                  <div key={objectUrl} className="relative w-24 h-24 border rounded overflow-hidden">
-                    <img
-                      src={objectUrl}
-                      alt="새 리뷰 이미지"
-                      className="object-cover w-full h-full"
-                    />
+                  <div key={key} className="relative w-24 h-24 border rounded overflow-hidden">
+                    <img src={objectUrl} alt="새 리뷰 이미지" className="object-cover w-full h-full" />
                     <button
                       type="button"
                       onClick={() => handleRemoveNewImage(file)}

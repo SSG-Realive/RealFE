@@ -5,13 +5,13 @@
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
-import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend } from '@/service/seller/sellerService';
+import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend, getTodayStats, getCurrentMonthStats, TodayStatsDTO, CurrentMonthStatsDTO } from '@/service/seller/sellerService';
 import { getCustomerQnaList } from '@/service/seller/customerQnaService';
 import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySalesDTO } from '@/types/seller/dashboard/sellerDashboardResponse';
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import dynamic from 'next/dynamic';
-import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel, Armchair, RefreshCw } from 'lucide-react';
+import { TrendingUp, Users, Star, DollarSign, Package, MessageCircle, ShoppingCart, BarChart3, Gavel, Armchair, RefreshCw, Calendar, TrendingDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 
@@ -26,6 +26,8 @@ export default function SellerDashboardPage() {
   const [dailyTrend, setDailyTrend] = useState<DailySalesDTO[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlySalesDTO[]>([]);
   const [actualUnansweredCount, setActualUnansweredCount] = useState(0); // 실제 미답변 문의 수
+  const [todayStats, setTodayStats] = useState<TodayStatsDTO | null>(null);
+  const [monthStats, setMonthStats] = useState<CurrentMonthStatsDTO | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -133,6 +135,13 @@ export default function SellerDashboardPage() {
         const endMonthStr = endMonthDate.toISOString().split('T')[0];
         const monthlyData = await getMonthlySalesTrend(startMonthStr, endMonthStr);
         setMonthlyTrend(monthlyData);
+
+        // 새로운 통계 API 호출
+        const todayStatsData = await getTodayStats();
+        setTodayStats(todayStatsData);
+        
+        const monthStatsData = await getCurrentMonthStats();
+        setMonthStats(monthStatsData);
 
         setLastUpdated(format(new Date(), 'M월 d일 a h:mm'));
       } catch (err) {
@@ -432,15 +441,27 @@ export default function SellerDashboardPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">오늘 판매</p>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <TrendingUp className="w-6 h-6 text-[#14b8a6]" />
+                  <p className="text-sm text-[#374151] font-medium">오늘 판매</p>
+                </div>
                 <p className="text-xl font-bold text-[#374151]">
-                  {dailyTrend.length > 0 ? dailyTrend[dailyTrend.length - 1]?.orderCount || 0 : 0}건
+                  {todayStats?.todayOrderCount || 0}건
+                </p>
+                <p className="text-xs text-[#6b7280] mt-1">
+                  💰 {todayStats?.todayRevenue?.toLocaleString() || 0}원
                 </p>
               </div>
               <div className="text-center p-4 bg-[#f3f4f6] rounded-lg border border-[#d1d5db]">
-                <p className="text-sm text-[#374151] mb-1">이번 달 판매</p>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Calendar className="w-6 h-6 text-[#8b5cf6]" />
+                  <p className="text-sm text-[#374151] font-medium">이번 달 판매</p>
+                </div>
                 <p className="text-xl font-bold text-[#374151]">
-                  {monthlyTrendFilled.length > 0 ? monthlyTrendFilled[monthlyTrendFilled.length - 1]?.orderCount || 0 : 0}건
+                  {monthStats?.currentMonthOrderCount || 0}건
+                </p>
+                <p className="text-xs text-[#6b7280] mt-1">
+                  💰 {monthStats?.currentMonthRevenue?.toLocaleString() || 0}원
                 </p>
               </div>
             </div>

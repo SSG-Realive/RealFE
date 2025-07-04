@@ -35,6 +35,14 @@ export interface AdminInquiryListResponse {
   empty: boolean;
 }
 
+// 새로운 통계 타입 정의
+export interface AdminInquiryStatistics {
+  totalCount: number;      // 전체 문의 수
+  unansweredCount: number; // 미답변 수
+  answeredCount: number;   // 답변완료 수
+  answerRate: number;      // 답변률 (%)
+}
+
 /**
  * 관리자 문의 등록
  */
@@ -73,4 +81,12 @@ export async function updateAdminInquiry(id: number, data: AdminInquiryRequest):
  */
 export async function deleteAdminInquiry(id: number): Promise<void> {
   await sellerApi.patch(`/seller/adminqna/${id}/edit`);
+}
+
+/**
+ * 관리자 문의 통계 조회
+ */
+export async function getAdminInquiryStatistics(): Promise<AdminInquiryStatistics> {
+  const res = await sellerApi.get('/seller/adminqna/statistics');
+  return res.data;
 } 

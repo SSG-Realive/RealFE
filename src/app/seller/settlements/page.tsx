@@ -68,7 +68,7 @@ export default function SellerSettlementPage() {
             const res = await getSellerSettlementList();
             setPayouts(res || []);
             
-            // 하루 단위로 재구성
+            // 하루 단위로 재구성 (원래 로직 복원)
             await createDailyPayoutsFromDetails(res || []);
             setError(null);
         } catch (err) {
@@ -85,11 +85,15 @@ export default function SellerSettlementPage() {
     const fetchFilteredByPeriod = async (from: string, to: string) => {
         try {
             setLoading(true);
-            console.log('=== 기간별 필터링 시작 ===');
-            console.log('요청 기간:', from, '~', to);
-            console.log('API 호출 URL:', `/seller/settlements/by-period?from=${from}&to=${to}`);
+            console.log('🚀 === 기간별 필터링 시작 ===');
+            console.log('🚀 요청 기간:', from, '~', to);
+            console.log('🚀 API 호출 URL:', `/seller/settlements/by-period?from=${from}&to=${to}`);
+            console.log('🚀 현재 시각:', new Date().toISOString());
             
+            const startTime = performance.now();
             const res = await getSellerSettlementListByPeriod(from, to);
+            const endTime = performance.now();
+            console.log(`🚀 API 응답 시간: ${Math.round(endTime - startTime)}ms`);
             console.log('📊 백엔드 응답 데이터:', res);
             console.log('📊 응답 데이터 개수:', res?.length || 0);
             
@@ -105,20 +109,18 @@ export default function SellerSettlementPage() {
                     });
                 });
                 
-                // 기간 밖의 데이터가 있는지 확인
-                const outOfRangeItems = res.filter(item => 
-                    item.periodStart < from || item.periodEnd > to
-                );
-                if (outOfRangeItems.length > 0) {
-                    console.warn('⚠️ 기간 밖의 데이터가 백엔드에서 반환됨:', outOfRangeItems);
-                }
+                // 백엔드에서 이미 필터링된 데이터이므로 그대로 사용
+                console.log('✅ 백엔드에서 필터링된 데이터 사용:', {
+                    total: res.length,
+                    requestPeriod: `${from} ~ ${to}`
+                });
             } else {
                 console.log('⚠️ 기간별 필터링 결과: 데이터가 없습니다.');
             }
             
             setPayouts(res || []);
             
-            // 하루 단위로 재구성
+            // 하루 단위로 재구성 (백엔드에서 올바르게 필터링된 데이터 사용)
             await createDailyPayoutsFromDetails(res || []);
             
             // 요약 정보도 함께 조회
@@ -180,27 +182,7 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 현재 필터 상태에 따른 새로고침
-    const applyFilter = () => {
-        console.log('새로고침 버튼 클릭 - 현재 필터:', {
-            type: filterType,
-            from: filterFrom,
-            to: filterTo
-        });
-        
-        if (filterType === 'period') {
-            if (filterFrom && filterTo) {
-                console.log('기간별 새로고침 실행');
-                fetchFilteredByPeriod(filterFrom, filterTo);
-            } else {
-                console.log('기간이 설정되지 않아 전체 조회 실행');
-                fetchAll();
-            }
-        } else {
-            console.log('전체 새로고침 실행');
-            fetchAll();
-        }
-    };
+
 
     // 필터 초기화
     const resetFilter = () => {
@@ -223,15 +205,12 @@ export default function SellerSettlementPage() {
         // 기간별은 useEffect에서 자동으로 처리됨
     };
 
-    // 기간 필터 변경 핸들러 - 상태만 업데이트하고 API 호출은 하지 않음
+    // 기간 필터 변경 핸들러 - 상태 업데이트만
     const handlePeriodChange = (from: string, to: string) => {
-        console.log('기간 변경:', { from, to, currentFrom: filterFrom, currentTo: filterTo });
+        console.log('기간 변경:', { from, to });
         
-        // 상태만 업데이트 (API 호출은 별도로)
         if (from !== undefined) setFilterFrom(from);
         if (to !== undefined) setFilterTo(to);
-        
-        console.log('기간 상태 업데이트 완료');
     };
 
     useEffect(() => {
@@ -244,6 +223,12 @@ export default function SellerSettlementPage() {
     useEffect(() => {
         if (filterType === 'period' && filterFrom && filterTo) {
             console.log('🔄 기간별 필터 자동 실행:', filterFrom, '~', filterTo);
+            console.log('🔄 날짜 비교 체크:', {
+                from: filterFrom,
+                to: filterTo,
+                isValidRange: filterFrom <= filterTo,
+                daysDiff: Math.ceil((new Date(filterTo).getTime() - new Date(filterFrom).getTime()) / (1000 * 60 * 60 * 24))
+            });
             fetchFilteredByPeriod(filterFrom, filterTo);
         }
     }, [filterType, filterFrom, filterTo]);
@@ -286,13 +271,7 @@ export default function SellerSettlementPage() {
                             soldAt: saleDetail.salesLog.soldAt
                         });
                         
-                        // 기간별 필터가 활성화된 경우 클라이언트에서도 한번 더 확인
-                        if (filterType === 'period' && filterFrom && filterTo) {
-                            if (saleDate < filterFrom || saleDate > filterTo) {
-                                console.log(`❌ 판매일 ${saleDate}가 필터 기간 ${filterFrom}~${filterTo} 밖이므로 제외`);
-                                return; // 해당 건 제외
-                            }
-                        }
+                        // 백엔드에서 이미 필터링된 데이터이므로 클라이언트 필터링 제거
                         
                         console.log(`✅ 판매 건 ${index + 1} 포함됨:`, saleDate);
                         
@@ -495,16 +474,7 @@ export default function SellerSettlementPage() {
                         </div>
                             )}
 
-                            {/* 필터 버튼들 */}
-                            <div className="flex gap-2">
-                        <button
-                                    onClick={applyFilter}
-                                    className="flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                                    새로고침
-                        </button>
-                            </div>
+                            {/* 기간 필터는 자동으로 적용됩니다 */}
                         </div>
                     </div>
 

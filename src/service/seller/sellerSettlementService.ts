@@ -24,8 +24,32 @@ export async function getSellerSettlementListByDate(date: string): Promise<Selle
  * @param to 종료 날짜 (YYYY-MM-DD)
  */
 export async function getSellerSettlementListByPeriod(from: string, to: string): Promise<SellerSettlementResponse[]> {
-    const res = await sellerApi.get(`/seller/settlements/by-period?from=${from}&to=${to}`);
-    return res.data;
+    const url = `/seller/settlements/by-period?from=${from}&to=${to}`;
+    console.log('🌐 API 요청 시작:', {
+        url,
+        from,
+        to,
+        timestamp: new Date().toISOString()
+    });
+    
+    try {
+        const res = await sellerApi.get(url);
+        console.log('🌐 API 응답 성공:', {
+            url,
+            dataLength: res.data?.length || 0,
+            status: res.status,
+            data: res.data
+        });
+        return res.data;
+    } catch (error: any) {
+        console.error('🌐 API 요청 실패:', {
+            url,
+            error: error.message,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        throw error;
+    }
 }
 
 /**

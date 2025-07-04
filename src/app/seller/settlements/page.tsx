@@ -38,20 +38,12 @@ export default function SellerSettlementPage() {
     const checking = useSellerAuthGuard();
     const router = useRouter();
     
-    // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오는 함수
-    const getTodayDate = () => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
+
     
-    // 상태 관리 - 기본값을 하루 단위(오늘 날짜)로 설정
+    // 상태 관리 - 기본값을 전체 조회로 설정
     const [payouts, setPayouts] = useState<SellerSettlementResponse[]>([]);
     const [selectedPayout, setSelectedPayout] = useState<PayoutLogDetailResponse | null>(null);
-    const [filterType, setFilterType] = useState<'all' | 'date' | 'period'>('date');
-    const [filterDate, setFilterDate] = useState(getTodayDate());
+    const [filterType, setFilterType] = useState<'all' | 'period'>('all');
     const [filterFrom, setFilterFrom] = useState('');
     const [filterTo, setFilterTo] = useState('');
     const [summary, setSummary] = useState<{
@@ -87,23 +79,7 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 날짜별 필터링
-    const fetchFilteredByDate = async (date: string) => {
-        try {
-            setLoading(true);
-            const res = await getSellerSettlementListByDate(date);
-            setPayouts(res || []);
-            
-            // 하루 단위로 재구성
-            await createDailyPayoutsFromDetails(res || []);
-            setError(null);
-        } catch (err) {
-            console.error('날짜 필터 조회 실패:', err);
-            setError('해당 날짜의 정산 데이터를 불러오지 못했습니다.');
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     // 기간별 필터링
     const fetchFilteredByPeriod = async (from: string, to: string) => {
@@ -111,23 +87,33 @@ export default function SellerSettlementPage() {
             setLoading(true);
             console.log('=== 기간별 필터링 시작 ===');
             console.log('요청 기간:', from, '~', to);
+            console.log('API 호출 URL:', `/seller/settlements/by-period?from=${from}&to=${to}`);
             
             const res = await getSellerSettlementListByPeriod(from, to);
-            console.log('백엔드 응답 데이터:', res);
-            console.log('응답 데이터 개수:', res?.length || 0);
+            console.log('📊 백엔드 응답 데이터:', res);
+            console.log('📊 응답 데이터 개수:', res?.length || 0);
             
             if (res && res.length > 0) {
-                console.log('첫 번째 데이터 샘플:', res[0]);
+                console.log('📊 모든 응답 데이터의 기간 정보:');
                 res.forEach((item, index) => {
-                    if (index < 5) { // 처음 5개만 로그 출력
-                        console.log(`데이터 ${index + 1}:`, {
-                            id: item.id,
-                            periodStart: item.periodStart,
-                            periodEnd: item.periodEnd,
-                            sellerId: item.sellerId
-                        });
-                    }
+                    console.log(`데이터 ${index + 1}:`, {
+                        id: item.id,
+                        periodStart: item.periodStart,
+                        periodEnd: item.periodEnd,
+                        sellerId: item.sellerId,
+                        inRange: item.periodStart >= from && item.periodEnd <= to ? '✅' : '❌'
+                    });
                 });
+                
+                // 기간 밖의 데이터가 있는지 확인
+                const outOfRangeItems = res.filter(item => 
+                    item.periodStart < from || item.periodEnd > to
+                );
+                if (outOfRangeItems.length > 0) {
+                    console.warn('⚠️ 기간 밖의 데이터가 백엔드에서 반환됨:', outOfRangeItems);
+                }
+            } else {
+                console.log('⚠️ 기간별 필터링 결과: 데이터가 없습니다.');
             }
             
             setPayouts(res || []);
@@ -136,12 +122,23 @@ export default function SellerSettlementPage() {
             await createDailyPayoutsFromDetails(res || []);
             
             // 요약 정보도 함께 조회
-            const summaryRes = await getSellerSettlementSummary(from, to);
-            console.log('요약 정보:', summaryRes);
-            setSummary(summaryRes);
+            try {
+                const summaryRes = await getSellerSettlementSummary(from, to);
+                console.log('요약 정보:', summaryRes);
+                setSummary(summaryRes);
+            } catch (summaryErr) {
+                console.error('요약 정보 조회 실패:', summaryErr);
+                setSummary(null);
+            }
+            
             setError(null);
-        } catch (err) {
+        } catch (err: any) {
             console.error('기간 필터 조회 실패:', err);
+            console.error('에러 상세:', {
+                message: err.message,
+                status: err.response?.status,
+                data: err.response?.data
+            });
             setError('해당 기간의 정산 데이터를 불러오지 못했습니다.');
         } finally {
             setLoading(false);
@@ -183,74 +180,73 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 필터 적용
+    // 현재 필터 상태에 따른 새로고침
     const applyFilter = () => {
-        if (filterType === 'date' && filterDate) {
-            fetchFilteredByDate(filterDate);
-        } else if (filterType === 'period' && filterFrom && filterTo) {
-            fetchFilteredByPeriod(filterFrom, filterTo);
-        } else if (filterType === 'all') {
+        console.log('새로고침 버튼 클릭 - 현재 필터:', {
+            type: filterType,
+            from: filterFrom,
+            to: filterTo
+        });
+        
+        if (filterType === 'period') {
+            if (filterFrom && filterTo) {
+                console.log('기간별 새로고침 실행');
+                fetchFilteredByPeriod(filterFrom, filterTo);
+            } else {
+                console.log('기간이 설정되지 않아 전체 조회 실행');
+                fetchAll();
+            }
+        } else {
+            console.log('전체 새로고침 실행');
             fetchAll();
         }
     };
 
     // 필터 초기화
     const resetFilter = () => {
-        setFilterType('date');
-        setFilterDate(getTodayDate());
+        setFilterType('all');
         setFilterFrom('');
         setFilterTo('');
         setSummary(null);
-        fetchFilteredByDate(getTodayDate());
+        fetchAll();
     };
 
     // 필터 타입 변경 핸들러
-    const handleFilterTypeChange = (type: 'all' | 'date' | 'period') => {
+    const handleFilterTypeChange = (type: 'all' | 'period') => {
+        console.log('필터 타입 변경:', type);
         setFilterType(type);
         
         if (type === 'all') {
             // 전체 조회 즉시 실행
-        fetchAll();
-        } else if (type === 'date') {
-            // 현재 설정된 날짜로 조회 (없으면 오늘 날짜)
-            const dateToUse = filterDate || getTodayDate();
-            setFilterDate(dateToUse);
-            fetchFilteredByDate(dateToUse);
-        } else if (type === 'period') {
-            // 기간별 필터는 시작일/종료일이 모두 설정되어야 조회
-            if (filterFrom && filterTo) {
-                fetchFilteredByPeriod(filterFrom, filterTo);
-            }
+            fetchAll();
         }
+        // 기간별은 useEffect에서 자동으로 처리됨
     };
 
-    // 날짜 필터 변경 핸들러
-    const handleDateChange = (date: string) => {
-        setFilterDate(date);
-        if (filterType === 'date' && date) {
-            fetchFilteredByDate(date);
-        }
-    };
-
-    // 기간 필터 변경 핸들러
+    // 기간 필터 변경 핸들러 - 상태만 업데이트하고 API 호출은 하지 않음
     const handlePeriodChange = (from: string, to: string) => {
-        if (from) setFilterFrom(from);
-        if (to) setFilterTo(to);
+        console.log('기간 변경:', { from, to, currentFrom: filterFrom, currentTo: filterTo });
         
-        // 시작일과 종료일이 모두 있으면 자동 조회
-        const fromDate = from || filterFrom;
-        const toDate = to || filterTo;
+        // 상태만 업데이트 (API 호출은 별도로)
+        if (from !== undefined) setFilterFrom(from);
+        if (to !== undefined) setFilterTo(to);
         
-        if (filterType === 'period' && fromDate && toDate) {
-            fetchFilteredByPeriod(fromDate, toDate);
-        }
+        console.log('기간 상태 업데이트 완료');
     };
 
     useEffect(() => {
         if (checking) return;
-        // 초기 로딩 시 오늘 날짜 기준으로 조회
-        fetchFilteredByDate(getTodayDate());
+        // 초기 로딩 시 전체 정산 내역 조회
+        fetchAll();
     }, [checking]);
+
+    // 기간별 필터 자동 실행
+    useEffect(() => {
+        if (filterType === 'period' && filterFrom && filterTo) {
+            console.log('🔄 기간별 필터 자동 실행:', filterFrom, '~', filterTo);
+            fetchFilteredByPeriod(filterFrom, filterTo);
+        }
+    }, [filterType, filterFrom, filterTo]);
 
     // 정산 상세 데이터를 날짜별 + 건별로 분리하여 정산 목록 생성
     const createDailyPayoutsFromDetails = async (payoutList: SellerSettlementResponse[]) => {
@@ -290,20 +286,15 @@ export default function SellerSettlementPage() {
                             soldAt: saleDetail.salesLog.soldAt
                         });
                         
-                        // 기간 필터링이 활성화된 경우 실제 판매일 기준으로 필터링
+                        // 기간별 필터가 활성화된 경우 클라이언트에서도 한번 더 확인
                         if (filterType === 'period' && filterFrom && filterTo) {
                             if (saleDate < filterFrom || saleDate > filterTo) {
-                                console.log(`판매일 ${saleDate}가 필터 기간 ${filterFrom}~${filterTo} 밖이므로 제외`);
-                                return; // 해당 건 제외
-                            }
-                        } else if (filterType === 'date' && filterDate) {
-                            if (saleDate !== filterDate) {
-                                console.log(`판매일 ${saleDate}가 필터 날짜 ${filterDate}와 다르므로 제외`);
+                                console.log(`❌ 판매일 ${saleDate}가 필터 기간 ${filterFrom}~${filterTo} 밖이므로 제외`);
                                 return; // 해당 건 제외
                             }
                         }
                         
-                        console.log(`판매 건 ${index + 1} 포함됨:`, saleDate);
+                        console.log(`✅ 판매 건 ${index + 1} 포함됨:`, saleDate);
                         
                         // 날짜별로 데이터 합산
                         if (!dailyDataMap[saleDate]) {
@@ -399,12 +390,8 @@ export default function SellerSettlementPage() {
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
                     <div className="mb-6">
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리 (날짜별)</h1>
-                        {filterType === 'date' && (
-                            <p className="text-sm text-[#6b7280] mt-1">
-                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'} - 배송 완료된 주문만 즉시 정산
-                            </p>
-                        )}
+                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리</h1>
+
                         {filterType === 'period' && filterFrom && filterTo && (
                             <p className="text-sm text-[#6b7280] mt-1">
                                 조회 기간: {filterFrom} ~ {filterTo} - 배송 완료된 주문만 즉시 정산
@@ -435,7 +422,6 @@ export default function SellerSettlementPage() {
                             </div>
                             <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
                             <div className="text-xs text-[#6b7280] mt-1">
-                                {filterType === 'date' && `${filterDate} 당일`}
                                 {filterType === 'period' && `${filterFrom}~${filterTo}`}
                                 {filterType === 'all' && '전체 기간'}
                             </div>
@@ -476,16 +462,6 @@ export default function SellerSettlementPage() {
                                     전체
                                 </button>
                                 <button
-                                    onClick={() => handleFilterTypeChange('date')}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                        filterType === 'date' 
-                                            ? 'bg-[#d1d5db] text-[#374151] shadow-sm'
-                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
-                                    }`}
-                                >
-                                    주문별
-                                </button>
-                                <button
                                     onClick={() => handleFilterTypeChange('period')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                                         filterType === 'period' 
@@ -496,25 +472,6 @@ export default function SellerSettlementPage() {
                                     기간별
                                 </button>
                             </div>
-
-                            {/* 날짜별 필터 */}
-                            {filterType === 'date' && (
-                                <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-[#6b7280]" />
-                            <input
-                                type="date"
-                                value={filterDate}
-                                onChange={(e) => handleDateChange(e.target.value)}
-                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white text-[#374151] transition-all"
-                                    />
-                                    <button
-                                        onClick={() => handleDateChange(getTodayDate())}
-                                        className="bg-green-100 text-green-800 px-3 py-2 rounded-md hover:bg-green-200 text-sm font-medium transition-colors"
-                                    >
-                                        오늘
-                                    </button>
-                                </div>
-                            )}
 
                             {/* 기간별 필터 */}
                             {filterType === 'period' && (
@@ -547,13 +504,6 @@ export default function SellerSettlementPage() {
                             <RefreshCw className="w-4 h-4" />
                                     새로고침
                         </button>
-                        <button
-                                    onClick={resetFilter}
-                                    className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                        >
-                            <Calendar className="w-4 h-4" />
-                                    오늘로 초기화
-                        </button>
                             </div>
                         </div>
                     </div>
@@ -567,13 +517,8 @@ export default function SellerSettlementPage() {
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
                             <CreditCard className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
                             <p className="text-[#6b7280] text-lg">
-                                {filterType === 'date' ? `${filterDate} 날짜에 판매된 주문의 정산 내역이 없습니다.` : '판매된 주문의 정산 내역이 없습니다.'}
+                                {filterType === 'period' ? '해당 기간에 판매된 주문의 정산 내역이 없습니다.' : '판매된 주문의 정산 내역이 없습니다.'}
                             </p>
-                            {filterType === 'date' && (
-                                <p className="text-[#6b7280] text-sm mt-2">
-                                    다른 날짜를 선택하거나 "전체" 필터를 사용해 보세요.
-                                </p>
-                            )}
                         </div>
                     ) : (
                         <>
@@ -582,12 +527,9 @@ export default function SellerSettlementPage() {
                                 <div className="flex items-start gap-3">
                                     <div className="w-5 h-5 bg-blue-500 rounded-full text-white text-xs flex items-center justify-center mt-0.5">i</div>
                                     <div>
-                                        <h4 className="font-semibold text-blue-800 mb-1">주문별 정산 데이터 안내</h4>
+                                        <h4 className="font-semibold text-blue-800 mb-1">정산 데이터 안내</h4>
                                         <p className="text-blue-700 text-sm">
-                                            {filterType === 'date' 
-                                                ? `${filterDate} 날짜별 정산 내역입니다. 각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.`
-                                                : '각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.'
-                                            } 
+                                            각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다. 
                                             배송 완료된 주문만 즉시 정산 처리됩니다.
                                         </p>
                                     </div>
@@ -612,7 +554,7 @@ export default function SellerSettlementPage() {
                                                 <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
                                                             <div className="font-semibold">
-                                                                {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                                                {item.date}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">

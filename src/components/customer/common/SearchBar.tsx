@@ -27,7 +27,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     return (
         <form
             onSubmit={handleSearch}
-            className="flex items-center w-full max-w-[900px] border border-gray-300 rounded-full px-4 py-1.5 bg-white shadow-sm"
+            className="flex items-center w-full max-w-[900px] mx-auto border border-gray-300 rounded-none px-4 py-1.5 bg-white shadow-sm"
         >
             {/* 🔍 검색 버튼 (왼쪽) */}
             <button

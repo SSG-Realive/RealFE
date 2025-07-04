@@ -5,6 +5,7 @@ import { getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } fro
 import { getAdminReviewReport, processAdminReviewReport } from "@/service/admin/reviewService";
 import { AdminReviewReport, ReviewReportStatus } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReportedReviewDetailPage() {
   const params = useParams();
@@ -17,7 +18,7 @@ export default function ReportedReviewDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const reportId = Number(id);
-
+  const {show} = useGlobalDialog();
   const fetchReportDetail = async () => {
     if (!accessToken || isNaN(reportId)) return;
     try {
@@ -50,7 +51,7 @@ export default function ReportedReviewDetailPage() {
         router.replace('/admin/login');
         return;
       }
-      alert(err.message || "신고 처리에 실패했습니다.");
+      show(err.message || "신고 처리에 실패했습니다.");
     }
   };
 

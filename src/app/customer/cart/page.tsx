@@ -24,6 +24,7 @@ export default function CartPage() {
     const router = useRouter();
     const { open, message, handleClose, show } = useDialog();
     const { confirm, dialog } = useConfirm();
+    
 
     const { hydrated, isAuthenticated } = useAuthStore();
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
@@ -31,7 +32,7 @@ export default function CartPage() {
     useEffect(() => {
         if (!hydrated) return;
         if (!isAuthenticated()) {
-            alert('로그인이 필요합니다.');
+            show('로그인이 필요합니다.');
             router.push('/login');
             return;
         }

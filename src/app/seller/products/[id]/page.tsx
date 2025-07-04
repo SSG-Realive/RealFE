@@ -9,6 +9,7 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
 import { ArrowLeft, Edit, Trash2, Package, DollarSign, Layers, Tag, Ruler, Eye, AlertCircle } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ProductDetailPage() {
     const checking = useSellerAuthGuard();
@@ -20,7 +21,7 @@ export default function ProductDetailPage() {
     const [product, setProduct] = useState<ProductDetail | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const {show} = useGlobalDialog();
     useEffect(() => {
         if (checking) return;
 
@@ -53,11 +54,11 @@ export default function ProductDetailPage() {
 
         try {
             await deleteProduct(productId);
-            alert('삭제 완료');
+            await show('삭제 완료');
             router.push('/seller/products');
         } catch (err) {
             console.error(err);
-            alert('삭제 실패');
+            show('삭제 실패');
         }
     };
 

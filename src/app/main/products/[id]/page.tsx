@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   useParams,
   useRouter,
-  usePathname,
 } from 'next/navigation';
 
 import {
@@ -33,7 +32,6 @@ import { useGlobalDialog } from '@/app/context/dialogContext';
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const pathname = usePathname();
   const { show } = useGlobalDialog();
 
   const withAuth = async (action: () => Promise<void>) => {
@@ -136,8 +134,6 @@ export default function ProductDetailPage() {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!product) return <p>로딩 중…</p>;
 
-  const totalPrice = (product.price * quantity).toLocaleString();
-
   return (
       <div>
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -147,40 +143,39 @@ export default function ProductDetailPage() {
               className="w-full h-96 object-contain rounded-lg shadow-md"
           />
 
-          {/* 상품 정보 섹션: relative로 설정하여 TrafficLightStatusCardforProductDetail의 absolute 기준점 제공 */}
-          <div className="relative">
-            <h1 className="text-2xl font-light mb-2">{product.name}</h1>
-            {/* 상품 설명에 오른쪽 마진을 추가하여 카드가 겹치지 않도록 함 */}
-            {/* 카드가 가격 라인에 맞춰지면, 상품 설명이 카드를 침범하지 않도록 mr 값을 더 줄여도 됩니다. */}
-            <p className="text-sm text-gray-700 mb-4 mr-[180px]">{product.description}</p>
+          <div>
+            <h1 className="text-xl font-light mb-2">{product.name}</h1>
+            <p className="text-sm text-gray-700 mb-4">{product.description}</p>
             <p className="text-xl font-light mb-6">
               {product.price.toLocaleString()}
               <span className="text-sm ml-1">원</span>
             </p>
+
             <div className="mb-6 space-y-2 text-sm text-gray-700">
-              <p className="whitespace-nowrap"><span className="font-normal">상품상태:</span> {product.status}</p>
-              <p className="whitespace-nowrap"><span className="font-normal">재고:</span> {product.stock}개</p>
+
+              <p><span className="font-light">상품상태:</span> {product.status}</p>
+              <p><span className="font-light">재고:</span> {product.stock}개</p>
               {product.width && product.depth && product.height && (
-                  <p className="whitespace-nowrap"><span className="font-normal">사이즈:</span> {product.width}×{product.depth}×{product.height} cm</p>
+                  <p><span className="font-light">사이즈:</span> {product.width}×{product.depth}×{product.height} cm</p>
               )}
               {product.categoryName && (
-                  <p className="whitespace-nowrap"><span className="font-normal">카테고리:</span> {product.categoryName}</p>
+                  <p><span className="font-light">카테고리:</span> {product.categoryName}</p>
               )}
               {product.sellerName && (
                 <p className="cursor-pointer hover:underline text-blue-600"
                   onClick={() => router.push(`/main/seller/${product.id}`)}>
                   <span className="font-light text-gray-700">판매자:</span> {product.sellerName}
-
-                  <div className="mb-6"> {/* 여백을 위한 div 추가 */}
-                    <TrafficLightStatusCardforProductDetail
-                        title="상품 평점"
-                        rating={averageRating}
-                        count={reviewCount}
-                        className="mx-auto" // 중앙 정렬을 위해 mx-auto 추가 (필요 시)
-                    />
-                  </div>
                 </p>
               )}
+
+              <div className="mb-6">
+                <TrafficLightStatusCardforProductDetail
+                    rating={averageRating}
+                    count={reviewCount}
+                    className="" // mx-auto 제거
+                />
+              </div>
+
             </div>
 
             <div className="border-t border-b py-6 mb-8">
@@ -228,7 +223,7 @@ export default function ProductDetailPage() {
                 <button
                     onClick={handleBuyNow}
                     className="flex-1 px-5 py-3 bg-black text-white hover:bg-gray-900 text-sm font-light"
-                >바로 구매</button>
+                >구매</button>
               </div>
             </div>
           </div>
@@ -245,27 +240,30 @@ export default function ProductDetailPage() {
         </div>
 
         {/* --- 상품 QnA 섹션 시작 --- */}
-        <div className="max-w-6xl mx-auto px-4 mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-light text-gray-600">상품 QnA</h2>
-            <button
-                onClick={handleWriteQna}
-                className="px-5 py-2 bg-black text-white rounded-md text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
-            >
-              QnA 작성
-            </button>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 mt-12">
+          <h2 className="text-lg font-light text-gray-600 mb-4">QnA</h2>
+
           {qnas.length > 0 ? (
               <QnaList qnas={qnas} initialDisplayCount={3} />
           ) : (
-              <p className="text-sm text-gray-600 p-4 border rounded-md shadow-sm bg-white">등록된 QnA가 없습니다.</p>
+              <p className="text-sm text-gray-600 p-4 shadow-sm bg-white">등록된 QnA가 없습니다.</p>
           )}
+
+          {/* 버튼을 아래로 옮기고 오른쪽 정렬 */}
+          <div className="flex justify-end mt-4">
+            <button
+                onClick={handleWriteQna}
+                className="px-5 py-2 bg-black text-white rounded-none text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
+            >
+              등록
+            </button>
+          </div>
         </div>
         {/* --- 상품 QnA 섹션 끝 --- */}
 
         {related.length > 0 && (
-            <div className="max-w-6xl mx-auto px-4 mt-8">
-              <h2 className="text-lg font-light text-gray-600 mb-4">추천상품</h2>
+            <div className="max-w-6xl mx-auto px-4 mt-20">
+              <h2 className="text-lg font-light text-gray-600 mb-4">추천 상품</h2>
 
               {/* 슬라이더 형식으로 수정 */}
               <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">

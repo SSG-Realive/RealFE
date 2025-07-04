@@ -217,7 +217,7 @@ export default function WishlistPage() {
                         <button
                             onClick={handleDeleteSelected}
                             disabled={selectedIds.size === 0}
-                            className="w-full py-3 bg-red-500 text-white font-light rounded-md disabled:bg-gray-300"
+                            className="w-full py-3 bg-black text-white font-light rounded-md disabled:bg-gray-300"
                         >
                             선택 삭제 ({selectedIds.size})
                         </button>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// ❌ 아이콘 import 제거
 import { useRouter } from 'next/navigation';
 import { publicAuctionService } from '@/service/customer/publicAuctionService';
 import ProductImage from '@/components/ProductImage';
@@ -25,9 +24,9 @@ export default function AuctionPage() {
         if (activeTab === 'live') {
           result = await publicAuctionService.fetchPublicActiveAuctions();
         } else if (activeTab === 'popular') {
-          result = await publicAuctionService.fetchPopularAuctions(); // 가정
+          result = await publicAuctionService.fetchPopularAuctions();
         } else {
-          result = await publicAuctionService.fetchEndingSoonAuctions(); // 가정
+          result = await publicAuctionService.fetchEndingSoonAuctions();
         }
         setAuctions(result.content);
       } catch (e) {
@@ -38,55 +37,74 @@ export default function AuctionPage() {
   }, [activeTab]);
 
   return (
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* 탭 */}
-        <div className="flex gap-4 border-b border-gray-200 mb-6">
-          {TAB_LIST.map((tab) => (
-              <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
-                  className={`pb-2 px-2 text-sm font-medium ${
-                      activeTab === tab.key
-                          ? 'border-b-2 border-black text-black'
-                          : 'text-gray-400 hover:text-black'
-                  }`}
-              >
-                {tab.label}
-              </button>
-          ))}
+      <>
+        <div className="max-w-6xl mx-auto px-4 py-6 pb-20"> {/* pb-20로 아래 버튼 공간 확보 */}
+          {/* 탭 */}
+          <div className="flex gap-4 border-b border-gray-200 mb-6">
+            {TAB_LIST.map((tab) => (
+                <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key as any)}
+                    className={`pb-2 px-2 text-sm font-medium ${
+                        activeTab === tab.key
+                            ? 'border-b-2 border-black text-black'
+                            : 'text-gray-400 hover:text-black'
+                    }`}
+                >
+                  {tab.label}
+                </button>
+            ))}
+          </div>
+
+          {/* 카드 목록 */}
+          <div className="mt-16 grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+            {auctions.map((a) => (
+                <div
+                    key={a.id}
+                    onClick={() => router.push(`/auctions/${a.id}`)}
+                    className="bg-white rounded-lg shadow hover:shadow-md cursor-pointer transition overflow-hidden"
+                >
+                  <div className="relative aspect-square bg-gray-100">
+                    <ProductImage
+                        src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
+                        alt={a.adminProduct?.productName ?? '경매 상품'}
+                        className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-3 text-sm">
+                    <p className="truncate text-gray-800">{a.adminProduct?.productName}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      시작가 {a.startPrice.toLocaleString()}원
+                    </p>
+                    <p className="text-sm text-black-500">
+                      현재가 {a.currentPrice.toLocaleString()}원
+                    </p>
+                    <p className="text-[11px] text-gray-400 mt-1">
+                      종료일 {new Date(a.endTime).toLocaleDateString()} {new Date(a.endTime).toLocaleTimeString()}
+                    </p>
+                  </div>
+                </div>
+            ))}
+          </div>
         </div>
 
-        {/* 카드 목록 */}
-        <div className="mt-16 grid gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
-          {auctions.map((a) => (
-              <div
-                  key={a.id}
-                  onClick={() => router.push(`/auctions/${a.id}`)}
-                  className="bg-white rounded-lg shadow hover:shadow-md cursor-pointer transition overflow-hidden"
-              >
-                <div className="relative aspect-square bg-gray-100">
-                  <ProductImage
-                      src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
-                      alt={a.adminProduct?.productName ?? '경매 상품'}
-                      className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-3 text-sm">
-                  <p className="truncate text-gray-800">{a.adminProduct?.productName}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    시작가 {a.startPrice.toLocaleString()}원
-                  </p>
-                  <p className="text-sm text-black-500">
-                    현재가 {a.currentPrice.toLocaleString()}원
-                  </p>
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    종료일 {new Date(a.endTime).toLocaleDateString()} {new Date(a.endTime).toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
-          ))}
+        {/* 하단 고정 입찰 현황 + 낙찰 경매 버튼 */}
+        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex gap-3">
+            <button
+                onClick={() => router.push('/customer/mypage/bids')}
+                className="w-1/2 bg-black text-white py-3 rounded-md text-center hover:bg-neutral-800 transition"
+            >
+              입찰 현황
+            </button>
+            <button
+                onClick={() => router.push('/customer/member/auctions/won')}
+                className="w-1/2 bg-black text-white py-3 rounded-md text-center hover:bg-neutral-800 transition"
+            >
+              낙찰 경매
+            </button>
+          </div>
         </div>
-
-      </div>
+      </>
   );
 }

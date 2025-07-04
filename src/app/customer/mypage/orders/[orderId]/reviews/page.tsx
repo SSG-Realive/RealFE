@@ -97,13 +97,13 @@ function ReviewPage() {
       const formData = new FormData();
       formData.append('file', file);
       try {
-        const res = await axios.post('http://localhost:8080/api/customer/reviews/images', formData, {
+        const res = await axios.post('http://localhost:8080/api/customer/reviews/images/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
           },
         });
-        urls.push(res.data.url); // 응답 구조에 따라 조정
+        urls.push(res.data); // 문자열 그대로 받기
       } catch (err) {
         console.error('이미지 업로드 실패:', err);
       }
@@ -111,6 +111,7 @@ function ReviewPage() {
 
     return urls;
   };
+
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -206,6 +207,36 @@ const handleSubmit = async (e: React.FormEvent) => {
             onChange={handleImageChange}
             className="block w-full border rounded-md text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
         />
+
+        {/* 이미지 미리보기 및 삭제 버튼 */}
+        {images.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-3">
+            {images.map((file) => {
+              const objectUrl = URL.createObjectURL(file);
+              return (
+                <div
+                  key={objectUrl}
+                  className="relative w-24 h-24 border rounded overflow-hidden shadow-sm"
+                >
+                  <img
+                    src={objectUrl}
+                    alt="리뷰 이미지 미리보기"
+                    className="object-cover w-full h-full"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(file)}
+                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-800"
+                    title="이미지 삭제"
+                  >
+                    ×
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         </div>
 
         {/* 제출 버튼 */}

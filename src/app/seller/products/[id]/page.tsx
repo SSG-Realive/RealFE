@@ -1,317 +1,242 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getProductDetail, deleteProduct } from '@/service/seller/productService';
 import { ProductDetail } from '@/types/seller/product/product';
-import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
+import { Edit, Trash2, Package, DollarSign, Eye, Armchair } from 'lucide-react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
-import { ArrowLeft, Edit, Trash2, Package, DollarSign, Layers, Tag, Ruler, Eye, AlertCircle, Star, TrendingUp, CheckCircle } from 'lucide-react';
 
-export default function ProductDetailPage() {
-    const checking = useSellerAuthGuard();
+export default function SellerProductDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const checking = useSellerAuthGuard();
+  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
-    const params = useParams();
-    const router = useRouter();
-    const productId = Number(params?.id);
+  const productId = params.id as string;
 
-    const [product, setProduct] = useState<ProductDetail | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        if (checking) return;
-
-        const token = useSellerAuthStore.getState().accessToken;
-        if (!token) {
-            router.push('/seller/login');
-            return;
-        }
-
-        if (!productId) return;
-
-        const fetchProduct = async () => {
-            try {
-                const data = await getProductDetail(productId);
-                setProduct(data);
-                setError(null);
-            } catch (err) {
-                console.error(err);
-                setError('상품 정보를 불러오지 못했습니다.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProduct();
-    }, [productId, checking]);
-
-    const handleDelete = async () => {
-        if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
-
-        try {
-            await deleteProduct(productId);
-            alert('삭제 완료');
-            router.push('/seller/products');
-        } catch (err) {
-            console.error(err);
-            alert('삭제 실패');
-        }
+  useEffect(() => {
+    if (checking) return;
+    
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const productData = await getProductDetail(Number(productId));
+        setProduct(productData);
+      } catch (error) {
+        console.error('상품 조회 실패:', error);
+        alert('상품을 불러오는데 실패했습니다.');
+        router.push('/seller/products');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleEdit = () => {
-        router.push(`/seller/products/${productId}/edit`);
-    };
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId, checking, router]);
 
-    if (checking) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-700 font-medium">인증 확인 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (loading) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-700 font-medium">상품 정보를 불러오는 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (error) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-            <div className="text-center bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20">
-                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <p className="text-red-600 font-medium">{error}</p>
-            </div>
-        </div>
-    );
-    
-    if (!product) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
-            <div className="text-center bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border border-white/20">
-                <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 font-medium">상품 정보를 불러올 수 없습니다.</p>
-            </div>
-        </div>
-    );
+  const handleEdit = () => {
+    router.push(`/seller/products/${productId}/edit`);
+  };
 
+  const handleDelete = async () => {
+    if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+      try {
+        setDeleting(true);
+        await deleteProduct(Number(productId));
+        alert('상품이 성공적으로 삭제되었습니다.');
+        router.push('/seller/products');
+      } catch (error) {
+        console.error('상품 삭제 실패:', error);
+        alert('상품 삭제에 실패했습니다.');
+      } finally {
+        setDeleting(false);
+      }
+    }
+  };
+
+  if (checking || loading) {
     return (
-        <>
-            <div className="hidden">
-                <SellerHeader />
-            </div>
-            <SellerLayout>
-                <div className="flex-1 w-full h-full px-4 py-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
-                    {/* 헤더와 액션 버튼 */}
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => router.push('/seller/products')}
-                                className="group flex items-center gap-2 text-slate-600 hover:text-indigo-600 transition-all duration-200 font-semibold bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-sm border border-white/50 hover:shadow-md hover:bg-white/90"
-                            >
-                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-200" />
-                                상품 목록으로
-                            </button>
-                            <div className="h-6 w-px bg-gradient-to-b from-transparent via-slate-300 to-transparent"></div>
-                            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-slate-700 to-indigo-700 bg-clip-text text-transparent">상품 상세</h1>
-                        </div>
-                        
-                        {/* 액션 버튼들을 헤더 오른쪽으로 이동 */}
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <button
-                                onClick={handleEdit}
-                                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:scale-[1.02] transform"
-                            >
-                                <Edit className="w-5 h-5 group-hover:rotate-12 transition-transform duration-200" />
-                                상품 수정
-                            </button>
-                            <button
-                                onClick={handleDelete}
-                                className="group flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:scale-[1.02] transform"
-                            >
-                                <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
-                                상품 삭제
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* 상품 기본 정보 카드 */}
-                    <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/50 p-8 mb-8 hover:shadow-2xl transition-all duration-300">
-                        <div className="flex flex-col lg:flex-row gap-8">
-                            {/* 상품 이미지 */}
-                            <div className="lg:w-1/3">
-                                <div className="aspect-square bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl overflow-hidden border border-white/50 shadow-inner group">
-                                    {product.imageThumbnailUrl ? (
-                                        <img
-                                            src={product.imageThumbnailUrl}
-                                            alt={product.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <Package className="w-20 h-20 text-slate-400" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* 상품 기본 정보 */}
-                            <div className="lg:w-2/3 space-y-6">
-                                <div className="space-y-2">
-                                    <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-indigo-700 bg-clip-text text-transparent leading-tight">{product.name}</h2>
-                                    <div className="flex items-center gap-2">
-                                        <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                                        <span className="text-slate-600 font-medium">프리미엄 상품</span>
-                                    </div>
-                                </div>
-                                
-                                {/* 상품 목록과 동일한 색상으로 변경 */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* 총 상품 수 색상 (slate) - 가격에 적용 */}
-                                    <div className="group bg-gradient-to-r from-slate-50 to-white p-4 rounded-2xl border border-white/50 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-[1.02]">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-gradient-to-r from-slate-500 to-gray-600 rounded-xl text-white">
-                                                <DollarSign className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-slate-700 font-medium">판매 가격</p>
-                                                <p className="text-xl font-bold text-slate-800">{product.price.toLocaleString()}원</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* 판매중 색상 (emerald) - 재고에 적용 */}
-                                    <div className="group bg-gradient-to-r from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-200/50 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-[1.02]">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl text-white">
-                                                <Layers className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-emerald-700 font-medium">재고 수량</p>
-                                                <p className="text-xl font-bold text-emerald-800">{product.stock}개</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* 품절 색상 (red) - 품질에 적용 */}
-                                    <div className="group bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-2xl border border-red-200/50 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-[1.02]">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl text-white">
-                                                <Tag className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-red-700 font-medium">상품 품질</p>
-                                                <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${
-                                                    product.status === '상' ? 'bg-green-100 text-green-700 border border-green-300' : 
-                                                    product.status === '중' ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' : 
-                                                    'bg-red-100 text-red-700 border border-red-300'
-                                                }`}>
-                                                    {product.status}등급
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* 판매중지 색상 (amber) - 상태에 적용 */}
-                                    <div className="group bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-200/50 shadow-xl hover:shadow-2xl transition-all duration-200 hover:scale-[1.02]">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl text-white">
-                                                <Eye className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-amber-700 font-medium">판매 상태</p>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold border ${
-                                                        product.isActive 
-                                                            ? 'bg-green-100 text-green-700 border-green-300' 
-                                                            : 'bg-red-100 text-red-700 border-red-300'
-                                                    }`}>
-                                                        {product.isActive ? (
-                                                            <>
-                                                                <CheckCircle className="w-3 h-3" />
-                                                                판매중
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <AlertCircle className="w-3 h-3" />
-                                                                중단됨
-                                                            </>
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 상품 상세 정보 */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* 상품 정보 */}
-                        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                            <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-indigo-700 bg-clip-text text-transparent mb-6 flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl text-white">
-                                    <Package className="w-6 h-6" />
-                                </div>
-                                상품 정보
-                            </h3>
-                            <div className="space-y-6">
-                                <div className="p-4 bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl border border-slate-200">
-                                    <p className="text-sm font-semibold text-slate-600 mb-2">상품 설명</p>
-                                    <p className="text-slate-800 leading-relaxed break-words">{product.description}</p>
-                                </div>
-                                <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-200">
-                                    <p className="text-sm font-semibold text-blue-700 mb-2">카테고리</p>
-                                    <p className="text-blue-800 font-medium">{product.categoryName}</p>
-                                </div>
-                                {product.width && product.depth && product.height && (
-                                    <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl border border-purple-200">
-                                        <p className="text-sm font-semibold text-purple-700 mb-2 flex items-center gap-2">
-                                            <Ruler className="w-4 h-4" />
-                                            제품 크기 (가로 × 세로 × 높이)
-                                        </p>
-                                        <p className="text-purple-800 font-mono text-lg">{product.width} × {product.depth} × {product.height}</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* 판매자 정보 */}
-                        <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/50 p-8 hover:shadow-2xl transition-all duration-300">
-                            <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 to-indigo-700 bg-clip-text text-transparent mb-6 flex items-center gap-3">
-                                <div className="p-2 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl text-white">
-                                    <TrendingUp className="w-6 h-6" />
-                                </div>
-                                판매자 정보
-                            </h3>
-                            <div className="space-y-6">
-                                <div className="p-4 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200">
-                                    <p className="text-sm font-semibold text-emerald-700 mb-2">판매자명</p>
-                                    <p className="text-emerald-800 font-bold text-lg">{product.sellerName}</p>
-                                </div>
-                                <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200">
-                                    <p className="text-sm font-semibold text-amber-700 mb-2">판매자 ID</p>
-                                    <p className="text-amber-800 font-mono">{product.sellerId}</p>
-                                </div>
-                                <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-2xl border border-indigo-200">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                                        <span className="text-indigo-700 font-medium">신뢰할 수 있는 판매자</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </SellerLayout>
-        </>
+      <SellerLayout>
+        <div className="min-h-screen bg-white p-6">
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
+            <span className="ml-3 text-[#374151] text-lg">상품 정보를 불러오는 중...</span>
+          </div>
+        </div>
+      </SellerLayout>
     );
+  }
+
+  if (!product) {
+    return (
+      <SellerLayout>
+        <div className="min-h-screen bg-white p-6">
+          <div className="text-center py-16">
+            <h2 className="text-xl font-bold text-[#374151] mb-4">상품을 찾을 수 없습니다</h2>
+            <button
+              onClick={() => router.push('/seller/products')}
+              className="bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+            >
+              상품 목록으로 돌아가기
+            </button>
+          </div>
+        </div>
+      </SellerLayout>
+    );
+  }
+
+  return (
+    <SellerLayout>
+      <div className="min-h-screen bg-white p-6">
+        {/* 헤더 */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 상세 정보</h1>
+            <p className="text-sm text-[#6b7280]">상품의 세부 정보를 확인하고 관리할 수 있습니다.</p>
+          </div>
+          <div className="flex gap-3 mt-4 md:mt-0">
+            <button
+              onClick={handleEdit}
+              className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+            >
+              <Edit className="w-4 h-4" />
+              수정
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-4 py-2 rounded-lg hover:bg-[#374151] transition-colors font-medium shadow-sm disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              {deleting ? '삭제 중...' : '삭제'}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 상품 이미지 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4 flex items-center gap-2">
+              <Eye className="w-5 h-5 text-[#6b7280]" />
+              상품 이미지
+            </h3>
+            <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden">
+              {product.imageThumbnailUrl ? (
+                <img
+                  src={product.imageThumbnailUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
+                  <Armchair className="w-16 h-16 text-[#6b7280]" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 상품 기본 정보 */}
+          <div className="space-y-6">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+              <h3 className="text-lg font-bold text-[#374151] mb-4">기본 정보</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">상품명</label>
+                  <p className="text-[#374151] font-semibold">{product.name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">카테고리</label>
+                  <p className="text-[#374151]">{product.categoryName}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">설명</label>
+                  <p className="text-[#374151] text-sm leading-relaxed">{product.description}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 정보 카드들 - 기존 판매자 스타일 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <DollarSign className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">가격</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.price.toLocaleString()}원</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Package className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">재고</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.stock}개</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Armchair className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">품질</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.status}</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Eye className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">상태</p>
+                  <p className="text-lg font-bold text-[#374151]">
+                    {product.isActive ? '판매중' : '판매중지'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 상세 정보 섹션 */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 크기 정보 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4">크기 정보</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">너비</label>
+                <p className="text-[#374151] font-semibold">{product.width || 0}cm</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">높이</label>
+                <p className="text-[#374151] font-semibold">{product.height || 0}cm</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">깊이</label>
+                <p className="text-[#374151] font-semibold">{product.depth || 0}cm</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 판매자 정보 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4">판매자 정보</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">판매자명</label>
+                <p className="text-[#374151] font-semibold">{product.sellerName}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">판매자 ID</label>
+                <p className="text-[#374151] font-mono">{product.sellerId}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SellerLayout>
+  );
 }

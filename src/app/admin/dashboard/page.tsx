@@ -8,6 +8,7 @@ import Modal from '@/components/Modal';
 import { useAdminAuthStore } from '@/store/admin/useAdminAuthStore';
 import { Users, UserCheck, UserX, UserPlus, Package, TrendingUp, DollarSign, ShoppingCart, Award, BarChart3 } from 'lucide-react';
 import apiClient from '@/lib/apiClient';
+import { Button } from "@/components/ui/button";
 
 const DashboardChart = dynamic(() => import('@/components/DashboardChart'), { ssr: false });
 
@@ -184,6 +185,10 @@ const AdminDashboardPage = () => {
         throw new Error('데이터를 불러오는데 실패했습니다.');
       } 
 
+      console.log('Dashboard data received:', data);
+      console.log('Period type:', periodType);
+      console.log('Sales summary:', data.salesSummaryStats);
+      
       setDashboardData(data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -307,12 +312,13 @@ const AdminDashboardPage = () => {
             <p className="text-lg font-semibold">오류가 발생했습니다</p>
             <p className="text-sm mt-2">{error}</p>
           </div>
-          <button
+          <Button
             onClick={fetchDashboardData}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full"
+            variant="default"
           >
             다시 시도
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -366,33 +372,29 @@ const AdminDashboardPage = () => {
                 </div>
               </div>
               <div className="flex gap-2 bg-white p-1 rounded-lg shadow-sm border w-full sm:w-auto">
-                <button
+                <Button
                   onClick={() => setPeriodType('DAILY')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors w-full sm:w-auto ${
-                    periodType === 'DAILY'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  variant={periodType === 'DAILY' ? "default" : "outline"}
+                  size="sm"
+                  className="w-full sm:w-auto"
                 >
                   일간
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setPeriodType('MONTHLY')}
-                  className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors w-full sm:w-auto ${
-                    periodType === 'MONTHLY'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  variant={periodType === 'MONTHLY' ? "default" : "outline"}
+                  size="sm"
+                  className="w-full sm:w-auto"
                 >
                   월간
-                </button>
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 메인 통계 카드 그리드 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 w-full">
+        {/* 주요 통계 카드 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="총 주문"
             value={dashboardData.salesSummaryStats?.totalOrdersInPeriod || 0}
@@ -401,7 +403,7 @@ const AdminDashboardPage = () => {
             color="bg-blue-500"
           />
           <StatCard
-            title="총 매출"
+            title={periodType === 'DAILY' ? '일일 매출' : '월간 매출'}
             value={dashboardData.salesSummaryStats?.totalRevenueInPeriod?.toLocaleString() || "0"}
             unit="원"
             icon={<DollarSign className="w-6 h-6 text-white" />}
@@ -551,7 +553,7 @@ const AdminDashboardPage = () => {
                 </div>
               ) : (
                 <DashboardChart
-                  data={periodType === 'MONTHLY' ? monthlySalesData : dashboardData}
+                  data={dashboardData}
                   type="sales"
                   periodType={periodType}
                 />

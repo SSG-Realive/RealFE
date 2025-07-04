@@ -31,7 +31,7 @@ export interface ProductListDTO {
     name: string;
     price: number;
     status: string;
-    isActive: boolean;
+    active: boolean;
     imageThumbnailUrl: string;
     parentCategoryName: string | null;
     categoryName: string;

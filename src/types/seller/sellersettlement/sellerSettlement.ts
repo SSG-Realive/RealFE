@@ -52,3 +52,26 @@ export interface CommissionLogDetail {
     commissionAmount: number;
     recordedAt: string;
 }
+
+// 판매일별 정산 데이터 타입
+export interface DailySettlementItem {
+    id: string; // 고유 ID (originalPayoutId_date_index 형식)
+    originalPayoutId: number; // 원본 정산 ID
+    sellerId: number;
+    date: string; // 판매일 (YYYY-MM-DD 형식)
+    periodStart: string; // 정산 기간 시작일 (판매일과 동일)
+    periodEnd: string; // 정산 기간 종료일 (판매일과 동일)
+    totalSales: number; // 해당 판매건의 매출
+    totalCommission: number; // 해당 판매건의 수수료
+    payoutAmount: number; // 해당 판매건의 지급액
+    processedAt: string; // 정산 처리일시
+    salesCount: number; // 개별 건이므로 항상 1
+    salesDetails: SalesWithCommissionDetail[]; // 해당 판매건의 상세 내역
+    // 개별 주문 정보
+    productId?: number; // 상품 ID
+    customerId?: number; // 고객 ID
+    quantity?: number; // 수량
+    unitPrice?: number; // 단가
+    orderItemId?: number; // 주문 항목 ID
+    soldAt?: string; // 판매 일시
+}

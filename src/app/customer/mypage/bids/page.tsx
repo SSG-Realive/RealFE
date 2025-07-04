@@ -62,7 +62,7 @@ function BidCard({
           {current.toLocaleString()}원
         </p>
         <span
-          className={`px-2 py-0.5 text-xs font-semibold rounded-full
+          className={`px-2 py-0.5 text-xs font-light rounded-full
             ${leading ? 'bg-blue-100 text-blue-700'
                        : 'bg-red-100 text-red-700'}`}
         >
@@ -157,7 +157,7 @@ export default function MyBidCardsPage() {
         {/* 하단 마퀴 슬라이더 */}
         {publicAuctions.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-lg font-semibold mb-3">
+            <h2 className="text-lg font-light mb-3">
               함께 진행 중인 다른 경매
             </h2>
             <AuctionCard auctions={publicAuctions} />

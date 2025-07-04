@@ -1,4 +1,4 @@
-// src/app/customer/orders/cart-payment/page.tsx
+// src/app/customer/mypage/orders/cart-payment/page.tsx
 import { PayRequestDTO } from '@/types/orders/payRequestDTO';
 import { ProductQuantityDTO } from '@/types/orders/productQuantityDTO';
 import { cookies } from 'next/headers';
@@ -88,7 +88,7 @@ async function CartPaymentPage() {
             console.log("장바구니 주문이 성공적으로 생성되었습니다. 주문 ID:", orderId);
 
             // 결제 성공 후 주문 완료 페이지로 리다이렉트
-            redirect(`/customer/orders/${orderId}`);
+            redirect(`/customer/mypage/orders/${orderId}`);
 
         } catch (error: any) {
             console.error('결제 처리 중 예상치 못한 오류 발생:', error);

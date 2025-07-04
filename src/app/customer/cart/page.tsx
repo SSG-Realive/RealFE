@@ -29,13 +29,8 @@ export default function CartPage() {
     const setItemsForCheckout = useCartStore((state) => state.setItemsForCheckout);
 
     useEffect(() => {
-        // hydrated가 true이고 인증된 상태일 때만 API 호출
-        if (!hydrated) {
-            return; // 아직 인증 정보가 로딩 중
-        }
-        
+        if (!hydrated) return;
         if (!isAuthenticated()) {
-            // 인증되지 않은 경우 로그인 페이지로 리다이렉트
             alert('로그인이 필요합니다.');
             router.push('/login');
             return;
@@ -136,7 +131,7 @@ export default function CartPage() {
         const itemsToCheckout = cartItems.filter((item) => selectedItemIds.has(item.cartItemId));
         if (itemsToCheckout.length === 0) return show('결제할 상품을 선택해주세요.');
         setItemsForCheckout(itemsToCheckout);
-        router.push('/customer/orders/new');
+        router.push('/customer/mypage/orders/new');
     };
 
     if (!hydrated) {
@@ -149,89 +144,88 @@ export default function CartPage() {
         <>
             {dialog}
             <GlobalDialog open={open} message={message} onClose={handleClose} />
-            <main className="max-w-4xl mx-auto p-6 pb-40">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-light">장바구니</h1>
-                    {cartItems.length > 0 && (
-                        <div className="flex gap-2">
-                            <button
-                                onClick={handleClearCart}
-                                className="text-sm text-red-600 px-3 py-1 border border-red-600 rounded hover:bg-red-50"
-                            >
-                                장바구니 비우기
-                            </button>
-                            <button
-                                onClick={() => setIsEditMode((prev) => !prev)}
-                                className="text-sm text-gray-600 px-3 py-1 border rounded hover:bg-gray-100"
-                            >
-                                상품 편집
-                            </button>
-                        </div>
-                    )}
-                </div>
 
-                {cartItems.length === 0 ? (
-                    <p className="text-gray-500 text-center py-20">장바구니가 비어있습니다.</p>
-                ) : (
-                    <>
-                        <div className="mb-4 pb-4">
-                            <label className="flex items-center space-x-3 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    className="h-5 w-5 accent-black"
-                                    onChange={handleSelectAll}
-                                    checked={selectedItemIds.size > 0 && selectedItemIds.size === cartItems.length}
-                                />
-                                <span>전체선택 ({selectedItemIds.size}/{cartItems.length})</span>
-                            </label>
-                        </div>
+            <main className="relative max-w-4xl mx-auto p-6 pb-40">
+                {/* 선택/편집/삭제 상단 바 */}
+                {cartItems.length > 0 && (
+                    <div className="flex items-center justify-between mb-4 pt-10 pb-4">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="h-5 w-5 accent-black"
+                                onChange={handleSelectAll}
+                                checked={
+                                    selectedItemIds.size > 0 &&
+                                    selectedItemIds.size === cartItems.length
+                                }
+                            />
+                            <span className="text-sm text-gray-800">
+              전체선택 ({selectedItemIds.size}/{cartItems.length})
+            </span>
+                        </label>
 
-                        <ul className="space-y-6">
-                            {cartItems.map((item) => (
-                                <CartItemCard
-                                    key={item.cartItemId}
-                                    item={item}
-                                    onQuantityChange={handleQuantityChange}
-                                    onDelete={handleDelete}
-                                    isSelected={selectedItemIds.has(item.cartItemId)}
-                                    onToggleSelect={handleToggleSelect}
-                                />
-                            ))}
-                        </ul>
-                    </>
-                )}
-            </main>
-
-            {/* ✅ 하단 고정 영역: 흰 배경 + 총 금액 + 결제 버튼 */}
-            {cartItems.length > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t z-10">
-                    <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
-                        <div className="text-lg font-light">
-                            총 금액: {totalPrice.toLocaleString()}
-                            <span className="text-sm ml-1">원</span>
-                        </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2 max-w-full">
                             {isEditMode && (
                                 <button
                                     onClick={handleDeleteSelected}
                                     disabled={selectedItemIds.size === 0}
-                                    className="py-3 px-4 bg-red-500 text-white font-light rounded-md disabled:bg-gray-300"
-                                    title="선택 상품 삭제"
+                                    className="py-1 px-2 flex items-center bg-red-500 text-white text-xs rounded-md disabled:bg-gray-300"
+                                    title="선택 삭제"
                                 >
-                                    <FiTrash2 className="text-lg" />
+                                    <FiTrash2 className="text-sm" />
                                 </button>
                             )}
                             <button
-                                onClick={handleCheckout}
-                                disabled={selectedItemIds.size === 0}
-                                className="py-3 px-6 bg-black text-white rounded hover:bg-gray-800 disabled:bg-gray-300"
+                                onClick={handleClearCart}
+                                className="text-xs text-red-600 border border-red-300 px-2 py-1 hover:bg-red-50 rounded-md whitespace-nowrap"
                             >
-                                결제
+                                전체 삭제
+                            </button>
+                            <button
+                                onClick={() => setIsEditMode((prev) => !prev)}
+                                className="text-xs text-gray-600 border border-gray-300 px-2 py-1 hover:bg-gray-100 rounded-md whitespace-nowrap"
+                            >
+                                편집
                             </button>
                         </div>
+                    </div>
+                )}
+
+                {/* 장바구니 항목 */}
+                {cartItems.length === 0 ? (
+                    <p className="text-gray-500 text-center py-20">장바구니가 비어있습니다.</p>
+                ) : (
+                    <ul className="space-y-6">
+                        {cartItems.map((item) => (
+                            <CartItemCard
+                                key={item.cartItemId}
+                                item={item}
+                                onQuantityChange={handleQuantityChange}
+                                onDelete={handleDelete}
+                                isSelected={selectedItemIds.has(item.cartItemId)}
+                                onToggleSelect={handleToggleSelect}
+                            />
+                        ))}
+                    </ul>
+                )}
+            </main>
+
+            {/* 결제 버튼 하단 고정 */}
+            {cartItems.length > 0 && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white z-10">
+                    <div className="max-w-4xl mx-auto px-4 py-4">
+                        <button
+                            onClick={handleCheckout}
+                            disabled={selectedItemIds.size === 0}
+                            className="w-full py-3 px-8 bg-black text-white text-sm rounded hover:bg-gray-800 disabled:bg-gray-300"
+                        >
+                            {totalPrice.toLocaleString()}원 ({selectedItemIds.size}) 결제
+                        </button>
                     </div>
                 </div>
             )}
         </>
     );
 }
+
+

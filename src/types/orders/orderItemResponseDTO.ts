@@ -5,6 +5,7 @@ export interface OrderItemResponseDTO {
     quantity: number;   // Spring의 int는 TypeScript에서 number로 매핑됩니다.
     price: number;      // Spring의 int는 TypeScript에서 number로 매핑됩니다.
     imageUrl: string;
-
     sellerId: number; // review 작성용
+    sellerName: string; // review 작성용
+    reviewWritten: boolean; // review 작성 여부
 }

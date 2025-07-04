@@ -1,0 +1,399 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { X, Package, DollarSign, Calendar, Eye, Star, Gavel } from "lucide-react";
+import apiClient from '@/lib/apiClient';
+
+interface OwnedProduct {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  stock: number;
+  status: string;
+  categoryName: string;
+  createdAt: string;
+  thumbnailUrl?: string;
+  purchasePrice?: number;
+  purchasedAt?: string;
+  isAuctioned?: boolean;
+  width?: number;
+  depth?: number;
+  height?: number;
+}
+
+interface OwnedProductDetailModalProps {
+  product: OwnedProduct | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onAuctionCreated?: () => void;
+}
+
+export default function OwnedProductDetailModal({ 
+  product, 
+  isOpen, 
+  onClose, 
+  onAuctionCreated 
+}: OwnedProductDetailModalProps) {
+  const [startPrice, setStartPrice] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
+  const [isCreatingAuction, setIsCreatingAuction] = useState(false);
+  const [showAuctionForm, setShowAuctionForm] = useState(false);
+
+  // 모달이 열릴 때마다 초기화
+  useEffect(() => {
+    if (isOpen) {
+      setStartPrice("");
+      setStartTime("");
+      setEndTime("");
+      setShowAuctionForm(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !product) return null;
+
+  const handleCreateAuction = async () => {
+    if (!product.purchasePrice) {
+      alert("매입 가격 정보가 없습니다.");
+      return;
+    }
+
+    const numericStartPrice = Number(startPrice.replace(/,/g, ''));
+    
+    if (numericStartPrice <= 0 || isNaN(numericStartPrice)) {
+      alert("유효한 시작 가격을 입력해주세요.");
+      return;
+    }
+    if (!startTime) {
+      alert("경매 시작 시간을 입력해주세요.");
+      return;
+    }
+    if (!endTime) {
+      alert("경매 종료 시간을 입력해주세요.");
+      return;
+    }
+
+    const startDateTime = new Date(startTime);
+    const endDateTime = new Date(endTime);
+    
+    if (startDateTime >= endDateTime) {
+      alert("종료 시간은 시작 시간보다 늦어야 합니다.");
+      return;
+    }
+
+    setIsCreatingAuction(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await apiClient.post('/admin/auctions', {
+        adminProductId: product.id,
+        startPrice: numericStartPrice,
+        startTime: startTime,
+        endTime: endTime
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      console.log('경매 등록 성공:', response.data);
+      alert("경매가 성공적으로 등록되었습니다.");
+      
+      if (onAuctionCreated) {
+        onAuctionCreated();
+      }
+      onClose();
+    } catch (error: any) {
+      console.error("경매 등록 중 오류:", error);
+      const errorMessage = error.response?.data?.message || "경매 등록 중 오류가 발생했습니다.";
+      alert(errorMessage);
+    } finally {
+      setIsCreatingAuction(false);
+    }
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // 숫자와 쉼표만 허용
+    const numericValue = value.replace(/[^0-9,]/g, '');
+    setStartPrice(numericValue);
+  };
+
+  const addToPrice = (amount: number) => {
+    const currentPrice = Number(startPrice.replace(/,/g, '')) || 0;
+    const newPrice = currentPrice + amount;
+    setStartPrice(newPrice.toLocaleString());
+  };
+
+  const handlePriceFocus = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 포커스 시 전체 선택
+    e.target.select();
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "상": return "bg-green-500 text-white";
+      case "중": return "bg-yellow-500 text-white";
+      case "하": return "bg-red-500 text-white";
+      case "판매중": return "bg-green-500 text-white";
+      case "품절": return "bg-red-500 text-white";
+      case "숨김": return "bg-gray-500 text-white";
+      default: return "bg-gray-500 text-white";
+    }
+  };
+
+  const getAuctionStatusColor = (isAuctioned: boolean | undefined) => {
+    return isAuctioned 
+      ? 'bg-blue-500 text-white' 
+      : 'bg-yellow-500 text-white';
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-800">
+            <Package className="w-6 h-6 text-gray-600" />
+            매입 상품 상세 정보
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition-colors p-2 hover:bg-gray-100 rounded-xl"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* 상품 정보 */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* 상품 이미지 섹션 */}
+            <div className="space-y-4">
+              <div className="aspect-square bg-gray-100 rounded-3xl overflow-hidden shadow-lg">
+                {product.thumbnailUrl ? (
+                  <img
+                    src={product.thumbnailUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    <div className="text-center">
+                      <Package className="w-20 h-20 mx-auto mb-4" />
+                      <p className="text-lg">이미지 없음</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 상품 정보 섹션 */}
+            <div className="space-y-6">
+              {/* 상품명과 상태 */}
+              <div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-3 leading-tight">
+                  {product.name}
+                </h3>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(product.status)}`}>
+                    {product.status}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold ${getAuctionStatusColor(product.isAuctioned)}`}>
+                    {product.isAuctioned ? '경매 등록' : '미등록'}
+                  </span>
+                  <div className="flex items-center gap-1 text-yellow-500">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span className="text-sm text-gray-600">품질 등급</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 기본 정보 */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <DollarSign className="w-4 h-4" />
+                      매입가
+                    </div>
+                    <div className="text-xl font-bold text-green-600">
+                      {product.purchasePrice ? product.purchasePrice.toLocaleString() : 'N/A'}원
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Package className="w-4 h-4" />
+                      재고
+                    </div>
+                    <div className="text-xl font-bold text-gray-800">
+                      {product.stock}개
+                    </div>
+                  </div>
+                </div>
+
+                {/* 상세 정보 */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Package className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-600 w-16">카테고리:</span>
+                    <span className="font-medium text-gray-800">{product.categoryName}</span>
+                  </div>
+
+                  {(product.width || product.depth || product.height) && (
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-4 h-4 flex items-center justify-center">
+                        <div className="w-3 h-3 border border-gray-400 rounded-sm"></div>
+                      </div>
+                      <span className="text-gray-600 w-16">사이즈:</span>
+                      <span className="font-medium text-gray-800">
+                        {product.width && `${product.width}W`}
+                        {product.depth && ` × ${product.depth}D`}
+                        {product.height && ` × ${product.height}H`}cm
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 text-sm">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-600 w-16">매입일:</span>
+                    <span className="font-medium text-gray-800">
+                      {product.purchasedAt ? formatDate(product.purchasedAt) : 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-sm">
+                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <span className="text-gray-600 w-16">등록일:</span>
+                    <span className="font-medium text-gray-800">{formatDate(product.createdAt)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 상품 설명 */}
+              {product.description && (
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    상품 설명
+                  </h4>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {product.description}
+                  </p>
+                </div>
+              )}
+
+              {/* 경매 등록 버튼 */}
+              {!product.isAuctioned && (
+                <div className="pt-4 border-t border-gray-200">
+                  {!showAuctionForm ? (
+                    <button
+                      onClick={() => setShowAuctionForm(true)}
+                      className="w-full bg-gray-800 text-white py-3 px-4 rounded-xl hover:bg-gray-700 transition-colors font-medium flex items-center justify-center gap-2"
+                    >
+                      <Gavel className="w-5 h-5" />
+                      경매 등록하기
+                    </button>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            시작 가격 (원)
+                          </label>
+                          <div className="space-y-2">
+                            <input
+                              type="text"
+                              value={startPrice}
+                              onChange={handlePriceChange}
+                              onFocus={handlePriceFocus}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                              placeholder="시작 가격을 입력하세요"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                type="button"
+                                onClick={() => addToPrice(10000)}
+                                className="flex-1 px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                              >
+                                +10,000원
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => addToPrice(50000)}
+                                className="flex-1 px-3 py-1 text-sm bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                              >
+                                +50,000원
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            경매 기간
+                          </label>
+                          <div className="space-y-2">
+                            <input
+                              type="datetime-local"
+                              value={startTime}
+                              onChange={(e) => setStartTime(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                            />
+                            <input
+                              type="datetime-local"
+                              value={endTime}
+                              onChange={(e) => setEndTime(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleCreateAuction}
+                          disabled={isCreatingAuction}
+                          className="flex-1 bg-gray-800 text-white py-2 px-4 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        >
+                          {isCreatingAuction ? "등록 중..." : "경매 등록"}
+                        </button>
+                        <button
+                          onClick={() => setShowAuctionForm(false)}
+                          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 이미 경매 등록된 경우 */}
+              {product.isAuctioned && (
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <div className="flex items-center gap-2 text-blue-800">
+                      <Gavel className="w-5 h-5" />
+                      <span className="font-medium">이미 경매에 등록되어 있습니다</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

@@ -7,6 +7,7 @@ import Footer from "@/components/customer/common/Footer";
 import ChatbotFloatingButton from "@/components/customer/common/ChatbotFloatingButton";
 import { Providers } from "./providers";
 
+
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],

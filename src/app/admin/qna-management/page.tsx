@@ -1,6 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Qna {
   id: number;
@@ -17,7 +20,7 @@ export default function QnaManagementPage() {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(10);
-  const [answeredFilter, setAnsweredFilter] = useState("");
+  const [answeredFilter, setAnsweredFilter] = useState("all");
 
   // 인증 체크
   useEffect(() => {
@@ -29,7 +32,7 @@ export default function QnaManagementPage() {
 
   const filtered = dummyQna.filter(q => {
     const matchesSearch = q.title.includes(search) || q.user.includes(search);
-    const matchesAnswered = !answeredFilter || 
+    const matchesAnswered = answeredFilter === "all" || 
       (answeredFilter === 'answered' && q.answered) ||
       (answeredFilter === 'unanswered' && !q.answered);
     return matchesSearch && matchesAnswered;
@@ -79,29 +82,29 @@ export default function QnaManagementPage() {
               <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
                 검색
               </label>
-        <input
+              <Input
                 id="search"
-          type="text"
+                type="text"
                 placeholder="제목 또는 작성자로 검색"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-        />
-      </div>
+              />
+            </div>
             <div className="sm:w-48">
               <label htmlFor="answeredFilter" className="block text-sm font-medium text-gray-700 mb-2">
                 답변 상태
               </label>
-              <select
-                id="answeredFilter"
-                value={answeredFilter}
-                onChange={e => setAnsweredFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-              >
-                <option value="">전체</option>
-                <option value="answered">답변완료</option>
-                <option value="unanswered">미답변</option>
-              </select>
+              <Select value={answeredFilter} onValueChange={setAnsweredFilter}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="전체" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="answered">답변완료</SelectItem>
+                  <SelectItem value="unanswered">미답변</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -172,12 +175,12 @@ export default function QnaManagementPage() {
               </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
-                          <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs">
+                          <Button variant="success" size="sm">
                             답변
-                          </button>
-                          <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs">
+                          </Button>
+                          <Button variant="destructive" size="sm">
                             삭제
-                          </button>
+                          </Button>
                         </div>
               </td>
             </tr>
@@ -218,18 +221,19 @@ export default function QnaManagementPage() {
               </div>
               
               <div className="flex gap-2">
-                <button 
-                  className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                <Button 
+                  className="flex-1"
+                  variant="default"
                   onClick={() => router.push(`/admin/qna-management/${q.id}`)}
                 >
                   상세 보기
-                </button>
-                <button className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-md text-sm">
+                </Button>
+                <Button variant="success" size="sm">
                   답변
-                </button>
-                <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm">
+                </Button>
+                <Button variant="destructive" size="sm">
                   삭제
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -239,38 +243,37 @@ export default function QnaManagementPage() {
         {totalPages > 1 && (
           <div className="mt-6 flex justify-center">
             <div className="flex space-x-2">
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                variant="outline"
+                size="sm"
               >
                 이전
-              </button>
+              </Button>
               
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
                 return (
-                  <button
+                  <Button
                     key={pageNum}
                     onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 border rounded ${
-                      currentPage === pageNum 
-                        ? 'bg-purple-500 text-white' 
-                        : 'hover:bg-gray-50'
-                    }`}
+                    variant={currentPage === pageNum ? "default" : "outline"}
+                    size="sm"
                   >
                     {pageNum}
-                  </button>
+                  </Button>
                 );
               })}
               
-              <button
+              <Button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                variant="outline"
+                size="sm"
               >
                 다음
-              </button>
+              </Button>
             </div>
           </div>
         )}

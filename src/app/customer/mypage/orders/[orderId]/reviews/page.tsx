@@ -6,6 +6,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import StarRating from '@/components/customer/review/StarRating';
 import { createReview } from '@/service/customer/reviewService';
 import Modal from '@/components/Modal';
+import { uploadReviewImages } from '@/service/customer/reviewImageService';
 
 
 
@@ -89,28 +90,7 @@ function ReviewPage() {
     setImages((prev) => prev.filter((f) => f !== file));
   };
 
-  const uploadImages = async (): Promise<string[]> => {
-    const urls: string[] = [];
-    const accessToken = getAccessToken();
 
-    for (const file of images) {
-      const formData = new FormData();
-      formData.append('file', file);
-      try {
-        const res = await axios.post('http://localhost:8080/api/customer/reviews/images/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
-          },
-        });
-        urls.push(res.data); // 문자열 그대로 받기
-      } catch (err) {
-        console.error('이미지 업로드 실패:', err);
-      }
-    }
-
-    return urls;
-  };
 
 
 const handleSubmit = async (e: React.FormEvent) => {
@@ -126,7 +106,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   setLoading(true);
   try {
-    const uploadedUrls = await uploadImages();
+    // 이미지 업로드 (images 배열을 꼭 넘겨줘야 함)
+    const uploadedUrls = await uploadReviewImages(images);
 
     const payload = {
       orderId: currentOrderId,
@@ -154,6 +135,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     setLoading(false);
   }
 };
+
 
 
   return (

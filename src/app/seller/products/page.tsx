@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle, RefreshCw } from 'lucide-react';
+import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle, RefreshCw, Search, Filter, Sparkles, ShoppingBag, DollarSign, Star } from 'lucide-react';
 import Link from 'next/link';
 
 import { getMyProducts, getMyProductStats } from '@/service/seller/productService';
@@ -107,10 +107,10 @@ export default function ProductListPage() {
   };
 
   if (checking) return (
-    <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
+    <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">인증 확인 중...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-700 font-medium">인증 확인 중...</p>
       </div>
     </div>
   ); // ✅ 인증 확인 중 UI 
@@ -120,25 +120,28 @@ export default function ProductListPage() {
       <SellerHeader toggleSidebar={toggleSidebar} />
       </div>
       <SellerLayout>
-        <div className="flex-1 w-full h-full px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-[#0f766e]">상품 관리</h1>
+        <div className="flex-1 w-full h-full px-4 py-8 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-slate-700 to-indigo-700 bg-clip-text text-transparent flex items-center gap-3">
+              <ShoppingBag className="w-10 h-10 text-indigo-600" />
+              상품 관리
+            </h1>
             <div className="flex gap-3">
               <button
                 onClick={() => {
                   fetchProductList(currentPage);
                   fetchProductStats();
                 }}
-                className="inline-flex items-center gap-2 bg-[#e5e7eb] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#d1d5db] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+                className="group flex items-center gap-2 bg-white/90 backdrop-blur-sm text-slate-700 px-5 py-3 rounded-xl hover:bg-white transition-all duration-200 font-semibold shadow-lg border border-white/50 hover:shadow-xl hover:scale-[1.02]"
               >
-                <RefreshCw className="w-5 h-5" />
+                <RefreshCw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
                 새로고침
               </button>
               <button
                 onClick={handleRegisterClick}
-                className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+                className="group flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02]"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
                 상품 등록
               </button>
             </div>
@@ -146,132 +149,265 @@ export default function ProductListPage() {
 
           {/* 상단 통계 카드 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <Package className="w-8 h-8 text-[#6b7280]" />
-                <span className="text-[#374151] text-sm font-semibold">총 상품 수</span>
+            <section className="group bg-gradient-to-r from-slate-50 to-white backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 p-6 min-h-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gradient-to-r from-slate-500 to-gray-600 rounded-xl text-white">
+                  <Package className="w-8 h-8" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-slate-600 to-gray-700 bg-clip-text text-transparent">
+                  {productStats.total}
+                </div>
               </div>
-              <div className="text-2xl font-bold text-[#374151]">{productStats.total}개</div>
+              <div className="space-y-1">
+                <h3 className="text-slate-700 font-bold text-lg">총 상품 수</h3>
+                <p className="text-slate-500 text-sm">전체 등록된 상품</p>
+              </div>
+              <div className="mt-4 h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-slate-400 to-gray-500 rounded-full w-full"></div>
+              </div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-8 h-8 text-green-600" />
-                <span className="text-[#374151] text-sm font-semibold">판매중</span>
+
+            <section className="group bg-gradient-to-r from-emerald-50 to-green-50 backdrop-blur-lg rounded-2xl shadow-xl border border-emerald-200/50 p-6 min-h-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl text-white">
+                  <TrendingUp className="w-8 h-8" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-700 bg-clip-text text-transparent">
+                  {productStats.selling}
+                </div>
               </div>
-              <div className="text-2xl font-bold text-green-700">{productStats.selling}개</div>
+              <div className="space-y-1">
+                <h3 className="text-emerald-700 font-bold text-lg">판매중</h3>
+                <p className="text-emerald-600 text-sm">활성 상품</p>
+              </div>
+              <div className="mt-4 h-2 bg-emerald-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-emerald-400 to-green-500 rounded-full transition-all duration-1000" 
+                  style={{ width: `${productStats.total > 0 ? (productStats.selling / productStats.total) * 100 : 0}%` }}
+                ></div>
+              </div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <XCircle className="w-8 h-8 text-red-600" />
-                <span className="text-[#374151] text-sm font-semibold">품절</span>
+
+            <section className="group bg-gradient-to-r from-red-50 to-pink-50 backdrop-blur-lg rounded-2xl shadow-xl border border-red-200/50 p-6 min-h-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-xl text-white">
+                  <XCircle className="w-8 h-8" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-red-600 to-pink-700 bg-clip-text text-transparent">
+                  {productStats.outOfStock}
+                </div>
               </div>
-              <div className="text-2xl font-bold text-red-700">{productStats.outOfStock}개</div>
+              <div className="space-y-1">
+                <h3 className="text-red-700 font-bold text-lg">품절</h3>
+                <p className="text-red-600 text-sm">재고 부족</p>
+              </div>
+              <div className="mt-4 h-2 bg-red-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-red-400 to-pink-500 rounded-full transition-all duration-1000" 
+                  style={{ width: `${productStats.total > 0 ? (productStats.outOfStock / productStats.total) * 100 : 0}%` }}
+                ></div>
+              </div>
             </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <PauseCircle className="w-8 h-8 text-yellow-600" />
-                <span className="text-[#374151] text-sm font-semibold">판매중지</span>
+
+            <section className="group bg-gradient-to-r from-amber-50 to-orange-50 backdrop-blur-lg rounded-2xl shadow-xl border border-amber-200/50 p-6 min-h-[160px] transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] cursor-pointer">
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl text-white">
+                  <PauseCircle className="w-8 h-8" />
+                </div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent">
+                  {productStats.suspended}
+                </div>
               </div>
-              <div className="text-2xl font-bold text-yellow-700">{productStats.suspended}개</div>
+              <div className="space-y-1">
+                <h3 className="text-amber-700 font-bold text-lg">판매중지</h3>
+                <p className="text-amber-600 text-sm">비활성 상품</p>
+              </div>
+              <div className="mt-4 h-2 bg-amber-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-1000" 
+                  style={{ width: `${productStats.total > 0 ? (productStats.suspended / productStats.total) * 100 : 0}%` }}
+                ></div>
+              </div>
             </section>
           </div>
 
           {/* 검색/필터 영역 */}
-          <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
+          <div className="bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-white/50 mb-8 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <Search className="w-6 h-6 text-indigo-600" />
+              <h3 className="text-lg font-bold text-slate-700">상품 검색 및 필터</h3>
+            </div>
             <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
-                placeholder="상품명으로 검색..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-                className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-                className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            >
-              <option value="">전체 품질등급</option>
-              <option value="상">상</option>
-              <option value="중">중</option>
-              <option value="하">하</option>
-            </select>
-            <button
-              onClick={handleSearch}
-              className="bg-[#d1d5db] text-[#374151] px-6 py-2 rounded-md hover:bg-[#e5e7eb] transition-colors font-medium"
-            >
-              검색
-            </button>
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="상품명으로 검색..."
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/90 border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 font-medium"
+                />
+              </div>
+              <div>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-3 bg-white/90 border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 font-medium min-w-[160px]"
+                >
+                  <option value="">전체 품질등급</option>
+                  <option value="상">상급</option>
+                  <option value="중">중급</option>
+                  <option value="하">하급</option>
+                </select>
+              </div>
+              <button
+                onClick={handleSearch}
+                className="group flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 py-3 rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02]"
+              >
+                <Search className="w-5 h-5 group-hover:scale-110 transition-transform duration-200" />
+                검색
+              </button>
             </div>
           </div>
 
-          {/* 상품 리스트 (쇼피파이 스타일 테이블+카드) */}
-          <div className="overflow-x-auto bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db]">
-            <table className="min-w-full divide-y divide-[#d1d5db]">
-              <thead className="bg-[#f3f4f6]">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상품명</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">가격</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">품질등급</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">판매상태</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">재고</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-[#d1d5db] uppercase tracking-wider">액션</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                {products.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-8 text-[#d1d5db]">상품이 없습니다.</td>
-                  </tr>
-                ) : (
-                  products.map((product) => {
+          {/* 상품 목록 */}
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 overflow-hidden">
+            {products.length === 0 ? (
+              <div className="text-center py-16">
+                <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-lg font-medium">등록된 상품이 없습니다.</p>
+                <p className="text-gray-500">새로운 상품을 등록해보세요!</p>
+              </div>
+            ) : (
+              <>
+                {/* 테이블 헤더 */}
+                <div className="bg-gradient-to-r from-slate-100 to-gray-100 px-6 py-4 border-b border-slate-200">
+                  <div className="grid grid-cols-12 gap-4 font-bold text-slate-700">
+                    <div className="col-span-1 text-center">이미지</div>
+                    <div className="col-span-3">상품명</div>
+                    <div className="col-span-2 text-center">가격</div>
+                    <div className="col-span-1 text-center">재고</div>
+                    <div className="col-span-1 text-center">품질</div>
+                    <div className="col-span-2 text-center">판매상태</div>
+                    <div className="col-span-2 text-center">관리</div>
+                  </div>
+                </div>
+
+                {/* 상품 목록 */}
+                <div className="divide-y divide-slate-100">
+                  {products.map((product) => {
                     const salesStatus = getProductSalesStatus(product);
                     return (
-                    <tr key={product.id} className="hover:bg-[#e5e7eb] transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">{product.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.price.toLocaleString()}원</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getQualityGradeColor(product.status)}`}>
-                          {product.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${salesStatus.color}`}>
-                          {salesStatus.text}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.stock ?? 0}개</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <button
-                          onClick={() => router.push(`/seller/products/${product.id}`)}
-                          className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
-                        >
-                          <Eye className="w-4 h-4" /> 상세 보기
-                        </button>
-                      </td>
-                    </tr>
-                  )})
-                )}
-              </tbody>
-            </table>
+                      <div key={product.id} className="px-6 py-4 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-all duration-200">
+                        <div className="grid grid-cols-12 gap-4 items-center">
+                          {/* 상품 이미지 */}
+                          <div className="col-span-1">
+                            <div className="w-16 h-16 bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl overflow-hidden border border-slate-200 shadow-inner">
+                              {product.imageThumbnailUrl ? (
+                                <img 
+                                  src={product.imageThumbnailUrl} 
+                                  alt={product.name}
+                                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <Package className="w-6 h-6 text-slate-400" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* 상품명 */}
+                          <div className="col-span-3">
+                            <Link 
+                              href={`/seller/products/${product.id}`}
+                              className="group"
+                            >
+                              <h3 className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors duration-200 line-clamp-2">
+                                {product.name}
+                              </h3>
+                              <p className="text-sm text-slate-500 mt-1">ID: {product.id}</p>
+                            </Link>
+                          </div>
+
+                          {/* 가격 */}
+                          <div className="col-span-2 text-center">
+                            <div className="flex items-center justify-center gap-1">
+                              <DollarSign className="w-4 h-4 text-emerald-600" />
+                              <span className="font-bold text-slate-800">{product.price.toLocaleString()}원</span>
+                            </div>
+                          </div>
+
+                          {/* 재고 */}
+                          <div className="col-span-1 text-center">
+                            <span className={`font-bold ${product.stock === 0 ? 'text-red-600' : 'text-slate-800'}`}>
+                              {product.stock}개
+                            </span>
+                          </div>
+
+                          {/* 품질등급 */}
+                          <div className="col-span-1 text-center">
+                            <span className={`px-3 py-1 rounded-full text-sm font-bold border ${getQualityGradeColor(product.status)}`}>
+                              {product.status}
+                            </span>
+                          </div>
+
+                          {/* 판매상태 */}
+                          <div className="col-span-2 text-center">
+                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-bold border ${salesStatus.color}`}>
+                              {product.isActive ? <TrendingUp className="w-3 h-3" /> : <PauseCircle className="w-3 h-3" />}
+                              {salesStatus.text}
+                            </span>
+                          </div>
+
+                          {/* 관리 버튼 */}
+                          <div className="col-span-2 text-center">
+                            <div className="flex gap-2 justify-center">
+                              <Link 
+                                href={`/seller/products/${product.id}`}
+                                className="group bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
+                              >
+                                <Eye className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                              </Link>
+                              <Link 
+                                href={`/seller/products/${product.id}/edit`}
+                                className="group bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg hover:scale-[1.02]"
+                              >
+                                <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-6 space-x-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => goToPage(i + 1)}
-                  className={`px-4 py-2 rounded-lg font-bold shadow-sm border text-sm transition-colors
-                    ${currentPage === i + 1
-                      ? 'bg-[#d1d5db] text-[#374151] border-[#d1d5db]'
-                      : 'bg-[#f3f4f6] text-[#374151] border-[#d1d5db] hover:bg-[#d1d5db] hover:text-[#374151]'}
-                  `}
-                >
-                  {i + 1}
-                </button>
-              ))}
+            <div className="mt-8 flex justify-center">
+              <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-xl border border-white/50 p-2">
+                <div className="flex gap-2">
+                  {Array.from({ length: totalPages }, (_, index) => {
+                    const page = index + 1;
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`px-4 py-2 rounded-xl font-semibold transition-all duration-200 ${
+                          currentPage === page
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-800'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           )}
         </div>

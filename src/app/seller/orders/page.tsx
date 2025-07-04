@@ -109,13 +109,13 @@ export default function SellerOrderListPage() {
       setTotalPages(ordersRes.totalPages || 0);
       setTotalElements(ordersRes.totalElements || 0);
       setStatistics(statisticsRes);
-      setError(null);
+        setError(null);
     } catch (err: any) {
         console.error('주문 목록 조회 실패', err);
         setError('주문 목록을 불러오는 데 실패했습니다.');
       } finally {
         setLoading(false);
-        setRefreshing(false);
+      setRefreshing(false);
         setStatisticsLoading(false);
       }
     };

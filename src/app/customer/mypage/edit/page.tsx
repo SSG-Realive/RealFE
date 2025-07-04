@@ -1,22 +1,22 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+// ✅ [수정] useCallback을 import 합니다.
+import { useEffect, useState, useCallback } from 'react';
 import {
   fetchMyProfile,
   updateMyProfile,
 } from '@/service/customer/customerService';
 import {
-  MemberModifyDTO,
   MemberReadDTO,
 } from '@/types/customer/member/member';
-import AddressInput from '@/components/customer/join/AddressInput';
+import AddressInput, { parseAddress } from '@/components/customer/join/AddressInput'; // ✅ parseAddress도 함께 import
 import useDialog from '@/hooks/useDialog';
 import GlobalDialog from '@/components/ui/GlobalDialog';
-import { parseAddress } from '@/lib/address-utils';
 import { Pencil } from 'lucide-react';
 import MyPageSidebar from '@/components/customer/common/MyPageSidebar';
 
+// ReadOnlyCard와 EditableCard 컴포넌트는 그대로 둡니다.
 function ReadOnlyCard({ label, value }: { label: string; value?: string | null }) {
   return (
       <section className="rounded-2xl bg-white/90 p-5 shadow ring-1 ring-gray-100">
@@ -72,6 +72,7 @@ function EditableCard(props: {
   );
 }
 
+
 export default function EditProfilePage() {
   const router = useRouter();
   const { open, message, handleClose, show } = useDialog();
@@ -94,9 +95,20 @@ export default function EditProfilePage() {
         show('프로필을 가져오지 못했습니다.');
       }
     })();
-  }, []);
+  }, [show]); // ✅ show를 의존성 배열에 추가합니다.
 
-  async function handleSubmit() {
+  // ✅ [수정] 모든 핸들러 함수를 useCallback으로 감싸서 불필요한 재생성을 방지합니다.
+  const handlePhoneCancel = useCallback(() => {
+    setPhone(profile?.phone ?? '');
+    setPhoneEdit(false);
+  }, [profile]);
+
+  const handleAddrCancel = useCallback(() => {
+    setAddrStr(profile?.address ?? '');
+    setAddrEdit(false);
+  }, [profile]);
+
+  const handleSubmit = useCallback(async () => {
     const payload = {
       phone: phone.trim() || undefined,
       address: addrStr.trim() || undefined,
@@ -104,14 +116,16 @@ export default function EditProfilePage() {
     try {
       setSaving(true);
       await updateMyProfile(payload);
-      show('수정이 완료되었습니다.');
+      await show('수정이 완료되었습니다.');
       setPhoneEdit(false);
       setAddrEdit(false);
       setProfile((p) => p ? { ...p, phone: payload.phone!, address: payload.address! } : p);
     } catch {
       show('저장에 실패했습니다.');
+    } finally {
+        setSaving(false);
     }
-  }
+  }, [phone, addrStr, show]);
 
   if (!profile) {
     return <p className="p-6 text-center text-gray-500">로딩 중…</p>;
@@ -123,12 +137,9 @@ export default function EditProfilePage() {
       <>
         <GlobalDialog open={open} message={message} onClose={handleClose} />
 
-        {/* ✅ 전체 레이아웃 (사이드바 포함) */}
         <div className="flex max-w-7xl mx-auto px-4">
-          {/* ✅ 좌측: 사이드바 */}
           <MyPageSidebar />
 
-          {/* ✅ 우측: 본문 */}
           <main className="flex-1 py-10 space-y-6 pl-6">
             <ReadOnlyCard label="이름" value={profile.name} />
             <ReadOnlyCard label="이메일" value={profile.email} />
@@ -140,10 +151,7 @@ export default function EditProfilePage() {
                 editing={phoneEdit}
                 value={phone || '-'}
                 onEdit={() => setPhoneEdit(true)}
-                onCancel={() => {
-                  setPhone(profile.phone ?? '');
-                  setPhoneEdit(false);
-                }}
+                onCancel={handlePhoneCancel} // ✅ useCallback으로 감싼 함수 사용
                 input={
                   <input
                       type="tel"
@@ -159,17 +167,14 @@ export default function EditProfilePage() {
                 editing={addrEdit}
                 value={
                   addrStr
-                      ? `${parsedAddr.address} ${parsedAddr.detail}`
-                      : '-'
+                    ? `${parsedAddr.address} ${parsedAddr.detail}`
+                    : '-'
                 }
                 onEdit={() => setAddrEdit(true)}
-                onCancel={() => {
-                  setAddrStr(profile.address ?? '');
-                  setAddrEdit(false);
-                }}
+                onCancel={handleAddrCancel} // ✅ useCallback으로 감싼 함수 사용
                 input={
                   <AddressInput
-                      onAddressChange={setAddrStr}
+                      onAddressChange={setAddrStr} // ✅ setAddrStr은 상태 설정 함수라 그대로 사용해도 괜찮습니다.
                       defaultAddress={parsedAddr}
                   />
                 }
@@ -179,23 +184,21 @@ export default function EditProfilePage() {
                 <div className="flex justify-end gap-3">
                   <button
                       type="button"
-                      onClick={() => {
-                        setPhone(profile.phone ?? '');
-                        setAddrStr(profile.address ?? '');
-                        setPhoneEdit(false);
-                        setAddrEdit(false);
+                      onClick={() => { // 이 부분은 복합적인 동작이라 인라인으로 두어도 괜찮습니다.
+                        handlePhoneCancel();
+                        handleAddrCancel();
                       }}
                       className="rounded-md px-4 py-2 text-sm ring-1 ring-gray-300 hover:bg-gray-50"
                   >
-                    취소
+                    전체 취소
                   </button>
                   <button
                       type="button"
-                      onClick={handleSubmit}
+                      onClick={handleSubmit} // ✅ useCallback으로 감싼 함수 사용
                       disabled={saving}
                       className="rounded-md bg-amber-500 px-5 py-2 text-sm font-light text-white shadow hover:bg-amber-600 disabled:opacity-50"
                   >
-                    {saving ? '저장 중…' : '저장'}
+                    {saving ? '저장 중…' : '변경사항 저장'}
                   </button>
                 </div>
             )}

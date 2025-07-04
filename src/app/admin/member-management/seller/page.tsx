@@ -6,6 +6,7 @@ import { Users, Search, Filter, UserCheck, UserX, CheckCircle, XCircle, ChevronD
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 interface Seller {
   id: number;
@@ -51,6 +52,7 @@ const AdminSellersPage: React.FC = () => {
     pending: 0
   });
   const router = useRouter();
+  const {show} = useGlobalDialog();
 
   // 인증 체크
   useEffect(() => {
@@ -158,7 +160,7 @@ const AdminSellersPage: React.FC = () => {
       fetchTotalStats();
     } catch (err) {
       const error = err as ErrorResponse;
-      alert(`상태 변경 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+      show(`상태 변경 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
     } finally {
       setUpdatingId(null);
     }
@@ -183,10 +185,10 @@ const AdminSellersPage: React.FC = () => {
       // 승인/거절 후 전체 통계 다시 로딩
       fetchTotalStats();
       
-      alert(`${seller.name} ${approved ? '승인' : '거절'} 처리되었습니다.`);
+      show(`${seller.name} ${approved ? '승인' : '거절'} 처리되었습니다.`);
     } catch (err) {
       const error = err as ErrorResponse;
-      alert(`처리 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+      show(`처리 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
     } finally {
       setUpdatingId(null);
     }

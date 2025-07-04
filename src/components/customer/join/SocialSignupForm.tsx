@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import AddressInput from './AddressInput';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 interface Props {
   email: string;
@@ -36,13 +37,14 @@ export default function SocialSignupForm({ email, token, onSuccess }: Props) {
     setLoading,
     isValid,
   } = useSocialSignupForm(email);
+  const { show } = useGlobalDialog();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     if (!isValid()) {
-      alert('모든 필드를 입력해주세요.');
+      await show('모든 필드를 입력해주세요.');
       setLoading(false);
       return;
     }
@@ -72,7 +74,7 @@ export default function SocialSignupForm({ email, token, onSuccess }: Props) {
       onSuccess({ id: data.id, userName });
     } catch (err) {
       console.error(err);
-      alert('회원가입에 실패했습니다.');
+      await show('회원가입에 실패했습니다.');
     } finally {
       setLoading(false);
     }

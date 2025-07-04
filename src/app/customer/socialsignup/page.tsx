@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/customer/authStore';
 import SocialSignupForm from '@/components/customer/join/SocialSignupForm';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SocialSignupPage() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function SocialSignupPage() {
     isTemporaryUser,
     setAuth,
   } = useAuthStore();
-
+  const {show} = useGlobalDialog();
   useEffect(() => {
     if (!email || !accessToken || !isTemporaryUser) {
       router.replace('/');
@@ -37,7 +38,7 @@ export default function SocialSignupPage() {
             userName: user.userName,
             temporaryUser: false,
           });
-          alert('회원가입이 완료되었습니다!');
+          show('회원가입이 완료되었습니다!');
           router.push('/main');
         }}
       />

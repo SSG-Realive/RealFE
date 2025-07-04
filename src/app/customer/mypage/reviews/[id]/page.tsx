@@ -11,13 +11,14 @@ import {
     getTrafficLightText,
     getTrafficLightBgClass
 } from '@/types/admin/review';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ReviewDetailPage() {
     const { id } = useParams();
     const router = useRouter();
     const [review, setReview] = useState<ReviewResponseDTO | null>(null);
     const [error, setError] = useState<string | null>(null);
-
+    const {show} = useGlobalDialog();
     useEffect(() => {
         if (!id) return;
         fetchReviewDetail(Number(id))
@@ -29,10 +30,10 @@ export default function ReviewDetailPage() {
         if (!confirm('정말 삭제하시겠습니까?')) return;
         try {
             await deleteReview(Number(id));
-            alert('리뷰가 삭제되었습니다.');
+            show('리뷰가 삭제되었습니다.');
             router.push('/customer/mypage/reviews'); // 목록 페이지로 이동
         } catch (err) {
-            alert('삭제에 실패했습니다.');
+            show('삭제에 실패했습니다.');
         }
     };
 

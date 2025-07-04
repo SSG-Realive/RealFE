@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Package, DollarSign, Calendar, Eye, Star, Gavel } from "lucide-react";
+import { X, Package, DollarSign, Calendar, Eye, Star, Gavel, PlayCircle, StopCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -360,89 +360,105 @@ export default function OwnedProductDetailModal({
                           <div className="space-y-4">
                             {/* 시작시간 */}
                             <div>
-                              <Label className="text-sm text-gray-600 mb-2 block">시작시간</Label>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div>
-                                  <Input
-                                    type="date"
-                                    value={startDate}
-                                    onChange={(e) => setStartDate(e.target.value)}
-                                    className="w-full"
-                                  />
-                                </div>
-                                <div>
-                                  <Select value={startHour} onValueChange={setStartHour}>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="max-h-60">
-                                      {Array.from({ length: 12 }, (_, i) => (
-                                        <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
-                                          {(i + 1).toString().padStart(2, '0')}시
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div>
-                                  <Select value={startMinute} onValueChange={setStartMinute}>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="max-h-60">
-                                      {Array.from({ length: 60 }, (_, i) => (
-                                        <SelectItem key={i} value={i.toString().padStart(2, '0')}>
-                                          {i.toString().padStart(2, '0')}분
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                              <Label className="text-sm text-gray-600 mb-2 flex items-center gap-1">
+                                <PlayCircle className="w-4 h-4 text-green-600" />
+                                시작
+                              </Label>
+                                <div className="space-y-3">
+                                  <div>
+                                    <Label className="text-sm text-gray-500 mb-1 block">날짜</Label>
+                                    <Input
+                                      type="date"
+                                      value={startDate}
+                                      onChange={(e) => setStartDate(e.target.value)}
+                                      className="w-full h-10"
+                                    />
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <div className="flex-1">
+                                      <Label className="text-sm text-gray-500 mb-1 block">시간</Label>
+                                      <Select value={startHour} onValueChange={setStartHour}>
+                                        <SelectTrigger className="h-10">
+                                          <SelectValue placeholder="시 선택" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 24 }, (_, i) => (
+                                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                              {i.toString().padStart(2, '0')}시
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="flex-1">
+                                      <Label className="text-sm text-gray-500 mb-1 block">분</Label>
+                                      <Select value={startMinute} onValueChange={setStartMinute}>
+                                        <SelectTrigger className="h-10">
+                                          <SelectValue placeholder="분 선택" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 60 }, (_, i) => (
+                                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                              {i.toString().padStart(2, '0')}분
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
                             
                             {/* 종료시간 */}
-                            <div>
-                              <Label className="text-sm text-gray-600 mb-2 block">종료시간</Label>
-                              <div className="grid grid-cols-3 gap-2">
-                                <div>
-                                  <Input
-                                    type="date"
-                                    value={endDate}
-                                    onChange={(e) => setEndDate(e.target.value)}
-                                    className="w-full"
-                                  />
-                                </div>
-                                <div>
-                                  <Select value={endHour} onValueChange={setEndHour}>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="max-h-60">
-                                      {Array.from({ length: 12 }, (_, i) => (
-                                        <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
-                                          {(i + 1).toString().padStart(2, '0')}시
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div>
-                                  <Select value={endMinute} onValueChange={setEndMinute}>
-                                    <SelectTrigger>
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="max-h-60">
-                                      {Array.from({ length: 60 }, (_, i) => (
-                                        <SelectItem key={i} value={i.toString().padStart(2, '0')}>
-                                          {i.toString().padStart(2, '0')}분
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                              <div>
+                                <Label className="text-sm text-gray-600 mb-2 flex items-center gap-1">
+                                <StopCircle className="w-4 h-4 text-red-600" />
+                                종료
+                                </Label>
+                                <div className="space-y-3">
+                                  <div>
+                                    <Label className="text-sm text-gray-500 mb-1 block">날짜</Label>
+                                    <Input
+                                      type="date"
+                                      value={endDate}
+                                      onChange={(e) => setEndDate(e.target.value)}
+                                      className="w-full h-10"
+                                    />
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <div className="flex-1">
+                                      <Label className="text-sm text-gray-500 mb-1 block">시간</Label>
+                                      <Select value={endHour} onValueChange={setEndHour}>
+                                        <SelectTrigger className="h-10">
+                                          <SelectValue placeholder="시 선택" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 24 }, (_, i) => (
+                                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                              {i.toString().padStart(2, '0')}시
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="flex-1">
+                                      <Label className="text-sm text-gray-500 mb-1 block">분</Label>
+                                      <Select value={endMinute} onValueChange={setEndMinute}>
+                                        <SelectTrigger className="h-10">
+                                          <SelectValue placeholder="분 선택" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Array.from({ length: 60 }, (_, i) => (
+                                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                              {i.toString().padStart(2, '0')}분
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
                           </div>
                         </div>
                       </div>

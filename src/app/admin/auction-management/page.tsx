@@ -148,7 +148,7 @@ export default function AuctionManagementPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
             <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-600 rounded-full animate-spin mx-auto mb-4"></div>
@@ -162,7 +162,7 @@ export default function AuctionManagementPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-32 h-32 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-8">
             <XCircle className="w-16 h-16 text-red-500" />
@@ -178,7 +178,7 @@ export default function AuctionManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="max-w-7xl mx-auto p-6">
         {/* 헤더 섹션 */}
         <div className="mb-8">

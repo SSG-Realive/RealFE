@@ -81,7 +81,7 @@ export default function SellerProductListPage() {
     if (product.stock === 0) {
       return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f87171] text-white">품절</span>;
     } else if (!product.isActive) {
-      return <span className="px-2 py-1 rounded text-xs font-bold bg-[#6b7280] text-white">판매중지</span>;
+      return <span className="px-2 py-1 rounded text-xs font-bold bg-[#d97706] text-white">판매중지</span>;
     } else {
       return <span className="px-2 py-1 rounded text-xs font-bold bg-[#6b7280] text-white">판매중</span>;
     }

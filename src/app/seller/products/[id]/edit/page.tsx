@@ -266,144 +266,151 @@ export default function ProductEditPage() {
                         </div>
                     </div>
 
-                    {/* 가격 및 재고 섹션 */}
-                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
-                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
-                            <DollarSign className="w-5 h-5 text-[#6b7280]" />
-                            가격 및 재고
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">판매 가격</label>
-                                <input
-                                    type="number"
-                                    name="price"
-                                    value={form.price}
-                                    onChange={handleChange}
-                                    min="0"
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">재고 수량</label>
-                                <input
-                                    type="number"
-                                    name="stock"
-                                    value={form.stock}
-                                    onChange={handleChange}
-                                    min="0"
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 카테고리 섹션 */}
-                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
-                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
-                            <Tag className="w-5 h-5 text-[#6b7280]" />
-                            카테고리
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">상위 카테고리</label>
-                                <select
-                                    value={parentCategoryIdState}
-                                    onChange={handleParentCategoryChange}
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                >
-                                    <option value="">상위 카테고리 선택</option>
-                                    {parentCategories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">하위 카테고리</label>
-                                <select
-                                    value={form.categoryId || ''}
-                                    onChange={handleSubCategoryChange}
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                    required
-                                >
-                                    <option value="">하위 카테고리 선택</option>
-                                    {subCategories.map(cat => (
-                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                    ))}
-                                </select>
+                    {/* 가격 및 재고, 카테고리, 크기 정보 - 컴팩트 그리드 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* 가격 및 재고 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <DollarSign className="w-3 h-3 text-[#6b7280]" />
+                                가격 및 재고
+                            </h2>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">판매 가격</label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        value={form.price}
+                                        onChange={handleChange}
+                                        min="0"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">재고 수량</label>
+                                    <input
+                                        type="number"
+                                        name="stock"
+                                        value={form.stock}
+                                        onChange={handleChange}
+                                        min="0"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* 크기 정보 섹션 */}
-                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
-                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
-                            <Ruler className="w-5 h-5 text-[#6b7280]" />
-                            크기 정보
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">너비 (cm)</label>
-                                <input
-                                    type="number"
-                                    name="width"
-                                    value={form.width || ''}
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.1"
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                />
+                        {/* 카테고리 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <Tag className="w-3 h-3 text-[#6b7280]" />
+                                카테고리
+                            </h2>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">상위 카테고리</label>
+                                    <select
+                                        value={parentCategoryIdState}
+                                        onChange={handleParentCategoryChange}
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                    >
+                                        <option value="">선택</option>
+                                        {parentCategories.map(cat => (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">하위 카테고리</label>
+                                    <select
+                                        value={form.categoryId || ''}
+                                        onChange={handleSubCategoryChange}
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                        required
+                                    >
+                                        <option value="">선택</option>
+                                        {subCategories.map(cat => (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">깊이 (cm)</label>
-                                <input
-                                    type="number"
-                                    name="depth"
-                                    value={form.depth || ''}
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.1"
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-[#374151] mb-2">높이 (cm)</label>
-                                <input
-                                    type="number"
-                                    name="height"
-                                    value={form.height || ''}
-                                    onChange={handleChange}
-                                    min="0"
-                                    step="0.1"
-                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                />
+                        </div>
+
+                        {/* 크기 정보 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <Ruler className="w-3 h-3 text-[#6b7280]" />
+                                크기 정보
+                            </h2>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">너비 (cm)</label>
+                                    <input
+                                        type="number"
+                                        name="width"
+                                        value={form.width || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">깊이 (cm)</label>
+                                    <input
+                                        type="number"
+                                        name="depth"
+                                        value={form.depth || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">높이 (cm)</label>
+                                    <input
+                                        type="number"
+                                        name="height"
+                                        value={form.height || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* 판매 상태 섹션 */}
-                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
-                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
-                            <Layers className="w-5 h-5 text-[#6b7280]" />
+                    <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-4">
+                        <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                            <Layers className="w-3 h-3 text-[#6b7280]" />
                             판매 상태
                         </h2>
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="checkbox"
-                                id="isActive"
-                                checked={form.isActive}
-                                onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                                className="w-4 h-4 text-[#6b7280] bg-white border-[#d1d5db] rounded focus:ring-[#6b7280] focus:ring-2"
-                            />
-                            <label htmlFor="isActive" className="text-sm font-medium text-[#374151]">
-                                판매 활성화
-                            </label>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded border border-[#d1d5db]">
+                            <div className="relative">
+                                <input
+                                    type="checkbox"
+                                    id="isActive"
+                                    checked={form.isActive}
+                                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                                    className="w-5 h-5 text-[#6b7280] bg-white border-2 border-[#d1d5db] rounded focus:ring-2 focus:ring-[#6b7280] checked:bg-[#6b7280] checked:border-[#6b7280]"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="isActive" className="text-sm font-medium text-[#374151] cursor-pointer">
+                                    판매 활성화
+                                </label>
+                                <p className="text-xs text-[#6b7280] mt-1">
+                                    체크하면 고객이 상품을 구매할 수 있습니다.
+                                </p>
+                            </div>
                         </div>
-                        <p className="text-xs text-[#6b7280] mt-2">
-                            체크하면 고객이 상품을 구매할 수 있습니다.
-                        </p>
                     </div>
 
                     {/* 미디어 업로드 섹션 */}

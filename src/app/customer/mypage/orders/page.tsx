@@ -30,7 +30,7 @@ export default function OrderListPage() {
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     const currentPage = Number(searchParams.get('page')) || 0;
-    const pageSize = 10;
+    const pageSize = 5;
 
     const fetchOrders = useCallback(async () => {
         setIsLoading(true);

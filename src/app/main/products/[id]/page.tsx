@@ -175,17 +175,17 @@ export default function ProductDetailPage() {
                 <p className="cursor-pointer hover:underline text-blue-600"
                   onClick={() => router.push(`/main/seller/${product.id}`)}>
                   <span className="font-light text-gray-700">판매자:</span> {product.sellerName}
-
-                  <div className="mb-6"> {/* 여백을 위한 div 추가 */}
-                    <TrafficLightStatusCardforProductDetail
-                        title="상품 평점"
-                        rating={averageRating}
-                        count={reviewCount}
-                        className="mx-auto" // 중앙 정렬을 위해 mx-auto 추가 (필요 시)
-                    />
-                  </div>
                 </p>
               )}
+
+              <div className="mb-6">
+                <TrafficLightStatusCardforProductDetail
+                    title="상품 평점"
+                    rating={averageRating}
+                    count={reviewCount}
+                    className="" // mx-auto 제거
+                />
+              </div>
 
             </div>
 
@@ -251,27 +251,30 @@ export default function ProductDetailPage() {
         </div>
 
         {/* --- 상품 QnA 섹션 시작 --- */}
-        <div className="max-w-6xl mx-auto px-4 mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-light text-gray-600">상품 QnA</h2>
-            <button
-                onClick={handleWriteQna}
-                className="px-5 py-2 bg-black text-white rounded-md text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
-            >
-              QnA 작성
-            </button>
-          </div>
+        <div className="max-w-6xl mx-auto px-4 mt-12">
+          <h2 className="text-lg font-light text-gray-600 mb-4">QnA</h2>
+
           {qnas.length > 0 ? (
               <QnaList qnas={qnas} initialDisplayCount={3} />
           ) : (
-              <p className="text-sm text-gray-600 p-4 border rounded-md shadow-sm bg-white">등록된 QnA가 없습니다.</p>
+              <p className="text-sm text-gray-600 p-4 shadow-sm bg-white">등록된 QnA가 없습니다.</p>
           )}
+
+          {/* 버튼을 아래로 옮기고 오른쪽 정렬 */}
+          <div className="flex justify-end mt-4">
+            <button
+                onClick={handleWriteQna}
+                className="px-5 py-2 bg-black text-white rounded-none text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
+            >
+              등록
+            </button>
+          </div>
         </div>
         {/* --- 상품 QnA 섹션 끝 --- */}
 
         {related.length > 0 && (
-            <div className="max-w-6xl mx-auto px-4 mt-8">
-              <h2 className="text-lg font-light text-gray-600 mb-4">추천상품</h2>
+            <div className="max-w-6xl mx-auto px-4 mt-20">
+              <h2 className="text-lg font-light text-gray-600 mb-4">추천 상품</h2>
 
               {/* 슬라이더 형식으로 수정 */}
               <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">

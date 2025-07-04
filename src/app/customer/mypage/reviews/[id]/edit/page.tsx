@@ -15,7 +15,7 @@ export default function EditReviewPage() {
   const [review, setReview] = useState<ReviewResponseDTO | null>(null);
   const [content, setContent] = useState('');
   const [rating, setRating] = useState(5);
-  const [tempRating, setTempRating] = useState<number | null>(null); 
+  const [tempRating, setTempRating] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const {show} = useGlobalDialog();
@@ -29,24 +29,24 @@ export default function EditReviewPage() {
   useEffect(() => {
     if (!id) return;
     fetchReviewDetail(Number(id))
-      .then((data) => {
-        setReview(data);
-        setContent(data.content);
-        setRating(data.rating);
-        setExistingImages(data.imageUrls ?? []);
-      })
-      .catch(() => setError('리뷰 정보를 불러올 수 없습니다.'))
-      .finally(() => setLoading(false));
+        .then((data) => {
+          setReview(data);
+          setContent(data.content);
+          setRating(data.rating);
+          setExistingImages(data.imageUrls ?? []);
+        })
+        .catch(() => setError('리뷰 정보를 불러올 수 없습니다.'))
+        .finally(() => setLoading(false));
   }, [id]);
 
   // 새 이미지 파일 선택 시 처리
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-        setNewImages((prev) => [...prev, ...Array.from(files)]);
+      setNewImages((prev) => [...prev, ...Array.from(files)]);
     }
     e.target.value = '';
-    };
+  };
 
 
   // 기존 이미지 삭제 처리
@@ -69,7 +69,7 @@ export default function EditReviewPage() {
 
       // 1. 삭제 요청된 이미지 서버에서 삭제 API 호출
       await Promise.all(
-        removedImages.map((url) => deleteReviewImage(url))
+          removedImages.map((url) => deleteReviewImage(url))
       );
 
       // 2. 새 이미지 업로드 (uploadReviewImages가 이미지 URL 배열 반환)
@@ -104,29 +104,25 @@ export default function EditReviewPage() {
   if (!review) return <div>리뷰가 존재하지 않습니다.</div>;
 
   return (
-    <div>
-      <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-        <label className="block font-semibold mb-2 text-gray-700">
-            별점: {(tempRating ?? rating).toFixed(1)}점
-        </label>
-        <StarRating rating={rating} setRating={setRating} setTempRating={setTempRating} />
-        </div>
+      <div>
+        <div className="max-w-2xl mx-auto px-6 py-10">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <StarRating rating={rating} setRating={setRating} setTempRating={setTempRating} />
+            </div>
 
 
-          <div>
-            <label className="block font-semibold mb-2 text-gray-700">리뷰 내용</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="border border-gray-300 rounded px-4 py-3 w-full min-h-[140px] text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-400"
-              placeholder="리뷰 내용을 입력하세요."
-            />
-          </div>
+            <div>
+              <label className="block font-light mb-2 text-gray-700">리뷰 내용</label>
+              <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="border border-gray-300 rounded px-4 py-3 w-full min-h-[140px] text-gray-800"
+                  placeholder="리뷰 내용을 입력하세요."
+              />
+            </div>
 
-          {/* <div>
+            {/* <div>
             <label className="block font-semibold mb-2 text-gray-700">기존 이미지</label>
             <div className="flex flex-wrap gap-3 mb-4">
               {existingImages.map((url) => (
@@ -172,14 +168,14 @@ export default function EditReviewPage() {
             </div>
           </div> */}
 
-          <button
-            type="submit"
-            className="px-6 py-3 bg-teal-700 text-white rounded hover:bg-teal-800 transition-colors duration-200"
-          >
-            저장
-          </button>
-        </form>
+            <button
+                type="submit"
+                className="w-full px-6 py-3 bg-black text-white rounded-none hover:bg-gray-800 transition-colors duration-200"
+            >
+              저장
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
   );
 }

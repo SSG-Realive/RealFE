@@ -178,7 +178,7 @@ const CustomerListPage: React.FC = () => {
       
       const customersWithBoolean = (response.data.data.content || []).map((c: any) => {
         return {
-          ...c,
+        ...c,
           is_active: Boolean(
             c.is_active === true ||
             c.is_active === 'true' ||
@@ -364,8 +364,8 @@ const CustomerListPage: React.FC = () => {
 
         {/* 검색/필터 영역 */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div className="md:col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">검색</label>
               <Input
                 type="text"
@@ -406,6 +406,7 @@ const CustomerListPage: React.FC = () => {
                 variant="outline" 
                 onClick={() => fetchCustomers(0, true)} 
                 disabled={loading}
+                size="sm"
                 className="w-full"
               >
                 새로고침
@@ -474,8 +475,16 @@ const CustomerListPage: React.FC = () => {
                           onClick={() => handleToggleActive(customer)}
                           disabled={updatingId === customer.id}
                         >
-                          {customer.is_active ? <UserX className="w-4 h-4 mr-1" /> : <UserCheck className="w-4 h-4 mr-1" />}
-                          {customer.is_active ? "비활성화" : "활성화"}
+                          {updatingId === customer.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
+                            </>
+                          ) : (
+                            <>
+                              {customer.is_active ? <UserX className="w-4 h-4 mr-1" /> : <UserCheck className="w-4 h-4 mr-1" />}
+                              {customer.is_active ? "정지" : "복구"}
+                            </>
+                          )}
                         </Button>
                       </td>
                       <td className="px-6 py-4 text-center">

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi } from '@/lib/apiClient';
-import { Users, Search, Filter, UserCheck, UserX, CheckCircle, XCircle, ChevronDown } from 'lucide-react';
+import { Users, Search, UserCheck, UserX, CheckCircle, XCircle} from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -253,7 +253,7 @@ const AdminSellersPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">판매자 관리</h1>
-              <p className="text-gray-600 mt-1">판매자 계정을 관리하고 승인/거절 및 상태를 변경할 수 있습니다</p>
+              <p className="text-gray-600 mt-1">판매자 계정을 관리하고 승인/거절 및 상태를 변경할 수 있습니다 (ID 순 정렬, 정지된 판매자는 하단에 표시)</p>
             </div>
           </div>
 
@@ -333,13 +333,14 @@ const AdminSellersPage: React.FC = () => {
 
         {/* 필터 및 검색 */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">검색</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
                   type="text"
-                  placeholder="이름 또는 이메일로 검색하세요..."
+                  placeholder="이름 또는 이메일로 검색"
                   value={search}
                   onChange={handleSearchChange}
                   className="w-full pl-10"
@@ -347,38 +348,47 @@ const AdminSellersPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="lg:w-48">
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">승인 상태</label>
                 <Select value={status} onValueChange={(value) => setStatus(value)}>
-                  <SelectTrigger className="w-full pl-10">
-                    <SelectValue placeholder="전체 승인 상태" />
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="승인 상태 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">전체 승인 상태</SelectItem>
+                  <SelectItem value="all">모든 상태</SelectItem>
                     <SelectItem value="승인">승인</SelectItem>
                     <SelectItem value="승인처리전">승인처리전</SelectItem>
                   </SelectContent>
                 </Select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
             </div>
             
-            <div className="lg:w-48">
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">활성 상태</label>
                 <Select value={activeFilter} onValueChange={(value) => setActiveFilter(value)}>
-                  <SelectTrigger className="w-full pl-10">
-                    <SelectValue placeholder="전체 활성 상태" />
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="활성 상태 선택" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">전체 활성 상태</SelectItem>
+                  <SelectItem value="all">모든 상태</SelectItem>
                     <SelectItem value="active">활성</SelectItem>
                     <SelectItem value="inactive">정지</SelectItem>
                   </SelectContent>
                 </Select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
+            
+            <div>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  fetchSellers();
+                  fetchTotalStats();
+                }} 
+                disabled={loading}
+                size="sm"
+                className="w-full"
+              >
+                새로고침
+              </Button>
             </div>
           </div>
         </div>
@@ -428,7 +438,7 @@ const AdminSellersPage: React.FC = () => {
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">가입일</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">승인 상태</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">활성 상태</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">액션</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">정지</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">상세</th>
                     </tr>
                   </thead>
@@ -514,10 +524,12 @@ const AdminSellersPage: React.FC = () => {
                               {updatingId === seller.id ? (
                                 <>
                                   <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
-                                  처리중
                                 </>
                               ) : (
-                                seller.is_active ? '정지' : '복구'
+                                  <>
+                                    {seller.is_active ? <UserX className="w-4 h-4 mr-1" /> : <UserCheck className="w-4 h-4 mr-1" />}
+                                    {seller.is_active ? "정지" : "복구"}
+                                  </>
                               )}
                             </Button>
                           </div>
@@ -620,7 +632,10 @@ const AdminSellersPage: React.FC = () => {
                                 처리중
                               </>
                             ) : (
-                              seller.is_active ? '정지' : '복구'
+                                <>
+                                  {seller.is_active ? <UserX className="w-4 h-4 mr-1" /> : <UserCheck className="w-4 h-4 mr-1" />}
+                                  {seller.is_active ? "정지" : "복구"}
+                                </>
                             )}
                           </Button>
                         </div>

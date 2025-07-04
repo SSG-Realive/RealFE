@@ -223,7 +223,7 @@ export default function SellerProductListPage() {
           </div>
         </div>
 
-        {/* 상품 그리드 */}
+        {/* 상품 테이블 */}
         {products.length === 0 ? (
           <div className="text-center py-16 bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db]">
             <Package className="w-16 h-16 text-[#6b7280] mx-auto mb-4" />
@@ -238,65 +238,107 @@ export default function SellerProductListPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] overflow-hidden hover:scale-[1.02] transition-all duration-200"
-              >
-                {/* 상품 이미지 */}
-                <div className="aspect-square bg-white">
-                  {product.imageThumbnailUrl ? (
-                    <img
-                      src={product.imageThumbnailUrl}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
-                      <Package className="w-12 h-12 text-[#6b7280]" />
-                    </div>
-                  )}
-                </div>
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-[#e5e7eb]">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      상품 정보
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      카테고리
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      가격
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      재고
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      관리
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-[#d1d5db]">
+                  {products.map((product) => (
+                    <tr key={product.id} className="hover:bg-[#f9fafb] transition-colors">
+                      {/* 상품 정보 (이미지 + 이름) */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-16 w-16">
+                            {product.imageThumbnailUrl ? (
+                              <img
+                                src={product.imageThumbnailUrl}
+                                alt={product.name}
+                                className="h-16 w-16 object-cover rounded-lg border border-[#d1d5db]"
+                              />
+                            ) : (
+                              <div className="h-16 w-16 bg-[#f3f4f6] rounded-lg border border-[#d1d5db] flex items-center justify-center">
+                                <Package className="w-6 h-6 text-[#6b7280]" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4 flex-1">
+                            <div className="text-sm font-bold text-[#374151] line-clamp-2">
+                              {product.name}
+                            </div>
+                            <div className="text-xs text-[#6b7280] mt-1">
+                              ID: {product.id}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-                {/* 상품 정보 */}
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-[#374151] text-sm line-clamp-2 flex-1">
-                      {product.name}
-                    </h3>
-                    {getStatusBadge(product)}
-                  </div>
-                  
-                  <p className="text-lg font-bold text-[#374151] mb-2">
-                    {product.price.toLocaleString()}원
-                  </p>
-                  
-                  <div className="flex justify-between items-center text-xs text-[#6b7280] mb-4">
-                    <span>재고: {product.stock}개</span>
-                    <span>{product.categoryName}</span>
-                  </div>
+                      {/* 카테고리 */}
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {product.categoryName}
+                      </td>
 
-                  {/* 액션 버튼 */}
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleView(product.id)}
-                      className="flex-1 bg-[#d1d5db] text-[#374151] px-3 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                    >
-                      <Eye className="w-3 h-3" />
-                      보기
-                    </button>
-                    <button
-                      onClick={() => handleEdit(product.id)}
-                      className="flex-1 bg-[#6b7280] text-white px-3 py-2 rounded-lg hover:bg-[#374151] transition-colors text-sm font-medium flex items-center justify-center gap-1"
-                    >
-                      <Edit className="w-3 h-3" />
-                      수정
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                      {/* 가격 */}
+                      <td className="px-6 py-4 text-sm font-bold text-[#374151]">
+                        {product.price.toLocaleString()}원
+                      </td>
+
+                      {/* 재고 */}
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        <span className={`font-medium ${product.stock === 0 ? 'text-red-600' : 'text-[#374151]'}`}>
+                          {product.stock}개
+                        </span>
+                      </td>
+
+                      {/* 상태 */}
+                      <td className="px-6 py-4">
+                        {getStatusBadge(product)}
+                      </td>
+
+                      {/* 관리 버튼 */}
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleView(product.id)}
+                            className="bg-[#d1d5db] text-[#374151] p-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+                            title="상품 보기"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(product.id)}
+                            className="bg-[#6b7280] text-white p-2 rounded-lg hover:bg-[#374151] transition-colors"
+                            title="상품 수정"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 

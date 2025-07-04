@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   useParams,
   useRouter,
-  usePathname,
 } from 'next/navigation';
 
 import {
@@ -33,7 +32,6 @@ import { useGlobalDialog } from '@/app/context/dialogContext';
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const pathname = usePathname();
   const { show } = useGlobalDialog();
 
   const withAuth = async (action: () => Promise<void>) => {
@@ -136,8 +134,6 @@ export default function ProductDetailPage() {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!product) return <p>로딩 중…</p>;
 
-  const totalPrice = (product.price * quantity).toLocaleString();
-
   return (
       <div>
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -156,6 +152,7 @@ export default function ProductDetailPage() {
             </p>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
+
               <p><span className="font-light">상품상태:</span> {product.status}</p>
               <p><span className="font-light">재고:</span> {product.stock}개</p>
               {product.width && product.depth && product.height && (
@@ -173,7 +170,6 @@ export default function ProductDetailPage() {
 
               <div className="mb-6">
                 <TrafficLightStatusCardforProductDetail
-                    title="상품 평점"
                     rating={averageRating}
                     count={reviewCount}
                     className="" // mx-auto 제거

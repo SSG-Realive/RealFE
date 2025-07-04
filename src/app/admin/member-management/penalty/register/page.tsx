@@ -3,6 +3,7 @@ import apiClient from '@/lib/apiClient';
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Save, ArrowLeft, User, FileText, Hash } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function PenaltyRegisterPage() {
   const router = useRouter();
@@ -11,6 +12,7 @@ export default function PenaltyRegisterPage() {
   const [points, setPoints] = useState(10);
   const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
   const [loading, setLoading] = useState(false);
+  const {show} = useGlobalDialog();
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
@@ -35,11 +37,11 @@ export default function PenaltyRegisterPage() {
           'Content-Type': 'application/json',
         }
       });
-      alert('패널티가 등록되었습니다.');
+      show('패널티가 등록되었습니다.');
       router.push('/admin/member-management/penalty');
     } catch (err) {
       const error = err as any;
-      alert('등록 실패: ' + (error?.response?.data?.message || error?.message || '알 수 없는 오류'));
+      show('등록 실패: ' + (error?.response?.data?.message || error?.message || '알 수 없는 오류'));
     } finally {
       setLoading(false);
     }

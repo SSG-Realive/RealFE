@@ -70,10 +70,21 @@ export async function getProductDetail(id: number): Promise<ProductDetail> {
  */
 export async function getMyProducts(searchParams: Record<string, any> = {}): Promise<PageResponse<ProductListItem>> {
     const query = buildSearchParams(searchParams); // ✅ 빈 값 빼고 쿼리스트링 구성
-  console.log('→ 최종 요청 URL:', `/seller/products?${query}`); // 디버그 확인용
-
-  const res = await sellerApi.get(`/seller/products?${query}`);
+    
+    // 임시 디버깅 로그
+    console.log('🔍 API 요청 디버깅:');
+    console.log('- 입력 파라미터:', searchParams);
+    console.log('- 생성된 쿼리:', query);
+    console.log('- 최종 URL:', `/seller/products?${query}`);
+    
+    const res = await sellerApi.get(`/seller/products?${query}`);
     const data = res.data;
+    
+    console.log('📦 API 응답 디버깅:');
+    console.log('- 응답 데이터:', data);
+    console.log('- 상품 개수:', data.dtoList?.length || 0);
+    console.log('- 첫 번째 상품 ID:', data.dtoList?.[0]?.id);
+    console.log('- 마지막 상품 ID:', data.dtoList?.[data.dtoList?.length - 1]?.id);
     
     // 백엔드에서 active로 오는 필드를 isActive로 변환
     if (data.dtoList && Array.isArray(data.dtoList)) {
@@ -139,10 +150,10 @@ export async function getMyProductStats(): Promise<{
         return product;
     });
     
-    // 품절 상품들 상세 확인
-    const outOfStockProducts = allProducts.filter(p => p.stock === 0);
-    const sellingProducts = allProducts.filter(p => p.isActive && p.stock > 0);
-    const suspendedProducts = allProducts.filter(p => !p.isActive);
+    // 상품 상태별 분류 (중복 제거)
+    const sellingProducts = allProducts.filter(p => p.isActive && p.stock > 0); // 판매중: 활성화 + 재고 있음
+    const outOfStockProducts = allProducts.filter(p => p.stock === 0); // 품절: 재고 0 (활성화 상태 관계없이)
+    const suspendedProducts = allProducts.filter(p => !p.isActive && p.stock > 0); // 판매중지: 비활성화 + 재고 있음
     
     const stats = {
       total: allProducts.length,

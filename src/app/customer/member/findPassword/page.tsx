@@ -18,7 +18,6 @@ export default function FindPasswordMultiStep() {
   const { show, open, message, handleClose } = useDialog();
   const router = useRouter();
 
-  // NEXT_PUBLIC_API_BASE_URL는 예: "http://localhost:8080/api"
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
   const post = async (path: string, body: any) => {
@@ -35,7 +34,7 @@ export default function FindPasswordMultiStep() {
 
   const onEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) { show('이메일을 입력해주세요.'); return; }
+    if (!email.trim()) return show('이메일을 입력해주세요.');
     setLoading(true);
     try {
       await post('/public/password-reset/request', { email });
@@ -50,7 +49,7 @@ export default function FindPasswordMultiStep() {
 
   const onCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim()) { show('인증번호를 입력해주세요.'); return; }
+    if (!code.trim()) return show('인증번호를 입력해주세요.');
     setLoading(true);
     try {
       await post('/public/password-reset/verify', { email, code });
@@ -65,14 +64,8 @@ export default function FindPasswordMultiStep() {
 
   const onPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPass || !confirmPass) {
-      show('새 비밀번호를 모두 입력해주세요.');
-      return;
-    }
-    if (newPass !== confirmPass) {
-      show('비밀번호가 일치하지 않습니다.');
-      return;
-    }
+    if (!newPass || !confirmPass) return show('새 비밀번호를 모두 입력해주세요.');
+    if (newPass !== confirmPass) return show('비밀번호가 일치하지 않습니다.');
     setLoading(true);
     try {
       await post('/public/password-reset/confirm', {
@@ -80,7 +73,6 @@ export default function FindPasswordMultiStep() {
         newPassword: newPass,
         confirmPassword: confirmPass,
       });
-      // 다이얼로그 확인 후 로그인 페이지로 이동
       await show('비밀번호가 변경되었습니다.');
       router.push('/customer/member/login');
     } catch (err: any) {
@@ -91,93 +83,89 @@ export default function FindPasswordMultiStep() {
   };
 
   return (
-    <>
-      <GlobalDialog open={open} message={message} onClose={handleClose} />
+      <>
+        <GlobalDialog open={open} message={message} onClose={handleClose} />
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="w-full max-w-md bg-white p-6 rounded-lg shadow">
+        <div className="w-full flex items-center justify-center bg-white p-4 mt-40">
+          <div className="w-full max-w-md bg-white p-5 rounded-lg shadow-sm">
+            {step === 'enterEmail' && (
+                <form onSubmit={onEmailSubmit}>
+                  <h1 className="text-lg font-medium mb-3">비밀번호 찾기</h1>
+                  <input
+                      type="email"
+                      placeholder="이메일"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-none mb-3 focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                  />
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-black text-white py-2 rounded-none hover:bg-gray-800 text-sm"
+                  >
+                    {loading ? '요청 중…' : '인증번호 발송'}
+                  </button>
+                </form>
+            )}
 
-          {step === 'enterEmail' && (
-            <form onSubmit={onEmailSubmit}>
-              <h1 className="text-2xl font-light mb-4">비밀번호 찾기</h1>
-              <input
-                type="email"
-                placeholder="이메일"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-4 focus:ring"
-                required
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-              >
-                {loading ? '요청 중…' : '인증번호 발송'}
-              </button>
-            </form>
-          )}
+            {step === 'verifyCode' && (
+                <form onSubmit={onCodeSubmit}>
+                  <h1 className="text-lg font-medium mb-3">인증번호 확인</h1>
+                  <p className="mb-2 text-sm text-gray-600">{email}로 발송된 코드를 입력하세요</p>
+                  <input
+                      type="text"
+                      placeholder="인증번호"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-none mb-3 focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                  />
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-black text-white py-2 rounded-none hover:bg-gray-800 text-sm"
+                  >
+                    {loading ? '검증 중…' : '코드 검증'}
+                  </button>
+                  <button
+                      type="button"
+                      onClick={() => setStep('enterEmail')}
+                      className="mt-3 text-xs text-gray-500 underline"
+                  >
+                    이메일 다시 입력
+                  </button>
+                </form>
+            )}
 
-          {step === 'verifyCode' && (
-            <form onSubmit={onCodeSubmit}>
-              <h1 className="text-2xl font-light mb-4">인증번호 확인</h1>
-              <p className="mb-2 text-sm text-gray-600">{email}로 발송된 코드를 입력</p>
-              <input
-                type="text"
-                placeholder="인증번호"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-4 focus:ring"
-                required
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-              >
-                {loading ? '검증 중…' : '코드 검증'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep('enterEmail')}
-                className="mt-2 text-sm text-gray-500 underline"
-              >
-                이메일 다시 입력
-              </button>
-            </form>
-          )}
-
-          {step === 'newPassword' && (
-            <form onSubmit={onPasswordSubmit}>
-              <h1 className="text-2xl font-light mb-4">새 비밀번호 설정</h1>
-              <input
-                type="password"
-                placeholder="새 비밀번호"
-                value={newPass}
-                onChange={(e) => setNewPass(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-4 focus:ring"
-                required
-              />
-              <input
-                type="password"
-                placeholder="비밀번호 확인"
-                value={confirmPass}
-                onChange={(e) => setConfirmPass(e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-6 focus:ring"
-                required
-              />
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-              >
-                {loading ? '변경 중…' : '비밀번호 변경'}
-              </button>
-            </form>
-          )}
-
+            {step === 'newPassword' && (
+                <form onSubmit={onPasswordSubmit}>
+                  <h1 className="text-lg font-medium mb-3">새 비밀번호 설정</h1>
+                  <input
+                      type="password"
+                      placeholder="새 비밀번호"
+                      value={newPass}
+                      onChange={(e) => setNewPass(e.target.value)}
+                      className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-none mb-3 focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                      required
+                  />
+                  <input
+                      type="password"
+                      placeholder="비밀번호 확인"
+                      value={confirmPass}
+                      onChange={(e) => setConfirmPass(e.target.value)}
+                      className="w-full bg-gray-100 border border-gray-300 px-3 py-2 rounded-none mb-4 focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                      required
+                  />
+                  <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full bg-black text-white py-2 rounded-none hover:bg-gray-800 text-sm"
+                  >
+                    {loading ? '변경 중…' : '비밀번호 변경'}
+                  </button>
+                </form>
+            )}
+          </div>
         </div>
-      </div>
-    </>
+      </>
   );
 }

@@ -32,6 +32,7 @@ import {
     CheckCircle,
     Calculator
 } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerSettlementPage() {
     const checking = useSellerAuthGuard();
@@ -63,7 +64,7 @@ export default function SellerSettlementPage() {
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dailyPayouts, setDailyPayouts] = useState<DailySettlementItem[]>([]); // 하루 단위로 재구성된 정산 데이터
-
+    const {show} = useGlobalDialog();
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -178,7 +179,7 @@ export default function SellerSettlementPage() {
             setError(errorMessage);
             
             // 에러 발생 시 알림 표시
-            alert(errorMessage);
+            show(errorMessage);
         }
     };
 
@@ -308,15 +309,15 @@ export default function SellerSettlementPage() {
                         if (!dailyDataMap[saleDate]) {
                             dailyDataMap[saleDate] = {
                                 id: `daily_${saleDate}`,
-                                originalPayoutId: payout.id,
-                                sellerId: payout.sellerId,
-                                date: saleDate,
-                                periodStart: saleDate,
-                                periodEnd: saleDate,
+                            originalPayoutId: payout.id,
+                            sellerId: payout.sellerId,
+                            date: saleDate,
+                            periodStart: saleDate,
+                            periodEnd: saleDate,
                                 totalSales: 0,
                                 totalCommission: 0,
                                 payoutAmount: 0,
-                                processedAt: payout.processedAt,
+                            processedAt: payout.processedAt,
                                 salesCount: 0,
                                 salesDetails: [] // 해당 날짜의 모든 상세 내역
                             };
@@ -336,17 +337,17 @@ export default function SellerSettlementPage() {
                     if (!dailyDataMap[fallbackDate]) {
                         dailyDataMap[fallbackDate] = {
                             id: `daily_${fallbackDate}_fallback`,
-                            originalPayoutId: payout.id,
-                            sellerId: payout.sellerId,
+                        originalPayoutId: payout.id,
+                        sellerId: payout.sellerId,
                             date: fallbackDate,
                             periodStart: fallbackDate,
-                            periodEnd: payout.periodEnd,
-                            totalSales: payout.totalSales,
-                            totalCommission: payout.totalCommission,
-                            payoutAmount: payout.payoutAmount,
-                            processedAt: payout.processedAt,
-                            salesCount: 1,
-                            salesDetails: []
+                        periodEnd: payout.periodEnd,
+                        totalSales: payout.totalSales,
+                        totalCommission: payout.totalCommission,
+                        payoutAmount: payout.payoutAmount,
+                        processedAt: payout.processedAt,
+                        salesCount: 1,
+                        salesDetails: []
                         };
                     }
                 }
@@ -443,13 +444,13 @@ export default function SellerSettlementPage() {
                             <div className="flex items-center gap-3 mb-2">
                                 <TrendingUp className="w-8 h-8 text-blue-600" />
                                 <span className="text-[#374151] text-sm font-semibold">평균 정산액</span>
-                            </div>
+                    </div>
                             <div className="text-2xl font-bold text-blue-600">
                                 {completedSettlements.length > 0 ? Math.round(completedAmount / completedSettlements.length).toLocaleString() : 0}원
-                            </div>
+                                                    </div>
                             <div className="text-xs text-[#6b7280] mt-1">건당 평균 지급액</div>
                         </section>
-                    </div>
+                                                    </div>
 
 
 
@@ -610,8 +611,8 @@ export default function SellerSettlementPage() {
                                             return (
                                                 <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
-                                                        <div className="font-semibold">
-                                                            {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                                            <div className="font-semibold">
+                                                                {item.date} {item.date === getTodayDate() && '(오늘)'}
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">

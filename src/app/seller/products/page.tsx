@@ -1,281 +1,394 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import SellerHeader from '@/components/seller/SellerHeader';
-import SellerLayout from '@/components/layouts/SellerLayout';
-import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { Armchair, Layers, AlertTriangle, Plus, Eye, TrendingUp, TrendingDown, BadgeCheck, Ban, Calculator, Package, XCircle, PauseCircle, RefreshCw } from 'lucide-react';
-import Link from 'next/link';
-
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { getMyProducts, getMyProductStats } from '@/service/seller/productService';
 import { ProductListItem } from '@/types/seller/product/productList';
+import { PageResponse } from '@/types/seller/page/pageResponse';
+import SellerLayout from '@/components/layouts/SellerLayout';
+import { Search, Plus, Edit, Eye, Trash2, Package, Filter } from 'lucide-react';
+import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 
-export default function ProductListPage() {
+export default function SellerProductListPage() {
   const checking = useSellerAuthGuard();
-   
-
   const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [products, setProducts] = useState<ProductListItem[]>([]);
-  const [totalProductCount, setTotalProductCount] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const [keyword, setKeyword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   
-  // 전체 상품 통계 상태 추가
-  const [productStats, setProductStats] = useState({
+  // 통계 상태
+  const [stats, setStats] = useState({
     total: 0,
     selling: 0,
     suspended: 0,
     outOfStock: 0
   });
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // 상품 상태 매핑 함수 - 실제 판매 상태 기반으로 수정
-  const getProductSalesStatus = (product: ProductListItem) => {
-    if (product.stock === 0) return { text: '품절', color: 'bg-red-100 text-red-800' };
-    if (!product.isActive) return { text: '판매중지', color: 'bg-yellow-100 text-yellow-800' };
-    return { text: '판매중', color: 'bg-green-100 text-green-800' };
-  };
-
-  // 품질등급 색상 지정 함수 (기존 status는 품질등급)
-  const getQualityGradeColor = (status: string) => {
-    switch (status) {
-      case '상': return 'bg-green-100 text-green-800';
-      case '중': return 'bg-yellow-100 text-yellow-800';
-      case '하': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // 전체 상품 통계 가져오기
-  const fetchProductStats = async () => {
+  const fetchProducts = async (page = 0) => {
     try {
-      const stats = await getMyProductStats();
-      setProductStats(stats);
+      setLoading(true);
+      const searchParams = {
+        page: page + 1, // 백엔드가 1부터 시작할 가능성이 높음
+        size: 12,
+        keyword: searchKeyword || undefined,
+        status: statusFilter || undefined,
+      };
+      
+      const [productsResponse, statsResponse] = await Promise.all([
+        getMyProducts(searchParams),
+        getMyProductStats()
+      ]);
+
+      setProducts(productsResponse.dtoList || []);
+      setTotalPages(Math.ceil((productsResponse.total || 0) / 12));
+      setTotalElements(productsResponse.total || 0);
+      setCurrentPage(page);
+      setStats(statsResponse);
     } catch (error) {
-      console.error('상품 통계 조회 실패:', error);
+      console.error('상품 목록 조회 실패:', error);
+      alert('상품 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (checking) return;
+    fetchProducts();
+  }, [checking]);
 
-    const page = parseInt(searchParams.get('page') || '1', 10);
-    setCurrentPage(page);
-    fetchProductList(page);
-    fetchProductStats(); // 전체 상품 통계도 함께 가져오기
-  }, [searchParams, checking]);
+  const handleSearch = () => {
+    fetchProducts(0);
+  };
 
-  const fetchProductList = async (page: number) => {
-    try {
-      const data = await getMyProducts({
-        page,
-        keyword,
-        status: statusFilter,
-      });
+  const handlePageChange = (newPage: number) => {
+    fetchProducts(newPage);
+  };
 
-      setProducts(data.dtoList);
-      setTotalProductCount(data.total);
-      setTotalPages(Math.ceil(data.total / data.size));
-    } catch (err) {
-      console.error('상품 목록 조회 실패', err);
+  const handleEdit = (productId: number) => {
+    router.push(`/seller/products/${productId}/edit`);
+  };
+
+  const handleView = (productId: number) => {
+    router.push(`/seller/products/${productId}`);
+  };
+
+  const getStatusBadge = (product: ProductListItem) => {
+    if (product.stock === 0) {
+      return <span className="px-2 py-1 rounded text-xs font-bold bg-[#f87171] text-white">품절</span>;
+    } else if (!product.isActive) {
+      return <span className="px-2 py-1 rounded text-xs font-bold bg-[#d97706] text-white">판매중지</span>;
+    } else {
+      return <span className="px-2 py-1 rounded text-xs font-bold bg-[#6b7280] text-white">판매중</span>;
     }
   };
 
-  const goToPage = (page: number) => {
-    router.push(`/seller/products?page=${page}`);
-  };
-
-  const handleSearch = () => {
-    if (checking) return;
-    fetchProductList(1);
-    fetchProductStats(); // 검색/필터링 시에도 전체 통계 업데이트
-    router.push(`/seller/products?page=1`);
-  };
-
-  const handleRegisterClick = () => {
-    router.push('/seller/products/new');
-  };
-
-  if (checking) return (
-    <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">인증 확인 중...</p>
-      </div>
-    </div>
-  ); // ✅ 인증 확인 중 UI 
-  return (
-    <>
-      <div className="hidden">
-      <SellerHeader toggleSidebar={toggleSidebar} />
-      </div>
+  if (checking || loading) {
+    return (
       <SellerLayout>
-        <div className="flex-1 w-full h-full px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl md:text-2xl font-bold text-[#0f766e]">상품 관리</h1>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  fetchProductList(currentPage);
-                  fetchProductStats();
-                }}
-                className="inline-flex items-center gap-2 bg-[#e5e7eb] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#d1d5db] transition-colors font-medium shadow-sm border border-[#d1d5db]"
-              >
-                <RefreshCw className="w-5 h-5" />
-                새로고침
-              </button>
-              <button
-                onClick={handleRegisterClick}
-                className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
-              >
-                <Plus className="w-5 h-5" />
-                상품 등록
-              </button>
-            </div>
+        <div className="min-h-screen bg-white p-6">
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
+            <span className="ml-3 text-[#374151] text-lg">상품 목록을 불러오는 중...</span>
           </div>
-
-          {/* 상단 통계 카드 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
-              <div className="flex items-center gap-3 mb-2">
-                <Package className="w-8 h-8 text-[#6b7280]" />
-                <span className="text-[#374151] text-sm font-semibold">총 상품 수</span>
-              </div>
-              <div className="text-2xl font-bold text-[#374151]">{productStats.total}개</div>
-            </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="w-8 h-8 text-green-600" />
-                <span className="text-[#374151] text-sm font-semibold">판매중</span>
-              </div>
-              <div className="text-2xl font-bold text-green-700">{productStats.selling}개</div>
-            </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <XCircle className="w-8 h-8 text-red-600" />
-                <span className="text-[#374151] text-sm font-semibold">품절</span>
-              </div>
-              <div className="text-2xl font-bold text-red-700">{productStats.outOfStock}개</div>
-            </section>
-            <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all hover:bg-[#e5e7eb] cursor-pointer">
-              <div className="flex items-center gap-3 mb-2">
-                <PauseCircle className="w-8 h-8 text-yellow-600" />
-                <span className="text-[#374151] text-sm font-semibold">판매중지</span>
-              </div>
-              <div className="text-2xl font-bold text-yellow-700">{productStats.suspended}개</div>
-            </section>
-          </div>
-
-          {/* 검색/필터 영역 */}
-          <div className="bg-[#f3f4f6] p-4 md:p-6 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
-                placeholder="상품명으로 검색..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-                className="flex-1 border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-                className="border-2 border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151]"
-            >
-              <option value="">전체 품질등급</option>
-              <option value="상">상</option>
-              <option value="중">중</option>
-              <option value="하">하</option>
-            </select>
-            <button
-              onClick={handleSearch}
-              className="bg-[#d1d5db] text-[#374151] px-6 py-2 rounded-md hover:bg-[#e5e7eb] transition-colors font-medium"
-            >
-              검색
-            </button>
-            </div>
-          </div>
-
-          {/* 상품 리스트 (쇼피파이 스타일 테이블+카드) */}
-          <div className="overflow-x-auto bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db]">
-            <table className="min-w-full divide-y divide-[#d1d5db]">
-              <thead className="bg-[#f3f4f6]">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">상품명</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">가격</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">품질등급</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">판매상태</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[#d1d5db] uppercase tracking-wider">재고</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-[#d1d5db] uppercase tracking-wider">액션</th>
-                </tr>
-              </thead>
-              <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                {products.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="text-center py-8 text-[#d1d5db]">상품이 없습니다.</td>
-                  </tr>
-                ) : (
-                  products.map((product) => {
-                    const salesStatus = getProductSalesStatus(product);
-                    return (
-                    <tr key={product.id} className="hover:bg-[#e5e7eb] transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">{product.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.price.toLocaleString()}원</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${getQualityGradeColor(product.status)}`}>
-                          {product.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${salesStatus.color}`}>
-                          {salesStatus.text}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-[#374151]">{product.stock ?? 0}개</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <button
-                          onClick={() => router.push(`/seller/products/${product.id}`)}
-                          className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
-                        >
-                          <Eye className="w-4 h-4" /> 상세 보기
-                        </button>
-                      </td>
-                    </tr>
-                  )})
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 페이지네이션 */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-6 space-x-2">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i + 1}
-                  onClick={() => goToPage(i + 1)}
-                  className={`px-4 py-2 rounded-lg font-bold shadow-sm border text-sm transition-colors
-                    ${currentPage === i + 1
-                      ? 'bg-[#d1d5db] text-[#374151] border-[#d1d5db]'
-                      : 'bg-[#f3f4f6] text-[#374151] border-[#d1d5db] hover:bg-[#d1d5db] hover:text-[#374151]'}
-                  `}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </SellerLayout>
-    </>
+    );
+  }
+
+  return (
+    <SellerLayout>
+      <div className="min-h-screen bg-white p-6">
+        {/* 헤더 */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 관리</h1>
+            <p className="text-sm text-[#6b7280]">등록된 상품을 관리하고 새로운 상품을 추가할 수 있습니다.</p>
+          </div>
+          <button
+            onClick={() => router.push('/seller/products/new')}
+            className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-[#6b7280] text-white px-4 py-2 rounded-lg hover:bg-[#374151] transition-colors font-medium shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            신규 상품 등록
+          </button>
+        </div>
+
+        {/* 통계 카드 */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#6b7280]">총 상품 수</p>
+                <p className="text-2xl font-bold text-[#374151]">{stats.total}개</p>
+              </div>
+              <Package className="w-8 h-8 text-[#6b7280]" />
+            </div>
+            <div className="mt-4 bg-[#d1d5db] rounded-full h-2">
+              <div 
+                className="bg-[#374151] h-2 rounded-full" 
+                style={{ width: stats.total > 0 ? '100%' : '0%' }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#6b7280]">판매중</p>
+                <p className="text-2xl font-bold text-[#6b7280]">{stats.selling}개</p>
+              </div>
+              <Eye className="w-8 h-8 text-[#6b7280]" />
+            </div>
+            <div className="mt-4 bg-[#d1d5db] rounded-full h-2">
+              <div 
+                className="bg-[#6b7280] h-2 rounded-full" 
+                style={{ width: stats.total > 0 ? `${(stats.selling / stats.total) * 100}%` : '0%' }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#6b7280]">품절</p>
+                <p className="text-2xl font-bold text-[#f87171]">{stats.outOfStock}개</p>
+              </div>
+              <Package className="w-8 h-8 text-[#f87171]" />
+            </div>
+            <div className="mt-4 bg-[#d1d5db] rounded-full h-2">
+              <div 
+                className="bg-[#f87171] h-2 rounded-full" 
+                style={{ width: stats.total > 0 ? `${(stats.outOfStock / stats.total) * 100}%` : '0%' }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#6b7280]">판매중지</p>
+                <p className="text-2xl font-bold text-[#6b7280]">{stats.suspended}개</p>
+              </div>
+              <Package className="w-8 h-8 text-[#6b7280]" />
+            </div>
+            <div className="mt-4 bg-[#d1d5db] rounded-full h-2">
+              <div 
+                className="bg-[#6b7280] h-2 rounded-full" 
+                style={{ width: stats.total > 0 ? `${(stats.suspended / stats.total) * 100}%` : '0%' }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 검색 및 필터 */}
+        <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6 mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="상품명으로 검색..."
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                  className="w-full pl-10 pr-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
+                />
+              </div>
+            </div>
+            <div className="md:w-48">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
+              >
+                <option value="">전체 상태</option>
+                <option value="active">판매중</option>
+                <option value="inactive">판매중지</option>
+                <option value="out_of_stock">품절</option>
+              </select>
+            </div>
+            <button
+              onClick={handleSearch}
+              className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-6 py-3 rounded-xl hover:bg-[#374151] transition-colors font-medium shadow-sm"
+            >
+              <Filter className="w-4 h-4" />
+              검색
+            </button>
+          </div>
+        </div>
+
+        {/* 상품 테이블 */}
+        {products.length === 0 ? (
+          <div className="text-center py-16 bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db]">
+            <Package className="w-16 h-16 text-[#6b7280] mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-[#374151] mb-2">등록된 상품이 없습니다</h3>
+            <p className="text-[#6b7280] mb-6">첫 번째 상품을 등록해보세요!</p>
+            <button
+              onClick={() => router.push('/seller/products/new')}
+              className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-4 py-2 rounded-lg hover:bg-[#374151] transition-colors font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              신규 상품 등록
+            </button>
+          </div>
+        ) : (
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-[#e5e7eb]">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      상품 정보
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      카테고리
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      가격
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      재고
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-[#374151] uppercase tracking-wider">
+                      관리
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-[#d1d5db]">
+                  {products.map((product) => (
+                    <tr key={product.id}>
+                      {/* 상품 정보 (이미지 + 이름) */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-16 w-16">
+                            {product.imageThumbnailUrl ? (
+                              <img
+                                src={product.imageThumbnailUrl}
+                                alt={product.name}
+                                className="h-16 w-16 object-cover rounded-lg border border-[#d1d5db]"
+                              />
+                            ) : (
+                              <div className="h-16 w-16 bg-[#f3f4f6] rounded-lg border border-[#d1d5db] flex items-center justify-center">
+                                <Package className="w-6 h-6 text-[#6b7280]" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-4 flex-1">
+                            <div className="text-sm font-bold text-[#374151] line-clamp-2">
+                              {product.name}
+                            </div>
+                            <div className="text-xs text-[#6b7280] mt-1">
+                              ID: {product.id}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 카테고리 */}
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        {product.categoryName}
+                      </td>
+
+                      {/* 가격 */}
+                      <td className="px-6 py-4 text-sm font-bold text-[#374151]">
+                        {product.price.toLocaleString()}원
+                      </td>
+
+                      {/* 재고 */}
+                      <td className="px-6 py-4 text-sm text-[#374151]">
+                        <span className={`font-medium ${product.stock === 0 ? 'text-red-600' : 'text-[#374151]'}`}>
+                          {product.stock}개
+                        </span>
+                      </td>
+
+                      {/* 상태 */}
+                      <td className="px-6 py-4">
+                        {getStatusBadge(product)}
+                      </td>
+
+                      {/* 관리 버튼 */}
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleView(product.id)}
+                            className="bg-[#d1d5db] text-[#374151] p-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+                            title="상품 보기"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(product.id)}
+                            className="bg-[#6b7280] text-white p-2 rounded-lg hover:bg-[#374151] transition-colors"
+                            title="상품 수정"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 페이지네이션 */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+                disabled={currentPage === 0}
+                className="px-3 py-2 border border-[#d1d5db] rounded-lg hover:bg-[#f3f4f6] disabled:opacity-50 disabled:cursor-not-allowed text-[#374151] bg-white"
+              >
+                이전
+              </button>
+              
+              {/* 페이지 번호 버튼들 */}
+              {(() => {
+                const maxVisiblePages = 10;
+                const startPage = Math.max(0, Math.min(currentPage - Math.floor(maxVisiblePages / 2), totalPages - maxVisiblePages));
+                const endPage = Math.min(totalPages, startPage + maxVisiblePages);
+                
+                return Array.from({ length: endPage - startPage }, (_, i) => {
+                  const pageNum = startPage + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 border border-[#d1d5db] rounded-lg transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-[#6b7280] text-white'
+                          : 'bg-white text-[#374151] hover:bg-[#f3f4f6]'
+                      }`}
+                    >
+                      {pageNum + 1}
+                    </button>
+                  );
+                });
+              })()}
+              
+              <button
+                onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
+                disabled={currentPage >= totalPages - 1}
+                className="px-3 py-2 border border-[#d1d5db] rounded-lg hover:bg-[#f3f4f6] disabled:opacity-50 disabled:cursor-not-allowed text-[#374151] bg-white"
+              >
+                다음
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </SellerLayout>
   );
 }

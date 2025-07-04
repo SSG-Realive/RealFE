@@ -7,11 +7,8 @@ export default function Footer() {
 
     const hiddenPaths = [
         '/autions',
-        '/login',
         '/seller',
         '/admin',
-        '/customer/signup',
-        '/customer/member/login',
         '/customer/cart',
     ];
 

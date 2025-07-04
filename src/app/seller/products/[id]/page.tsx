@@ -1,259 +1,242 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getProductDetail, deleteProduct } from '@/service/seller/productService';
 import { ProductDetail } from '@/types/seller/product/product';
-import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
+import { Edit, Trash2, Package, DollarSign, Eye, Armchair } from 'lucide-react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
-import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
-import { ArrowLeft, Edit, Trash2, Package, DollarSign, Layers, Tag, Ruler, Eye, AlertCircle } from 'lucide-react';
 
-export default function ProductDetailPage() {
-    const checking = useSellerAuthGuard();
+export default function SellerProductDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const checking = useSellerAuthGuard();
+  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
-    const params = useParams();
-    const router = useRouter();
-    const productId = Number(params?.id);
+  const productId = params.id as string;
 
-    const [product, setProduct] = useState<ProductDetail | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-
-    useEffect(() => {
-        if (checking) return;
-
-        const token = useSellerAuthStore.getState().accessToken;
-        if (!token) {
-            router.push('/seller/login');
-            return;
-        }
-
-        if (!productId) return;
-
-        const fetchProduct = async () => {
-            try {
-                const data = await getProductDetail(productId);
-                setProduct(data);
-                setError(null);
-            } catch (err) {
-                console.error(err);
-                setError('상품 정보를 불러오지 못했습니다.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProduct();
-    }, [productId, checking]);
-
-    const handleDelete = async () => {
-        if (!confirm('정말로 이 상품을 삭제하시겠습니까?')) return;
-
-        try {
-            await deleteProduct(productId);
-            alert('삭제 완료');
-            router.push('/seller/products');
-        } catch (err) {
-            console.error(err);
-            alert('삭제 실패');
-        }
+  useEffect(() => {
+    if (checking) return;
+    
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const productData = await getProductDetail(Number(productId));
+        setProduct(productData);
+      } catch (error) {
+        console.error('상품 조회 실패:', error);
+        alert('상품을 불러오는데 실패했습니다.');
+        router.push('/seller/products');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleEdit = () => {
-        router.push(`/seller/products/${productId}/edit`);
-    };
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId, checking, router]);
 
-    if (checking) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">인증 확인 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (loading) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">상품 정보를 불러오는 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (error) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <p className="text-red-600">{error}</p>
-            </div>
-        </div>
-    );
-    
-    if (!product) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">상품 정보를 불러올 수 없습니다.</p>
-            </div>
-        </div>
-    );
+  const handleEdit = () => {
+    router.push(`/seller/products/${productId}/edit`);
+  };
 
+  const handleDelete = async () => {
+    if (window.confirm('정말로 이 상품을 삭제하시겠습니까?')) {
+      try {
+        setDeleting(true);
+        await deleteProduct(Number(productId));
+        alert('상품이 성공적으로 삭제되었습니다.');
+        router.push('/seller/products');
+      } catch (error) {
+        console.error('상품 삭제 실패:', error);
+        alert('상품 삭제에 실패했습니다.');
+      } finally {
+        setDeleting(false);
+      }
+    }
+  };
+
+  if (checking || loading) {
     return (
-        <>
-            <div className="hidden">
-                <SellerHeader />
-            </div>
-            <SellerLayout>
-                <div className="flex-1 w-full h-full px-4 py-8">
-                    {/* 헤더 */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <button
-                            onClick={() => router.push('/seller/products')}
-                            className="flex items-center gap-2 text-[#6b7280] hover:text-[#374151] transition-colors font-bold"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            상품 목록으로
-                        </button>
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">상품 상세</h1>
-                    </div>
-
-                    {/* 상품 기본 정보 카드 */}
-                    <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8 mb-6">
-                        <div className="flex flex-col lg:flex-row gap-6">
-                            {/* 상품 이미지 */}
-                            <div className="lg:w-1/3">
-                                <div className="aspect-square bg-[#f3f4f6] rounded-xl overflow-hidden border border-[#d1d5db]">
-                                    {product.imageThumbnailUrl ? (
-                                        <img
-                                            src={product.imageThumbnailUrl}
-                                            alt={product.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            <Package className="w-16 h-16 text-[#6b7280]" />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* 상품 기본 정보 */}
-                            <div className="lg:w-2/3">
-                                <h2 className="text-2xl font-bold text-[#374151] mb-4">{product.name}</h2>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div className="flex items-center gap-3 p-3 bg-[#f3f4f6] rounded-xl border border-[#d1d5db]">
-                                        <DollarSign className="w-5 h-5 text-[#6b7280]" />
-                                        <div>
-                                            <p className="text-sm text-[#374151]">가격</p>
-                                            <p className="font-bold text-[#374151]">{product.price.toLocaleString()}원</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#f3f4f6] rounded-xl border border-[#d1d5db]">
-                                        <Layers className="w-5 h-5 text-[#6b7280]" />
-                                        <div>
-                                            <p className="text-sm text-[#374151]">재고</p>
-                                            <p className="font-bold text-[#374151]">{product.stock}개</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#f3f4f6] rounded-xl border border-[#d1d5db]">
-                                        <Tag className="w-5 h-5 text-[#6b7280]" />
-                                        <div>
-                                            <p className="text-sm text-[#374151]">상태</p>
-                                            <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                                product.status === '상' ? 'bg-green-100 text-green-700' : 
-                                                product.status === '중' ? 'bg-yellow-100 text-yellow-700' : 
-                                                'bg-red-100 text-red-700'
-                                            }`}>
-                                                {product.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-3 p-3 bg-[#f3f4f6] rounded-xl border border-[#d1d5db]">
-                                        <Eye className="w-5 h-5 text-[#6b7280]" />
-                                        <div>
-                                            <p className="text-sm text-[#374151]">활성화</p>
-                                            <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                                product.isActive 
-                                                    ? 'bg-green-100 text-green-700' 
-                                                    : 'bg-red-100 text-red-700'
-                                            }`}>
-                                                {product.isActive ? '활성' : '비활성'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* 액션 버튼 */}
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <button
-                                        onClick={handleEdit}
-                                        className="bg-[#d1d5db] text-[#374151] px-4 py-2 rounded hover:bg-[#e5e7eb] hover:text-[#374151] transition-colors"
-                                    >
-                                        <Edit className="w-4 h-4" />
-                                        상품 수정
-                                    </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="bg-red-200 text-red-700 px-4 py-2 rounded hover:bg-red-300 hover:text-red-800 transition-colors"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        상품 삭제
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 상품 상세 정보 */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* 상품 정보 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-[#6b7280]" />
-                                상품 정보
-                            </h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-sm font-medium text-[#374151] mb-1">상품 설명</p>
-                                    <p className="text-[#374151] break-words">{product.description}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-[#374151] mb-1">카테고리</p>
-                                    <p className="text-[#374151]">{product.categoryName}</p>
-                                </div>
-                                {product.width && product.depth && product.height && (
-                                    <div>
-                                        <p className="text-sm font-medium text-[#374151] mb-1 flex items-center gap-2">
-                                            <Ruler className="w-4 h-4 text-[#6b7280]" />
-                                            크기 (가로 x 세로 x 높이)
-                                        </p>
-                                        <p className="text-[#374151]">{product.width} x {product.depth} x {product.height}</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* 판매자 정보 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4">판매자 정보</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <p className="text-sm font-medium text-[#374151] mb-1">판매자명</p>
-                                    <p className="text-[#374151]">{product.sellerName}</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-[#374151] mb-1">판매자 ID</p>
-                                    <p className="text-[#374151]">{product.sellerId}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </SellerLayout>
-        </>
+      <SellerLayout>
+        <div className="min-h-screen bg-white p-6">
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
+            <span className="ml-3 text-[#374151] text-lg">상품 정보를 불러오는 중...</span>
+          </div>
+        </div>
+      </SellerLayout>
     );
+  }
+
+  if (!product) {
+    return (
+      <SellerLayout>
+        <div className="min-h-screen bg-white p-6">
+          <div className="text-center py-16">
+            <h2 className="text-xl font-bold text-[#374151] mb-4">상품을 찾을 수 없습니다</h2>
+            <button
+              onClick={() => router.push('/seller/products')}
+              className="bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+            >
+              상품 목록으로 돌아가기
+            </button>
+          </div>
+        </div>
+      </SellerLayout>
+    );
+  }
+
+  return (
+    <SellerLayout>
+      <div className="min-h-screen bg-white p-6">
+        {/* 헤더 */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 상세 정보</h1>
+            <p className="text-sm text-[#6b7280]">상품의 세부 정보를 확인하고 관리할 수 있습니다.</p>
+          </div>
+          <div className="flex gap-3 mt-4 md:mt-0">
+            <button
+              onClick={handleEdit}
+              className="inline-flex items-center gap-2 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+            >
+              <Edit className="w-4 h-4" />
+              수정
+            </button>
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-4 py-2 rounded-lg hover:bg-[#374151] transition-colors font-medium shadow-sm disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              {deleting ? '삭제 중...' : '삭제'}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 상품 이미지 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4 flex items-center gap-2">
+              <Eye className="w-5 h-5 text-[#6b7280]" />
+              상품 이미지
+            </h3>
+            <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden">
+              {product.imageThumbnailUrl ? (
+                <img
+                  src={product.imageThumbnailUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
+                  <Armchair className="w-16 h-16 text-[#6b7280]" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 상품 기본 정보 */}
+          <div className="space-y-6">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+              <h3 className="text-lg font-bold text-[#374151] mb-4">기본 정보</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">상품명</label>
+                  <p className="text-[#374151] font-semibold">{product.name}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">카테고리</label>
+                  <p className="text-[#374151]">{product.categoryName}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-[#6b7280] block mb-1">설명</label>
+                  <p className="text-[#374151] text-sm leading-relaxed">{product.description}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 정보 카드들 - 기존 판매자 스타일 */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <DollarSign className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">가격</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.price.toLocaleString()}원</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Package className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">재고</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.stock}개</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Armchair className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">품질</p>
+                  <p className="text-lg font-bold text-[#374151]">{product.status}</p>
+                </div>
+              </div>
+
+              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
+                <Eye className="w-8 h-8 text-[#6b7280]" />
+                <div>
+                  <p className="text-sm font-medium text-[#6b7280]">상태</p>
+                  <p className="text-lg font-bold text-[#374151]">
+                    {product.isActive ? '판매중' : '판매중지'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 상세 정보 섹션 */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 크기 정보 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4">크기 정보</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">너비</label>
+                <p className="text-[#374151] font-semibold">{product.width || 0}cm</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">높이</label>
+                <p className="text-[#374151] font-semibold">{product.height || 0}cm</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">깊이</label>
+                <p className="text-[#374151] font-semibold">{product.depth || 0}cm</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 판매자 정보 */}
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+            <h3 className="text-lg font-bold text-[#374151] mb-4">판매자 정보</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">판매자명</label>
+                <p className="text-[#374151] font-semibold">{product.sellerName}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-[#6b7280] block mb-1">판매자 ID</label>
+                <p className="text-[#374151] font-mono">{product.sellerId}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SellerLayout>
+  );
 }

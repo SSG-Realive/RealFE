@@ -8,6 +8,7 @@ import { getProfile } from '@/service/seller/sellerService'; // 불필요한 log
 import { useEffect, useState } from 'react';
 import { useSellerAuthStore } from '@/store/seller/useSellerAuthStore';
 import { requestSellerLogout } from '@/service/seller/logoutService'; // 정확한 로그아웃 서비스 함수
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 interface SellerHeaderProps {
   toggleSidebar?: () => void;
@@ -16,7 +17,7 @@ interface SellerHeaderProps {
 export default function SellerHeader({ toggleSidebar }: SellerHeaderProps) {
     const router = useRouter();
     const [name, setName] = useState<string>('');
-
+    const {show} = useGlobalDialog();
     // ✨ 1. Zustand 스토어에서 필요한 값들을 한번에, 올바른 이름으로 가져옵니다.
     const accessToken = useSellerAuthStore((state) => state.accessToken);
     const logout = useSellerAuthStore((state) => state.logout);
@@ -43,10 +44,10 @@ export default function SellerHeader({ toggleSidebar }: SellerHeaderProps) {
     const handleLogout = async () => {
         try {
             await requestSellerLogout();
-            alert('안전하게 로그아웃 되었습니다.');
+            await show('안전하게 로그아웃 되었습니다.');
         } catch (error) {
             console.error("판매자 로그아웃 요청 실패:", error);
-            alert('로그아웃 처리 중 오류가 발생했지만, 클라이언트에서는 로그아웃됩니다.');
+            await show('로그아웃 처리 중 오류가 발생했지만, 클라이언트에서는 로그아웃됩니다.');
         } finally {
             // ✨ 4. 스토어에서 직접 가져온 'logout' 함수를 호출합니다.
             logout(); 

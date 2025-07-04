@@ -2,13 +2,12 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import SellerHeader from '@/components/seller/SellerHeader';
 import { getProductDetail, updateProduct, fetchCategories } from '@/service/seller/productService';
 import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
 import { ProductDetail } from '@/types/seller/product/product';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
-import { ArrowLeft, Package, Tag, DollarSign, Layers, Ruler, Image, Video, Save, AlertCircle } from 'lucide-react';
+import { Package, Tag, DollarSign, Layers, Ruler, Image, Video, Save, AlertCircle } from 'lucide-react';
 
 export default function ProductEditPage() {
     const checking = useSellerAuthGuard();
@@ -18,7 +17,7 @@ export default function ProductEditPage() {
 
     const [form, setForm] = useState<ProductDetail | null>(null);
     const [categories, setCategories] = useState<SellerCategoryDTO[]>([]);
-    const [parentCategoryIdState, setParentCategoryIdState] = useState<number | ''>(''); // ✅ UI 용 parentCategoryId
+    const [parentCategoryIdState, setParentCategoryIdState] = useState<number | ''>('');
     const [imageThumbnail, setImageThumbnail] = useState<File | null>(null);
     const [videoThumbnail, setVideoThumbnail] = useState<File | null>(null);
     const [subImages, setSubImages] = useState<FileList | null>(null);
@@ -36,18 +35,14 @@ export default function ProductEditPage() {
                     fetchCategories()
                 ]);
 
-                // parentCategoryId 계산
                 const selectedCategory = categoryData.find(cat => cat.id === productData.categoryId);
                 const parentId = selectedCategory?.parentId ?? '';
 
-                // form 세팅
                 setForm({
                     ...productData,
                 });
 
-                // parentCategoryId state 에만 유지
                 setParentCategoryIdState(parentId);
-
                 setCategories(categoryData);
                 setError(null);
             } catch (err) {
@@ -66,19 +61,11 @@ export default function ProductEditPage() {
         const { name, value } = e.target;
         if (name === 'stock') {
             const newStock = Number(value);
-            console.log('=== 재고 변경 ===');
-            console.log('이전 재고:', form.stock);
-            console.log('새 재고:', newStock);
-            console.log('현재 isActive:', form.isActive);
-
             setForm({
                 ...form,
                 stock: newStock,
-                // 재고가 0이 되더라도 isActive를 강제로 변경하지 않음
-                // 사용자가 체크박스로 직접 제어하도록 함
             });
             
-            // 재고가 0이면서 활성화된 상품에 대한 경고
             if (newStock === 0 && form.isActive) {
                 console.log('경고: 재고가 0이지만 상품이 활성화되어 있습니다.');
             }
@@ -92,15 +79,10 @@ export default function ProductEditPage() {
         setError(null);
         if (!form) return;
 
-        // 카테고리 필수 체크
         if (!form.categoryId || form.categoryId === 0) {
             alert('카테고리를 선택해주세요.');
             return;
         }
-
-        console.log('=== 상품 수정 시작 ===');
-        console.log('수정할 상품 ID:', productId);
-        console.log('폼 데이터:', form);
 
         const formData = new FormData();
         formData.append('name', form.name);
@@ -112,49 +94,25 @@ export default function ProductEditPage() {
         formData.append('height', String(form.height || 0));
         formData.append('status', form.status);
         formData.append('active', String(form.isActive));
-        formData.append('categoryId', String(form.categoryId)); // ✅ categoryId 만 서버 전송
+        formData.append('categoryId', String(form.categoryId));
 
-        // 이미지
         if (imageThumbnail) {
-            console.log('대표 이미지 추가:', imageThumbnail.name);
             formData.append('imageThumbnail', imageThumbnail);
         }
         if (videoThumbnail) {
-            console.log('대표 영상 추가:', videoThumbnail.name);
             formData.append('videoThumbnail', videoThumbnail);
         }
         if (subImages) {
-            console.log('서브 이미지 개수:', subImages.length);
-            Array.from(subImages).forEach((file, index) => {
-                console.log(`서브 이미지 ${index + 1}:`, file.name);
+            Array.from(subImages).forEach((file) => {
                 formData.append('subImages', file);
             });
         }
 
-        // FormData 내용 로깅
-        console.log('=== FormData 내용 ===');
-        for (let [key, value] of formData.entries()) {
-            if (value instanceof File) {
-                console.log(`${key}: [파일] ${value.name} (${value.size} bytes)`);
-            } else {
-                console.log(`${key}: ${value}`);
-            }
-        }
-
         try {
-            console.log('API 호출 시작...');
             await updateProduct(Number(productId), formData);
-            console.log('상품 수정 성공!');
             alert('상품이 수정되었습니다.');
             router.push('/seller/products');
         } catch (err: any) {
-            console.error('=== 상품 수정 실패 ===');
-            console.error('에러 객체:', err);
-            console.error('에러 메시지:', err.message);
-            console.error('응답 상태:', err.response?.status);
-            console.error('응답 데이터:', err.response?.data);
-            console.error('응답 헤더:', err.response?.headers);
-            
             let errorMessage = '상품 수정 중 오류가 발생했습니다.';
             
             if (err.response?.status === 400) {
@@ -178,8 +136,8 @@ export default function ProductEditPage() {
 
     const handleParentCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const parentId = e.target.value ? Number(e.target.value) : '';
-        setParentCategoryIdState(parentId); // ✅ select box state 유지
-        setForm(form ? { ...form, categoryId: 0 } : null); // ✅ subCategory 초기화
+        setParentCategoryIdState(parentId);
+        setForm(form ? { ...form, categoryId: 0 } : null);
     };
 
     const handleSubCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -187,376 +145,324 @@ export default function ProductEditPage() {
         setForm(form ? { ...form, categoryId: subCategoryId } : null);
     };
 
-    if (checking) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
-                <p className="text-[#374151]">인증 확인 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (loading) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
-            <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
-                <p className="text-[#374151]">상품 정보를 불러오는 중...</p>
-            </div>
-        </div>
-    );
-    
-    if (error) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
-            <div className="text-center">
-                <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <p className="text-red-600">{error}</p>
-            </div>
-        </div>
-    );
-    
-    if (!form) return (
-        <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
-            <div className="text-center">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-[#374151]">상품 정보를 불러올 수 없습니다.</p>
-            </div>
-        </div>
-    );
+    if (checking || loading) {
+        return (
+            <SellerLayout>
+                <div className="min-h-screen bg-white p-6">
+                    <div className="flex items-center justify-center py-16">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
+                        <span className="ml-3 text-[#374151] text-lg">
+                            {checking ? '인증 확인 중...' : '상품 정보를 불러오는 중...'}
+                        </span>
+                    </div>
+                </div>
+            </SellerLayout>
+        );
+    }
 
-    const parentCategories = categories.filter(cat => cat.parentId === null);
-    const subCategories = categories.filter(cat => cat.parentId === Number(parentCategoryIdState));
+    if (error) {
+        return (
+            <SellerLayout>
+                <div className="min-h-screen bg-white p-6">
+                    <div className="text-center py-16">
+                        <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                        <p className="text-red-600 font-medium">{error}</p>
+                        <button
+                            onClick={() => router.push('/seller/products')}
+                            className="mt-4 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+                        >
+                            상품 목록으로 돌아가기
+                        </button>
+                    </div>
+                </div>
+            </SellerLayout>
+        );
+    }
+
+    if (!form) {
+        return (
+            <SellerLayout>
+                <div className="min-h-screen bg-white p-6">
+                    <div className="text-center py-16">
+                        <Package className="w-16 h-16 text-[#6b7280] mx-auto mb-4" />
+                        <p className="text-[#6b7280] font-medium">상품 정보를 불러올 수 없습니다.</p>
+                        <button
+                            onClick={() => router.push('/seller/products')}
+                            className="mt-4 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors"
+                        >
+                            상품 목록으로 돌아가기
+                        </button>
+                    </div>
+                </div>
+            </SellerLayout>
+        );
+    }
+
+    const parentCategories = categories.filter(cat => !cat.parentId);
+    const subCategories = categories.filter(cat => cat.parentId === parentCategoryIdState);
 
     return (
-        <>
-            <div className="hidden">
-                <SellerHeader />
-            </div>
-            <SellerLayout>
-                <div className="flex-1 w-full h-full px-4 py-8">
-                    {/* 헤더 */}
-                    <div className="flex items-center gap-4 mb-6">
-                        <button
-                            onClick={() => router.push(`/seller/products/${productId}`)}
-                            className="flex items-center gap-2 text-[#6b7280] hover:text-[#374151] transition-colors font-bold"
-                        >
-                            <ArrowLeft className="w-5 h-5" />
-                            상품 상세로
-                        </button>
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">상품 수정</h1>
+        <SellerLayout>
+            <div className="min-h-screen bg-white p-6">
+                {/* 헤더 */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                    <div>
+                        <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 수정</h1>
+                        <p className="text-sm text-[#6b7280]">상품의 정보를 수정하고 업데이트할 수 있습니다.</p>
+                    </div>
+                    <button
+                        onClick={() => router.push('/seller/products')}
+                        className="mt-4 md:mt-0 bg-[#d1d5db] text-[#374151] px-4 py-2 rounded-lg hover:bg-[#e5e7eb] transition-colors font-medium shadow-sm border border-[#d1d5db]"
+                    >
+                        상품 목록으로
+                    </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* 기본 정보 섹션 */}
+                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
+                            <Package className="w-5 h-5 text-[#6b7280]" />
+                            기본 정보
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-[#374151] mb-2">상품명</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#374151] mb-2">상품 상태</label>
+                                <select
+                                    name="status"
+                                    value={form.status}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
+                                    required
+                                >
+                                    <option value="">선택해주세요</option>
+                                    <option value="상">상급</option>
+                                    <option value="중">중급</option>
+                                    <option value="하">하급</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-[#374151] mb-2">상품 설명</label>
+                                <textarea
+                                    name="description"
+                                    value={form.description}
+                                    onChange={handleChange}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
+                                    required
+                                />
+                            </div>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-6">
-                        {/* 기본 정보 섹션 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <Package className="w-5 h-5 text-[#6b7280]" />
-                                기본 정보
-                            </h3>
-                            
-                            {/* 카테고리 선택 */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {/* 가격 및 재고, 카테고리, 크기 정보 - 컴팩트 그리드 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        {/* 가격 및 재고 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <DollarSign className="w-3 h-3 text-[#6b7280]" />
+                                가격 및 재고
+                            </h2>
+                            <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        카테고리 (1차)
-                                    </label>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">판매 가격</label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        value={form.price}
+                                        onChange={handleChange}
+                                        min="0"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">재고 수량</label>
+                                    <input
+                                        type="number"
+                                        name="stock"
+                                        value={form.stock}
+                                        onChange={handleChange}
+                                        min="0"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 카테고리 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <Tag className="w-3 h-3 text-[#6b7280]" />
+                                카테고리
+                            </h2>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">상위 카테고리</label>
                                     <select
                                         value={parentCategoryIdState}
                                         onChange={handleParentCategoryChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        required
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
                                     >
-                                        <option value="">-- 선택 --</option>
+                                        <option value="">선택</option>
                                         {parentCategories.map(cat => (
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
                                     </select>
                                 </div>
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        카테고리 (2차)
-                                    </label>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">하위 카테고리</label>
                                     <select
                                         value={form.categoryId || ''}
                                         onChange={handleSubCategoryChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
                                         required
                                     >
-                                        <option value="">-- 선택 --</option>
+                                        <option value="">선택</option>
                                         {subCategories.map(cat => (
                                             <option key={cat.id} value={cat.id}>{cat.name}</option>
                                         ))}
                                     </select>
                                 </div>
                             </div>
-
-                            {/* 상품명 */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    상품명
-                                </label>
-                                <input 
-                                    name="name" 
-                                    value={form.name} 
-                                    onChange={handleChange} 
-                                    required 
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                    placeholder="상품명을 입력하세요"
-                                />
-                            </div>
-
-                            {/* 상품 설명 */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    상품 설명
-                                </label>
-                                <textarea 
-                                    name="description" 
-                                    value={form.description} 
-                                    onChange={handleChange} 
-                                    required 
-                                    rows={4}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] resize-none"
-                                    placeholder="상품 설명을 입력하세요"
-                                />
-                            </div>
                         </div>
 
-                        {/* 가격 및 재고 섹션 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <DollarSign className="w-5 h-5 text-[#6b7280]" />
-                                가격 및 재고
-                            </h3>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        가격
-                                    </label>
-                                    <input 
-                                        type="number" 
-                                        name="price" 
-                                        value={form.price} 
-                                        onChange={handleChange} 
-                                        required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        placeholder="가격을 입력하세요"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        재고
-                                    </label>
-                                    <input 
-                                        type="number" 
-                                        name="stock" 
-                                        value={form.stock} 
-                                        onChange={handleChange} 
-                                        required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        placeholder="재고 수량을 입력하세요"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 상품 상태 섹션 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <Tag className="w-5 h-5 text-[#6b7280]" />
-                                상품 상태
-                            </h3>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        상품 상태
-                                    </label>
-                                    <select
-                                        name="status"
-                                        value={form.status}
-                                        onChange={handleChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        required
-                                    >
-                                        <option value="상">상</option>
-                                        <option value="중">중</option>
-                                        <option value="하">하</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="active"
-                                        checked={form.isActive}
-                                        onChange={(e) => {
-                                            console.log('=== isActive 체크박스 변경 ===');
-                                            console.log('현재 재고:', form.stock);
-                                            console.log('현재 isActive:', form.isActive);
-                                            console.log('변경하려는 값:', e.target.checked);
-                                            
-                                            // 재고가 0인 상태에서 활성화하려고 할 때만 경고
-                                            if (form.stock === 0 && e.target.checked) {
-                                                alert('재고가 0인 상태에서는 상품을 활성화할 수 없습니다.\n재고를 먼저 추가해주세요.');
-                                                console.log('재고 0으로 인한 활성화 차단');
-                                                return;  // 체크 방지
-                                            }
-                                            
-                                            console.log('isActive 변경 적용:', e.target.checked);
-                                            setForm({ ...form, isActive: e.target.checked });
-                                        }}
-                                        className="h-4 w-4 text-[#6b7280] focus:ring-[#6b7280] border-gray-300 rounded"
-                                    />
-                                    <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
-                                        활성화 여부
-                                        <span className="ml-2 text-xs text-gray-500">
-                                            (현재: {form.isActive ? '활성' : '비활성'})
-                                        </span>
-                                        {form.stock === 0 && (
-                                            <span className="ml-2 text-xs text-red-500">
-                                                ⚠️ 재고 0: 활성화 불가
-                                            </span>
-                                        )}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 크기 정보 섹션 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <Ruler className="w-5 h-5 text-[#6b7280]" />
+                        {/* 크기 정보 */}
+                        <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-3">
+                            <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                                <Ruler className="w-3 h-3 text-[#6b7280]" />
                                 크기 정보
-                            </h3>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            </h2>
+                            <div className="space-y-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        가로 (Width)
-                                    </label>
-                                    <input 
-                                        type="number" 
-                                        name="width" 
-                                        value={form.width} 
-                                        onChange={handleChange} 
-                                        required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        placeholder="가로"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        세로 (Depth)
-                                    </label>
-                                    <input 
-                                        type="number" 
-                                        name="depth" 
-                                        value={form.depth} 
-                                        onChange={handleChange} 
-                                        required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        placeholder="세로"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        높이 (Height)
-                                    </label>
-                                    <input 
-                                        type="number" 
-                                        name="height" 
-                                        value={form.height} 
-                                        onChange={handleChange} 
-                                        required 
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280]"
-                                        placeholder="높이"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 미디어 섹션 */}
-                        <div className="bg-[#f3f4f6] rounded-xl shadow border border-[#d1d5db] p-8">
-                            <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
-                                <Image className="w-5 h-5 text-[#6b7280]" />
-                                미디어
-                            </h3>
-                            
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        대표 이미지
-                                    </label>
-                                    {form?.imageThumbnailUrl && (
-                                        <div className="mb-2 text-sm text-gray-600">
-                                            현재 등록된 파일명: {form.imageThumbnailUrl.split('/').pop()}
-                                        </div>
-                                    )}
-                                    <input 
-                                        type="file" 
-                                        accept="image/*" 
-                                        onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} 
-                                        required={form?.imageThumbnailUrl ? false : true} 
-                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                                        <Video className="w-4 h-4" />
-                                        대표 영상
-                                    </label>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">너비 (cm)</label>
                                     <input
-                                        type="file" 
-                                        accept="video/*" 
-                                        onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)} 
-                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
+                                        type="number"
+                                        name="width"
+                                        value={form.width || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
                                     />
                                 </div>
-
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        서브 이미지
-                                    </label>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">깊이 (cm)</label>
                                     <input
-                                        type="file" 
-                                        accept="image/*" 
-                                        multiple 
-                                        onChange={(e) => setSubImages(e.target.files)} 
-                                        className="w-full px-3 py-2 border border-[#d1d5db] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#374151] hover:file:bg-[#e5e7eb]"
+                                        type="number"
+                                        name="depth"
+                                        value={form.depth || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-[#374151] mb-1">높이 (cm)</label>
+                                    <input
+                                        type="number"
+                                        name="height"
+                                        value={form.height || ''}
+                                        onChange={handleChange}
+                                        min="0"
+                                        step="0.1"
+                                        className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
                                     />
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* 에러 메시지 */}
-                        {error && (
-                            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                                <div className="flex items-center gap-2">
-                                    <AlertCircle className="w-5 h-5 text-red-500" />
-                                    <p className="text-red-600 text-sm">{error}</p>
-                                </div>
+                    {/* 판매 상태 섹션 */}
+                    <div className="bg-[#f3f4f6] rounded-lg shadow border border-[#d1d5db] p-4">
+                        <h2 className="text-sm font-bold text-[#374151] mb-3 flex items-center gap-1">
+                            <Layers className="w-3 h-3 text-[#6b7280]" />
+                            판매 상태
+                        </h2>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded border border-[#d1d5db]">
+                            <div className="relative">
+                                <input
+                                    type="checkbox"
+                                    id="isActive"
+                                    checked={form.isActive}
+                                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                                    className="w-5 h-5 text-[#6b7280] bg-white border-2 border-[#d1d5db] rounded focus:ring-2 focus:ring-[#6b7280] checked:bg-[#6b7280] checked:border-[#6b7280]"
+                                />
                             </div>
-                        )}
-
-                        {/* 제출 버튼 */}
-                        <div className="flex justify-end">
-                            <button 
-                                type="submit" 
-                                className="flex items-center gap-2 bg-[#d1d5db] hover:bg-[#6b7280] text-[#374151] hover:text-white py-3 px-6 rounded-lg font-medium transition-colors"
-                            >
-                                <Save className="w-4 h-4" />
-                                상품 수정
-                            </button>
+                            <div>
+                                <label htmlFor="isActive" className="text-sm font-medium text-[#374151] cursor-pointer">
+                                    판매 활성화
+                                </label>
+                                <p className="text-xs text-[#6b7280] mt-1">
+                                    체크하면 고객이 상품을 구매할 수 있습니다.
+                                </p>
+                            </div>
                         </div>
-                    </form>
-                </div>
-            </SellerLayout>
-        </>
+                    </div>
+
+                    {/* 미디어 업로드 섹션 */}
+                    <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
+                        <h2 className="text-lg font-bold text-[#374151] mb-6 flex items-center gap-2">
+                            <Image className="w-5 h-5 text-[#6b7280]" />
+                            미디어 업로드
+                        </h2>
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-[#374151] mb-2">대표 이미지</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#374151] mb-2">대표 영상</label>
+                                <input
+                                    type="file"
+                                    accept="video/*"
+                                    onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#374151] mb-2">추가 이미지</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => setSubImages(e.target.files)}
+                                    className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 제출 버튼 */}
+                    <div className="flex justify-center">
+                        <button
+                            type="submit"
+                            className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#374151] transition-colors shadow-lg"
+                        >
+                            <Save className="w-5 h-5" />
+                            상품 수정 완료
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </SellerLayout>
     );
 }

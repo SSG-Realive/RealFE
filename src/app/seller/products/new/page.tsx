@@ -7,6 +7,7 @@ import { createProduct, fetchCategories } from '@/service/seller/productService'
 import { SellerCategoryDTO } from '@/types/seller/category/sellerCategory';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ProductNewPage() {
     const checking = useSellerAuthGuard();
@@ -19,7 +20,7 @@ export default function ProductNewPage() {
     const [subImages, setSubImages] = useState<FileList | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
+    const {show} = useGlobalDialog();
     const [form, setForm] = useState({
         name: '',
         description: '',
@@ -68,12 +69,12 @@ export default function ProductNewPage() {
 
         // 카테고리 필수 체크
         if (!form.categoryId || form.categoryId === 0) {
-            alert('카테고리를 선택해주세요.');
+            show('카테고리를 선택해주세요.');
             return;
         }
 
         if (!imageThumbnail) {
-            alert('대표 이미지는 필수입니다.');
+            show('대표 이미지는 필수입니다.');
             return;
         }
 
@@ -105,7 +106,7 @@ export default function ProductNewPage() {
 
         try {
             await createProduct(formData);
-            alert('상품이 등록되었습니다.');
+            show('상품이 등록되었습니다.');
             router.push('/seller/products');
         } catch (err) {
             console.error('등록 실패', err);

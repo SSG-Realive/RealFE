@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { getAdminReviewList, updateAdminReview } from "@/service/admin/reviewService";
 import { AdminReview, AdminReviewListRequest, AdminReviewListResponse, getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function ReviewListPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function ReviewListPage() {
     productFilter: '',
     sellerFilter: '',
   });
+  const {show} = useGlobalDialog();
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -86,7 +88,7 @@ export default function ReviewListPage() {
       setReviews(reviews.map(r => r.reviewId === reviewId ? { ...r, isHidden: !isHidden } : r));
     } catch (err: any) {
       console.error('리뷰 상태 변경 실패:', err);
-      alert(err.message || '리뷰 상태 변경에 실패했습니다.');
+      show(err.message || '리뷰 상태 변경에 실패했습니다.');
     }
   };
 

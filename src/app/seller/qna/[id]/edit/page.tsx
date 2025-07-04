@@ -9,6 +9,7 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { SellerQnaUpdateRequest } from '@/types/seller/sellerqna/sellerQnaRequest';
 import { SellerQnaDetailResponse } from '@/types/seller/sellerqna/sellerQnaResponse';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function QnaEditPage() {
     useSellerAuthGuard();
@@ -19,13 +20,13 @@ export default function QnaEditPage() {
         title: '',
         content: '',
     });
-
+    const {show} = useGlobalDialog();
     useEffect(() => {
         if (!id) return;
 
         getQnaDetail(Number(id)).then((qna: SellerQnaDetailResponse) => {
             if (qna.isAnswered) {
-                alert('이미 답변된 QnA는 수정할 수 없습니다.');
+                show('이미 답변된 QnA는 수정할 수 없습니다.');
                 router.push('/seller/qna');
             } else {
                 setForm({
@@ -42,7 +43,7 @@ export default function QnaEditPage() {
 
     const handleSubmit = async () => {
         await updateQna(Number(id), form);
-        alert('질문이 수정되었습니다.');
+        await show('질문이 수정되었습니다.');
         router.push('/seller/admin-qna');
     };
 
@@ -51,7 +52,7 @@ export default function QnaEditPage() {
         if (!confirmed) return;
 
         await deleteQna(Number(id));
-        alert('QnA가 삭제되었습니다.');
+        await show('QnA가 삭제되었습니다.');
         router.push('/seller/admin-qna');
     };
 

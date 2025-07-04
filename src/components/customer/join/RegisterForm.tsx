@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react'; // ✅ useCallback 임포트
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -45,8 +45,8 @@ export default function RegisterForm({ onSuccess }: Props) {
     verificationCode: '',
   });
 
-  const [sending, setSending] = useState(false); // 인증 코드 발송
-  const [saving, setSaving] = useState(false); // 회원가입
+  const [sending, setSending] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -55,10 +55,21 @@ export default function RegisterForm({ onSuccess }: Props) {
     setFormData(p => ({ ...p, [name]: value }));
   };
 
+  // ✅ [수정] useCallback을 사용하여 함수가 렌더링마다 재생성되는 것을 방지합니다.
+  const handleGenderChange = useCallback((g: GenderWithUnselected) => {
+    setFormData(p => ({ ...p, gender: g }));
+  }, []);
+
+  // ✅ [수정] 주소 변경 핸들러도 동일하게 useCallback으로 감싸줍니다.
+  const handleAddressChange = useCallback((fullAddress: string) => {
+    setFormData(p => ({ ...p, address: fullAddress }));
+  }, []);
+
+
   /* ---------------- Dialog 상태 ---------------- */
-  const [dlgOpen, setDlgOpen] = useState(false);   // ★
-  const [dlgMsg, setDlgMsg] = useState('');      // ★
-  const showDialog = (msg: string) => {                  // ★
+  const [dlgOpen, setDlgOpen] = useState(false);
+  const [dlgMsg, setDlgMsg] = useState('');
+  const showDialog = (msg: string) => {
     setDlgMsg(msg);
     setDlgOpen(true);
   };
@@ -127,7 +138,6 @@ export default function RegisterForm({ onSuccess }: Props) {
 
       showDialog('회원가입 성공!');
 
-      // 백엔드가 토큰을 내려줄 경우 자동 로그인
       if (data.accessToken && data.email && data.name) {
         setAuth({
           id: data.id ?? 0,
@@ -139,7 +149,6 @@ export default function RegisterForm({ onSuccess }: Props) {
         });
       }
 
-      // 외부에서 콜백을 넘겼으면 우선 실행
       if (onSuccess) {
         onSuccess();
       } else {
@@ -156,21 +165,17 @@ export default function RegisterForm({ onSuccess }: Props) {
   /* ---------------- UI ---------------- */
   return (
     <>
-      {/* Dialog 모달 – 화면 중앙 고정 */}
       <Dialog open={dlgOpen} onOpenChange={setDlgOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="sr-only">알림</DialogTitle>
           </DialogHeader>
-
           <p className="py-4 whitespace-pre-line">{dlgMsg}</p>
-
           <DialogFooter>
             <Button onClick={() => setDlgOpen(false)}>확인</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
 
       <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
         <Card>
@@ -263,9 +268,7 @@ export default function RegisterForm({ onSuccess }: Props) {
               <div className="grid gap-2">
                 <Label htmlFor="address">주소</Label>
                 <AddressInput
-                  onAddressChange={(full) =>
-                    setFormData(p => ({ ...p, address: full }))
-                  }
+                  onAddressChange={handleAddressChange} // ✅ 수정된 핸들러 사용
                 />
               </div>
 
@@ -284,7 +287,7 @@ export default function RegisterForm({ onSuccess }: Props) {
               {/* 성별 선택 */}
               <GenderSelector
                 gender={formData.gender}
-                onChange={g => setFormData(p => ({ ...p, gender: g }))}
+                onChange={handleGenderChange} // ✅ 수정된 핸들러 사용
               />
             </div>
           </CardContent>

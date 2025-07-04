@@ -79,7 +79,6 @@ export default function ChatBotWidget() {
                                 setResponse("❌ 응답 중 오류가 발생했습니다.");
                                 console.error(err);
                             }
-
                             setInput('');
                         }}
                         className="mt-2"

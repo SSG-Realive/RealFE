@@ -32,7 +32,7 @@ export default function SellerProductListPage() {
     try {
       setLoading(true);
       const searchParams = {
-        page,
+        page: page + 1, // 백엔드가 1부터 시작할 가능성이 높음
         size: 12,
         keyword: searchKeyword || undefined,
         status: statusFilter || undefined,
@@ -120,7 +120,7 @@ export default function SellerProductListPage() {
 
         {/* 통계 카드 */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] hover:scale-[1.02] transition-all duration-200">
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[#6b7280]">총 상품 수</p>
@@ -136,7 +136,7 @@ export default function SellerProductListPage() {
             </div>
           </div>
 
-          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] hover:scale-[1.02] transition-all duration-200">
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[#6b7280]">판매중</p>
@@ -152,7 +152,7 @@ export default function SellerProductListPage() {
             </div>
           </div>
 
-          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] hover:scale-[1.02] transition-all duration-200">
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[#6b7280]">품절</p>
@@ -168,7 +168,7 @@ export default function SellerProductListPage() {
             </div>
           </div>
 
-          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db] hover:scale-[1.02] transition-all duration-200">
+          <div className="bg-[#f3f4f6] p-6 rounded-xl shadow border-2 border-[#d1d5db]">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[#6b7280]">판매중지</p>
@@ -265,7 +265,7 @@ export default function SellerProductListPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-[#d1d5db]">
                   {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-[#f9fafb] transition-colors">
+                    <tr key={product.id}>
                       {/* 상품 정보 (이미지 + 이름) */}
                       <td className="px-6 py-4">
                         <div className="flex items-center">
@@ -354,24 +354,29 @@ export default function SellerProductListPage() {
                 이전
               </button>
               
-              {Array.from({ length: Math.min(10, totalPages) }, (_, i) => {
-                const pageNum = Math.floor(currentPage / 10) * 10 + i;
-                if (pageNum >= totalPages) return null;
+              {/* 페이지 번호 버튼들 */}
+              {(() => {
+                const maxVisiblePages = 10;
+                const startPage = Math.max(0, Math.min(currentPage - Math.floor(maxVisiblePages / 2), totalPages - maxVisiblePages));
+                const endPage = Math.min(totalPages, startPage + maxVisiblePages);
                 
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 border border-[#d1d5db] rounded-lg transition-colors ${
-                      currentPage === pageNum
-                        ? 'bg-[#6b7280] text-white'
-                        : 'bg-white text-[#374151] hover:bg-[#f3f4f6]'
-                    }`}
-                  >
-                    {pageNum + 1}
-                  </button>
-                );
-              })}
+                return Array.from({ length: endPage - startPage }, (_, i) => {
+                  const pageNum = startPage + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 border border-[#d1d5db] rounded-lg transition-colors ${
+                        currentPage === pageNum
+                          ? 'bg-[#6b7280] text-white'
+                          : 'bg-white text-[#374151] hover:bg-[#f3f4f6]'
+                      }`}
+                    >
+                      {pageNum + 1}
+                    </button>
+                  );
+                });
+              })()}
               
               <button
                 onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}

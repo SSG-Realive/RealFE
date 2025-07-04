@@ -1,19 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+
 import { fetchMyReviews } from '@/service/customer/reviewService';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-import Link from 'next/link';
 import {
     getTrafficLightEmoji,
     getTrafficLightText,
     getTrafficLightBgClass
 } from '@/types/admin/review';
-
-
-// 내 리뷰 목록 조회 페이지
-
-// 내 리뷰 목록 조회 페이지
+import MyPageLayout from '@/components/layouts/MyPageLayout';
 
 export default function MyReviewPage() {
     const [reviews, setReviews] = useState<ReviewResponseDTO[]>([]);
@@ -30,11 +27,9 @@ export default function MyReviewPage() {
             .finally(() => setLoading(false));
     }, []);
 
-
     return (
-        <div>
+        <MyPageLayout>
             <div className="max-w-3xl mx-auto px-4 py-10">
-                <h1 className="text-2xl font-bold mb-2">내가 작성한 리뷰</h1>
                 <p className="text-sm text-gray-500 mb-6">
                     총 <span className="text-[#FF6347]">{reviews.length}</span>개
                 </p>
@@ -51,13 +46,12 @@ export default function MyReviewPage() {
                             <Link
                                 key={review.reviewId}
                                 href={`/customer/mypage/reviews/${review.reviewId}`}
-                                className="block pt-4 hover:bg-gray-50 transition"
+                                className="block border border-gray-200 rounded-md p-4 hover:bg-gray-50 transition"
                             >
-                                {/* 상단 얇은 선 + 판매자 정보 */}
+                                {/* 상단 선 + 판매자 정보 */}
                                 <div className="relative mb-4 sm:mb-2">
                                     <hr className="border-t border-gray-200" />
                                     <div className="absolute -top-3 left-0 flex items-center space-x-1 bg-white px-2 text-sm text-gray-600">
-                                        <span>🏠</span>
                                         <span>판매자 {review.sellerId}</span>
                                     </div>
                                     <span className="absolute top-0 right-0 text-xs text-gray-400">
@@ -65,11 +59,9 @@ export default function MyReviewPage() {
                                     </span>
                                 </div>
 
-                                {/* 본문 */}
-                                <p className="font-semibold mb-2 sm:mb-1">{review.productName}</p>
+                                <p className="font-normal mb-2 sm:mb-1">{review.productName}</p>
 
                                 <div className="flex justify-end items-center mb-3 sm:mb-1">
-                                    {/* 신호등 평가 */}
                                     <div
                                         className={`flex items-center gap-1 px-3 py-1 rounded-full border ${getTrafficLightBgClass(
                                             review.rating
@@ -84,7 +76,9 @@ export default function MyReviewPage() {
                                     </div>
                                 </div>
 
-                                <p className="text-gray-700 text-sm mt-2 line-clamp-2">{review.content}</p>
+                                <p className="text-gray-700 text-sm mt-2 line-clamp-2">
+                                    {review.content}
+                                </p>
 
                                 <p className="text-xs text-gray-400 mt-1">
                                     {new Date(review.createdAt).toLocaleString('ko-KR', {
@@ -96,7 +90,6 @@ export default function MyReviewPage() {
                                     })}
                                 </p>
 
-                                {/* 리뷰 썸네일 이미지 */}
                                 {review.imageUrls && review.imageUrls.length > 0 && (
                                     <div className="mt-3 flex space-x-2 overflow-x-auto">
                                         {review.imageUrls.map((url, idx) => (
@@ -112,10 +105,9 @@ export default function MyReviewPage() {
                                 )}
                             </Link>
                         ))}
-          
                     </div>
                 )}
             </div>
-        </div>
+        </MyPageLayout>
     );
 }

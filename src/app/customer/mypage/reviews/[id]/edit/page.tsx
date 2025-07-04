@@ -5,7 +5,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { fetchReviewDetail, updateReview } from '@/service/customer/reviewService';
 import { uploadReviewImages, deleteReviewImage } from '@/service/customer/reviewImageService'; // 이미지 API 함수
 import { ReviewResponseDTO } from '@/types/customer/review/review';
-import Navbar from '@/components/customer/common/Navbar';
 import StarRating from '@/components/customer/review/StarRating';
 import { useGlobalDialog } from '@/app/context/dialogContext';
 
@@ -106,7 +105,6 @@ export default function EditReviewPage() {
 
   return (
     <div>
-      <Navbar />
       <div className="max-w-2xl mx-auto px-6 py-10 bg-teal-50 rounded-md shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-gray-800">리뷰 수정</h1>
         <form onSubmit={handleSubmit} className="space-y-6">

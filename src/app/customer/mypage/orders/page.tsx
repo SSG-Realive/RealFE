@@ -169,7 +169,7 @@ export default function OrderListPage() {
                                     onClick={() => handleDeleteClick(order.orderId)}
                                     disabled={isDeleting && orderToDeleteId === order.orderId}
                                 >
-                                    {isDeleting && orderToDeleteId === order.orderId ? '삭제 중...' : '구매내역 삭제'}
+                                    {isDeleting && orderToDeleteId === order.orderId ? '삭제 중...' : '주문내역 삭제'}
                                 </button>
 
                                 <button
@@ -220,7 +220,7 @@ export default function OrderListPage() {
             {showDeleteModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>구매내역 삭제</h2>
+                        <h2>주문내역 삭제</h2>
                         <p>정말로 이 주문 내역을 삭제하시겠습니까?</p>
                         <div className="modal-actions">
                             <button className="button-outline" onClick={handleCancelDelete} disabled={isDeleting}>

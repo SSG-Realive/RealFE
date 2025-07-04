@@ -35,7 +35,7 @@ function WonAuctionItemCard({
             <p className="text-sm font-light text-gray-800 truncate" title={productName}>
               {productName ?? '상품 정보 없음'}
             </p>
-            <p className="text-base font-semibold text-black-600 mt-2">
+            <p className="text-base font-normal text-black-600 mt-2">
               {winningBidPrice?.toLocaleString()}
               <span className="ml-1 text-sm font-medium text-gray-700">원</span>
             </p>

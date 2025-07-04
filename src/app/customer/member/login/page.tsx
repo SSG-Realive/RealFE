@@ -1,25 +1,19 @@
 import LoginForm from '@/components/customer/login/LoginComponent';
 import { Suspense } from 'react';
 
-
-
 export default function LoginPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow">
-        <h1 className="text-2xl font-light text-center mb-6">로그인</h1>
-        <Suspense fallback={<div>Loading...</div>}>
-          <LoginForm />
-        </Suspense>
-        <div className="mt-4 flex justify-between text-sm">
-          <a href="/customer/signup" className="text-blue-600 hover:underline">
-            회원가입
-          </a>
-          <a href="/customer/member/findPassword" className="text-blue-600 hover:underline">
-            비밀번호 찾기
-          </a>
+    return (
+        <div className="flex flex-col flex-grow items-center justify-start min-h-full px-4 pt-10 pb-0">
+            <div className="w-full max-w-md">
+                <Suspense fallback={<div>Loading...</div>}>
+                    <LoginForm />
+                </Suspense>
+
+                <div className="mt-4 flex justify-between text-sm">
+                    <a href="/customer/signup">회원가입</a>
+                    <a href="/customer/member/findPassword">비밀번호 찾기</a>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

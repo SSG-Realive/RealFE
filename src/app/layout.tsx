@@ -4,8 +4,8 @@ import "./globals.css";
 import Head from "next/head";
 import Navbar from "@/components/customer/common/Navbar";
 import Footer from "@/components/customer/common/Footer";
-import ChatbotFloatingButton from "@/components/customer/common/ChatbotFloatingButton";
 import { Providers } from "./providers";
+import ChatBotWidget from "@/components/aiChatbot/chatbot";
 
 
 const geistSans = Geist({
@@ -51,7 +51,7 @@ export default function RootLayout({
             <main className="flex-grow">{children}</main>
         </Providers>
         <Footer />
-        <ChatbotFloatingButton />
+        <ChatBotWidget />
         </body>
         </html>
     );

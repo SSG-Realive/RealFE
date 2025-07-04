@@ -6,11 +6,9 @@ import { useRouter } from 'next/navigation';
 import { 
   createAdminInquiry, 
   getAdminInquiryList, 
-  getAdminInquiryStatistics,
   AdminInquiryRequest, 
   AdminInquiryResponse,
-  AdminInquiryListResponse,
-  AdminInquiryStatistics
+  AdminInquiryListResponse 
 } from '@/service/seller/adminInquiryService';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { 
@@ -21,6 +19,7 @@ import {
   Plus,
   Search
 } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerAdminQnaPage() {
   const checking = useSellerAuthGuard();
@@ -33,11 +32,7 @@ export default function SellerAdminQnaPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // 통계 상태 추가
-  const [statistics, setStatistics] = useState<AdminInquiryStatistics | null>(null);
-  const [statisticsLoading, setStatisticsLoading] = useState(false);
-
+  const {show} = useGlobalDialog();
   // 폼 상태
   const [form, setForm] = useState<AdminInquiryRequest>({
     title: '',
@@ -46,26 +41,6 @@ export default function SellerAdminQnaPage() {
 
   // 필터 상태
   const [searchKeyword, setSearchKeyword] = useState('');
-
-  // 통계 데이터 로딩
-  const fetchStatistics = async () => {
-    try {
-      setStatisticsLoading(true);
-      const statsData = await getAdminInquiryStatistics();
-      setStatistics(statsData);
-    } catch (err: any) {
-      console.error('통계 조회 실패:', err);
-      // 통계 조회 실패 시 기본값 설정
-      setStatistics({
-        totalCount: 0,
-        unansweredCount: 0,
-        answeredCount: 0,
-        answerRate: 0
-      });
-    } finally {
-      setStatisticsLoading(false);
-    }
-  };
 
   // 문의 목록 로딩
   const fetchInquiries = async (page = 0) => {
@@ -79,12 +54,7 @@ export default function SellerAdminQnaPage() {
         ...(searchKeyword && { keyword: searchKeyword })
       };
 
-      // 목록과 통계를 병렬로 조회
-      const [response, _] = await Promise.all([
-        getAdminInquiryList(searchParams),
-        fetchStatistics()
-      ]);
-      
+      const response: AdminInquiryListResponse = await getAdminInquiryList(searchParams);
       setInquiryList(response.content || []);
       setTotalPages(response.totalPages || 1);
       setTotalElements(response.totalElements || 0);
@@ -109,7 +79,7 @@ export default function SellerAdminQnaPage() {
     e.preventDefault();
     
     if (!form.title.trim() || !form.content.trim()) {
-      alert('제목과 내용을 모두 입력해주세요.');
+      show('제목과 내용을 모두 입력해주세요.');
       return;
     }
 
@@ -123,11 +93,11 @@ export default function SellerAdminQnaPage() {
         content: ''
       });
       
-      alert('문의가 성공적으로 등록되었습니다.');
-      fetchInquiries(0); // 목록 및 통계 새로고침
+      show('문의가 성공적으로 등록되었습니다.');
+      fetchInquiries(0); // 목록 새로고침
     } catch (err: any) {
       console.error('문의 등록 실패:', err);
-      alert('문의 등록에 실패했습니다.');
+      show('문의 등록에 실패했습니다.');
     } finally {
       setSubmitting(false);
     }
@@ -175,7 +145,7 @@ export default function SellerAdminQnaPage() {
           <h1 className="text-xl md:text-2xl font-bold text-[#374151]">관리자 문의</h1>
           <div className="flex items-center gap-2 text-sm text-[#6b7280]">
             <MessageCircle className="w-4 h-4" />
-            총 {statistics?.totalCount || 0}건의 문의 (전체 데이터 기준)
+            총 {totalElements}건의 문의
           </div>
         </div>
 
@@ -185,11 +155,8 @@ export default function SellerAdminQnaPage() {
             <div className="flex items-center gap-3 mb-2">
               <MessageCircle className="w-6 h-6 text-[#6b7280]" />
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#374151]">
-                  {statisticsLoading ? '...' : (statistics?.totalCount || 0)}
-                </div>
+                <div className="text-2xl font-bold text-[#374151]">{totalElements}</div>
                 <div className="text-sm text-[#6b7280]">전체 문의</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
               </div>
             </div>
           </div>
@@ -199,10 +166,9 @@ export default function SellerAdminQnaPage() {
               <Clock className="w-6 h-6 text-[#6b7280]" />
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#374151]">
-                  {statisticsLoading ? '...' : (statistics?.unansweredCount || 0)}
+                  {inquiryList.filter(item => !item.isAnswered).length}
                 </div>
                 <div className="text-sm text-[#6b7280]">미답변</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
               </div>
             </div>
           </div>
@@ -212,10 +178,9 @@ export default function SellerAdminQnaPage() {
               <CheckCircle className="w-6 h-6 text-[#6b7280]" />
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#374151]">
-                  {statisticsLoading ? '...' : (statistics?.answeredCount || 0)}
+                  {inquiryList.filter(item => item.isAnswered).length}
                 </div>
                 <div className="text-sm text-[#6b7280]">답변완료</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
               </div>
             </div>
           </div>
@@ -225,10 +190,9 @@ export default function SellerAdminQnaPage() {
               <MessageCircle className="w-6 h-6 text-[#6b7280]" />
               <div className="text-center">
                 <div className="text-2xl font-bold text-[#374151]">
-                  {statisticsLoading ? '...' : `${Math.round(statistics?.answerRate || 0)}%`}
+                  {totalElements > 0 ? Math.round((inquiryList.filter(item => item.isAnswered).length / inquiryList.length) * 100) : 0}%
                 </div>
                 <div className="text-sm text-[#6b7280]">답변률</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
               </div>
             </div>
           </div>

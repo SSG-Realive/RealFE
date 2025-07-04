@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { getAdminReviewQna, deleteAdminReviewQna } from "@/service/admin/reviewService";
 import { AdminReviewQnaDetail } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 export default function QnaDetailPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function QnaDetailPage() {
   const [qna, setQna] = useState<AdminReviewQnaDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const {show} = useGlobalDialog();
   
   const fetchQnaDetail = async () => {
     if (!accessToken || isNaN(qnaId)) return;
@@ -42,11 +44,11 @@ export default function QnaDetailPage() {
     if (confirm("정말로 이 Q&A를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) {
       try {
         await deleteAdminReviewQna(qnaId);
-        alert("Q&A가 삭제되었습니다.");
+        show("Q&A가 삭제되었습니다.");
         router.push("/admin/review-management/qna");
       } catch (err: any) {
         console.error("Q&A 삭제 실패:", err);
-        alert(err.message || "삭제에 실패했습니다.");
+        show(err.message || "삭제에 실패했습니다.");
       }
     }
   };

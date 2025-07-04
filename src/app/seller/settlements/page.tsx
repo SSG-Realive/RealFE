@@ -32,6 +32,7 @@ import {
     CheckCircle,
     Calculator
 } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function SellerSettlementPage() {
     const checking = useSellerAuthGuard();
@@ -63,7 +64,7 @@ export default function SellerSettlementPage() {
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [dailyPayouts, setDailyPayouts] = useState<DailySettlementItem[]>([]); // 하루 단위로 재구성된 정산 데이터
-
+    const {show} = useGlobalDialog();
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -178,7 +179,7 @@ export default function SellerSettlementPage() {
             setError(errorMessage);
             
             // 에러 발생 시 알림 표시
-            alert(errorMessage);
+            show(errorMessage);
         }
     };
 

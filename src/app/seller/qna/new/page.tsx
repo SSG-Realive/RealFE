@@ -8,10 +8,12 @@ import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { SellerCreateQnaRequest } from '@/types/seller/sellerqna/sellerQnaRequest';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function QnaCreatePage() {
     useSellerAuthGuard();
     const router = useRouter();
+    const {show} = useGlobalDialog();
     const [form, setForm] = useState<SellerCreateQnaRequest>({
         title: '',
         content: '',
@@ -23,7 +25,7 @@ export default function QnaCreatePage() {
 
     const handleSubmit = async () => {
         await createQna(form);
-        alert('질문이 등록되었습니다.');
+        await show('질문이 등록되었습니다.');
         router.push('/seller/admin-qna');
     };
 

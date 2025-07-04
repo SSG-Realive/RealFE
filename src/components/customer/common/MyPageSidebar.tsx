@@ -21,7 +21,7 @@ export default function MyPageSidebar() {
         { name: '장바구니', path: '/customer/cart', icon: <FiShoppingCart /> },
         { name: '리뷰', path: '/customer/mypage/reviews', icon: <FiStar /> },
         { name: '개인정보', path: '/customer/mypage/edit', icon: <FiUser /> },
-        { name: '낙찰한 경매', path: '/customer/mypage/auctions', icon: <FiCheckCircle /> },
+        { name: '낙찰한 경매', path: '/customer/member/auctions/won', icon: <FiCheckCircle /> },
     ];
 
     return (

@@ -7,7 +7,18 @@ import {ReviewResponseDTO} from "@/types/reviews/reviewResponseDTO";
 import {ReviewListResponseDTO} from "@/types/reviews/reviewListResponseDTO";
 import {ProductListDTO} from "@/types/seller/product/product";
 
+// 새로운 통계 타입 정의
+export interface TodayStatsDTO {
+  todayOrderCount: number;
+  todayRevenue: number;
+  date: string;
+}
 
+export interface CurrentMonthStatsDTO {
+  currentMonthOrderCount: number;
+  currentMonthRevenue: number;
+  yearMonth: string;
+}
 
 // 로그인 요청
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
@@ -64,6 +75,17 @@ export async function getDailySalesTrend(startDate: string, endDate: string): Pr
 
 export async function getMonthlySalesTrend(startDate: string, endDate: string): Promise<MonthlySalesDTO[]> {
   const response = await sellerApi.get(`/seller/dashboard/monthly-sales-trend?startDate=${startDate}&endDate=${endDate}`);
+  return response.data;
+}
+
+// 새로운 API 함수들 추가
+export async function getTodayStats(): Promise<TodayStatsDTO> {
+  const response = await sellerApi.get('/seller/dashboard/today-stats');
+  return response.data;
+}
+
+export async function getCurrentMonthStats(): Promise<CurrentMonthStatsDTO> {
+  const response = await sellerApi.get('/seller/dashboard/current-month-stats');
   return response.data;
 }
 

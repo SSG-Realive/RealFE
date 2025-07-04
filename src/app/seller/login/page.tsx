@@ -48,7 +48,7 @@ export default function SellerLoginPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f3f4f6] px-4">
       <div className="w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-        <div className="bg-[#f3f4f6] rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
+        <div className="bg-white rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
           <h1 className="text-2xl font-bold text-center mb-6 text-[#374151]">판매자 로그인</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -62,7 +62,7 @@ export default function SellerLoginPage() {
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="이메일을 입력하세요"
               />
             </div>
@@ -78,20 +78,20 @@ export default function SellerLoginPage() {
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
-                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border-2 border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="비밀번호를 입력하세요"
               />
             </div>
             
             {error && (
-              <p className="text-[#dc2626] text-sm bg-[#f3f4f6] p-3 rounded-md border-2 border-[#d1d5db]">
+              <p className="text-[#dc2626] text-sm bg-[#fef2f2] p-3 rounded-md border-2 border-[#fecaca]">
                 {error}
               </p>
             )}
             
             <button 
               type="submit" 
-              className="w-full bg-[#d1d5db] text-[#374151] py-2 px-4 rounded-md hover:bg-[#e5e7eb] hover:text-[#374151] focus:outline-none focus:ring-2 focus:ring-[#d1d5db] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-[#6b7280] text-white py-2 px-4 rounded-md hover:bg-[#374151] focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               로그인
             </button>

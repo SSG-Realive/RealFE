@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { getSellerOrders, SellerOrderSearchParams } from '@/service/seller/sellerOrderService';
+import { getSellerOrders, SellerOrderSearchParams, getOrderStatistics, OrderStatistics } from '@/service/seller/sellerOrderService';
 import { SellerOrderResponse } from '@/types/seller/sellerorder/sellerOrder';
 import SellerHeader from '@/components/seller/SellerHeader';
 import SellerLayout from '@/components/layouts/SellerLayout';
@@ -34,6 +34,15 @@ export default function SellerOrderListPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const router = useRouter();
+  
+  // 📊 통계 상태 추가
+  const [statistics, setStatistics] = useState<OrderStatistics>({
+    totalOrders: 0,
+    preparingOrders: 0,
+    inProgressOrders: 0,
+    completedOrders: 0
+  });
+  const [statisticsLoading, setStatisticsLoading] = useState(true);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -58,18 +67,48 @@ export default function SellerOrderListPage() {
         status: statusFilter || undefined
       };
       
-      const res: PageResponseForOrder<SellerOrderResponse> = await getSellerOrders(searchParams);
+      // 📊 주문 목록과 통계를 병렬로 조회
+      const [ordersRes, statisticsRes] = await Promise.all([
+        getSellerOrders(searchParams),
+        getOrderStatistics()
+      ]);
       
       console.log('📊 주문 목록 응답:', {
-        totalElements: res.totalElements,
-        totalPages: res.totalPages,
-        currentPage: res.number,
-        contentLength: res.content?.length
+        totalElements: ordersRes.totalElements,
+        totalPages: ordersRes.totalPages,
+        currentPage: ordersRes.number,
+        contentLength: ordersRes.content?.length
       });
       
-        setOrders(res.content || []);
-      setTotalPages(res.totalPages || 0);
-      setTotalElements(res.totalElements || 0);
+      console.log('📊 통계 응답:', statisticsRes);
+      
+      // 🔍 실제 주문 데이터의 orderedAt 값들을 확인
+      console.log('📅 주문 데이터 orderedAt 값들 (정렬 확인):', ordersRes.content?.map((order, index) => ({
+        순서: index + 1,
+        주문ID: order.orderId,
+        주문일시: order.orderedAt,
+        고객명: order.customerName
+      })));
+      
+      // 🔍 더 자세한 정렬 확인
+      if (ordersRes.content && ordersRes.content.length > 0) {
+        console.log('🔍 첫 번째 주문 (최신):', ordersRes.content[0]);
+        console.log('🔍 마지막 주문 (가장 오래된):', ordersRes.content[ordersRes.content.length - 1]);
+        
+        // 각 주문의 orderedAt 값만 따로 출력
+        const orderedAtValues = ordersRes.content.map(order => order.orderedAt);
+        console.log('📅 orderedAt 값들만:', orderedAtValues);
+        
+        // 정렬이 올바른지 확인
+        const sortedCheck = [...orderedAtValues].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+        const isCorrectlySorted = JSON.stringify(orderedAtValues) === JSON.stringify(sortedCheck);
+        console.log('✅ 정렬 상태 확인:', isCorrectlySorted ? '올바르게 정렬됨' : '정렬이 잘못됨');
+      }
+      
+      setOrders(ordersRes.content || []);
+      setTotalPages(ordersRes.totalPages || 0);
+      setTotalElements(ordersRes.totalElements || 0);
+      setStatistics(statisticsRes);
         setError(null);
     } catch (err: any) {
         console.error('주문 목록 조회 실패', err);
@@ -77,6 +116,7 @@ export default function SellerOrderListPage() {
       } finally {
         setLoading(false);
       setRefreshing(false);
+        setStatisticsLoading(false);
       }
     };
 
@@ -121,14 +161,19 @@ export default function SellerOrderListPage() {
       return acc;
     }, {});
     
-    return Object.values(grouped);
+    // 🔧 그룹핑 후 정렬 순서 유지 (orderedAt 기준 내림차순)
+    return Object.values(grouped).sort((a: any, b: any) => 
+      new Date(b.orderedAt).getTime() - new Date(a.orderedAt).getTime()
+    );
   };
 
   const groupedOrders = groupOrdersByOrderId(orders);
-  const totalOrders = totalElements; // 전체 주문 수는 totalElements 사용
-  const preparingOrders = groupedOrders.filter((order: any) => order.deliveryStatus === 'DELIVERY_PREPARING').length;
-  const inProgressOrders = groupedOrders.filter((order: any) => order.deliveryStatus === 'DELIVERY_IN_PROGRESS').length;
-  const completedOrders = groupedOrders.filter((order: any) => order.deliveryStatus === 'DELIVERY_COMPLETED').length;
+  
+  // 📊 API에서 가져온 실제 통계 사용 (전체 데이터 기준)
+  const totalOrders = statistics.totalOrders;
+  const preparingOrders = statistics.preparingOrders;
+  const inProgressOrders = statistics.inProgressOrders;
+  const completedOrders = statistics.completedOrders;
 
   const filteredOrders = groupedOrders.filter((order: any) => {
     const matchesKeyword = searchKeyword === '' || 
@@ -195,32 +240,40 @@ export default function SellerOrderListPage() {
               <ShoppingCart className="w-8 h-8 text-[#6b7280]" />
               <span className="text-[#374151] text-sm font-semibold">총 주문</span>
             </div>
-            <div className="text-2xl font-bold text-[#374151]">{totalOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">전체 주문 수</div>
+            <div className="text-2xl font-bold text-[#374151]">
+              {statisticsLoading ? '...' : `${totalOrders}건`}
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
           </section>
           <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-8 h-8 text-[#6b7280]" />
               <span className="text-[#374151] text-sm font-semibold">대기 중</span>
             </div>
-            <div className="text-2xl font-bold text-[#374151]">{preparingOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+            <div className="text-2xl font-bold text-[#374151]">
+              {statisticsLoading ? '...' : `${preparingOrders}건`}
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
           </section>
           <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
               <Truck className="w-8 h-8 text-[#6b7280]" />
               <span className="text-[#374151] text-sm font-semibold">배송 중</span>
             </div>
-            <div className="text-2xl font-bold text-[#374151]">{inProgressOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+            <div className="text-2xl font-bold text-[#374151]">
+              {statisticsLoading ? '...' : `${inProgressOrders}건`}
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
           </section>
           <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
             <div className="flex items-center gap-3 mb-2">
               <CheckCircle className="w-8 h-8 text-[#6b7280]" />
               <span className="text-[#374151] text-sm font-semibold">완료</span>
             </div>
-            <div className="text-2xl font-bold text-[#374151]">{completedOrders}건</div>
-                <div className="text-xs text-[#6b7280] mt-1">현재 페이지 기준</div>
+            <div className="text-2xl font-bold text-[#374151]">
+              {statisticsLoading ? '...' : `${completedOrders}건`}
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1">전체 데이터 기준</div>
           </section>
         </div>
             

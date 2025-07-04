@@ -253,7 +253,7 @@ const AdminSellersPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">판매자 관리</h1>
-              <p className="text-gray-600 mt-1">판매자 계정을 관리하고 승인/거절 및 상태를 변경할 수 있습니다 (ID 순 정렬, 정지된 판매자는 하단에 표시)</p>
+              <p className="text-gray-600 mt-1">판매자 계정을 관리하고 승인/거절 및 상태를 변경할 수 있습니다</p>
             </div>
           </div>
 

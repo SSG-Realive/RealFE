@@ -80,7 +80,7 @@ const SellerSignup: React.FC = () => {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#f3f4f6] px-4 py-8">
       <div className="w-full max-w-md md:max-w-lg lg:max-w-xl mx-auto">
-        <div className="bg-[#f3f4f6] rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
+        <div className="bg-white rounded-lg shadow-md p-6 md:p-8 border-2 border-[#d1d5db]">
           <h1 className="text-2xl font-bold text-center mb-6 text-[#374151]">판매자 회원가입</h1>
           <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4">
             <div>
@@ -93,7 +93,7 @@ const SellerSignup: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="이메일을 입력하세요"
               />
             </div>
@@ -108,7 +108,7 @@ const SellerSignup: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="비밀번호를 입력하세요 (최소 6자)"
               />
             </div>
@@ -122,7 +122,7 @@ const SellerSignup: React.FC = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="판매자 이름을 입력하세요"
               />
             </div>
@@ -136,7 +136,7 @@ const SellerSignup: React.FC = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="전화번호를 입력하세요"
               />
             </div>
@@ -150,7 +150,7 @@ const SellerSignup: React.FC = () => {
                 value={businessNumber}
                 onChange={(e) => setBusinessNumber(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] placeholder-[#6b7280]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] placeholder-[#6b7280]"
                 placeholder="사업자등록번호를 입력하세요"
               />
             </div>
@@ -164,7 +164,7 @@ const SellerSignup: React.FC = () => {
                 accept=".jpg,.jpeg,.png,.pdf"
                 onChange={(e) => handleFileChange(e, setBusinessLicenseFile)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#6b7280] hover:file:bg-[#e5e7eb] hover:file:text-[#374151]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
               />
             </div>
             <div>
@@ -177,17 +177,17 @@ const SellerSignup: React.FC = () => {
                 accept=".jpg,.jpeg,.png,.pdf"
                 onChange={(e) => handleFileChange(e, setBankAccountFile)}
                 required
-                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#d1d5db] bg-[#f3f4f6] text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d1d5db] file:text-[#6b7280] hover:file:bg-[#e5e7eb] hover:file:text-[#374151]"
+                className="w-full px-3 py-2 border border-[#d1d5db] rounded-md focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:border-[#6b7280] bg-white text-[#374151] file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
               />
             </div>
             {error && (
-              <div className="bg-[#fbeee0] border border-[#bfa06a] rounded-md p-3">
-                <p className="text-[#b94a48] text-sm">{error}</p>
-              </div>
+              <p className="text-[#dc2626] text-sm bg-[#fef2f2] p-3 rounded-md border-2 border-[#fecaca]">
+                {error}
+              </p>
             )}
             <button
               type="submit"
-              className="w-full bg-[#d1d5db] text-[#374151] py-3 px-4 rounded-md font-medium hover:bg-[#e5e7eb] hover:text-[#374151] focus:outline-none focus:ring-2 focus:ring-[#d1d5db] focus:ring-offset-2 transition-colors"
+              className="w-full bg-[#6b7280] text-white py-3 px-4 rounded-md font-medium hover:bg-[#374151] focus:outline-none focus:ring-2 focus:ring-[#6b7280] focus:ring-offset-2 transition-colors"
             >
               회원가입
             </button>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Link  from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -33,10 +32,11 @@ function BidCard({
   const current = auction.currentPrice;
 
   return (
-      <div
-          onClick={() => router.push(`/customer/auctions/${bid.auctionId}`)}
-          className="flex gap-4 p-4 border border-gray-200 rounded-lg hover:shadow transition cursor-pointer"
-      >
+    <div
+      onClick={() => router.push(`/auctions/${bid.auctionId}`)}
+      className="flex gap-4 p-4 border rounded-lg hover:shadow transition
+                 cursor-pointer"
+    >
       {/* 썸네일 */}
       <div className="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-gray-100">
         <Image

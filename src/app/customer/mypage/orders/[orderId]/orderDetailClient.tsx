@@ -67,13 +67,32 @@ export default function OrderDetailClient({ orderId }: OrderDetailClientProps) {
     }, [orderId, accessToken, hydrated]);
 
     if (loading) {
-        return <div className="text-center py-10">주문 정보를 불러오는 중...</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-lg">주문 정보를 불러오는 중...</p>
+                </div>
+            </div>
+        );
     }
 
     if (error) {
         return (
-            <div className="text-center py-10 text-red-600">
-                <p>오류: {error}</p>
+            <div>
+                <div className="container mx-auto p-4 font-inter">
+
+                    <h1 className="text-3xl font-light mb-6 text-center text-gray-800">
+                        주문 상세
+                    </h1>
+                    <div
+                        className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+                        role="alert"
+                    >
+                        <strong className="font-light">오류: </strong>
+                        <span className="block sm:inline">{error}</span>
+                    </div>
+                </div>
             </div>
         );
     }

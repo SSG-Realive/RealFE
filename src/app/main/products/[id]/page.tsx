@@ -2,7 +2,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react'; // useMemo 임포트 추가
+import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   useParams,
   useRouter,
@@ -21,8 +21,7 @@ import { getProductQnaList } from '@/service/customer/customerQnaService';
 import ReviewList from '@/components/customer/review/ReviewList';
 import ProductImage from '@/components/ProductImage';
 import QnaList from '@/components/customer/qna/QnaList';
-// ✨ TrafficLightStatusCard 컴포넌트 임포트
-import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
+import TrafficLightStatusCardforProductDetail from "@/components/seller/TrafficLightStatusCardforProductDetail";
 
 import { ProductDetail, ProductListDTO } from '@/types/seller/product/product';
 import { ReviewResponseDTO } from '@/types/customer/review/review';
@@ -30,7 +29,6 @@ import { CustomerQnaResponse, CustomerQnaListResponse } from '@/types/customer/q
 
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useGlobalDialog } from '@/app/context/dialogContext';
-import TrafficLightStatusCardforProductDetail from "@/components/seller/TrafficLightStatusCardforProductDetail";
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -92,14 +90,13 @@ export default function ProductDetailPage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // ⭐⭐⭐ 새로 추가된 부분: 리뷰 평균 평점 계산
   const { averageRating, reviewCount } = useMemo(() => {
     if (!reviews || reviews.length === 0) {
       return { averageRating: 0, reviewCount: 0 };
     }
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
     const avg = totalRating / reviews.length;
-    return { averageRating: parseFloat(avg.toFixed(1)), reviewCount: reviews.length }; // 소수점 한 자리까지
+    return { averageRating: parseFloat(avg.toFixed(1)), reviewCount: reviews.length };
   }, [reviews]);
 
 
@@ -109,11 +106,7 @@ export default function ProductDetailPage() {
         setWishlistLoading(true);
         try {
           await toggleWishlist({ productId: product.id });
-          setIsWished((prev) => {
-            const newState = !prev;
-            show(newState ? '찜한 상품에 추가되었습니다.' : '찜 목록에서 제거되었습니다.');
-            return newState;
-          });
+          setIsWished((prev) => !prev);
         } finally {
           setWishlistLoading(false);
         }
@@ -131,7 +124,7 @@ export default function ProductDetailPage() {
         if (!product || quantity <= 0) return;
         sessionStorage.setItem('directBuyProductId', product.id.toString());
         sessionStorage.setItem('directBuyQuantity', quantity.toString());
-        router.push('/customer/mypage/orders/direct');
+        router.push('/customer/orders/direct');
       });
 
   const handleWriteQna = () => {

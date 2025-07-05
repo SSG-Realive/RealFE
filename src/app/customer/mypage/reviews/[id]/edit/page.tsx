@@ -99,6 +99,7 @@ export default function EditReviewPage() {
             className="bg-black/30 backdrop-blur-sm"
             titleClassName="text-blue-900"
             buttonClassName="bg-blue-600"
+            title="리뷰 수정 완료"
         />
         <div className="max-w-2xl mx-auto px-6 py-10 bg-white-50">
           <form onSubmit={handleSubmit} className="space-y-6">

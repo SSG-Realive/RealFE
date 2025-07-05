@@ -8,8 +8,8 @@ import { fetchMyProfile } from '@/service/customer/customerService';
 import { getDirectPaymentInfo, processDirectPaymentApi } from '@/service/order/orderService';
 import { DirectPaymentInfoDTO, PayRequestDTO } from '@/types/customer/order/order';
 import { useAuthStore } from '@/store/customer/authStore';
-import { 
-  loadTossPayments, 
+import {
+  loadTossPayments,
   requestPayment,
   DEFAULT_CONFIG,
   PaymentRequestOptions
@@ -137,19 +137,19 @@ export default function DirectOrderPage() {
             try {
                 console.log('토스페이먼츠 SDK 초기화 시작...', { customerId, finalAmount });
                 setError(null);
-                
+
                 // DOM 엘리먼트가 준비될 때까지 대기
                 await new Promise(resolve => setTimeout(resolve, 100));
-                
+
                 // 토스페이먼츠 객체 생성
                 if (!(window as any).TossPayments) {
                     throw new Error('토스페이먼츠 SDK가 로드되지 않았습니다');
                 }
-                
+
                 const tossPayments = (window as any).TossPayments(DEFAULT_CONFIG.CLIENT_KEY);
                 tossPaymentsRef.current = tossPayments;
                 console.log('토스페이먼츠 SDK 초기화 완료');
-                
+
             } catch (error: any) {
                 console.error("토스페이먼츠 SDK 초기화 실패:", error);
                 setError(`토스페이먼츠 SDK 초기화에 실패했습니다: ${error.message}`);
@@ -219,9 +219,9 @@ const handleAddressChange = useCallback((fullAddress: string) => {
 
         try {
             const orderId = `direct_${productInfo.productId}_${Date.now()}`;
-            
+
             console.log('결제 요청 준비 중...');
-            
+
             // 결제 성공 페이지에서 사용할 주문 정보를 sessionStorage에 저장
             const checkoutInfo = {
                 productId: productInfo.productId,
@@ -256,7 +256,7 @@ const handleAddressChange = useCallback((fullAddress: string) => {
             await requestPayment(tossPaymentsRef.current, paymentOptions);
         } catch (error: any) {
             console.error('결제 요청 오류:', error);
-            
+
             if (error.paymentKey && error.orderId && error.amount) {
                 await processPaymentApproval(error.paymentKey, error.orderId, error.amount);
             } else {
@@ -295,7 +295,7 @@ const handleAddressChange = useCallback((fullAddress: string) => {
             const result = await response.json();
             await show('결제가 성공적으로 완료되었습니다!');
             router.push('/customer/mypage/orders');
-            
+
         } catch (error) {
             console.error('결제 승인 처리 오류:', error);
             show('결제 승인 처리 중 오류가 발생했습니다.');

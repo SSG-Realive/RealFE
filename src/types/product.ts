@@ -18,9 +18,21 @@ export interface ProductDetail {
     height: number;
     status: string;
     isActive: boolean;
+
     categoryId: number;
+    parentCategoryId: number;
+    categoryName: string;
+
+    sellerId: number;
+    sellerName: string;
+
+    imageThumbnailUrl: string;
+    videoThumbnailUrl?: string;
+    imageUrls: string[];
+
     deliveryPolicy: DeliveryPolicy;
 }
+
 
 export interface FeaturedProductSummary {
   productId: number;

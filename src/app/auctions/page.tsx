@@ -94,20 +94,14 @@ export default function AuctionPage() {
           </div>
         </div>
 
-        {/* 하단 고정 입찰 현황 + 낙찰 경매 버튼 */}
+        {/* 하단 고정 입찰 현황 버튼 */}
         <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex gap-3">
+          <div className="max-w-6xl mx-auto px-4 py-3">
             <button
                 onClick={() => router.push('/customer/mypage/bids')}
-                className="w-1/2 bg-black text-white py-3 rounded-md text-center hover:bg-neutral-800 transition"
+                className="w-full bg-black text-white py-3 rounded-md text-center hover:bg-neutral-800 transition"
             >
-              입찰 현황
-            </button>
-            <button
-                onClick={() => router.push('/customer/member/auctions/won')}
-                className="w-1/2 bg-black text-white py-3 rounded-md text-center hover:bg-neutral-800 transition"
-            >
-              낙찰 경매
+              입찰 현황 보기
             </button>
           </div>
         </div>

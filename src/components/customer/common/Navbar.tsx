@@ -68,7 +68,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
         }
     };
 
-    const hideNavbarPaths = ['/autions', '/seller', '/admin'];
+    const hideNavbarPaths = ['/seller', '/admin'];
 
     if (hideNavbarPaths.some((path) => pathname.startsWith(path))) {
         return null;
@@ -163,7 +163,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     </div>
 
                     {/* ✅ PC 카테고리 */}
-                    {pathname.startsWith('/main') && (
+                    {(pathname.startsWith('/main') || pathname.includes('/auctions')) && (
                         <div className="hidden md:block mt-4">
                             <CategoryDropdown onCategorySelect={onCategorySelect} />
                         </div>
@@ -234,7 +234,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                     )}
 
                     {/* ✅ 모바일 카테고리 */}
-                    {pathname.startsWith('/main') && (
+                    {(pathname.startsWith('/main') || pathname.includes('/auctions')) && (
                         <div className="block md:hidden mt-4">
                             <CategoryDropdown onCategorySelect={onCategorySelect} />
                         </div>

@@ -122,7 +122,7 @@ export default function ProductDetailPage() {
         if (!product || quantity <= 0) return;
         sessionStorage.setItem('directBuyProductId', product.id.toString());
         sessionStorage.setItem('directBuyQuantity', quantity.toString());
-        router.push('/customer/orders/direct');
+        router.push('/customer/mypage/orders/direct');
       });
 
   const handleWriteQna = () => {

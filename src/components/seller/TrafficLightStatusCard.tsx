@@ -51,6 +51,9 @@ export default function TrafficLightStatusCard({
       onClick={onClick}
     >
       <div className="flex flex-col items-center justify-center w-full">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
+        </div>
         <span className="mb-2 animate-pulse" style={{ display: 'inline-block' }}>
           <svg width="56" height="56" viewBox="0 0 56 56">
             <circle

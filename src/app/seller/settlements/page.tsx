@@ -6,6 +6,7 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import SellerHeader from '@/components/seller/SellerHeader';
 import {
     getSellerSettlementList,
+    getSellerSettlementListWithPaging,
     getSellerSettlementListByDate,
     getSellerSettlementListByPeriod,
     getSellerSettlementSummary,
@@ -14,7 +15,8 @@ import {
 import { 
     SellerSettlementResponse, 
     PayoutLogDetailResponse,
-    DailySettlementItem 
+    DailySettlementItem,
+    PageResponse
 } from '@/types/seller/sellersettlement/sellerSettlement';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { 
@@ -38,20 +40,11 @@ export default function SellerSettlementPage() {
     const checking = useSellerAuthGuard();
     const router = useRouter();
     
-    // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오는 함수
-    const getTodayDate = () => {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-    
-    // 상태 관리 - 기본값을 하루 단위(오늘 날짜)로 설정
-    const [payouts, setPayouts] = useState<SellerSettlementResponse[]>([]);
+    // 상태 관리 - 원본 데이터와 하루별 그룹핑된 데이터
+    const [settlements, setSettlements] = useState<SellerSettlementResponse[]>([]);
+    const [dailyPayouts, setDailyPayouts] = useState<DailySettlementItem[]>([]);
     const [selectedPayout, setSelectedPayout] = useState<PayoutLogDetailResponse | null>(null);
-    const [filterType, setFilterType] = useState<'all' | 'date' | 'period'>('date');
-    const [filterDate, setFilterDate] = useState(getTodayDate());
+    const [filterType, setFilterType] = useState<'all' | 'period'>('all');
     const [filterFrom, setFilterFrom] = useState('');
     const [filterTo, setFilterTo] = useState('');
     const [summary, setSummary] = useState<{
@@ -63,21 +56,145 @@ export default function SellerSettlementPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [dailyPayouts, setDailyPayouts] = useState<DailySettlementItem[]>([]); // 하루 단위로 재구성된 정산 데이터
+    
+    // 페이징 상태 관리
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [usePagination, setUsePagination] = useState(false);
     const {show} = useGlobalDialog();
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
-    // 전체 정산 내역 조회
-    const fetchAll = async () => {
+    // 🎯 최적화된 하루별 그룹핑 로직
+    const createDailyPayoutsOptimized = async (payoutList: SellerSettlementResponse[]) => {
+        try {
+            console.log('📊 하루별 그룹핑 시작 (최적화된 버전)');
+            
+            // 날짜별로 데이터를 그룹핑할 맵
+            const dailyDataMap: { [date: string]: DailySettlementItem } = {};
+            
+            // 🔥 최적화: 모든 상세 정보를 병렬로 조회
+            const detailPromises = payoutList.map(payout => 
+                getSellerSettlementDetail(payout.id).catch(err => {
+                    console.error(`정산 상세 조회 실패 (ID: ${payout.id}):`, err);
+                    return null;
+                })
+            );
+            
+            const allDetails = await Promise.all(detailPromises);
+            
+            // 각 정산 데이터와 상세 정보를 매칭하여 처리
+            payoutList.forEach((payout, index) => {
+                const detail = allDetails[index];
+                
+                if (detail && detail.salesDetails) {
+                    // 상세 정보가 있는 경우: 날짜별로 분리
+                    detail.salesDetails.forEach((saleDetail) => {
+                        const saleDate = saleDetail.salesLog.soldAt.split('T')[0];
+                        
+                        // 필터링 적용 (기간별 필터가 활성화된 경우)
+                        if (filterType === 'period' && filterFrom && filterTo) {
+                            if (saleDate < filterFrom || saleDate > filterTo) {
+                                return; // 해당 건 제외
+                            }
+                        }
+                        
+                        if (!dailyDataMap[saleDate]) {
+                            dailyDataMap[saleDate] = {
+                                id: `daily_${saleDate}`,
+                                originalPayoutId: payout.id,
+                                sellerId: payout.sellerId,
+                                date: saleDate,
+                                periodStart: saleDate,
+                                periodEnd: saleDate,
+                                totalSales: 0,
+                                totalCommission: 0,
+                                payoutAmount: 0,
+                                processedAt: payout.processedAt,
+                                salesCount: 0,
+                                salesDetails: []
+                            };
+                        }
+                        
+                        // 날짜별 합계 누적
+                        dailyDataMap[saleDate].totalSales += saleDetail.salesLog.totalPrice;
+                        dailyDataMap[saleDate].totalCommission += saleDetail.commissionLog.commissionAmount;
+                        dailyDataMap[saleDate].payoutAmount += (saleDetail.salesLog.totalPrice - saleDetail.commissionLog.commissionAmount);
+                        dailyDataMap[saleDate].salesCount += 1;
+                        dailyDataMap[saleDate].salesDetails.push(saleDetail);
+                    });
+                } else {
+                    // 상세 조회 실패 시: 원본 데이터를 날짜별로 변환
+                    const fallbackDate = payout.periodStart;
+                    if (!dailyDataMap[fallbackDate]) {
+                        dailyDataMap[fallbackDate] = {
+                            id: `daily_${fallbackDate}_fallback`,
+                            originalPayoutId: payout.id,
+                            sellerId: payout.sellerId,
+                            date: fallbackDate,
+                            periodStart: fallbackDate,
+                            periodEnd: payout.periodEnd,
+                            totalSales: payout.totalSales,
+                            totalCommission: payout.totalCommission,
+                            payoutAmount: payout.payoutAmount,
+                            processedAt: payout.processedAt,
+                            salesCount: 1,
+                            salesDetails: []
+                        };
+                    }
+                }
+            });
+            
+            // 맵을 배열로 변환하고 날짜순 정렬 (최신순)
+            const dailyData = Object.values(dailyDataMap).sort((a, b) => {
+                return new Date(b.date).getTime() - new Date(a.date).getTime();
+            });
+            
+            console.log('📊 하루별 그룹핑 완료:', {
+                총정산건수: payoutList.length,
+                하루별건수: dailyData.length,
+                데이터: dailyData
+            });
+            
+            setDailyPayouts(dailyData);
+            
+        } catch (error) {
+            console.error('하루별 그룹핑 실패:', error);
+            setDailyPayouts([]);
+        }
+    };
+
+    // 전체 정산 내역 조회 (페이징 지원)
+    const fetchAll = async (page: number = 0) => {
         try {
             setLoading(true);
-            const res = await getSellerSettlementList();
-            setPayouts(res || []);
+            console.log('📊 정산 내역 조회 시작:', { page, usePagination });
             
-            // 하루 단위로 재구성
-            await createDailyPayoutsFromDetails(res || []);
+            if (usePagination) {
+                // 페이징 조회
+                const res = await getSellerSettlementListWithPaging(page, pageSize);
+                console.log('📊 페이징 정산 데이터:', res);
+                setSettlements(res.content || []);
+                setTotalPages(res.totalPages);
+                setTotalElements(res.totalElements);
+                setCurrentPage(res.number);
+            } else {
+                // 전체 조회
+                const res = await getSellerSettlementList();
+                console.log('📊 전체 정산 데이터:', res);
+                setSettlements(res || []);
+                setTotalPages(0);
+                setTotalElements(res?.length || 0);
+                setCurrentPage(0);
+            }
+            
+            // 하루별로 그룹핑
+            await createDailyPayoutsOptimized(usePagination ? res.content || [] : res || []);
+            setSummary(null);
             setError(null);
         } catch (err) {
             console.error('정산 목록 조회 실패:', err);
@@ -87,60 +204,27 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 날짜별 필터링
-    const fetchFilteredByDate = async (date: string) => {
-        try {
-            setLoading(true);
-            const res = await getSellerSettlementListByDate(date);
-            setPayouts(res || []);
-            
-            // 하루 단위로 재구성
-            await createDailyPayoutsFromDetails(res || []);
-            setError(null);
-        } catch (err) {
-            console.error('날짜 필터 조회 실패:', err);
-            setError('해당 날짜의 정산 데이터를 불러오지 못했습니다.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     // 기간별 필터링
     const fetchFilteredByPeriod = async (from: string, to: string) => {
         try {
             setLoading(true);
-            console.log('=== 기간별 필터링 시작 ===');
-            console.log('요청 기간:', from, '~', to);
+            console.log('📊 기간별 정산 조회:', { from, to });
             
-            const res = await getSellerSettlementListByPeriod(from, to);
-            console.log('백엔드 응답 데이터:', res);
-            console.log('응답 데이터 개수:', res?.length || 0);
+            const [res, summaryRes] = await Promise.all([
+                getSellerSettlementListByPeriod(from, to),
+                getSellerSettlementSummary(from, to).catch(() => null)
+            ]);
             
-            if (res && res.length > 0) {
-                console.log('첫 번째 데이터 샘플:', res[0]);
-                res.forEach((item, index) => {
-                    if (index < 5) { // 처음 5개만 로그 출력
-                        console.log(`데이터 ${index + 1}:`, {
-                            id: item.id,
-                            periodStart: item.periodStart,
-                            periodEnd: item.periodEnd,
-                            sellerId: item.sellerId
-                        });
-                    }
-                });
-            }
+            console.log('📊 기간별 정산 데이터:', res);
+            console.log('📊 요약 정보:', summaryRes);
             
-            setPayouts(res || []);
-            
-            // 하루 단위로 재구성
-            await createDailyPayoutsFromDetails(res || []);
-            
-            // 요약 정보도 함께 조회
-            const summaryRes = await getSellerSettlementSummary(from, to);
-            console.log('요약 정보:', summaryRes);
+            setSettlements(res || []);
             setSummary(summaryRes);
+            
+            // 하루별로 그룹핑 (기간 필터 적용)
+            await createDailyPayoutsOptimized(res || []);
             setError(null);
-        } catch (err) {
+        } catch (err: any) {
             console.error('기간 필터 조회 실패:', err);
             setError('해당 기간의 정산 데이터를 불러오지 못했습니다.');
         } finally {
@@ -148,24 +232,36 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 정산 상세 정보 조회
-    const fetchPayoutDetail = async (payoutLogId: number) => {
+    // 정산 상세 정보 조회 (상세보기 모달용)
+    const fetchPayoutDetailForModal = async (date: string, dailyItem: DailySettlementItem) => {
         try {
-            console.log('정산 상세 조회 시도:', payoutLogId);
-            const res = await getSellerSettlementDetail(payoutLogId);
-            console.log('정산 상세 조회 성공:', res);
+            console.log('하루별 상세 정보 표시:', date);
+            
+            // 이미 하루별 데이터에 상세 정보가 있는 경우 그대로 사용
+            if (dailyItem.salesDetails && dailyItem.salesDetails.length > 0) {
+                const mockDetail = {
+                    payoutInfo: {
+                        id: dailyItem.originalPayoutId,
+                        sellerId: dailyItem.sellerId,
+                        periodStart: dailyItem.date,
+                        periodEnd: dailyItem.date,
+                        totalSales: dailyItem.totalSales,
+                        totalCommission: dailyItem.totalCommission,
+                        payoutAmount: dailyItem.payoutAmount,
+                        processedAt: dailyItem.processedAt
+                    },
+                    salesDetails: dailyItem.salesDetails
+                };
+                setSelectedPayout(mockDetail);
+            } else {
+                // 상세 정보가 없는 경우 API 호출
+                const res = await getSellerSettlementDetail(dailyItem.originalPayoutId);
             setSelectedPayout(res);
+            }
         } catch (err: any) {
             console.error('정산 상세 조회 실패:', err);
-            console.error('에러 상세:', {
-                message: err.message,
-                status: err.response?.status,
-                statusText: err.response?.statusText,
-                data: err.response?.data
-            });
             
             let errorMessage = '정산 상세 정보를 불러오지 못했습니다.';
-            
             if (err.response?.status === 500) {
                 errorMessage = '서버에서 오류가 발생했습니다. 백엔드 팀에 문의해주세요.';
             } else if (err.response?.status === 404) {
@@ -177,208 +273,66 @@ export default function SellerSettlementPage() {
             }
             
             setError(errorMessage);
-            
-            // 에러 발생 시 알림 표시
             show(errorMessage);
         }
     };
 
-    // 필터 적용
-    const applyFilter = () => {
-        if (filterType === 'date' && filterDate) {
-            fetchFilteredByDate(filterDate);
-        } else if (filterType === 'period' && filterFrom && filterTo) {
-            fetchFilteredByPeriod(filterFrom, filterTo);
-        } else if (filterType === 'all') {
-            fetchAll();
-        }
-    };
-
-    // 필터 초기화
-    const resetFilter = () => {
-        setFilterType('date');
-        setFilterDate(getTodayDate());
-        setFilterFrom('');
-        setFilterTo('');
-        setSummary(null);
-        fetchFilteredByDate(getTodayDate());
-    };
-
     // 필터 타입 변경 핸들러
-    const handleFilterTypeChange = (type: 'all' | 'date' | 'period') => {
+    const handleFilterTypeChange = (type: 'all' | 'period') => {
+        console.log('필터 타입 변경:', type);
         setFilterType(type);
         
         if (type === 'all') {
-            // 전체 조회 즉시 실행
+            setFilterFrom('');
+            setFilterTo('');
         fetchAll();
-        } else if (type === 'date') {
-            // 현재 설정된 날짜로 조회 (없으면 오늘 날짜)
-            const dateToUse = filterDate || getTodayDate();
-            setFilterDate(dateToUse);
-            fetchFilteredByDate(dateToUse);
-        } else if (type === 'period') {
-            // 기간별 필터는 시작일/종료일이 모두 설정되어야 조회
-            if (filterFrom && filterTo) {
-                fetchFilteredByPeriod(filterFrom, filterTo);
-            }
-        }
-    };
-
-    // 날짜 필터 변경 핸들러
-    const handleDateChange = (date: string) => {
-        setFilterDate(date);
-        if (filterType === 'date' && date) {
-            fetchFilteredByDate(date);
         }
     };
 
     // 기간 필터 변경 핸들러
     const handlePeriodChange = (from: string, to: string) => {
-        if (from) setFilterFrom(from);
-        if (to) setFilterTo(to);
-        
-        // 시작일과 종료일이 모두 있으면 자동 조회
-        const fromDate = from || filterFrom;
-        const toDate = to || filterTo;
-        
-        if (filterType === 'period' && fromDate && toDate) {
-            fetchFilteredByPeriod(fromDate, toDate);
-        }
+        console.log('기간 변경:', { from, to });
+        setFilterFrom(from);
+        setFilterTo(to);
     };
-
+        
+    // 초기 로딩
     useEffect(() => {
         if (checking) return;
-        // 초기 로딩 시 오늘 날짜 기준으로 조회
-        fetchFilteredByDate(getTodayDate());
+        fetchAll();
     }, [checking]);
 
-    // 정산 상세 데이터를 날짜별 + 건별로 분리하여 정산 목록 생성
-    const createDailyPayoutsFromDetails = async (payoutList: SellerSettlementResponse[]) => {
-        try {
-            console.log('=== 정산 데이터 가공 시작 ===');
-            console.log('입력된 정산 목록:', payoutList);
-            
-            // 날짜별로 데이터를 그룹핑할 맵
-            const dailyDataMap: { [date: string]: DailySettlementItem } = {};
-            
-            for (const payout of payoutList) {
-                console.log(`정산 ID ${payout.id} 처리 중...`, {
-                    periodStart: payout.periodStart,
-                    periodEnd: payout.periodEnd,
-                    totalSales: payout.totalSales
-                });
-                
-                try {
-                    // 각 정산의 상세 정보 조회
-                    const detail = await getSellerSettlementDetail(payout.id);
-                    console.log(`정산 ID ${payout.id} 상세 정보:`, {
-                        salesDetailsCount: detail.salesDetails.length,
-                        salesDetails: detail.salesDetails.map(sd => ({
-                            soldAt: sd.salesLog.soldAt,
-                            totalPrice: sd.salesLog.totalPrice,
-                            productId: sd.salesLog.productId
-                        }))
-                    });
-                    
-                    // 각 salesDetail을 날짜별로 그룹핑
-                    detail.salesDetails.forEach((saleDetail, index) => {
-                        const saleDate = saleDetail.salesLog.soldAt.split('T')[0]; // YYYY-MM-DD 형식으로 변환
-                        console.log(`판매 건 ${index + 1}:`, {
-                            saleDate,
-                            productId: saleDetail.salesLog.productId,
-                            totalPrice: saleDetail.salesLog.totalPrice,
-                            soldAt: saleDetail.salesLog.soldAt
-                        });
-                        
-                        // 기간 필터링이 활성화된 경우 실제 판매일 기준으로 필터링
-                        if (filterType === 'period' && filterFrom && filterTo) {
-                            if (saleDate < filterFrom || saleDate > filterTo) {
-                                console.log(`판매일 ${saleDate}가 필터 기간 ${filterFrom}~${filterTo} 밖이므로 제외`);
-                                return; // 해당 건 제외
-                            }
-                        } else if (filterType === 'date' && filterDate) {
-                            if (saleDate !== filterDate) {
-                                console.log(`판매일 ${saleDate}가 필터 날짜 ${filterDate}와 다르므로 제외`);
-                                return; // 해당 건 제외
-                            }
-                        }
-                        
-                        console.log(`판매 건 ${index + 1} 포함됨:`, saleDate);
-                        
-                        // 날짜별로 데이터 합산
-                        if (!dailyDataMap[saleDate]) {
-                            dailyDataMap[saleDate] = {
-                                id: `daily_${saleDate}`,
-                            originalPayoutId: payout.id,
-                            sellerId: payout.sellerId,
-                            date: saleDate,
-                            periodStart: saleDate,
-                            periodEnd: saleDate,
-                                totalSales: 0,
-                                totalCommission: 0,
-                                payoutAmount: 0,
-                            processedAt: payout.processedAt,
-                                salesCount: 0,
-                                salesDetails: [] // 해당 날짜의 모든 상세 내역
-                            };
-                        }
-                        
-                        // 날짜별 합계 누적
-                        dailyDataMap[saleDate].totalSales += saleDetail.salesLog.totalPrice;
-                        dailyDataMap[saleDate].totalCommission += saleDetail.commissionLog.commissionAmount;
-                        dailyDataMap[saleDate].payoutAmount += (saleDetail.salesLog.totalPrice - saleDetail.commissionLog.commissionAmount);
-                        dailyDataMap[saleDate].salesCount += 1;
-                        dailyDataMap[saleDate].salesDetails.push(saleDetail);
-                    });
-                } catch (detailError) {
-                    console.error(`정산 상세 조회 실패 (ID: ${payout.id}):`, detailError);
-                    // 상세 조회 실패 시 원본 데이터를 하루 단위로 변환
-                    const fallbackDate = payout.periodStart;
-                    if (!dailyDataMap[fallbackDate]) {
-                        dailyDataMap[fallbackDate] = {
-                            id: `daily_${fallbackDate}_fallback`,
-                        originalPayoutId: payout.id,
-                        sellerId: payout.sellerId,
-                            date: fallbackDate,
-                            periodStart: fallbackDate,
-                        periodEnd: payout.periodEnd,
-                        totalSales: payout.totalSales,
-                        totalCommission: payout.totalCommission,
-                        payoutAmount: payout.payoutAmount,
-                        processedAt: payout.processedAt,
-                        salesCount: 1,
-                        salesDetails: []
-                        };
-                    }
-                }
-            }
-            
-            // 맵을 배열로 변환하고 날짜순 정렬 (최신순)
-            const dailyData = Object.values(dailyDataMap).sort((a, b) => {
-                const dateA = new Date(a.date).getTime();
-                const dateB = new Date(b.date).getTime();
-                return dateB - dateA;
-            });
-            
-            console.log('날짜별로 합산된 정산 데이터:', dailyData);
-            setDailyPayouts(dailyData);
-            
-        } catch (error) {
-            console.error('날짜별 합산 정산 데이터 생성 실패:', error);
-            setDailyPayouts([]);
+    // 기간별 필터 자동 실행
+    useEffect(() => {
+        if (filterType === 'period' && filterFrom && filterTo) {
+            console.log('🔄 기간별 필터 자동 실행:', filterFrom, '~', filterTo);
+            fetchFilteredByPeriod(filterFrom, filterTo);
         }
+    }, [filterType, filterFrom, filterTo]);
+
+    // 페이징 관련 함수들
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        fetchAll(newPage);
     };
 
-    // 통계 계산 (건별로 분리된 결과 사용)
+    const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize);
+        setCurrentPage(0);
+        fetchAll(0);
+    };
+
+    const togglePagination = () => {
+        setUsePagination(!usePagination);
+        setCurrentPage(0);
+        fetchAll(0);
+    };
+
+    // 🎯 하루별 그룹핑된 데이터 기준 통계 계산
     const totalSettlements = dailyPayouts.length;
     const totalSales = dailyPayouts.reduce((sum, item) => sum + item.totalSales, 0);
     const totalCommission = dailyPayouts.reduce((sum, item) => sum + item.totalCommission, 0);
     const totalPayout = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
-
-    // 배송 완료된 주문만 정산 대상 - 즉시 정산 완료 처리
-    // 모든 데이터는 이미 배송 완료 후 정산된 상태
-    const completedSettlements = dailyPayouts; // 모든 정산이 완료된 상태
-    const completedAmount = dailyPayouts.reduce((sum, item) => sum + item.payoutAmount, 0);
 
     if (checking || loading) {
         return (
@@ -399,20 +353,15 @@ export default function SellerSettlementPage() {
             <SellerLayout>
                 <div className="flex-1 w-full h-full px-4 py-8">
                     <div className="mb-6">
-                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리 (날짜별)</h1>
-                        {filterType === 'date' && (
-                            <p className="text-sm text-[#6b7280] mt-1">
-                                조회 날짜: {filterDate} {filterDate === getTodayDate() && '(오늘)'} - 배송 완료된 주문만 즉시 정산
-                            </p>
-                        )}
+                        <h1 className="text-xl md:text-2xl font-bold text-[#374151]">정산 관리</h1>
                         {filterType === 'period' && filterFrom && filterTo && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                조회 기간: {filterFrom} ~ {filterTo} - 배송 완료된 주문만 즉시 정산
+                                조회 기간: {filterFrom} ~ {filterTo} (판매일 기준)
                             </p>
                         )}
                         {filterType === 'all' && (
                             <p className="text-sm text-[#6b7280] mt-1">
-                                전체 기간 조회 - 배송 완료된 주문만 즉시 정산
+                                전체 기간 조회 (하루별 합계 표시)
                             </p>
                         )}
                     </div>
@@ -422,20 +371,21 @@ export default function SellerSettlementPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <CheckCircle className="w-8 h-8 text-green-600" />
-                                <span className="text-[#374151] text-sm font-semibold">정산 건수</span>
+                                <span className="text-[#374151] text-sm font-semibold">정산 일수</span>
                             </div>
-                            <div className="text-2xl font-bold text-green-600">{completedSettlements.length}건</div>
-                            <div className="text-sm font-semibold text-green-600">{completedAmount.toLocaleString()}원</div>
-                            <div className="text-xs text-[#6b7280] mt-1">배송 완료시 즉시 정산</div>
+                            <div className="text-2xl font-bold text-green-600">{totalSettlements}일</div>
+                            <div className="text-sm font-semibold text-green-600">{totalPayout.toLocaleString()}원</div>
+                            <div className="text-xs text-[#6b7280] mt-1">하루별 합계 기준</div>
                         </section>
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <DollarSign className="w-8 h-8 text-[#374151]" />
                                 <span className="text-[#374151] text-sm font-semibold">총 정산액</span>
                             </div>
-                            <div className="text-2xl font-bold text-[#374151]">{summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원</div>
+                            <div className="text-2xl font-bold text-[#374151]">
+                                {summary ? summary.totalPayoutAmount.toLocaleString() : totalPayout.toLocaleString()}원
+                            </div>
                             <div className="text-xs text-[#6b7280] mt-1">
-                                {filterType === 'date' && `${filterDate} 당일`}
                                 {filterType === 'period' && `${filterFrom}~${filterTo}`}
                                 {filterType === 'all' && '전체 기간'}
                             </div>
@@ -443,16 +393,14 @@ export default function SellerSettlementPage() {
                         <section className="bg-[#f3f4f6] rounded-xl shadow-xl border-2 border-[#d1d5db] flex flex-col justify-center items-center p-6 min-h-[140px] transition-all">
                             <div className="flex items-center gap-3 mb-2">
                                 <TrendingUp className="w-8 h-8 text-blue-600" />
-                                <span className="text-[#374151] text-sm font-semibold">평균 정산액</span>
+                                <span className="text-[#374151] text-sm font-semibold">일평균 정산액</span>
                     </div>
                             <div className="text-2xl font-bold text-blue-600">
-                                {completedSettlements.length > 0 ? Math.round(completedAmount / completedSettlements.length).toLocaleString() : 0}원
-                                                    </div>
-                            <div className="text-xs text-[#6b7280] mt-1">건당 평균 지급액</div>
+                                {totalSettlements > 0 ? Math.round(totalPayout / totalSettlements).toLocaleString() : 0}원
+                            </div>
+                            <div className="text-xs text-[#6b7280] mt-1">하루 평균 지급액</div>
                         </section>
-                                                    </div>
-
-
+                        </div>
 
                     {/* 필터 섹션 */}
                     <div className="bg-[#f3f4f6] p-4 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
@@ -476,16 +424,6 @@ export default function SellerSettlementPage() {
                                     전체
                                 </button>
                                 <button
-                                    onClick={() => handleFilterTypeChange('date')}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                                        filterType === 'date' 
-                                            ? 'bg-[#d1d5db] text-[#374151] shadow-sm'
-                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb] hover:text-[#374151]'
-                                    }`}
-                                >
-                                    주문별
-                                </button>
-                                <button
                                     onClick={() => handleFilterTypeChange('period')}
                                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                                         filterType === 'period' 
@@ -497,22 +435,31 @@ export default function SellerSettlementPage() {
                                 </button>
                             </div>
 
-                            {/* 날짜별 필터 */}
-                            {filterType === 'date' && (
+                            {/* 페이징 토글 */}
+                            {filterType === 'all' && (
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="w-5 h-5 text-[#6b7280]" />
-                            <input
-                                type="date"
-                                value={filterDate}
-                                onChange={(e) => handleDateChange(e.target.value)}
-                                        className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white text-[#374151] transition-all"
-                                    />
                                     <button
-                                        onClick={() => handleDateChange(getTodayDate())}
-                                        className="bg-green-100 text-green-800 px-3 py-2 rounded-md hover:bg-green-200 text-sm font-medium transition-colors"
+                                        onClick={togglePagination}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            usePagination 
+                                                ? 'bg-blue-500 text-white shadow-sm'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
                                     >
-                                        오늘
+                                        {usePagination ? '페이징 ON' : '페이징 OFF'}
                                     </button>
+                                    {usePagination && (
+                                        <select
+                                            value={pageSize}
+                                            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                                            className="border border-[#d1d5db] rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white text-[#374151] text-sm"
+                                        >
+                                            <option value={5}>5개씩</option>
+                                            <option value={10}>10개씩</option>
+                                            <option value={20}>20개씩</option>
+                                            <option value={50}>50개씩</option>
+                                        </select>
+                                    )}
                                 </div>
                             )}
 
@@ -537,28 +484,10 @@ export default function SellerSettlementPage() {
                             />
                         </div>
                             )}
-
-                            {/* 필터 버튼들 */}
-                            <div className="flex gap-2">
-                        <button
-                                    onClick={applyFilter}
-                                    className="flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-md hover:bg-blue-200 transition-colors"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                                    새로고침
-                        </button>
-                        <button
-                                    onClick={resetFilter}
-                                    className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                        >
-                            <Calendar className="w-4 h-4" />
-                                    오늘로 초기화
-                        </button>
-                            </div>
                         </div>
                     </div>
 
-                    {/* 정산 리스트 */}
+                    {/* 🎯 하루별 정산 리스트 */}
                     {error ? (
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-4">
                             <p className="text-[#374151]">{error}</p>
@@ -567,28 +496,19 @@ export default function SellerSettlementPage() {
                         <div className="bg-[#f3f4f6] border border-[#d1d5db] rounded-lg p-8 text-center">
                             <CreditCard className="w-12 h-12 text-[#6b7280] mx-auto mb-4" />
                             <p className="text-[#6b7280] text-lg">
-                                {filterType === 'date' ? `${filterDate} 날짜에 판매된 주문의 정산 내역이 없습니다.` : '판매된 주문의 정산 내역이 없습니다.'}
+                                {filterType === 'period' ? '해당 기간에 판매된 주문의 정산 내역이 없습니다.' : '판매된 주문의 정산 내역이 없습니다.'}
                             </p>
-                            {filterType === 'date' && (
-                                <p className="text-[#6b7280] text-sm mt-2">
-                                    다른 날짜를 선택하거나 "전체" 필터를 사용해 보세요.
-                                </p>
-                            )}
                         </div>
                     ) : (
                         <>
-                            {/* 데이터 검증 안내 */}
+                            {/* 데이터 안내 */}
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                                 <div className="flex items-start gap-3">
                                     <div className="w-5 h-5 bg-blue-500 rounded-full text-white text-xs flex items-center justify-center mt-0.5">i</div>
                                     <div>
-                                        <h4 className="font-semibold text-blue-800 mb-1">주문별 정산 데이터 안내</h4>
+                                        <h4 className="font-semibold text-blue-800 mb-1">정산 데이터 안내</h4>
                                         <p className="text-blue-700 text-sm">
-                                            {filterType === 'date' 
-                                                ? `${filterDate} 날짜별 정산 내역입니다. 각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.`
-                                                : '각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.'
-                                            } 
-                                            배송 완료된 주문만 즉시 정산 처리됩니다.
+                                            각 행은 하루치 판매 합계를 나타내며, "상세 보기"를 클릭하여 해당 날짜의 개별 주문 내역을 확인할 수 있습니다.
                                         </p>
                                     </div>
                                 </div>
@@ -607,16 +527,15 @@ export default function SellerSettlementPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
-                                        {dailyPayouts.map((item) => {
-                                            return (
-                                                <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
+                                        {dailyPayouts.map((item) => (
+                                            <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
                                                             <div className="font-semibold">
-                                                                {item.date} {item.date === getTodayDate() && '(오늘)'}
+                                                        {item.date}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
-                                                        {item.salesCount}건
+                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
+                                                    {item.salesCount}건
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
                                                 {item.totalSales.toLocaleString()}원
@@ -629,34 +548,103 @@ export default function SellerSettlementPage() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-center">
                                                 <button
-                                                            onClick={() => {
-                                                                // 해당 날짜의 상세 데이터를 모달에 표시
-                                                                const mockDetail = {
-                                                                    payoutInfo: {
-                                                                        id: item.originalPayoutId,
-                                                                        sellerId: item.sellerId,
-                                                                        periodStart: item.date,
-                                                                        periodEnd: item.date,
-                                                                        totalSales: item.totalSales,
-                                                                        totalCommission: item.totalCommission,
-                                                                        payoutAmount: item.payoutAmount,
-                                                                        processedAt: item.processedAt
-                                                                    },
-                                                                    salesDetails: item.salesDetails || []
-                                                                };
-                                                                setSelectedPayout(mockDetail);
-                                                            }}
+                                                        onClick={() => fetchPayoutDetailForModal(item.date, item)}
                                                     className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
                                                 >
                                                     <Eye className="w-4 h-4" /> 상세 보기
                                                 </button>
                                             </td>
                                         </tr>
-                                            );
-                                        })}
+                                        ))}
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* 페이징 UI */}
+                        {usePagination && totalPages > 1 && (
+                            <div className="mt-6 flex items-center justify-between">
+                                <div className="text-sm text-[#6b7280]">
+                                    총 {totalElements}개 중 {(currentPage * pageSize) + 1}~{Math.min((currentPage + 1) * pageSize, totalElements)}개 표시
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePageChange(0)}
+                                        disabled={currentPage === 0}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === 0
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        처음
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 0}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === 0
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        이전
+                                    </button>
+                                    
+                                    {/* 페이지 번호들 */}
+                                    <div className="flex gap-1">
+                                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i;
+                                            } else if (currentPage < 3) {
+                                                pageNum = i;
+                                            } else if (currentPage >= totalPages - 3) {
+                                                pageNum = totalPages - 5 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+                                            
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => handlePageChange(pageNum)}
+                                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                        currentPage === pageNum
+                                                            ? 'bg-blue-500 text-white'
+                                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                                    }`}
+                                                >
+                                                    {pageNum + 1}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages - 1}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === totalPages - 1
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        다음
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(totalPages - 1)}
+                                        disabled={currentPage === totalPages - 1}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === totalPages - 1
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        마지막
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                         </>
                     )}
 
@@ -676,128 +664,46 @@ export default function SellerSettlementPage() {
                                     </button>
                                 </div>
                                 
-                                {/* 실제 계산된 정산 정보 */}
-                                {(() => {
-                                    // salesDetails를 기반으로 실제 총합 계산
-                                    const calculatedTotalSales = selectedPayout.salesDetails.reduce(
-                                        (sum, detail) => sum + detail.salesLog.totalPrice, 0
-                                    );
-                                    const calculatedTotalCommission = selectedPayout.salesDetails.reduce(
-                                        (sum, detail) => sum + detail.commissionLog.commissionAmount, 0
-                                    );
-                                    const calculatedPayoutAmount = calculatedTotalSales - calculatedTotalCommission;
-                                    
-                                    // 백엔드 값과 계산된 값 비교
-                                    const salesDiff = selectedPayout.payoutInfo.totalSales - calculatedTotalSales;
-                                    const commissionDiff = selectedPayout.payoutInfo.totalCommission - calculatedTotalCommission;
-                                    const payoutDiff = selectedPayout.payoutInfo.payoutAmount - calculatedPayoutAmount;
-                                    
-                                    // 차이가 있으면 로그 출력
-                                    if (salesDiff !== 0 || commissionDiff !== 0 || payoutDiff !== 0) {
-                                        console.log('=== 정산 데이터 불일치 발견 ===');
-                                        console.log('백엔드 총매출:', selectedPayout.payoutInfo.totalSales.toLocaleString());
-                                        console.log('계산된 총매출:', calculatedTotalSales.toLocaleString());
-                                        console.log('매출 차이:', salesDiff.toLocaleString());
-                                        console.log('백엔드 총수수료:', selectedPayout.payoutInfo.totalCommission.toLocaleString());
-                                        console.log('계산된 총수수료:', calculatedTotalCommission.toLocaleString());
-                                        console.log('수수료 차이:', commissionDiff.toLocaleString());
-                                        console.log('백엔드 지급액:', selectedPayout.payoutInfo.payoutAmount.toLocaleString());
-                                        console.log('계산된 지급액:', calculatedPayoutAmount.toLocaleString());
-                                        console.log('지급액 차이:', payoutDiff.toLocaleString());
-                                        console.log('판매 상세 내역 개수:', selectedPayout.salesDetails.length);
-                                    }
-                                    
-                                    return (
-                                        <>
-                                            {/* 차이가 있을 경우 경고 표시 */}
-                                            {(salesDiff !== 0 || commissionDiff !== 0 || payoutDiff !== 0) && (
-                                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <div className="w-5 h-5 bg-yellow-400 rounded-full text-white text-xs flex items-center justify-center">!</div>
-                                                        <h4 className="font-semibold text-yellow-800">데이터 불일치 감지</h4>
-                                                    </div>
-                                                    <p className="text-yellow-700 text-sm">
-                                                        정산 총계와 상세 내역의 합계가 일치하지 않습니다. 개발자 도구 콘솔을 확인해주세요.
-                                                    </p>
-                                                </div>
-                                            )}
-                                            
-                                            {/* 정산 기본 정보 - 계산된 값 사용 */}
+                                {/* 정산 기본 정보 */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
-                                        <h4 className="font-semibold text-[#374151] mb-2">정산 기간</h4>
+                                        <h4 className="font-semibold text-[#374151] mb-2">판매일</h4>
                                         <p className="text-[#374151]">
-                                            {selectedPayout.payoutInfo.periodStart} ~ {selectedPayout.payoutInfo.periodEnd}
+                                            {selectedPayout.payoutInfo.periodStart}
+                                            {selectedPayout.payoutInfo.periodStart !== selectedPayout.payoutInfo.periodEnd && 
+                                                ` ~ ${selectedPayout.payoutInfo.periodEnd}`
+                                            }
                                         </p>
                                     </div>
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
-                                                    <h4 className="font-semibold text-[#374151] mb-2">
-                                                        총 매출
-                                                        {salesDiff !== 0 && (
-                                                            <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                                                재계산됨
-                                                            </span>
-                                                        )}
-                                                    </h4>
+                                        <h4 className="font-semibold text-[#374151] mb-2">총 매출</h4>
                                         <p className="text-[#388e3c] font-bold">
-                                                        {calculatedTotalSales.toLocaleString()}원
-                                                    </p>
-                                                    {salesDiff !== 0 && (
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            원래: {selectedPayout.payoutInfo.totalSales.toLocaleString()}원
+                                            {selectedPayout.payoutInfo.totalSales.toLocaleString()}원
                                                         </p>
-                                                    )}
                                     </div>
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
-                                                    <h4 className="font-semibold text-[#374151] mb-2">
-                                                        수수료
-                                                        {commissionDiff !== 0 && (
-                                                            <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                                                재계산됨
-                                                            </span>
-                                                        )}
-                                                    </h4>
+                                        <h4 className="font-semibold text-[#374151] mb-2">수수료</h4>
                                         <p className="text-[#374151] font-bold">
-                                                        {calculatedTotalCommission.toLocaleString()}원
-                                                    </p>
-                                                    {commissionDiff !== 0 && (
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            원래: {selectedPayout.payoutInfo.totalCommission.toLocaleString()}원
+                                            {selectedPayout.payoutInfo.totalCommission.toLocaleString()}원
                                                         </p>
-                                                    )}
                                     </div>
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
-                                                    <h4 className="font-semibold text-[#374151] mb-2">
-                                                        지급액
-                                                        {payoutDiff !== 0 && (
-                                                            <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                                                재계산됨
-                                                            </span>
-                                                        )}
-                                                    </h4>
+                                        <h4 className="font-semibold text-[#374151] mb-2">지급액</h4>
                                         <p className="text-[#6b7280] font-bold">
-                                                        {calculatedPayoutAmount.toLocaleString()}원
-                                                    </p>
-                                                    {payoutDiff !== 0 && (
-                                                        <p className="text-xs text-gray-500 mt-1">
-                                                            원래: {selectedPayout.payoutInfo.payoutAmount.toLocaleString()}원
+                                            {selectedPayout.payoutInfo.payoutAmount.toLocaleString()}원
                                                         </p>
-                                                    )}
                                     </div>
                                 </div>
-                                        </>
-                                    );
-                                })()}
 
                                 {/* 판매 상세 내역 */}
                                 <div className="bg-white rounded-lg p-4 border border-[#d1d5db]">
                                     <h4 className="font-semibold text-[#374151] mb-4 flex items-center gap-2">
                                         <BarChart3 className="w-5 h-5" />
-                                        판매 상세 내역 ({selectedPayout.salesDetails.length}건)
+                                        개별 주문 내역 ({selectedPayout.salesDetails.length}건)
                                     </h4>
                                     
                                     {selectedPayout.salesDetails.length === 0 ? (
-                                        <p className="text-[#374151] text-center py-4">판매 내역이 없습니다.</p>
+                                        <p className="text-[#374151] text-center py-4">주문 내역이 없습니다.</p>
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="min-w-full divide-y divide-gray-200">
@@ -809,7 +715,7 @@ export default function SellerSettlementPage() {
                                                         <th className="px-4 py-2 text-left text-xs font-medium text-[#374151]">단가</th>
                                                         <th className="px-4 py-2 text-left text-xs font-medium text-[#374151]">총액</th>
                                                         <th className="px-4 py-2 text-left text-xs font-medium text-[#374151]">수수료</th>
-                                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#374151]">판매일</th>
+                                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#374151]">판매일시</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-200">

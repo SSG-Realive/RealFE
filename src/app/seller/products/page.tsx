@@ -94,8 +94,8 @@ export default function SellerProductListPage() {
           <div className="flex items-center justify-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#374151]"></div>
             <span className="ml-3 text-[#374151] text-lg">상품 목록을 불러오는 중...</span>
-          </div>
-        </div>
+      </div>
+    </div>
       </SellerLayout>
     );
   }
@@ -108,14 +108,14 @@ export default function SellerProductListPage() {
           <div>
             <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 관리</h1>
             <p className="text-sm text-[#6b7280]">등록된 상품을 관리하고 새로운 상품을 추가할 수 있습니다.</p>
-          </div>
-          <button
+      </div>
+              <button
             onClick={() => router.push('/seller/products/new')}
             className="mt-4 md:mt-0 inline-flex items-center gap-2 bg-[#6b7280] text-white px-4 py-2 rounded-lg hover:bg-[#374151] transition-colors font-medium shadow-sm"
           >
             <Plus className="w-4 h-4" />
             신규 상품 등록
-          </button>
+              </button>
         </div>
 
         {/* 통계 카드 */}
@@ -181,19 +181,19 @@ export default function SellerProductListPage() {
                 className="bg-[#6b7280] h-2 rounded-full" 
                 style={{ width: stats.total > 0 ? `${(stats.suspended / stats.total) * 100}%` : '0%' }}
               ></div>
-            </div>
+              </div>
           </div>
-        </div>
+          </div>
 
         {/* 검색 및 필터 */}
         <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6b7280] w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="상품명으로 검색..."
+            <input
+              type="text"
+                placeholder="상품명으로 검색..."
                   value={searchKeyword}
                   onChange={(e) => setSearchKeyword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -202,16 +202,16 @@ export default function SellerProductListPage() {
               </div>
             </div>
             <div className="md:w-48">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
               >
                 <option value="">전체 상태</option>
                 <option value="active">판매중</option>
                 <option value="inactive">판매중지</option>
                 <option value="out_of_stock">품절</option>
-              </select>
+            </select>
             </div>
             <button
               onClick={handleSearch}
@@ -220,11 +220,11 @@ export default function SellerProductListPage() {
               <Filter className="w-4 h-4" />
               검색
             </button>
+            </div>
           </div>
-        </div>
 
         {/* 상품 테이블 */}
-        {products.length === 0 ? (
+                {products.length === 0 ? (
           <div className="text-center py-16 bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db]">
             <Package className="w-16 h-16 text-[#6b7280] mx-auto mb-4" />
             <h3 className="text-lg font-bold text-[#374151] mb-2">등록된 상품이 없습니다</h3>
@@ -325,25 +325,25 @@ export default function SellerProductListPage() {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          <button
+                        <button
                             onClick={() => handleEdit(product.id)}
                             className="bg-[#6b7280] text-white p-2 rounded-lg hover:bg-[#374151] transition-colors"
                             title="상품 수정"
-                          >
+                        >
                             <Edit className="w-4 h-4" />
-                          </button>
+                        </button>
                         </div>
                       </td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
+              </tbody>
+            </table>
             </div>
           </div>
         )}
 
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
+          {/* 페이지네이션 */}
+          {totalPages > 1 && (
           <div className="mt-8 flex justify-center">
             <div className="flex gap-2">
               <button
@@ -378,17 +378,17 @@ export default function SellerProductListPage() {
                 });
               })()}
               
-              <button
+                <button
                 onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
                 disabled={currentPage >= totalPages - 1}
                 className="px-3 py-2 border border-[#d1d5db] rounded-lg hover:bg-[#f3f4f6] disabled:opacity-50 disabled:cursor-not-allowed text-[#374151] bg-white"
               >
                 다음
-              </button>
+                </button>
             </div>
-          </div>
-        )}
-      </div>
-    </SellerLayout>
+            </div>
+          )}
+        </div>
+      </SellerLayout>
   );
 }

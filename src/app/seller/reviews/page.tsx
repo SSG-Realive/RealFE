@@ -99,6 +99,31 @@ export default function SellerReviewPage() {
         setCurrentPage(0);
     };
 
+    // 리뷰 데이터와 통계 새로고침
+    const refreshData = async () => {
+        try {
+            // 통계 데이터 새로고침
+            const newStats = await getSellerReviewStatistics();
+            setStatistics(newStats);
+            
+            // 리뷰 목록 새로고침
+            await fetchReviews();
+            
+            console.log('리뷰 데이터 새로고침 완료');
+        } catch (error) {
+            console.error('리뷰 데이터 새로고침 실패:', error);
+        }
+    };
+
+    // WebSocket 또는 주기적 갱신 설정
+    useEffect(() => {
+        // 1분마다 데이터 새로고침
+        const intervalId = setInterval(refreshData, 60000);
+        
+        // 컴포넌트 언마운트 시 정리
+        return () => clearInterval(intervalId);
+    }, []);
+
     // 신호등 색상 반환 (대시보드와 동일한 규칙)
     const getTrafficLightColor = (rating: number) => {
         if (rating === 0) return '#d1d5db'; // 회색 (평가없음)

@@ -16,7 +16,7 @@ export default async function OrdersDetailPage({ params }: { params: Promise<{ o
     if (isNaN(Number(orderId)) || Number(orderId) <= 0) {
         return (
             <div className="container mx-auto p-4 text-center text-red-600 font-inter">
-                <h1 className="text-3xl font-light mb-6">오류</h1>
+                <h1 className="text-xl font-light mb-6">오류</h1>
                 <p>유효하지 않은 주문 ID입니다.</p>
             </div>
         );

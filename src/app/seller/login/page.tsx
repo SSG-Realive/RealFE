@@ -41,7 +41,26 @@ export default function SellerLoginPage() {
         setError('로그인 응답이 올바르지 않습니다.');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message ?? '로그인 중 오류가 발생했습니다.');
+      console.error('로그인 오류:', err);
+      
+      // 더 구체적인 오류 메시지 처리
+      if (err.response) {
+        const status = err.response.status;
+        const message = err.response.data?.message;
+        
+        if (status === 401 || status === 500) {
+          // 인증 실패 시 통일된 메시지 (보안상 구체적인 오류 정보 노출 방지)
+          setError('아이디 또는 비밀번호를 확인해주세요.');
+        } else if (status === 400) {
+          setError(message || '입력 정보를 확인해주세요.');
+        } else {
+          setError(message || '로그인 중 오류가 발생했습니다.');
+        }
+      } else if (err.request) {
+        setError('서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.');
+      } else {
+        setError('로그인 중 오류가 발생했습니다.');
+      }
     }
   };
 

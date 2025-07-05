@@ -88,13 +88,11 @@ export default function WriteQnaPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg my-8">
-            <h1 className="text-2xl font-light mb-6 text-gray-800">상품 QnA 작성</h1>
-
+        <div className="max-w-2xl mx-auto px-4 my-8">
             {/* 상품 정보 요약 */}
             {productName && (
-                <div className="flex items-center space-x-4 p-4 border rounded-md bg-gray-50 mb-6">
-                    <img src={productThumbnail} alt={productName} className="w-16 h-16 object-contain rounded" />
+                <div className="flex items-center space-x-4 mb-6">
+                    <img src={productThumbnail} alt={productName} className="w-25 h-25 object-contain rounded" />
                     <div>
                         <p className="font-medium text-gray-900">{productName}</p>
                         <p className="text-sm text-gray-600">ID: {productId}</p>
@@ -112,7 +110,7 @@ export default function WriteQnaPage() {
                         id="title"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         placeholder="QnA 제목을 입력해주세요 (최대 100자)"
                         maxLength={100}
                         required
@@ -128,7 +126,7 @@ export default function WriteQnaPage() {
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         rows={8}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-none shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         placeholder="QnA 내용을 입력해주세요 (최대 1000자)"
                         maxLength={1000}
                         required
@@ -139,17 +137,17 @@ export default function WriteQnaPage() {
                     <button
                         type="button"
                         onClick={() => router.back()}
-                        className="px-6 py-2 border border-gray-300 rounded-md text-sm font-light text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out"
+                        className="px-6 py-2 border border-gray-300 rounded-none text-sm font-light text-gray-700 hover:bg-gray-100 transition duration-150 ease-in-out"
                         disabled={loading}
                     >
                         취소
                     </button>
                     <button
                         type="submit"
-                        className="px-6 py-2 bg-black text-white rounded-md text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
+                        className="px-6 py-2 bg-black text-white rounded-none text-sm font-light hover:bg-gray-900 transition duration-150 ease-in-out"
                         disabled={loading}
                     >
-                        {loading ? '작성 중...' : 'QnA 작성'}
+                        {loading ? '작성 중...' : '등록'}
                     </button>
                 </div>
             </form>

@@ -1,6 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { X, Package, DollarSign, Calendar, Eye, Star, Gavel } from "lucide-react";
+import { X, Package, DollarSign, Calendar, Eye, Star, Gavel, PlayCircle, StopCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import apiClient from '@/lib/apiClient';
 
 interface OwnedProduct {
@@ -35,8 +38,12 @@ export default function OwnedProductDetailModal({
   onAuctionCreated 
 }: OwnedProductDetailModalProps) {
   const [startPrice, setStartPrice] = useState<string>("");
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
+  const [startDate, setStartDate] = useState<string>("");
+  const [startHour, setStartHour] = useState<string>("12");
+  const [startMinute, setStartMinute] = useState<string>("00");
+  const [endDate, setEndDate] = useState<string>("");
+  const [endHour, setEndHour] = useState<string>("12");
+  const [endMinute, setEndMinute] = useState<string>("00");
   const [isCreatingAuction, setIsCreatingAuction] = useState(false);
   const [showAuctionForm, setShowAuctionForm] = useState(false);
 
@@ -44,8 +51,12 @@ export default function OwnedProductDetailModal({
   useEffect(() => {
     if (isOpen) {
       setStartPrice("");
-      setStartTime("");
-      setEndTime("");
+      setStartDate("");
+      setStartHour("12");
+      setStartMinute("00");
+      setEndDate("");
+      setEndHour("12");
+      setEndMinute("00");
       setShowAuctionForm(false);
     }
   }, [isOpen]);
@@ -64,17 +75,46 @@ export default function OwnedProductDetailModal({
       alert("유효한 시작 가격을 입력해주세요.");
       return;
     }
-    if (!startTime) {
-      alert("경매 시작 시간을 입력해주세요.");
+    if (!startDate) {
+      alert("경매 시작 날짜를 입력해주세요.");
       return;
     }
-    if (!endTime) {
-      alert("경매 종료 시간을 입력해주세요.");
+    if (!endDate) {
+      alert("경매 종료 날짜를 입력해주세요.");
       return;
     }
 
-    const startDateTime = new Date(startTime);
-    const endDateTime = new Date(endTime);
+    // 날짜와 시간을 조합하여 한국 시간대로 직접 계산
+    const createKoreaTime = (date: string, hour: string, minute: string) => {
+      const koreaTime = new Date(`${date}T${hour}:${minute}:00+09:00`);
+      return koreaTime;
+    };
+    
+    const startDateTime = createKoreaTime(startDate, startHour, startMinute);
+    const endDateTime = createKoreaTime(endDate, endHour, endMinute);
+    
+    // 백엔드로 보낼 때는 한국 시간대로 직접 문자열 생성 (yyyy-MM-dd'T'HH:mm:ss)
+    const startTime = `${startDate}T${startHour}:${startMinute}:00`;
+    const endTime = `${endDate}T${endHour}:${endMinute}:00`;
+    
+    // 현재 시간과 비교 (한국 시간대 기준)
+    const now = new Date();
+    
+    console.log('현재 시간:', now.toLocaleString('ko-KR'));
+    console.log('시작 시간:', startDateTime.toLocaleString('ko-KR'));
+    console.log('종료 시간:', endDateTime.toLocaleString('ko-KR'));
+    console.log('백엔드로 보낼 시작 시간:', startTime);
+    console.log('백엔드로 보낼 종료 시간:', endTime);
+    
+    if (startDateTime <= now) {
+      alert("시작 시간은 현재 시간 이후여야 합니다.");
+      return;
+    }
+    
+    if (endDateTime <= now) {
+      alert("종료 시간은 현재 시간 이후여야 합니다.");
+      return;
+    }
     
     if (startDateTime >= endDateTime) {
       alert("종료 시간은 시작 시간보다 늦어야 합니다.");
@@ -84,6 +124,14 @@ export default function OwnedProductDetailModal({
     setIsCreatingAuction(true);
     try {
       const token = localStorage.getItem('adminToken');
+      
+      console.log('경매 등록 요청 데이터:', {
+        adminProductId: product.id,
+        startPrice: numericStartPrice,
+        startTime: startTime,
+        endTime: endTime
+      });
+      
       const response = await apiClient.post('/admin/auctions', {
         adminProductId: product.id,
         startPrice: numericStartPrice,
@@ -158,7 +206,7 @@ export default function OwnedProductDetailModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div className={`bg-white rounded-3xl max-w-4xl w-full ${showAuctionForm ? 'max-h-[95vh]' : 'max-h-[90vh]'} overflow-y-auto`}>
         {/* 헤더 */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-800">
@@ -197,7 +245,7 @@ export default function OwnedProductDetailModal({
             </div>
 
             {/* 상품 정보 섹션 */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {/* 상품명과 상태 */}
               <div>
                 <h3 className="text-2xl font-bold text-gray-800 mb-3 leading-tight">
@@ -218,7 +266,7 @@ export default function OwnedProductDetailModal({
               </div>
 
               {/* 기본 정보 */}
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
                     <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
@@ -242,7 +290,7 @@ export default function OwnedProductDetailModal({
                 </div>
 
                 {/* 상세 정보 */}
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div className="flex items-center gap-3 text-sm">
                     <Package className="w-4 h-4 text-gray-500" />
                     <span className="text-gray-600 w-16">카테고리:</span>
@@ -279,8 +327,8 @@ export default function OwnedProductDetailModal({
                 </div>
               </div>
 
-              {/* 상품 설명 */}
-              {product.description && (
+              {/* 상품 설명 - 경매 등록 폼이 열려있을 때는 숨김 */}
+              {product.description && !showAuctionForm && (
                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
                   <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <Eye className="w-4 h-4" />
@@ -304,7 +352,7 @@ export default function OwnedProductDetailModal({
                       경매 등록하기
                     </button>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -339,22 +387,111 @@ export default function OwnedProductDetailModal({
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <Label className="block text-sm font-medium text-gray-700 mb-2">
                             경매 기간
-                          </label>
-                          <div className="space-y-2">
-                            <input
-                              type="datetime-local"
-                              value={startTime}
-                              onChange={(e) => setStartTime(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                            />
-                            <input
-                              type="datetime-local"
-                              value={endTime}
-                              onChange={(e) => setEndTime(e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
-                            />
+                          </Label>
+                          <div className="space-y-3">
+                            {/* 시작시간 */}
+                            <div>
+                              <Label className="text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                <PlayCircle className="w-4 h-4 text-green-600" />
+                                시작
+                              </Label>
+                              <div className="space-y-2">
+                                <div>
+                                  <Label className="text-xs text-gray-500 mb-1 block">날짜</Label>
+                                  <Input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    className="w-full h-8 text-sm"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <div className="flex-1">
+                                    <Label className="text-xs text-gray-500 mb-1 block">시간</Label>
+                                    <Select value={startHour} onValueChange={setStartHour}>
+                                      <SelectTrigger className="h-10 text-sm">
+                                        <SelectValue placeholder="시 선택" />
+                                      </SelectTrigger>
+                                      <SelectContent className="max-h-48">
+                                        {Array.from({ length: 24 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                            {i.toString().padStart(2, '0')}시
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Label className="text-xs text-gray-500 mb-1 block">분</Label>
+                                    <Select value={startMinute} onValueChange={setStartMinute}>
+                                      <SelectTrigger className="h-10 text-sm">
+                                        <SelectValue placeholder="분 선택" />
+                                      </SelectTrigger>
+                                      <SelectContent className="max-h-48">
+                                        {Array.from({ length: 60 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                            {i.toString().padStart(2, '0')}분
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* 종료시간 */}
+                            <div>
+                              <Label className="text-sm text-gray-600 mb-1 flex items-center gap-1">
+                                <StopCircle className="w-4 h-4 text-red-600" />
+                                종료
+                              </Label>
+                              <div className="space-y-2">
+                                <div>
+                                  <Label className="text-xs text-gray-500 mb-1 block">날짜</Label>
+                                  <Input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    className="w-full h-8 text-sm"
+                                  />
+                                </div>
+                                <div className="flex gap-2">
+                                  <div className="flex-1">
+                                    <Label className="text-xs text-gray-500 mb-1 block">시간</Label>
+                                    <Select value={endHour} onValueChange={setEndHour}>
+                                      <SelectTrigger className="h-10 text-sm">
+                                        <SelectValue placeholder="시 선택" />
+                                      </SelectTrigger>
+                                      <SelectContent className="max-h-48">
+                                        {Array.from({ length: 24 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                            {i.toString().padStart(2, '0')}시
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex-1">
+                                    <Label className="text-xs text-gray-500 mb-1 block">분</Label>
+                                    <Select value={endMinute} onValueChange={setEndMinute}>
+                                      <SelectTrigger className="h-10 text-sm">
+                                        <SelectValue placeholder="분 선택" />
+                                      </SelectTrigger>
+                                      <SelectContent className="max-h-48">
+                                        {Array.from({ length: 60 }, (_, i) => (
+                                          <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                                            {i.toString().padStart(2, '0')}분
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

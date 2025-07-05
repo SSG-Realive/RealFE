@@ -10,10 +10,11 @@ const TAB_LIST = [
   { key: 'live', label: '실시간' },
   { key: 'popular', label: '인기' },
   { key: 'ending', label: '마감 임박' },
+  { key: 'scheduled', label: '예정' },
 ];
 
 export default function AuctionPage() {
-  const [activeTab, setActiveTab] = useState<'live' | 'popular' | 'ending'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'popular' | 'ending' | 'scheduled'>('live');
   const [auctions, setAuctions] = useState<Auction[]>([]);
   const router = useRouter();
 
@@ -25,10 +26,15 @@ export default function AuctionPage() {
           result = await publicAuctionService.fetchPublicActiveAuctions();
         } else if (activeTab === 'popular') {
           result = await publicAuctionService.fetchPopularAuctions();
-        } else {
+        } else if (activeTab === 'ending') {
           result = await publicAuctionService.fetchEndingSoonAuctions();
+        } else if (activeTab === 'scheduled') {
+          result = await publicAuctionService.fetchScheduledAuctions();
         }
-        setAuctions(result.content);
+
+        if (result) {
+          setAuctions(result.content);
+        }
       } catch (e) {
         console.error('경매 목록 불러오기 실패', e);
       }

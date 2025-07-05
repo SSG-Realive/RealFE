@@ -40,7 +40,113 @@ const fetchPublicActiveAuctions = async (): Promise<PaginatedAuctionResponse> =>
     };
 };
 
+/**
+ * 인기 경매 목록을 가져옵니다 (입찰 수 기준)
+ */
+const fetchPopularAuctions = async (): Promise<PaginatedAuctionResponse> => {
+    try {
+        const response = await customerApi.get<BackendApiResponse<SpringPage<Auction>>>(
+            '/public/auctions?status=PROCEEDING&size=10&sort=bidCount,desc'
+        );
+        
+        if (response.data && response.data.data && response.data.data.content) {
+            const backendPageData = response.data.data;
+            return {
+                content: backendPageData.content,
+                totalPages: backendPageData.totalPages,
+                number: backendPageData.number,
+                last: backendPageData.last,
+            };
+        }
+        
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    } catch (error) {
+        console.error('인기 경매 목록 조회 실패:', error);
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    }
+};
 
+/**
+ * 마감 임박 경매 목록을 가져옵니다 (종료 시간 기준)
+ */
+const fetchEndingSoonAuctions = async (): Promise<PaginatedAuctionResponse> => {
+    try {
+        const response = await customerApi.get<BackendApiResponse<SpringPage<Auction>>>(
+            '/public/auctions?status=PROCEEDING&size=10&sort=endTime,asc'
+        );
+        
+        if (response.data && response.data.data && response.data.data.content) {
+            const backendPageData = response.data.data;
+            return {
+                content: backendPageData.content,
+                totalPages: backendPageData.totalPages,
+                number: backendPageData.number,
+                last: backendPageData.last,
+            };
+        }
+        
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    } catch (error) {
+        console.error('마감 임박 경매 목록 조회 실패:', error);
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    }
+};
+
+/**
+ * 경매 예정 목록을 가져옵니다 (시작 시간 기준)
+ */
+const fetchScheduledAuctions = async (): Promise<PaginatedAuctionResponse> => {
+    try {
+        const response = await customerApi.get<BackendApiResponse<SpringPage<Auction>>>(
+            '/public/auctions?status=SCHEDULED&size=10&sort=startTime,asc'
+        );
+        
+        if (response.data && response.data.data && response.data.data.content) {
+            const backendPageData = response.data.data;
+            return {
+                content: backendPageData.content,
+                totalPages: backendPageData.totalPages,
+                number: backendPageData.number,
+                last: backendPageData.last,
+            };
+        }
+        
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    } catch (error) {
+        console.error('경매 예정 목록 조회 실패:', error);
+        return {
+            content: [],
+            totalPages: 0,
+            number: 0,
+            last: true,
+        };
+    }
+};
 
 // =================================================================
 // ✨ Zustand 스토어를 위해 새로 추가하는 함수
@@ -63,7 +169,11 @@ const getPublicAuctions = (params: GetAuctionsParams) => {
 
 
 export const publicAuctionService = {
-    fetchPublicActiveAuctions,getPublicAuctions
+    fetchPublicActiveAuctions,
+    fetchPopularAuctions,
+    fetchEndingSoonAuctions,
+    fetchScheduledAuctions,
+    getPublicAuctions
 };
 
 

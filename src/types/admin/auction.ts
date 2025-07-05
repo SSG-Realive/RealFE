@@ -32,15 +32,8 @@ export interface AuctionCreateRequestDTO {
 
 export interface AuctionUpdateRequestDTO {
   id: number;
-  name: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  startPrice: number;
-  buyNowPrice?: number;
-  category: string;
-  sellerId: number;
-  productId: number;
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface AuctionCancelResponseDTO {
@@ -53,12 +46,10 @@ export interface AuctionCancelResponseDTO {
 export interface BidResponseDTO {
   id: number;
   auctionId: number;
-  auctionName: string;
   customerId: number;
   customerName: string;
-  bidAmount: number;
+  bidPrice: number;
   bidTime: string;
-  isWinning: boolean;
 }
 
 export interface PageResponse<T> {

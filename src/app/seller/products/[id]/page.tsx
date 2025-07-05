@@ -121,12 +121,12 @@ export default function SellerProductDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* 상품 이미지 */}
-          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-4">
-            <h3 className="text-lg font-bold text-[#374151] mb-3 flex items-center gap-2">
-              <Eye className="w-5 h-5 text-[#6b7280]" />
+          <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-3">
+            <h3 className="text-base font-bold text-[#374151] mb-2 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-[#6b7280]" />
               상품 이미지
             </h3>
-            <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden">
+            <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden max-w-xs mx-auto">
                                     {product.imageThumbnailUrl ? (
                                         <img
                                             src={product.imageThumbnailUrl}
@@ -135,7 +135,7 @@ export default function SellerProductDetailPage() {
                                         />
                                     ) : (
                 <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
-                  <Armchair className="w-12 h-12 text-[#6b7280]" />
+                  <Armchair className="w-10 h-10 text-[#6b7280]" />
                                         </div>
                                     )}
                                 </div>

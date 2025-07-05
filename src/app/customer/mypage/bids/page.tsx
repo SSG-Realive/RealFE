@@ -34,7 +34,7 @@ function BidCard({
   return (
     <div
       onClick={() => router.push(`/auctions/${bid.auctionId}`)}
-      className="flex gap-4 p-4 border rounded-lg hover:shadow transition
+      className="flex gap-4 p-4 rounded-lg hover:shadow transition
                  cursor-pointer"
     >
       {/* 썸네일 */}

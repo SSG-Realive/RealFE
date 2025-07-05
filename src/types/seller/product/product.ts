@@ -19,11 +19,13 @@ export interface ProductDetail {
     isActive: boolean;
     imageThumbnailUrl: string;
     videoThumbnailUrl?: string;
+    imageUrls: string[];
     categoryName?: string;
     categoryId?: number;
     parentCategoryId?: number;
     sellerName: string;
     sellerId: number;
+    deliveryPolicy: DeliveryPolicy; 
 }
 
 export interface ProductListDTO {

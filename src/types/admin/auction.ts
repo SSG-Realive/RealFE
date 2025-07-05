@@ -1,7 +1,19 @@
 // 경매 관련 타입 정의
-export interface AuctionResponseDTO {
-    name: any;
+export interface AdminProduct {
   id: number;
+  productId: number;
+  productName: string;
+  productDescription: string;
+  purchasePrice: number;
+  purchasedFromSellerId: number | null;
+  purchasedAt: string;
+  auctioned: boolean;
+  imageThumbnailUrl: string;
+  imageUrls: string[];
+}
+export interface AuctionResponseDTO {
+  id: number;
+  name: any;
   startPrice: number;
   currentPrice: number;
   startTime: string;
@@ -10,17 +22,7 @@ export interface AuctionResponseDTO {
   statusText?: string;
   createdAt: string;
   updatedAt: string;
-  adminProduct: {
-    id: number;
-    productId: number;
-    productName: string;
-    productDescription: string;
-    purchasePrice: number;
-    purchasedFromSellerId: number | null;
-    purchasedAt: string;
-    auctioned: boolean;
-    imageThumbnailUrl: string;
-  };
+  adminProduct: AdminProduct;
 }
 
 export interface AuctionCreateRequestDTO {

@@ -185,33 +185,32 @@ function AuctionPaymentComponent() {
 
       <div className="min-h-screen bg-white">
         <main className="mx-auto max-w-4xl px-4 py-8">
-          <h1 className="mb-6 text-3xl font-light">경매 상품 결제</h1>
 
           {/* 배송지 */}
-          <section className="mb-6 rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-lg font-semibold">배송지</h2>
+          <section className="mb-6 rounded-lg border border-gray-400 boder-gray-400 bg-white p-6">
+            <h2 className="mb-4 text-lg font-light">배송지</h2>
             <div className="space-y-3">
               <input
                 name="receiverName"
                 value={shippingInfo.receiverName}
                 onChange={onBasicChange}
                 placeholder="받는 분"
-                className="w-full rounded border p-2 text-sm"
+                className="w-full rounded border border-gray-400 p-2 text-sm"
               />
               <input
                 name="phone"
                 value={shippingInfo.phone}
                 onChange={onBasicChange}
                 placeholder="연락처"
-                className="w-full rounded border p-2 text-sm"
+                className="w-full rounded border border-gray-400 p-2 text-sm"
               />
               <AddressInput onAddressChange={onAddressChange} defaultAddress={addrObj} />
             </div>
           </section>
 
           {/* 주문 상품 */}
-          <section className="mb-6 rounded-lg border bg-white p-6">
-            <h2 className="mb-4 text-lg font-semibold">주문 상품</h2>
+          <section className="mb-6 rounded-lg border border-gray-400 bg-white p-6">
+            <h2 className="mb-4 text-lg font-light">주문 상품</h2>
             <div className="flex items-start gap-4">
               <img
                 src={auctionInfo.productImageUrl || '/images/default-product.png'}
@@ -228,8 +227,8 @@ function AuctionPaymentComponent() {
           </section>
 
           {/* 결제 금액 */}
-          <section className="rounded-lg border bg-white p-6">
-            <h3 className="mb-4 text-lg font-semibold">결제 금액</h3>
+          <section className="rounded-lg border border-gray-400 bg-white p-6">
+            <h3 className="mb-4 text-lg font-light">결제 금액</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span>낙찰가</span>
@@ -245,13 +244,13 @@ function AuctionPaymentComponent() {
                 <span>{finalAmount.toLocaleString()}원</span>
               </div>
             </div>
-            <button
-              onClick={payClick}
-              className="mt-4 w-full rounded bg-blue-600 py-3 text-white hover:bg-blue-700"
-            >
-              {finalAmount.toLocaleString()}원 결제하기
-            </button>
           </section>
+          <button
+              onClick={payClick}
+              className="mt-4 w-full rounded-none  bg-black py-3 text-white hover:bg-neutral-800"
+          >
+            {finalAmount.toLocaleString()}원 결제하기
+          </button>
         </main>
       </div>
     </>

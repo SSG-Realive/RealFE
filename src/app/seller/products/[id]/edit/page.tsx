@@ -154,12 +154,12 @@ export default function ProductEditPage() {
                         <span className="ml-3 text-[#374151] text-lg">
                             {checking ? '인증 확인 중...' : '상품 정보를 불러오는 중...'}
                         </span>
-                    </div>
-                </div>
+            </div>
+        </div>
             </SellerLayout>
-        );
+    );
     }
-
+    
     if (error) {
         return (
             <SellerLayout>
@@ -173,14 +173,14 @@ export default function ProductEditPage() {
                         >
                             상품 목록으로 돌아가기
                         </button>
-                    </div>
-                </div>
+            </div>
+        </div>
             </SellerLayout>
         );
     }
 
     if (!form) {
-        return (
+    return (
             <SellerLayout>
                 <div className="min-h-screen bg-white p-6">
                     <div className="text-center py-16">
@@ -206,7 +206,7 @@ export default function ProductEditPage() {
             <div className="min-h-screen bg-white p-6">
                 {/* 헤더 */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-                    <div>
+                                <div>
                         <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 수정</h1>
                         <p className="text-sm text-[#6b7280]">상품의 정보를 수정하고 업데이트할 수 있습니다.</p>
                     </div>
@@ -216,7 +216,7 @@ export default function ProductEditPage() {
                     >
                         상품 목록으로
                     </button>
-                </div>
+                                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* 기본 정보 섹션 */}
@@ -226,15 +226,15 @@ export default function ProductEditPage() {
                             기본 정보
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                                <div>
                                 <label className="block text-sm font-medium text-[#374151] mb-2">상품명</label>
-                                <input
+                                <input 
                                     type="text"
-                                    name="name"
-                                    value={form.name}
-                                    onChange={handleChange}
+                                    name="name" 
+                                    value={form.name} 
+                                    onChange={handleChange} 
                                     className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
-                                    required
+                                    required 
                                 />
                             </div>
                             <div>
@@ -254,17 +254,17 @@ export default function ProductEditPage() {
                             </div>
                             <div className="md:col-span-2">
                                 <label className="block text-sm font-medium text-[#374151] mb-2">상품 설명</label>
-                                <textarea
-                                    name="description"
-                                    value={form.description}
-                                    onChange={handleChange}
+                                <textarea 
+                                    name="description" 
+                                    value={form.description} 
+                                    onChange={handleChange} 
                                     rows={4}
                                     className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151]"
                                     required
                                 />
                             </div>
+                            </div>
                         </div>
-                    </div>
 
                     {/* 가격 및 재고, 카테고리, 크기 정보 - 컴팩트 그리드 */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -277,26 +277,26 @@ export default function ProductEditPage() {
                             <div className="space-y-3">
                                 <div>
                                     <label className="block text-xs font-medium text-[#374151] mb-1">판매 가격</label>
-                                    <input
-                                        type="number"
-                                        name="price"
-                                        value={form.price}
-                                        onChange={handleChange}
+                                    <input 
+                                        type="number" 
+                                        name="price" 
+                                        value={form.price} 
+                                        onChange={handleChange} 
                                         min="0"
                                         className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
-                                        required
+                                        required 
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-[#374151] mb-1">재고 수량</label>
-                                    <input
-                                        type="number"
-                                        name="stock"
-                                        value={form.stock}
-                                        onChange={handleChange}
+                                    <input 
+                                        type="number" 
+                                        name="stock" 
+                                        value={form.stock} 
+                                        onChange={handleChange} 
                                         min="0"
                                         className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
-                                        required
+                                        required 
                                     />
                                 </div>
                             </div>
@@ -348,11 +348,11 @@ export default function ProductEditPage() {
                             <div className="space-y-3">
                                 <div>
                                     <label className="block text-xs font-medium text-[#374151] mb-1">너비 (cm)</label>
-                                    <input
-                                        type="number"
-                                        name="width"
+                                    <input 
+                                        type="number" 
+                                        name="width" 
                                         value={form.width || ''}
-                                        onChange={handleChange}
+                                        onChange={handleChange} 
                                         min="0"
                                         step="0.1"
                                         className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
@@ -360,11 +360,11 @@ export default function ProductEditPage() {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-[#374151] mb-1">깊이 (cm)</label>
-                                    <input
-                                        type="number"
-                                        name="depth"
+                                    <input 
+                                        type="number" 
+                                        name="depth" 
                                         value={form.depth || ''}
-                                        onChange={handleChange}
+                                        onChange={handleChange} 
                                         min="0"
                                         step="0.1"
                                         className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
@@ -372,11 +372,11 @@ export default function ProductEditPage() {
                                 </div>
                                 <div>
                                     <label className="block text-xs font-medium text-[#374151] mb-1">높이 (cm)</label>
-                                    <input
-                                        type="number"
-                                        name="height"
+                                    <input 
+                                        type="number" 
+                                        name="height" 
                                         value={form.height || ''}
-                                        onChange={handleChange}
+                                        onChange={handleChange} 
                                         min="0"
                                         step="0.1"
                                         className="w-full px-2 py-1.5 border border-[#d1d5db] rounded focus:ring-1 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] text-sm"
@@ -402,16 +402,16 @@ export default function ProductEditPage() {
                                     className="w-5 h-5 text-[#6b7280] bg-white border-2 border-[#d1d5db] rounded focus:ring-2 focus:ring-[#6b7280] checked:bg-[#6b7280] checked:border-[#6b7280]"
                                 />
                             </div>
-                            <div>
+                                <div>
                                 <label htmlFor="isActive" className="text-sm font-medium text-[#374151] cursor-pointer">
                                     판매 활성화
-                                </label>
+                                    </label>
                                 <p className="text-xs text-[#6b7280] mt-1">
                                     체크하면 고객이 상품을 구매할 수 있습니다.
                                 </p>
                             </div>
                         </div>
-                    </div>
+                                        </div>
 
                     {/* 미디어 업로드 섹션 */}
                     <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-6">
@@ -422,47 +422,47 @@ export default function ProductEditPage() {
                         <div className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-[#374151] mb-2">대표 이미지</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)}
+                                    <input 
+                                        type="file" 
+                                        accept="image/*" 
+                                        onChange={(e) => setImageThumbnail(e.target.files?.[0] || null)} 
                                     className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
-                                />
-                            </div>
-                            <div>
+                                    />
+                                </div>
+                                <div>
                                 <label className="block text-sm font-medium text-[#374151] mb-2">대표 영상</label>
-                                <input
-                                    type="file"
-                                    accept="video/*"
-                                    onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)}
+                                    <input
+                                        type="file" 
+                                        accept="video/*" 
+                                        onChange={(e) => setVideoThumbnail(e.target.files?.[0] || null)} 
                                     className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
-                                />
-                            </div>
-                            <div>
+                                    />
+                                </div>
+                                <div>
                                 <label className="block text-sm font-medium text-[#374151] mb-2">추가 이미지</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    onChange={(e) => setSubImages(e.target.files)}
+                                    <input
+                                        type="file" 
+                                        accept="image/*" 
+                                        multiple 
+                                        onChange={(e) => setSubImages(e.target.files)} 
                                     className="w-full px-4 py-3 border border-[#d1d5db] rounded-xl focus:ring-2 focus:ring-[#6b7280] focus:border-transparent bg-white text-[#374151] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#6b7280] file:text-white hover:file:bg-[#374151]"
-                                />
+                                    />
                             </div>
-                        </div>
-                    </div>
+                                </div>
+                            </div>
 
-                    {/* 제출 버튼 */}
+                        {/* 제출 버튼 */}
                     <div className="flex justify-center">
-                        <button
-                            type="submit"
+                            <button 
+                                type="submit" 
                             className="inline-flex items-center gap-2 bg-[#6b7280] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#374151] transition-colors shadow-lg"
-                        >
+                            >
                             <Save className="w-5 h-5" />
                             상품 수정 완료
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </SellerLayout>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </SellerLayout>
     );
 }

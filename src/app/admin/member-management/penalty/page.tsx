@@ -2,15 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import apiClient from '@/lib/apiClient';
-import { AlertTriangle, Search, Plus, Eye } from 'lucide-react';
+import { AlertTriangle, Search, Plus, Eye, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface Penalty {
-  id: string;
+  id: number;
   customerId: number;
   reason: string;
   createdAt: string;
+  penaltyScore?: number; // 패널티 점수 추가
 }
 
 export default function PenaltyListPage() {
@@ -19,6 +20,7 @@ export default function PenaltyListPage() {
   const [customers, setCustomers] = useState<{id: number, name: string, email: string}[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : '';
@@ -31,17 +33,11 @@ export default function PenaltyListPage() {
       }
     })
       .then(res => {
-        console.log('Penalties API response:', res.data);
-        console.log('Penalties content:', res.data.content);
-        if (res.data.content && res.data.content.length > 0) {
-          console.log('First penalty item:', res.data.content[0]);
-          console.log('Available fields:', Object.keys(res.data.content[0]));
-        }
         setPenalties(res.data.content || []);
         setLoading(false);
       })
       .catch((error) => {
-        console.log('Penalties API error:', error);
+        console.error('패널티 목록 로딩 실패:', error);
         setPenalties([]);
         setLoading(false);
       });
@@ -56,6 +52,34 @@ export default function PenaltyListPage() {
       .then(res => setCustomers(res.data.data.content || []))
       .catch(() => setCustomers([]));
   }, []);
+
+  // 패널티 삭제 핸들러
+  const handleDeletePenalty = async (penaltyId: number, customerId: number) => {
+    if (!confirm('이 패널티를 삭제하시겠습니까? 삭제 시 해당 고객의 패널티 점수도 차감됩니다.')) {
+      return;
+    }
+
+    try {
+      setDeletingId(penaltyId);
+      const token = localStorage.getItem('adminToken');
+      
+      await apiClient.delete(`/admin/penalties/${penaltyId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      // 삭제 성공 시 목록에서 제거
+      setPenalties(prev => prev.filter(p => p.id !== penaltyId));
+      alert('패널티가 성공적으로 삭제되었습니다.');
+    } catch (error: any) {
+      console.error('패널티 삭제 실패:', error);
+      alert(`패널티 삭제 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const filtered = Array.isArray(penalties)
     ? penalties.filter(p => (p.customerId ?? '').toString().includes(search) || (p.reason ?? '').includes(search))
@@ -225,14 +249,34 @@ export default function PenaltyListPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <Button
-                            onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
-                            variant="link"
-                            size="sm"
-                          >
-                            <Eye className="w-4 h-4 mr-1" />
-                            상세보기
-                          </Button>
+                          <div className="flex gap-2 justify-center">
+                            <Button
+                              onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
+                              variant="link"
+                              size="sm"
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              상세보기
+                            </Button>
+                            <Button
+                              onClick={() => handleDeletePenalty(penalty.id, penalty.customerId)}
+                              variant="destructive"
+                              size="sm"
+                              disabled={deletingId === penalty.id}
+                            >
+                              {deletingId === penalty.id ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
+                                  삭제중
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="w-4 h-4 mr-1" />
+                                  삭제
+                                </>
+                              )}
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -249,25 +293,45 @@ export default function PenaltyListPage() {
                         <h3 className="font-semibold text-gray-900">#{idx + 1}</h3>
                         <p className="text-sm text-gray-500 mb-2">{getCustomerName(penalty.customerId)}</p>
                         <p className="text-sm text-gray-600 mb-2">{penalty.reason}</p>
-                                                 <p className="text-xs text-gray-400">
-                           {penalty.createdAt ? (() => {
-                             try {
-                               const date = new Date(penalty.createdAt);
-                               return isNaN(date.getTime()) ? penalty.createdAt : date.toLocaleDateString();
-                             } catch (error) {
-                               return penalty.createdAt;
-                             }
-                           })() : '-'}
-                         </p>
+                        <p className="text-xs text-gray-400">
+                          {penalty.createdAt ? (() => {
+                            try {
+                              const date = new Date(penalty.createdAt);
+                              return isNaN(date.getTime()) ? penalty.createdAt : date.toLocaleDateString();
+                            } catch (error) {
+                              return penalty.createdAt;
+                            }
+                          })() : '-'}
+                        </p>
                       </div>
-                      <Button
-                        onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
-                        variant="link"
-                        size="sm"
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        상세보기
-                      </Button>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          onClick={() => router.push(`/admin/member-management/penalty/${penalty.id}`)}
+                          variant="link"
+                          size="sm"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          상세보기
+                        </Button>
+                        <Button
+                          onClick={() => handleDeletePenalty(penalty.id, penalty.customerId)}
+                          variant="destructive"
+                          size="sm"
+                          disabled={deletingId === penalty.id}
+                        >
+                          {deletingId === penalty.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-3 w-3 border-b border-white mr-1"></div>
+                              삭제중
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              삭제
+                            </>
+                          )}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}

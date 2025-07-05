@@ -10,12 +10,15 @@ import { customerApi } from '@/lib/apiClient';
 interface AuctionPaymentRequestDTO {
     auctionId: number;
     paymentKey: string;
-    tossOrderId: string;
-    amount: number;
-    receiverName: string;
-    phone: string;
-    address: string;
-    paymentMethod: 'CARD' | 'CELL_PHONE' | 'ACCOUNT'; // 백엔드가 받는 Enum 타입
+    amount: number; // 백엔드에서는 Long이지만 프론트엔드에서는 number로 처리
+}
+
+// 백엔드 ApiResponse 구조에 맞는 타입
+interface ApiResponse<T> {
+    status: number;
+    message: string;
+    data: T;
+    timestamp: string;
 }
 
 // ✅ [수정] 경매 전용 결제 승인 API 호출 함수
@@ -65,30 +68,32 @@ function PaymentSuccessComponent() {
         const requestData: AuctionPaymentRequestDTO = {
           auctionId: parseInt(auctionId),
           paymentKey,
-          tossOrderId,
           amount,
-          receiverName: checkoutInfo.receiverName,
-          phone: checkoutInfo.phone,
-          address: checkoutInfo.address,
-          paymentMethod: 'CARD', // 결제수단은 예시이며, 실제 값으로 대체해야 할 수 있습니다.
         };
         
+        console.log('결제 요청 데이터:', requestData);
+        
         // ✅ [수정] 올바른 API 함수를 호출합니다.
-        const response = await processAuctionPaymentApi(auctionId, requestData);
+        const response: ApiResponse<number> = await processAuctionPaymentApi(auctionId, requestData);
 
-        if (response.success) {
+        console.log('결제 응답:', response);
+
+        // ✅ [수정] 백엔드 ApiResponse 구조에 맞게 처리
+        if (response.status === 200 || response.status === 201) {
           setOrderId(response.data); // 백엔드에서 반환된 최종 주문 ID
           setStatus('SUCCESS');
           setMessage('결제가 성공적으로 완료되었습니다!');
           sessionStorage.removeItem(`checkout_auction_${auctionId}`); // 성공 후 정보 삭제
         } else {
-          // API 응답이 성공(2xx)이지만, success: false인 경우
-          throw new Error(response.error?.message || '결제 승인에 실패했습니다.');
+          // API 응답이 성공(2xx)이지만, status가 200/201이 아닌 경우
+          throw new Error(response.message || '결제 승인에 실패했습니다.');
         }
       } catch (err: any) {
+        console.error('결제 처리 오류:', err);
+        console.error('오류 응답:', err.response);
         // API 호출 자체가 실패한 경우 (5xx, 4xx 에러 등)
         setStatus('ERROR');
-        setMessage(err.response?.data?.error?.message || err.message || '결제 최종 승인 중 오류가 발생했습니다.');
+        setMessage(err.response?.data?.message || err.message || '결제 최종 승인 중 오류가 발생했습니다.');
       }
     };
 

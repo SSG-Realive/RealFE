@@ -246,9 +246,9 @@ export default function ProductManagementPage() {
 
   const handlePurchase = async (productId: number, purchasePrice: number, quantity: number) => {
     try {
-      await adminApi.post(`/admin/products/${productId}/purchase`, {
-        purchasePrice,
-        quantity
+      await adminApi.post(`/admin/products/purchase`, {
+        productId,
+        purchasePrice
       });
       fetchData(); // 데이터 새로고침
       setIsModalOpen(false);

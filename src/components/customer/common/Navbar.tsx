@@ -89,6 +89,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                 width={120}
                                 height={30}
                                 className="object-contain drop-shadow-sm"
+                                priority
                             />
                         </Link>
 

@@ -34,7 +34,7 @@ interface Seller {
   status: boolean | string;
   image?: string;
   businessNumber?: string;
-  joinedAt?: string;
+  createdAt?: string;
 }
 
 export default function AdminCustomersDashboard() {
@@ -140,7 +140,12 @@ export default function AdminCustomersDashboard() {
     const status = getStatusLabel(user);
     const isActive = status === '활성';
     return (
-      <Badge variant={isActive ? "success" : "destructive"}>{status}</Badge>
+      <Badge 
+        variant={isActive ? "success" : "destructive"}
+        className={!isActive ? "text-white" : ""}
+      >
+        {status}
+      </Badge>
     );
   };
 
@@ -311,7 +316,7 @@ export default function AdminCustomersDashboard() {
                               <div className="text-sm text-gray-900">{user.businessNumber || '-'}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-900">{user.joinedAt ? new Date(user.joinedAt).toLocaleDateString() : '-'}</div>
+                              <div className="text-sm text-gray-900">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-'}</div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(user)}</td>
                           </tr>

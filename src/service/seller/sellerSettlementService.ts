@@ -1,11 +1,19 @@
 import  { sellerApi } from '@/lib/apiClient';
-import { SellerSettlementResponse, PayoutLogDetailResponse } from '@/types/seller/sellersettlement/sellerSettlement';
+import { SellerSettlementResponse, PayoutLogDetailResponse, PageResponse } from '@/types/seller/sellersettlement/sellerSettlement';
 
 /**
  * 판매자 정산 내역 전체 조회
  */
 export async function getSellerSettlementList(): Promise<SellerSettlementResponse[]> {
     const res = await sellerApi.get('/seller/settlements');
+    return res.data;
+}
+
+/**
+ * 판매자 정산 내역 페이징 조회
+ */
+export async function getSellerSettlementListWithPaging(page: number = 0, size: number = 10): Promise<PageResponse<SellerSettlementResponse>> {
+    const res = await sellerApi.get(`/seller/settlements?page=${page}&size=${size}`);
     return res.data;
 }
 
@@ -40,7 +48,7 @@ export async function getSellerSettlementListByPeriod(from: string, to: string):
             status: res.status,
             data: res.data
         });
-        return res.data;
+    return res.data;
     } catch (error: any) {
         console.error('🌐 API 요청 실패:', {
             url,

@@ -93,9 +93,9 @@ export default function SellerProductDetailPage() {
 
     return (
             <SellerLayout>
-      <div className="min-h-screen bg-white p-6">
+      <div className="h-screen bg-white p-4 overflow-hidden">
                     {/* 헤더 */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
           <div>
             <h1 className="text-2xl font-extrabold text-[#374151] tracking-wide mb-2">상품 상세 정보</h1>
             <p className="text-sm text-[#6b7280]">상품의 세부 정보를 확인하고 관리할 수 있습니다.</p>
@@ -119,16 +119,16 @@ export default function SellerProductDetailPage() {
           </div>
                     </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-12rem)]">
                             {/* 왼쪽: 상품 이미지 + 크기 정보 + 판매자 정보 */}
-          <div className="space-y-4">
-            {/* 상품 이미지 */}
+          <div className="space-y-3 h-full overflow-y-auto">
+                            {/* 상품 이미지 */}
             <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-3">
               <h3 className="text-base font-bold text-[#374151] mb-2 flex items-center gap-2">
                 <Eye className="w-4 h-4 text-[#6b7280]" />
                 상품 이미지
               </h3>
-              <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden w-48 mx-auto">
+              <div className="aspect-square bg-white rounded-lg border-2 border-[#d1d5db] overflow-hidden w-40 mx-auto">
                                     {product.imageThumbnailUrl ? (
                                         <img
                                             src={product.imageThumbnailUrl}
@@ -136,17 +136,17 @@ export default function SellerProductDetailPage() {
                                             className="w-full h-full object-cover"
                                         />
                                     ) : (
-                <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
-                  <Armchair className="w-10 h-10 text-[#6b7280]" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
+                    <Armchair className="w-8 h-8 text-[#6b7280]" />
                                         </div>
                                     )}
                                 </div>
                             </div>
 
             {/* 크기 정보 */}
-            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-4">
-              <h3 className="text-lg font-bold text-[#374151] mb-3">크기 정보</h3>
-              <div className="grid grid-cols-3 gap-3">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-3">
+              <h3 className="text-base font-bold text-[#374151] mb-2">크기 정보</h3>
+              <div className="grid grid-cols-3 gap-2">
                                   <div className="text-center">
                   <label className="text-xs font-medium text-[#6b7280] block mb-1">너비</label>
                   <p className="text-[#374151] font-semibold text-sm">{product.width || 0}cm</p>
@@ -163,9 +163,9 @@ export default function SellerProductDetailPage() {
                           </div>
 
             {/* 판매자 정보 */}
-            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-4">
-              <h3 className="text-lg font-bold text-[#374151] mb-3">판매자 정보</h3>
-              <div className="grid grid-cols-2 gap-3">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-3">
+              <h3 className="text-base font-bold text-[#374151] mb-2">판매자 정보</h3>
+              <div className="grid grid-cols-2 gap-2">
                                   <div className="text-center">
                   <label className="text-xs font-medium text-[#6b7280] block mb-1">판매자명</label>
                   <p className="text-[#374151] font-semibold text-sm">{product.sellerName}</p>
@@ -179,10 +179,10 @@ export default function SellerProductDetailPage() {
           </div>
 
                             {/* 오른쪽: 상품 기본 정보 + 상품 설명 + 정보 카드들 */}
-          <div className="space-y-5">
-            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-5">
-              <h3 className="text-xl font-bold text-[#374151] mb-4">기본 정보</h3>
-              <div className="space-y-4">
+          <div className="space-y-3 h-full overflow-y-auto">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-4">
+              <h3 className="text-lg font-bold text-[#374151] mb-3">기본 정보</h3>
+              <div className="space-y-3">
                                         <div>
                   <label className="text-sm font-medium text-[#6b7280] block mb-1">상품명</label>
                   <p className="text-[#374151] font-semibold text-base">{product.name}</p>
@@ -195,9 +195,9 @@ export default function SellerProductDetailPage() {
                                     </div>
 
             {/* 상품 설명 */}
-            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-5">
-              <h3 className="text-xl font-bold text-[#374151] mb-4">상품 설명</h3>
-              <div className="bg-white rounded-lg p-4 border border-[#d1d5db] max-h-36 overflow-y-auto">
+            <div className="bg-[#f3f4f6] rounded-xl shadow border-2 border-[#d1d5db] p-4">
+              <h3 className="text-lg font-bold text-[#374151] mb-3">상품 설명</h3>
+              <div className="bg-white rounded-lg p-3 border border-[#d1d5db] max-h-24 overflow-y-auto">
                 <p className="text-[#374151] text-sm leading-relaxed whitespace-pre-wrap break-words">
                   {product.description}
                 </p>
@@ -205,39 +205,39 @@ export default function SellerProductDetailPage() {
             </div>
 
             {/* 정보 카드들 - 기존 판매자 스타일 */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
-                <DollarSign className="w-7 h-7 text-[#6b7280]" />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#f3f4f6] p-3 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-2">
+                <DollarSign className="w-6 h-6 text-[#6b7280]" />
                                         <div>
-                  <p className="text-sm font-medium text-[#6b7280]">가격</p>
-                  <p className="text-base font-bold text-[#374151]">{product.price.toLocaleString()}원</p>
+                  <p className="text-xs font-medium text-[#6b7280]">가격</p>
+                  <p className="text-sm font-bold text-[#374151]">{product.price.toLocaleString()}원</p>
                                         </div>
                                     </div>
 
-              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
-                <Package className="w-7 h-7 text-[#6b7280]" />
+              <div className="bg-[#f3f4f6] p-3 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-2">
+                <Package className="w-6 h-6 text-[#6b7280]" />
                                         <div>
-                  <p className="text-sm font-medium text-[#6b7280]">재고</p>
-                  <p className="text-base font-bold text-[#374151]">{product.stock}개</p>
+                  <p className="text-xs font-medium text-[#6b7280]">재고</p>
+                  <p className="text-sm font-bold text-[#374151]">{product.stock}개</p>
                                     </div>
                                 </div>
 
-              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
-                <Armchair className="w-7 h-7 text-[#6b7280]" />
+              <div className="bg-[#f3f4f6] p-3 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-2">
+                <Armchair className="w-6 h-6 text-[#6b7280]" />
                 <div>
-                  <p className="text-sm font-medium text-[#6b7280]">품질</p>
-                  <p className="text-base font-bold text-[#374151]">{product.status}</p>
-                </div>
-              </div>
+                  <p className="text-xs font-medium text-[#6b7280]">품질</p>
+                  <p className="text-sm font-bold text-[#374151]">{product.status}</p>
+                        </div>
+                    </div>
 
-              <div className="bg-[#f3f4f6] p-4 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-3">
-                <Eye className="w-7 h-7 text-[#6b7280]" />
-                <div>
-                  <p className="text-sm font-medium text-[#6b7280]">상태</p>
-                  <p className="text-base font-bold text-[#374151]">
+              <div className="bg-[#f3f4f6] p-3 rounded-xl shadow border-2 border-[#d1d5db] flex items-center gap-2">
+                <Eye className="w-6 h-6 text-[#6b7280]" />
+                                <div>
+                  <p className="text-xs font-medium text-[#6b7280]">상태</p>
+                  <p className="text-sm font-bold text-[#374151]">
                     {product.isActive ? '판매중' : '판매중지'}
                   </p>
-                </div>
+                                </div>
                                 </div>
                             </div>
                         </div>

@@ -6,6 +6,7 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import SellerHeader from '@/components/seller/SellerHeader';
 import {
     getSellerSettlementList,
+    getSellerSettlementListWithPaging,
     getSellerSettlementListByDate,
     getSellerSettlementListByPeriod,
     getSellerSettlementSummary,
@@ -14,7 +15,8 @@ import {
 import { 
     SellerSettlementResponse, 
     PayoutLogDetailResponse,
-    DailySettlementItem 
+    DailySettlementItem,
+    PageResponse
 } from '@/types/seller/sellersettlement/sellerSettlement';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import { 
@@ -54,8 +56,15 @@ export default function SellerSettlementPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const {show} = useGlobalDialog();
     
+    // 페이징 상태 관리
+    const [currentPage, setCurrentPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [usePagination, setUsePagination] = useState(false);
+    const {show} = useGlobalDialog();
+
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -159,17 +168,32 @@ export default function SellerSettlementPage() {
         }
     };
 
-    // 전체 정산 내역 조회
-    const fetchAll = async () => {
+    // 전체 정산 내역 조회 (페이징 지원)
+    const fetchAll = async (page: number = 0) => {
         try {
             setLoading(true);
-            console.log('📊 전체 정산 내역 조회 시작');
-            const res = await getSellerSettlementList();
-            console.log('📊 전체 정산 데이터:', res);
-            setSettlements(res || []);
+            console.log('📊 정산 내역 조회 시작:', { page, usePagination });
+            
+            if (usePagination) {
+                // 페이징 조회
+                const res = await getSellerSettlementListWithPaging(page, pageSize);
+                console.log('📊 페이징 정산 데이터:', res);
+                setSettlements(res.content || []);
+                setTotalPages(res.totalPages);
+                setTotalElements(res.totalElements);
+                setCurrentPage(res.number);
+            } else {
+                // 전체 조회
+                const res = await getSellerSettlementList();
+                console.log('📊 전체 정산 데이터:', res);
+                setSettlements(res || []);
+                setTotalPages(0);
+                setTotalElements(res?.length || 0);
+                setCurrentPage(0);
+            }
             
             // 하루별로 그룹핑
-            await createDailyPayoutsOptimized(res || []);
+            await createDailyPayoutsOptimized(usePagination ? res.content || [] : res || []);
             setSummary(null);
             setError(null);
         } catch (err) {
@@ -232,7 +256,7 @@ export default function SellerSettlementPage() {
             } else {
                 // 상세 정보가 없는 경우 API 호출
                 const res = await getSellerSettlementDetail(dailyItem.originalPayoutId);
-                setSelectedPayout(res);
+            setSelectedPayout(res);
             }
         } catch (err: any) {
             console.error('정산 상세 조회 실패:', err);
@@ -261,7 +285,7 @@ export default function SellerSettlementPage() {
         if (type === 'all') {
             setFilterFrom('');
             setFilterTo('');
-            fetchAll();
+        fetchAll();
         }
     };
 
@@ -271,7 +295,7 @@ export default function SellerSettlementPage() {
         setFilterFrom(from);
         setFilterTo(to);
     };
-
+        
     // 초기 로딩
     useEffect(() => {
         if (checking) return;
@@ -285,6 +309,24 @@ export default function SellerSettlementPage() {
             fetchFilteredByPeriod(filterFrom, filterTo);
         }
     }, [filterType, filterFrom, filterTo]);
+
+    // 페이징 관련 함수들
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        fetchAll(newPage);
+    };
+
+    const handlePageSizeChange = (newSize: number) => {
+        setPageSize(newSize);
+        setCurrentPage(0);
+        fetchAll(0);
+    };
+
+    const togglePagination = () => {
+        setUsePagination(!usePagination);
+        setCurrentPage(0);
+        fetchAll(0);
+    };
 
     // 🎯 하루별 그룹핑된 데이터 기준 통계 계산
     const totalSettlements = dailyPayouts.length;
@@ -352,13 +394,13 @@ export default function SellerSettlementPage() {
                             <div className="flex items-center gap-3 mb-2">
                                 <TrendingUp className="w-8 h-8 text-blue-600" />
                                 <span className="text-[#374151] text-sm font-semibold">일평균 정산액</span>
-                            </div>
+                    </div>
                             <div className="text-2xl font-bold text-blue-600">
                                 {totalSettlements > 0 ? Math.round(totalPayout / totalSettlements).toLocaleString() : 0}원
                             </div>
                             <div className="text-xs text-[#6b7280] mt-1">하루 평균 지급액</div>
                         </section>
-                    </div>
+                        </div>
 
                     {/* 필터 섹션 */}
                     <div className="bg-[#f3f4f6] p-4 rounded-lg shadow-sm border-2 border-[#d1d5db] mb-6">
@@ -393,6 +435,34 @@ export default function SellerSettlementPage() {
                                 </button>
                             </div>
 
+                            {/* 페이징 토글 */}
+                            {filterType === 'all' && (
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={togglePagination}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            usePagination 
+                                                ? 'bg-blue-500 text-white shadow-sm'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        {usePagination ? '페이징 ON' : '페이징 OFF'}
+                                    </button>
+                                    {usePagination && (
+                                        <select
+                                            value={pageSize}
+                                            onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                                            className="border border-[#d1d5db] rounded-md px-2 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white text-[#374151] text-sm"
+                                        >
+                                            <option value={5}>5개씩</option>
+                                            <option value={10}>10개씩</option>
+                                            <option value={20}>20개씩</option>
+                                            <option value={50}>50개씩</option>
+                                        </select>
+                                    )}
+                                </div>
+                            )}
+
                             {/* 기간별 필터 */}
                             {filterType === 'period' && (
                                 <div className="flex items-center gap-2">
@@ -411,8 +481,8 @@ export default function SellerSettlementPage() {
                                         onChange={(e) => handlePeriodChange(filterFrom, e.target.value)}
                                         placeholder="종료일"
                                         className="border border-[#d1d5db] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white text-[#374151] transition-all"
-                                    />
-                                </div>
+                            />
+                        </div>
                             )}
                         </div>
                     </div>
@@ -444,51 +514,137 @@ export default function SellerSettlementPage() {
                                 </div>
                             </div>
                             
-                            <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
-                                <table className="min-w-full divide-y divide-[#d1d5db]">
-                                    <thead className="bg-[#f3f4f6]">
-                                        <tr>
+                        <div className="overflow-x-auto bg-[#f3f4f6] rounded-lg shadow-sm border border-[#d1d5db]">
+                            <table className="min-w-full divide-y divide-[#d1d5db]">
+                                <thead className="bg-[#f3f4f6]">
+                                    <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매일</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">판매건수</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">총 매출</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수수료</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">지급액</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상세보기</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">총 매출</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">수수료</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">지급액</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-[#6b7280] uppercase tracking-wider">상세보기</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-[#f3f4f6] divide-y divide-[#d1d5db]">
                                         {dailyPayouts.map((item) => (
                                             <tr key={item.id} className="bg-white hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
-                                                    <div className="font-semibold">
+                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-[#374151]">
+                                                            <div className="font-semibold">
                                                         {item.date}
-                                                    </div>
-                                                </td>
+                                                        </div>
+                                                    </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
                                                     {item.salesCount}건
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
-                                                    {item.totalSales.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
-                                                    {item.totalCommission.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
-                                                    {item.payoutAmount.toLocaleString()}원
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center">
-                                                    <button
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-[#374151] font-semibold">
+                                                {item.totalSales.toLocaleString()}원
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-[#374151]">
+                                                {item.totalCommission.toLocaleString()}원
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap font-semibold text-[#374151]">
+                                                {item.payoutAmount.toLocaleString()}원
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-center">
+                                                <button
                                                         onClick={() => fetchPayoutDetailForModal(item.date, item)}
-                                                        className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
-                                                    >
-                                                        <Eye className="w-4 h-4" /> 상세 보기
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                                    className="inline-flex items-center gap-1 bg-[#d1d5db] text-[#374151] px-3 py-1.5 rounded hover:bg-[#e5e7eb] hover:text-[#374151] text-sm transition-colors"
+                                                >
+                                                    <Eye className="w-4 h-4" /> 상세 보기
+                                                </button>
+                                            </td>
+                                        </tr>
                                         ))}
-                                    </tbody>
-                                </table>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 페이징 UI */}
+                        {usePagination && totalPages > 1 && (
+                            <div className="mt-6 flex items-center justify-between">
+                                <div className="text-sm text-[#6b7280]">
+                                    총 {totalElements}개 중 {(currentPage * pageSize) + 1}~{Math.min((currentPage + 1) * pageSize, totalElements)}개 표시
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handlePageChange(0)}
+                                        disabled={currentPage === 0}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === 0
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        처음
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 0}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === 0
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        이전
+                                    </button>
+                                    
+                                    {/* 페이지 번호들 */}
+                                    <div className="flex gap-1">
+                                        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                            let pageNum;
+                                            if (totalPages <= 5) {
+                                                pageNum = i;
+                                            } else if (currentPage < 3) {
+                                                pageNum = i;
+                                            } else if (currentPage >= totalPages - 3) {
+                                                pageNum = totalPages - 5 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+                                            
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    onClick={() => handlePageChange(pageNum)}
+                                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                                        currentPage === pageNum
+                                                            ? 'bg-blue-500 text-white'
+                                                            : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                                    }`}
+                                                >
+                                                    {pageNum + 1}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages - 1}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === totalPages - 1
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        다음
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(totalPages - 1)}
+                                        disabled={currentPage === totalPages - 1}
+                                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                            currentPage === totalPages - 1
+                                                ? 'bg-[#f3f4f6] text-[#9ca3af] cursor-not-allowed'
+                                                : 'bg-[#f3f4f6] text-[#374151] hover:bg-[#e5e7eb]'
+                                        }`}
+                                    >
+                                        마지막
+                                    </button>
+                                </div>
                             </div>
+                        )}
                         </>
                     )}
 
@@ -523,19 +679,19 @@ export default function SellerSettlementPage() {
                                         <h4 className="font-semibold text-[#374151] mb-2">총 매출</h4>
                                         <p className="text-[#388e3c] font-bold">
                                             {selectedPayout.payoutInfo.totalSales.toLocaleString()}원
-                                        </p>
+                                                        </p>
                                     </div>
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">수수료</h4>
                                         <p className="text-[#374151] font-bold">
                                             {selectedPayout.payoutInfo.totalCommission.toLocaleString()}원
-                                        </p>
+                                                        </p>
                                     </div>
                                     <div className="bg-white p-4 rounded-lg border border-[#d1d5db]">
                                         <h4 className="font-semibold text-[#374151] mb-2">지급액</h4>
                                         <p className="text-[#6b7280] font-bold">
                                             {selectedPayout.payoutInfo.payoutAmount.toLocaleString()}원
-                                        </p>
+                                                        </p>
                                     </div>
                                 </div>
 

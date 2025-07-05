@@ -32,7 +32,7 @@ const feedbackGroup: MenuGroup = {
   label: "피드백",
   items: [
     { label: "고객리뷰", href: "/seller/reviews" },
-    { label: "고객문의확인", href: "/seller/qna" },
+  { label: "고객문의확인", href: "/seller/qna" },
     { label: "관리자문의", href: "/seller/admin-qna" },
   ]
 };

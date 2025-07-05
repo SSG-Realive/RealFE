@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminReviewList, updateAdminReview } from "@/service/admin/reviewService";
 import { AdminReview, AdminReviewListRequest, AdminReviewListResponse, getTrafficLightEmoji, getTrafficLightText, getTrafficLightBgClass } from "@/types/admin/review";
@@ -40,14 +40,32 @@ export default function ReviewListPage() {
     productFilter: '',
     sellerFilter: '',
   });
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const {show} = useGlobalDialog();
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  // 디바운싱된 검색 함수
+  const debouncedSearch = useCallback((page: number = 1) => {
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      fetchReviews(page);
+    }, 500); // 500ms 지연
+    
+    setSearchTimeout(timeout);
+  }, [searchTimeout]);
+
+  // 즉시 검색 함수 (버튼 클릭 시)
   const applyFilters = () => {
-    fetchReviews(1); // Reset to first page
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    fetchReviews(1);
   };
 
   const fetchReviews = async (page: number = 1) => {
@@ -87,20 +105,44 @@ export default function ReviewListPage() {
     }
   };
 
+  // 필터 변경 시 자동 검색
   useEffect(() => {
     if (accessToken) {
-      console.log('리뷰 목록 페이지 - accessToken 확인:', accessToken ? '있음' : '없음');
-      fetchReviews(currentPage);
-    } else {
-      console.log('리뷰 목록 페이지 - accessToken 없음, 로그인 페이지로 이동');
+      debouncedSearch(1);
     }
-  }, [accessToken, currentPage, sortOption]);
+  }, [filters, sortOption, accessToken]);
+
+  // 정렬 옵션 변경 시 즉시 검색 (디바운싱 없이)
+  const handleSortChange = (value: string) => {
+    setSortOption(value);
+    // 정렬 변경 시 즉시 검색 실행
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    fetchReviews(1);
+  };
+
+  // 페이지 변경 시 검색
+  useEffect(() => {
+    if (accessToken && currentPage > 1) {
+      fetchReviews(currentPage);
+    }
+  }, [currentPage, accessToken]);
 
   useEffect(() => {
     if (!accessToken) {
       router.replace('/admin/login');
     }
   }, [accessToken, router]);
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
   const handleToggleVisibility = async (reviewId: number, isHidden: boolean) => {
     try {
@@ -216,7 +258,7 @@ export default function ReviewListPage() {
                 />
               </div>
               <div className="flex gap-2">
-                <Select value={sortOption} onValueChange={setSortOption}>
+                <Select value={sortOption} onValueChange={handleSortChange}>
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="정렬 기준" />
                   </SelectTrigger>
@@ -274,10 +316,7 @@ export default function ReviewListPage() {
                               {new Date(review.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">신고: {review.reportCount || 0}회</span>
-                          </div>
+
                         </div>
 
                         <div className="mb-4">

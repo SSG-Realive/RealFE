@@ -8,6 +8,13 @@ const nextConfig = {
             },
         ];
     },
+    images: {
+        domains: [
+            "realive-upload-images.s3.ap-northeast-2.amazonaws.com"
+        ]
+    }
 };
+
+
 
 module.exports = nextConfig;

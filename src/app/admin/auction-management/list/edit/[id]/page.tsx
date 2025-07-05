@@ -79,14 +79,25 @@ export default function AuctionEditPage() {
     try {
       setSaving(true);
       
-      // 날짜와 시간을 조합하여 ISO 문자열 생성
+      // 한국 시간대로 직접 문자열 생성 (yyyy-MM-dd'T'HH:mm:ss)
       const startTime = startDate && startHour && startMinute 
-        ? new Date(`${startDate}T${startHour}:${startMinute}:00`).toISOString()
+        ? `${startDate}T${startHour}:${startMinute}:00`
         : undefined;
       
       const endTime = endDate && endHour && endMinute
-        ? new Date(`${endDate}T${endHour}:${endMinute}:00`).toISOString()
+        ? `${endDate}T${endHour}:${endMinute}:00`
         : undefined;
+
+      // 종료시간만 현재 시간과 비교 (시작시간은 이미 시작된 경매도 수정 가능)
+      if (endTime) {
+        const endDateTime = new Date(`${endDate}T${endHour}:${endMinute}:00+09:00`);
+        const now = new Date();
+        
+        if (endDateTime <= now) {
+          alert("종료 시간은 현재 시간 이후여야 합니다.");
+          return;
+        }
+      }
 
       const updateData: AuctionUpdateRequestDTO = {
         id: auction.id,
@@ -256,9 +267,9 @@ export default function AuctionEditPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
-                          {Array.from({ length: 12 }, (_, i) => (
-                            <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
-                              {(i + 1).toString().padStart(2, '0')}시
+                          {Array.from({ length: 24 }, (_, i) => (
+                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                              {i.toString().padStart(2, '0')}시
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -306,9 +317,9 @@ export default function AuctionEditPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="max-h-60">
-                          {Array.from({ length: 12 }, (_, i) => (
-                            <SelectItem key={i + 1} value={(i + 1).toString().padStart(2, '0')}>
-                              {(i + 1).toString().padStart(2, '0')}시
+                          {Array.from({ length: 24 }, (_, i) => (
+                            <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                              {i.toString().padStart(2, '0')}시
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -97,18 +97,18 @@ function AuctionListPage() {
       (a.adminProduct?.productName && a.adminProduct.productName.includes(search)) ||
       (a.statusText && a.statusText.includes(search));
     
-    // 상태 필터링
+    // 상태 필터링 - 백엔드 statusText 값에 맞게 수정
     let matchesStatus = true;
     if (statusFilter === 'PROCEEDING') {
       matchesStatus = a.statusText === '진행중';
     } else if (statusFilter === 'SCHEDULED') {
       matchesStatus = a.statusText === '예정';
     } else if (statusFilter === 'COMPLETED') {
-      matchesStatus = a.statusText === '완료';
+      matchesStatus = a.statusText === '종료';
     } else if (statusFilter === 'FAILED') {
       matchesStatus = a.statusText === '실패';
     } else if (statusFilter === 'CANCELLED') {
-      matchesStatus = a.statusText === '취소됨';
+      matchesStatus = a.statusText === '취소';
     }
     
     return matchesSearch && matchesStatus;
@@ -153,8 +153,8 @@ function AuctionListPage() {
     
     switch (status) {
       case 'PROCEEDING': return '진행중';
-      case 'COMPLETED': return '완료';
-      case 'CANCELLED': return '취소됨';
+      case 'COMPLETED': return '종료';
+      case 'CANCELLED': return '취소';
       case 'FAILED': return '실패';
       default: return status;
     }
@@ -265,7 +265,7 @@ function AuctionListPage() {
                     variant={statusFilter === 'COMPLETED' ? 'default' : 'outline'}
                     size="sm"
                   >
-                    완료
+                    종료
                   </Button>
                   <Button
                     onClick={() => handleStatusFilterChange('FAILED')}

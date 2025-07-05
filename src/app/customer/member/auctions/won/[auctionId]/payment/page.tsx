@@ -42,12 +42,7 @@ interface UserProfile {
 interface AuctionPaymentRequestDTO {
   auctionId: number;
   paymentKey: string;
-  tossOrderId: string;
   amount: number;
-  receiverName: string;
-  phone: string;
-  deliveryAddress: string;
-  paymentMethod: 'CARD';
 }
 
 /* ───────── API ───────── */
@@ -289,12 +284,7 @@ function PaymentResultHandler() {
         const dto: AuctionPaymentRequestDTO = {
           auctionId: Number(auctionId),
           paymentKey,
-          tossOrderId: orderId,
           amount,
-          receiverName: shippingInfo.receiverName,
-          phone: shippingInfo.phone,
-          deliveryAddress: shippingInfo.address,
-          paymentMethod: 'CARD',
         };
         const res = await approvePayment(auctionId, dto);
 

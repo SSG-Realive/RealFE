@@ -119,7 +119,10 @@ export default function ReviewListPage() {
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
-    fetchReviews(1);
+    // 즉시 검색 실행
+    setTimeout(() => {
+      fetchReviews(1);
+    }, 0);
   };
 
   // 페이지 변경 시 검색
@@ -288,7 +291,7 @@ export default function ReviewListPage() {
             <ScrollArea className="h-[600px]">
               <div className="space-y-4">
                 {reviews?.map((review) => (
-                  <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition-colors">
+                  <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">

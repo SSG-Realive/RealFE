@@ -42,6 +42,7 @@ export default function ReviewListPage() {
   });
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const {show} = useGlobalDialog();
+  const [totalElements, setTotalElements] = useState(0);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -87,6 +88,7 @@ export default function ReviewListPage() {
       setReviews(response.content);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
+      setTotalElements(response.totalElements ?? 0);
     } catch (err: any) {
       console.error('리뷰 목록 조회 실패:', err);
       console.error('에러 상세 정보:', {
@@ -165,8 +167,8 @@ export default function ReviewListPage() {
     return '#22c55e'; // 초록 (4-5점: 긍정적)
   };
 
-  // 통계 계산
-  const totalCount = reviews.length;
+  // 통계 계산 (전체 기준)
+  const totalCount = totalElements ?? 0;
   const hiddenCount = reviews.filter(r => r.isHidden).length;
   const visibleCount = totalCount - hiddenCount;
 

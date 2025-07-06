@@ -28,6 +28,7 @@ export default function ReviewQnaPage() {
     answeredCount: 0,
     unansweredCount: 0
   });
+  const [totalElements, setTotalElements] = useState(0);
   const {show} = useGlobalDialog();
 
   // snake_case → camelCase 변환 함수
@@ -59,12 +60,13 @@ export default function ReviewQnaPage() {
       setQnas(mappedQnas);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
+      setTotalElements(response.totalElements ?? 0);
       
       // 통계 계산
-      const answeredCount = mappedQnas.filter(qna => qna.isAnswered).length;
-      const unansweredCount = mappedQnas.filter(qna => !qna.isAnswered).length;
+      const answeredCount = (response as any).answeredCount ?? mappedQnas.filter(qna => qna.isAnswered).length;
+      const unansweredCount = (response as any).unansweredCount ?? mappedQnas.filter(qna => !qna.isAnswered).length;
       setStatistics({
-        totalCount: mappedQnas.length,
+        totalCount: response.totalElements ?? 0,
         answeredCount,
         unansweredCount
       });
@@ -276,48 +278,15 @@ export default function ReviewQnaPage() {
                       variant="default"
                       size="sm"
                       onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
-                      className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit"
                     >
-                      상세
+                      답변하기
                     </Button>
                   </div>
                 </div>
               ))}
-              {(!qnas || qnas.length === 0) && !loading && (
-                <div className="text-center py-12">
-                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-lg font-medium text-gray-500 mb-2">조회된 Q&A가 없습니다</h3>
-                  <p className="text-gray-400">검색 조건을 변경해보세요.</p>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>
-
-        {/* 페이징 */}
-        {totalPages > 1 && (
-          <div className="mt-8 flex justify-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => fetchQnas(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              <ChevronLeft className="w-4 h-4" /> 이전
-            </Button>
-            <span className="px-3 py-1 text-gray-700 font-semibold">
-              {currentPage} / {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              onClick={() => fetchQnas(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
-              다음 <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -72,9 +72,9 @@ export default function ProductCard({
   // UI
   return (
       <Link href={`/main/products/${id}`} prefetch={false}>
-        <div className="group relative bg-white rounded-2xl p-4 hover:shadow-md transition">
+        <div className="group relative bg-white rounded-none p-4 hover:shadow-md transition">
           {/* --- 이미지 --- */}
-          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-gray-100">
+          <div className="relative w-full aspect-square rounded-none overflow-hidden bg-gray-100">
             {imageThumbnailUrl ? (
                 <ProductImage
                     src={imageThumbnailUrl}
@@ -113,12 +113,11 @@ export default function ProductCard({
             </button>
           </div>
 
-          {/* 이름 · 가격 */}
-          <div className="mt-4 text-left">
-            <p className="text-base font-light truncate">{name}</p>
-            <p className="text-sm font-light mt-1">
-              {price.toLocaleString()}
-              <span className="ml-1 text-xs">원</span>
+          {/* 텍스트 정보 */}
+          <div className="mt-1">
+            <p className="text-sm font-light text-gray-800 truncate text-center">{name}</p>
+            <p className="text-xs font-light text-gray-700 text-right mt-0.5">
+              KRW {price.toLocaleString()}
             </p>
           </div>
         </div>

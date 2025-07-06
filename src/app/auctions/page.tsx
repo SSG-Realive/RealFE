@@ -72,7 +72,11 @@ export default function AuctionPage() {
                 >
                   <div className="relative aspect-square bg-gray-100">
                     <ProductImage
-                        src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
+                        src={
+                            a.adminProduct?.imageThumbnailUrl ||
+                            a.adminProduct?.imageUrls?.[0] ||
+                            '/default-thumbnail.png'
+                        }
                         alt={a.adminProduct?.productName ?? '경매 상품'}
                         className="w-full h-full object-cover"
                     />

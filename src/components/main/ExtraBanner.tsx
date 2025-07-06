@@ -37,40 +37,39 @@ export default function ExtraBannerCarousel() {
     };
 
     return (
-        <div className="w-full px-4 my-10">
-            <div className="max-w-screen-xl mx-auto">
-                {isMobile ? (
-                    <Slider {...sliderSettings}>
-                        {bannerImages.map((item, idx) => (
-                            <div key={idx} className="px-2">
-                                <Link href={item.link}>
-                                    <img
-                                        src={item.src}
-                                        alt={`배너 ${idx + 1}`}
-                                        className="w-full h-auto object-contain rounded-lg shadow-md cursor-pointer"
-                                    />
-                                </Link>
-                            </div>
-                        ))}
-                    </Slider>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {bannerImages.map((item, idx) => (
-                            <Link
-                                key={idx}
-                                href={item.link}
-                                className="w-full overflow-hidden shadow-sm rounded-lg bg-white block"
-                            >
+        <div className="w-full my-0 pt-0">
+            {/* ✅ max-w 제거하고 padding도 없앰 */}
+            {isMobile ? (
+                <Slider {...sliderSettings}>
+                    {bannerImages.map((item, idx) => (
+                        <div key={idx}>
+                            <Link href={item.link}>
                                 <img
                                     src={item.src}
                                     alt={`배너 ${idx + 1}`}
-                                    className="w-full h-auto object-contain cursor-pointer"
+                                    className="w-full h-auto object-cover cursor-pointer"
                                 />
                             </Link>
-                        ))}
-                    </div>
-                )}
-            </div>
+                        </div>
+                    ))}
+                </Slider>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0">
+                    {bannerImages.map((item, idx) => (
+                        <Link
+                            key={idx}
+                            href={item.link}
+                            className="w-full block overflow-hidden"
+                        >
+                            <img
+                                src={item.src}
+                                alt={`배너 ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                            />
+                        </Link>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

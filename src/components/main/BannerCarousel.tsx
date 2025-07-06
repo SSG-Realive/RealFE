@@ -105,7 +105,7 @@ export default function BannerCarousel({
           }
         }
       `}</style>
-            <div className="w-full relative overflow-hidden h-[180px] sm:h-[600px] mb-4 sm:mb-6">
+            <div className="w-full my-10">
                 <Slider {...settings}>
                     {images.map((item, index) => (
                         <div key={index}>

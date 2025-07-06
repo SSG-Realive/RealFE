@@ -106,26 +106,25 @@ export default function CustomerHomePage() {
 
     return (
         <div className="min-h-screen overflow-x-auto">
-            {isMainDefaultView && <div className="mb-0 sm:mb-2"><BannerCarousel /></div>}
+            {isMainDefaultView && <div className="mb-0 sm:mb-2"><ExtraBanner /></div>}
 
             {/* ✅ 주간 경매 */}
             {!categoryId && (
-                <section className="max-w-screen-xl mx-auto px-4 mt-1 mb-4 sm:mt-6 sm:mb-8">
-                    <h2 className="text-xl font-light mb-4">주간 경매</h2>
+                <section className="w-full mt-32 mb-4 sm:mt-6 sm:mb-8">
                     {auctionLoading ? (
-                        <p>로딩 중...</p>
+                        <p className="px-4">로딩 중...</p>
                     ) : auctionError ? (
-                        <p>{auctionError}</p>
+                        <p className="px-4">{auctionError}</p>
                     ) : auctions.length > 0 ? (
                         <AuctionCard auctions={auctions} />
                     ) : (
-                        <p>진행중인 경매 없음</p>
+                        <p className="px-4">진행중인 경매 없음</p>
                     )}
                 </section>
             )}
 
             <PopularProductsGrid />
-            {isMainDefaultView && <ExtraBanner />}
+            {isMainDefaultView && <BannerCarousel />}
             {isMainDefaultView && <div className="my-4 sm:my-8 md:my-12"><FeaturedSellersSection /></div>}
             {isMainDefaultView && <MiddleBannerCarousel />}
 
@@ -170,8 +169,8 @@ export default function CustomerHomePage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 mt-4 px-2 sm:px-0">
-                    {products.map((p, index) => (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4 px-4">
+                {products.map((p, index) => (
                         <ProductCard key={`product-${p.id}-${index}`} {...p} />
                     ))}
                 </div>

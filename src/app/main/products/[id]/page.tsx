@@ -141,11 +141,11 @@ export default function ProductDetailPage() {
         <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 대표 이미지 + 썸네일 */}
           <div>
-            <div className="w-full aspect-square bg-white overflow-hidden shadow-sm">
+            <div className="w-full max-h-[500px] bg-white overflow-hidden shadow-sm">
               <img
                   src={mainImage}
                   alt={product.name}
-                  className="w-full h-full object-contain"
+                  className="w-full h-auto object-cover"
               />
             </div>
             {imageList.length > 0 && (
@@ -172,11 +172,14 @@ export default function ProductDetailPage() {
 
           {/* 상품 설명 + 버튼 */}
           <div>
-            <h1 className="text-xl font-light mb-2">{product.name}</h1>
-            <p className="text-sm text-gray-700 mb-4">{product.description}</p>
-            <p className="text-xl font-light mb-6">
-              {product.price.toLocaleString()} <span className="text-sm ml-1">원</span>
+            <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+            <p className="text-sm text-gray-700 mb-4 break-words whitespace-pre-wrap">
+              {product.description}
             </p>
+            <div className="flex items-center justify-between text-base font-light mb-6">
+              <span>총 상품금액</span>
+              <span>KRW {(product.price * quantity).toLocaleString()}</span>
+            </div>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
               <p><span className="font-light">상품상태:</span> {product.status}</p>
@@ -245,7 +248,7 @@ export default function ProductDetailPage() {
         {/* 추천 상품 */}
         {related.length > 0 && (
             <div className="max-w-6xl mx-auto px-4 mt-20">
-              <h2 className="text-lg font-light text-gray-600 mb-4">추천 상품</h2>
+              <h2 className="text-lg font-light text-gray-600 mb-4">이런 상품은 어떠세요?</h2>
               <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                 {related.map((item) => (
                     <div key={item.id} onClick={() => router.push(`/main/products/${item.id}`)} className="cursor-pointer bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition flex-shrink-0 w-44">

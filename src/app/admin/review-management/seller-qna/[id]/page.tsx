@@ -16,6 +16,7 @@ export default function QnaDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const {show} = useGlobalDialog();
+  const [answer, setAnswer] = useState('');
   
   const fetchQnaDetail = async () => {
     if (!accessToken || isNaN(qnaId)) return;
@@ -53,6 +54,18 @@ export default function QnaDetailPage() {
     }
   };
 
+  const handleAnswer = async () => {
+    if (!qna) return;
+    try {
+      await getAdminReviewQna(qnaId, { answer });
+      show("답변이 등록되었습니다.");
+      fetchQnaDetail();
+    } catch (err: any) {
+      console.error("답변 등록 실패:", err);
+      show(err.message || "답변 등록에 실패했습니다.");
+    }
+  };
+
   if (loading) return <div className="p-8 text-center">로딩 중...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
   if (!qna) return <div className="p-8">Q&A 정보를 찾을 수 없습니다.</div>;
@@ -77,54 +90,40 @@ export default function QnaDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-6 space-y-6">
-        {/* 질문 정보 */}
-        <div>
-          <h2 className="text-lg font-semibold border-b pb-2 mb-4">질문 정보</h2>
-          <div className="space-y-3">
-            <div>
-              <span className="font-medium">Q&A ID:</span>
-              <span className="ml-2">{qna.id}</span>
-            </div>
-            <div>
-              <span className="font-medium">제목:</span>
-              <span className="ml-2">{qna.title}</span>
-            </div>
-            {qna.userName && (
-              <div>
-                <span className="font-medium">작성자:</span>
-                <span className="ml-2">{qna.userName}</span>
-              </div>
-            )}
-            <div>
-              <span className="font-medium">작성일:</span>
-              <span className="ml-2">{new Date(qna.createdAt).toLocaleString()}</span>
-            </div>
-             <div>
-                <span className="font-medium">답변상태:</span>
-                <span className={`ml-2 font-semibold ${qna.isAnswered ? 'text-green-600' : 'text-red-600'}`}>
-                  {qna.isAnswered ? '답변완료' : '미답변'}
-                </span>
-              </div>
+      <div className="bg-white rounded-xl shadow p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+          <div>
+            <div className="text-lg font-bold text-gray-800 mb-1">{qna.title}</div>
+            <div className="text-sm text-gray-500">작성일: {new Date(qna.createdAt).toLocaleString()}</div>
+          </div>
+          <div className="text-right">
+            <div className="font-bold">{qna.sellerName}</div>
+            <div className="text-xs text-gray-500">{qna.sellerEmail}</div>
+            <div className="text-xs text-gray-400">ID: {qna.sellerId}</div>
           </div>
         </div>
-        
-        {/* 질문 내용 */}
-        <div>
-          <h2 className="text-lg font-semibold border-b pb-2 mb-4">질문 내용</h2>
-          <div className="p-4 bg-gray-50 rounded min-h-[100px]">
-            <p className="whitespace-pre-wrap">{qna.content}</p>
-          </div>
+        <div className="text-base text-gray-700 whitespace-pre-line mb-4">{qna.content}</div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${qna.isAnswered ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{qna.isAnswered ? "답변완료" : "미답변"}</span>
+          {qna.answeredAt && <span className="text-xs text-gray-400">답변일: {new Date(qna.answeredAt).toLocaleString()}</span>}
         </div>
+      </div>
 
-        {qna.isAnswered && (
-          <div className="border-t pt-6">
-            <h2 className="text-lg font-semibold border-b pb-2 mb-4">답변 내용</h2>
-            <div className="p-4 bg-blue-50 rounded min-h-[100px]">
-              <p className="whitespace-pre-wrap">{qna.answer}</p>
-            </div>
-          </div>
-        )}
+      {!qna.isAnswered ? (
+        <div className="bg-gray-50 rounded-xl shadow p-6 mb-6">
+          <div className="font-bold mb-2">답변 작성</div>
+          <textarea className="w-full border rounded p-2 mb-2" rows={4} value={answer} onChange={e => setAnswer(e.target.value)} placeholder="답변을 입력하세요..." />
+          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" onClick={handleAnswer}>답변 등록</button>
+        </div>
+      ) : (
+        <div className="bg-green-50 rounded-xl shadow p-6 mb-6">
+          <div className="font-bold mb-2 text-green-800">답변</div>
+          <div className="text-base text-gray-700 whitespace-pre-line">{qna.answer}</div>
+        </div>
+      )}
+
+      <div className="mb-4">
+        <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors" onClick={() => router.push('/admin/review-management/seller-qna')}>목록으로</button>
       </div>
     </div>
   );

@@ -180,19 +180,19 @@ export default function ReviewQnaPage() {
 
         {/* 통계 카드 */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-purple-700">{statistics?.totalCount ?? 0}</div>
               <div className="text-sm text-gray-500 mt-1">총 문의</div>
             </CardContent>
           </Card>
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-green-700">{statistics?.answeredCount ?? 0}</div>
               <div className="text-sm text-gray-500 mt-1">답변완료</div>
             </CardContent>
           </Card>
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-red-700">{statistics?.unansweredCount ?? 0}</div>
               <div className="text-sm text-gray-500 mt-1">미답변</div>
@@ -201,7 +201,7 @@ export default function ReviewQnaPage() {
         </div>
 
         {/* 검색/필터 Card */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <Filter className="w-5 h-5" />
@@ -248,7 +248,7 @@ export default function ReviewQnaPage() {
         </Card>
 
         {/* Q&A 목록 Card */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
@@ -258,7 +258,7 @@ export default function ReviewQnaPage() {
           <CardContent>
             <div className="space-y-4">
               {qnas?.map(qna => (
-                <div key={qna.id} className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div key={qna.id} className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm border border-gray-100 transition">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className="font-semibold text-lg text-gray-800 truncate max-w-xs" title={qna.title}>{qna.title}</span>
@@ -276,7 +276,7 @@ export default function ReviewQnaPage() {
                       variant="default"
                       size="sm"
                       onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
-                      className="bg-gray-800 hover:bg-gray-700 w-full"
+                      className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit"
                     >
                       상세
                     </Button>

@@ -229,19 +229,19 @@ export default function ReviewListPage() {
 
         {/* 통계 카드 */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-purple-700">{totalCount}</div>
               <div className="text-sm text-gray-500 mt-1">총 리뷰</div>
             </CardContent>
           </Card>
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-green-700">{visibleCount}</div>
               <div className="text-sm text-gray-500 mt-1">공개</div>
             </CardContent>
           </Card>
-          <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
             <CardContent className="flex flex-col items-center py-6">
               <div className="text-3xl font-bold text-red-700">{hiddenCount}</div>
               <div className="text-sm text-gray-500 mt-1">숨김</div>
@@ -250,7 +250,7 @@ export default function ReviewListPage() {
         </div>
 
         {/* 검색/필터 Card */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <Filter className="w-5 h-5" />
@@ -299,7 +299,7 @@ export default function ReviewListPage() {
         </Card>
 
         {/* 리뷰 목록 Card */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
@@ -309,7 +309,7 @@ export default function ReviewListPage() {
           <CardContent>
             <div className="space-y-4">
               {reviews?.map((review) => (
-                <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm border border-gray-100 transition">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
                       <span className="font-semibold text-lg text-gray-800 truncate max-w-xs" title={review.productName}>{review.productName || '상품명 없음'}</span>
@@ -336,7 +336,7 @@ export default function ReviewListPage() {
                       variant="default"
                       size="sm"
                       onClick={() => router.push(`/admin/review-management/list/${review.reviewId}`)}
-                      className="bg-gray-800 hover:bg-gray-700 w-full"
+                      className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit"
                     >
                       상세보기
                     </Button>

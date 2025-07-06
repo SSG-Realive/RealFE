@@ -83,20 +83,20 @@ export default function QnaDetailPage() {
         <div>
           <button 
             onClick={() => router.back()}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mr-2"
+            className="bg-gray-500 text-white px-4 py-2 rounded !hover:bg-gray-500 !hover:shadow-none !hover:text-inherit mr-2"
           >
             목록으로
           </button>
           <button 
             onClick={handleDelete}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 rounded !hover:bg-red-500 !hover:shadow-none !hover:text-inherit"
           >
             삭제
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-6 mb-6">
+      <div className="bg-white rounded-xl shadow p-6 mb-6 !shadow-sm !hover:shadow-none">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
           <div>
             <div className="text-lg font-bold text-gray-800 mb-1">{qna.title}</div>
@@ -115,20 +115,20 @@ export default function QnaDetailPage() {
       </div>
 
       {!qna.isAnswered ? (
-        <div className="bg-gray-50 rounded-xl shadow p-6 mb-6">
+        <div className="bg-gray-50 rounded-xl shadow p-6 mb-6 !shadow-sm !hover:shadow-none">
           <div className="font-bold mb-2">답변 작성</div>
           <textarea className="w-full border rounded p-2 mb-2" rows={4} value={answer} onChange={e => setAnswer(e.target.value)} placeholder="답변을 입력하세요..." />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors" onClick={handleAnswer}>답변 등록</button>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded !hover:bg-blue-600 !hover:shadow-none !hover:text-inherit" onClick={handleAnswer}>답변 등록</button>
         </div>
       ) : (
-        <div className="bg-green-50 rounded-xl shadow p-6 mb-6">
+        <div className="bg-green-50 rounded-xl shadow p-6 mb-6 !shadow-sm !hover:shadow-none">
           <div className="font-bold mb-2 text-green-800">답변</div>
           <div className="text-base text-gray-700 whitespace-pre-line">{qna.answer}</div>
         </div>
       )}
 
       <div className="mb-4">
-        <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors" onClick={() => router.push('/admin/review-management/seller-qna')}>목록으로</button>
+        <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded !hover:bg-gray-200 !hover:shadow-none !hover:text-inherit" onClick={() => router.push('/admin/review-management/seller-qna')}>목록으로</button>
       </div>
     </div>
   );

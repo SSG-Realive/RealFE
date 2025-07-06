@@ -22,7 +22,7 @@ export default function CategoryFilterInline({ selectedCategoryId, onSelect }: P
     return (
         <div className="flex flex-wrap items-center justify-between mb-6">
             {/* 왼쪽: 전체상품 텍스트 */}
-            <h2 className="text-lg font-light whitespace-nowrap mr-4">전체 상품</h2>
+            <h2 className="text-lg font-bold whitespace-nowrap mr-4">전체 상품</h2>
 
             {/* 오른쪽: 카테고리 버튼들 */}
             <div className="flex flex-wrap gap-2">

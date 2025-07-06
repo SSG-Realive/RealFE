@@ -1,12 +1,11 @@
 'use client';
 
 import Slider from 'react-slick';
-import Link from 'next/link'; // ✅ 링크 추가
+import Link from 'next/link';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const inspirationImages = [
-    { src: '/images/banner9.jpg', link: '/main?category=25' },
     { src: '/images/banner10.jpg', link: '/main?category=25' },
     { src: '/images/banner11.jpg', link: '/main?category=25' },
     { src: '/images/banner12.jpg', link: '/main?category=20' },
@@ -33,7 +32,8 @@ export default function BottomInspirationSlider() {
 
     return (
         <div className="w-full bg-white py-10">
-            <div className="relative w-full overflow-visible max-w-screen-xl mx-auto px-4">
+            {/* ✅ w-full로 확장, padding 제거 */}
+            <div className="relative w-full overflow-visible px-0">
                 <Slider {...settings}>
                     {inspirationImages.map((item, idx) => (
                         <div key={idx} className="px-2">
@@ -43,14 +43,13 @@ export default function BottomInspirationSlider() {
                                         src={item.src}
                                         alt={`인테리어 ${idx + 1}`}
                                         className="
-                      w-full
-                      h-auto
-                      aspect-[4/3]
-                      object-cover
-                      max-h-[140px]
-                      sm:max-h-[180px]
-                      md:max-h-[220px]
-                    "
+  w-full
+  h-[200px]
+  sm:h-[260px]
+  md:h-[320px]
+  object-cover
+  rounded-lg
+"
                                     />
                                 </div>
                             </Link>

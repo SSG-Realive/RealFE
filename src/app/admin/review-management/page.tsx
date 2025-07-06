@@ -139,14 +139,12 @@ export default function ReviewManagementPage() {
           </table>
         </div>
 
-
-
         {/* Q&A 관리 요약 */}
         <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-800">Q&A 관리</h2>
-            <Link href="/admin/review-management/qna" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
-              전체보기 →
+            <Link href="/admin/review-management/seller-qna" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
+              Q&A 관리 전체보기 →
             </Link>
           </div>
           <table className="w-full text-sm text-left">

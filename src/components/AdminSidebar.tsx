@@ -163,7 +163,7 @@ export default function AdminSidebar() {
             <Accordion open={reviewOpen}>
               <ul className="list-none p-0 m-0 ml-7 border-l border-gray-600">
                 <li className="w-full"><Link href="/admin/review-management/list" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/list')}>리뷰 목록</Link></li>
-                <li className="w-full"><Link href="/admin/review-management/qna" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/qna')}>Q&A 관리</Link></li>
+                <li className="w-full"><Link href="/admin/review-management/seller-qna" className="block w-full text-lg px-6 py-4 pl-2 rounded hover:bg-teal-600 transition-colors md:text-base md:px-3 md:py-2 md:pl-6" style={getSubLinkStyle('/admin/review-management/seller-qna')}>Q&A 관리</Link></li>
               </ul>
             </Accordion>
           </li>

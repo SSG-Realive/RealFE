@@ -45,7 +45,7 @@ export default function QnaDetailPage() {
       try {
         await deleteAdminReviewQna(qnaId);
         show("Q&A가 삭제되었습니다.");
-        router.push("/admin/review-management/qna");
+        router.push("/admin/review-management/seller-qna");
       } catch (err: any) {
         console.error("Q&A 삭제 실패:", err);
         show(err.message || "삭제에 실패했습니다.");

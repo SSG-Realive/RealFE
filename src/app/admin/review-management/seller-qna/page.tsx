@@ -202,10 +202,10 @@ export default function ReviewQnaPage() {
                         onClick={() => {
                           console.log('Q&A 상세 버튼 클릭:', qna.id);
                           try {
-                            router.push(`/admin/review-management/qna/${qna.id}`);
+                            router.push(`/admin/review-management/seller-qna/${qna.id}`);
                           } catch (error) {
                             console.error('라우터 에러:', error);
-                            window.location.href = `/admin/review-management/qna/${qna.id}`;
+                            window.location.href = `/admin/review-management/seller-qna/${qna.id}`;
                           }
                         }}
                     >
@@ -261,7 +261,7 @@ export default function ReviewQnaPage() {
               <button
                 className="text-blue-600 underline"
                 onClick={() => {
-                  router.push(`/admin/review-management/qna/${qna.id}`);
+                  router.push(`/admin/review-management/seller-qna/${qna.id}`);
                 }}
               >상세</button>
             </div>

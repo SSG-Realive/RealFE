@@ -27,7 +27,7 @@ export default function QnaDetailPage() {
       const d = data as any;
       setQna({
         ...data,
-        isAnswered: d.isAnswered ?? d.is_answered,
+        isAnswered: d.isAnswered ?? d.is_answered ?? d.answered ?? false,
         answeredAt: d.answeredAt ?? d.answered_at,
         createdAt: d.createdAt ?? d.created_at,
       });

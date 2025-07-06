@@ -24,6 +24,15 @@ export default function ReviewQnaPage() {
   });
   const {show} = useGlobalDialog();
 
+  // snake_case → camelCase 변환 함수
+  const toCamelQna = (qna: any): AdminReviewQna => ({
+    ...qna,
+    isAnswered: qna.isAnswered ?? qna.is_answered ?? qna.answered ?? false,
+    answeredAt: qna.answeredAt ?? qna.answered_at,
+    createdAt: qna.createdAt ?? qna.created_at,
+    updatedAt: qna.updatedAt ?? qna.updated_at,
+  });
+
   // Q&A 목록 조회
   const fetchQnas = async (page: number = 1) => {
     try {
@@ -39,21 +48,17 @@ export default function ReviewQnaPage() {
       };
 
       const response = await getAdminReviewQnaList(params);
-      // camelCase로 매핑 (any로 캐스팅하여 snake_case 접근)
-      setQnas((response.content as any[]).map(qna => ({
-        ...qna,
-        isAnswered: qna.isAnswered ?? qna.is_answered,
-        answeredAt: qna.answeredAt ?? qna.answered_at,
-        createdAt: qna.createdAt ?? qna.created_at,
-      })));
+      // camelCase로 일괄 변환
+      const mappedQnas = (response.content as any[]).map(toCamelQna);
+      setQnas(mappedQnas);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
       
       // 통계 계산
-      const answeredCount = (response.content as any[]).filter(qna => (qna.isAnswered ?? qna.is_answered)).length;
-      const unansweredCount = (response.content as any[]).filter(qna => !(qna.isAnswered ?? qna.is_answered)).length;
+      const answeredCount = mappedQnas.filter(qna => qna.isAnswered).length;
+      const unansweredCount = mappedQnas.filter(qna => !qna.isAnswered).length;
       setStatistics({
-        totalCount: response.content.length,
+        totalCount: mappedQnas.length,
         answeredCount,
         unansweredCount
       });

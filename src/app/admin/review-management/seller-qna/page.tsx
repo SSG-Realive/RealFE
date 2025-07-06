@@ -39,13 +39,19 @@ export default function ReviewQnaPage() {
       };
 
       const response = await getAdminReviewQnaList(params);
-      setQnas(response.content);
+      // camelCase로 매핑 (any로 캐스팅하여 snake_case 접근)
+      setQnas((response.content as any[]).map(qna => ({
+        ...qna,
+        isAnswered: qna.isAnswered ?? qna.is_answered,
+        answeredAt: qna.answeredAt ?? qna.answered_at,
+        createdAt: qna.createdAt ?? qna.created_at,
+      })));
       setTotalPages(response.totalPages);
       setCurrentPage(page);
       
       // 통계 계산
-      const answeredCount = response.content.filter(qna => qna.isAnswered).length;
-      const unansweredCount = response.content.filter(qna => !qna.isAnswered).length;
+      const answeredCount = (response.content as any[]).filter(qna => (qna.isAnswered ?? qna.is_answered)).length;
+      const unansweredCount = (response.content as any[]).filter(qna => !(qna.isAnswered ?? qna.is_answered)).length;
       setStatistics({
         totalCount: response.content.length,
         answeredCount,

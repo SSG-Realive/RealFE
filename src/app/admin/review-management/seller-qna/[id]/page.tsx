@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getAdminReviewQna, deleteAdminReviewQna } from "@/service/admin/reviewService";
+import { getAdminReviewQna, answerAdminReviewQna, deleteAdminReviewQna } from "@/service/admin/reviewService";
 import { AdminReviewQnaDetail } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
 import { useGlobalDialog } from "@/app/context/dialogContext";
@@ -24,7 +24,13 @@ export default function QnaDetailPage() {
       setLoading(true);
       setError(null);
       const data = await getAdminReviewQna(qnaId);
-      setQna(data);
+      const d = data as any;
+      setQna({
+        ...data,
+        isAnswered: d.isAnswered ?? d.is_answered,
+        answeredAt: d.answeredAt ?? d.answered_at,
+        createdAt: d.createdAt ?? d.created_at,
+      });
     } catch (err: any) {
       console.error("Q&A 상세 조회 실패:", err);
       setError(err.message || "Q&A 정보를 불러오는데 실패했습니다.");
@@ -57,7 +63,7 @@ export default function QnaDetailPage() {
   const handleAnswer = async () => {
     if (!qna) return;
     try {
-      await getAdminReviewQna(qnaId, { answer });
+      await answerAdminReviewQna(qnaId, { answer });
       show("답변이 등록되었습니다.");
       fetchQnaDetail();
     } catch (err: any) {
@@ -97,9 +103,8 @@ export default function QnaDetailPage() {
             <div className="text-sm text-gray-500">작성일: {new Date(qna.createdAt).toLocaleString()}</div>
           </div>
           <div className="text-right">
-            <div className="font-bold">{qna.sellerName}</div>
-            <div className="text-xs text-gray-500">{qna.sellerEmail}</div>
-            <div className="text-xs text-gray-400">ID: {qna.sellerId}</div>
+            <div className="font-bold">{qna.userName}</div>
+            <div className="text-xs text-gray-400">ID: {qna.customerId}</div>
           </div>
         </div>
         <div className="text-base text-gray-700 whitespace-pre-line mb-4">{qna.content}</div>

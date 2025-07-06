@@ -140,7 +140,8 @@ export default function SellerAdminQnaPage() {
 
   // 상태별 배지
   const getStatusBadge = (inquiry: AdminInquiryResponse) => {
-    if (inquiry.isAnswered) {
+    const isAnswered = inquiry.isAnswered || !!inquiry.answer || inquiry.status === 'ANSWERED';
+    if (isAnswered) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
           <CheckCircle className="w-3 h-3" />

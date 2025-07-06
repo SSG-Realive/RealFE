@@ -50,6 +50,8 @@ export default function AdminQnaDetailPage() {
         );
     }
 
+    const isAnswered = inquiry && (inquiry.isAnswered || !!inquiry.answer || inquiry.status === 'ANSWERED');
+
     return (
         <>
             <div className="hidden">
@@ -84,15 +86,10 @@ export default function AdminQnaDetailPage() {
                                         <span className="text-[#374151] font-semibold">관리자 문의 상세</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        {inquiry.isAnswered ? (
+                                        {isAnswered && (
                                             <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 flex items-center gap-1">
                                                 <CheckCircle className="w-4 h-4" />
                                                 답변 완료
-                                            </span>
-                                        ) : (
-                                            <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 flex items-center gap-1">
-                                                <Clock className="w-4 h-4" />
-                                                답변 대기
                                             </span>
                                         )}
                                     </div>
@@ -151,7 +148,7 @@ export default function AdminQnaDetailPage() {
                             </div>
 
                             {/* 답변 영역 */}
-                            {inquiry.answer ? (
+                            {isAnswered && (
                                 <div className="bg-white rounded-lg shadow-sm border border-[#d1d5db] p-4 sm:p-6">
                                     <h3 className="text-lg font-semibold text-[#374151] mb-4 flex items-center gap-2">
                                         <CheckCircle className="w-5 h-5 text-green-600" />
@@ -164,25 +161,6 @@ export default function AdminQnaDetailPage() {
                                             {inquiry.answeredBy && <span>답변자 ID: {inquiry.answeredBy}</span>}
                                         </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="bg-yellow-50 rounded-lg shadow-sm border border-yellow-200 p-4 sm:p-6">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Clock className="w-5 h-5 text-yellow-600" />
-                                        <h3 className="text-lg font-semibold text-yellow-800">답변 대기 중</h3>
-                                    </div>
-                                    <p className="text-yellow-700">관리자의 답변을 기다리고 있습니다.</p>
-                                    {inquiry.status && (
-                                        <div className="mt-2">
-                                            <span className="text-sm font-medium text-yellow-800">상태: </span>
-                                            <span className="text-sm text-yellow-700">
-                                                {inquiry.status === 'PENDING' ? '대기중' :
-                                                 inquiry.status === 'IN_PROGRESS' ? '처리중' :
-                                                 inquiry.status === 'ANSWERED' ? '답변완료' :
-                                                 inquiry.status === 'CLOSED' ? '종료' : inquiry.status}
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
                             )}
 

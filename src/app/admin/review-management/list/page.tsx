@@ -42,6 +42,7 @@ export default function ReviewListPage() {
   });
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const {show} = useGlobalDialog();
+  const [totalElements, setTotalElements] = useState(0);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -87,6 +88,7 @@ export default function ReviewListPage() {
       setReviews(response.content);
       setTotalPages(response.totalPages);
       setCurrentPage(page);
+      setTotalElements(response.totalElements ?? 0);
     } catch (err: any) {
       console.error('리뷰 목록 조회 실패:', err);
       console.error('에러 상세 정보:', {
@@ -165,6 +167,11 @@ export default function ReviewListPage() {
     return '#22c55e'; // 초록 (4-5점: 긍정적)
   };
 
+  // 통계 계산 (전체 기준)
+  const totalCount = totalElements ?? 0;
+  const hiddenCount = reviews.filter(r => r.isHidden).length;
+  const visibleCount = totalCount - hiddenCount;
+
   if (loading && !reviews.length) {
     return (
       <div className="h-screen bg-gray-50 flex items-center justify-center">
@@ -197,7 +204,7 @@ export default function ReviewListPage() {
   }
 
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto p-6">
         {/* 헤더 섹션 */}
         <div className="mb-8">
@@ -209,20 +216,12 @@ export default function ReviewListPage() {
                 </div>
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-gray-800">
-                  리뷰 관리
-                </h1>
-                <p className="text-gray-600 text-lg mt-2">
-                  고객 리뷰를 관리하고 모니터링할 수 있습니다.
-                </p>
+                <h1 className="text-4xl font-bold text-gray-800">리뷰 관리</h1>
+                <p className="text-gray-600 text-lg mt-2">고객 리뷰를 관리하고 모니터링할 수 있습니다.</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button 
-                onClick={() => fetchReviews(currentPage)}
-                variant="outline"
-                className="flex items-center space-x-2"
-              >
+              <Button onClick={() => fetchReviews(currentPage)} variant="outline" className="flex items-center space-x-2">
                 <RefreshCw className="w-4 h-4" />
                 <span>새로고침</span>
               </Button>
@@ -230,8 +229,30 @@ export default function ReviewListPage() {
           </div>
         </div>
 
-        {/* 필터 섹션 */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+        {/* 통계 카드 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
+            <CardContent className="flex flex-col items-center py-6">
+              <div className="text-3xl font-bold text-purple-700">{totalCount}</div>
+              <div className="text-sm text-gray-500 mt-1">총 리뷰</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
+            <CardContent className="flex flex-col items-center py-6">
+              <div className="text-3xl font-bold text-green-700">{visibleCount}</div>
+              <div className="text-sm text-gray-500 mt-1">공개</div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
+            <CardContent className="flex flex-col items-center py-6">
+              <div className="text-3xl font-bold text-red-700">{hiddenCount}</div>
+              <div className="text-sm text-gray-500 mt-1">숨김</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 검색/필터 Card */}
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none mb-6">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <Filter className="w-5 h-5" />
@@ -279,8 +300,8 @@ export default function ReviewListPage() {
           </CardContent>
         </Card>
 
-        {/* 리뷰 목록 */}
-        <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+        {/* 리뷰 목록 Card */}
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
@@ -288,159 +309,75 @@ export default function ReviewListPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[600px]">
-              <div className="space-y-4">
-                {reviews?.map((review) => (
-                  <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <h3 className="font-semibold text-lg text-gray-800 truncate max-w-md">
-                            {review.productName || '상품명 없음'}
-                          </h3>
-                          <Badge variant={review.isHidden ? "secondary" : "default"} className="flex items-center gap-1">
-                            {review.isHidden ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                            {review.isHidden ? '숨김' : '공개'}
-                          </Badge>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                          <div className="flex items-center gap-2">
-                            <User className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">고객: {review.customerName}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Store className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">판매자: {review.sellerName}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">
-                              {new Date(review.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-
-                        </div>
-
-                        <div className="mb-4">
-                          <p className="text-gray-700 text-sm leading-relaxed">
-                            {review.contentSummary || review.content || '내용 없음'}
-                          </p>
-                        </div>
-
-                                                 <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-4">
-                             <div className="flex items-center gap-3">
-                               <div className="relative">
-                                 <svg width="32" height="32" viewBox="0 0 32 32">
-                                   <circle
-                                     cx="16"
-                                     cy="16"
-                                     r="14"
-                                     fill={getTrafficLightColor(review.rating)}
-                                     stroke="#d6ccc2"
-                                     strokeWidth="2"
-                                     style={{ 
-                                       filter: 'drop-shadow(0 0 4px rgba(0,0,0,0.1))',
-                                       transition: 'all 0.3s ease'
-                                     }}
-                                   />
-                                 </svg>
-                                 <div className="absolute inset-0 flex items-center justify-center">
-                                   <span className="text-xs font-bold text-white drop-shadow-sm">
-                                     {review.rating.toFixed(1)}
-                                   </span>
-                                 </div>
-                               </div>
-                               <div className="flex flex-col">
-                                 <span className="text-sm font-semibold text-gray-800">{getTrafficLightText(review.rating)}</span>
-                                 <span className="text-xs text-gray-500">{review.rating.toFixed(1)}점</span>
-                               </div>
-                             </div>
-                           </div>
-                          
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleToggleVisibility(review.reviewId, review.isHidden)}
-                              className="flex items-center gap-1"
-                            >
-                              {review.isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                              {review.isHidden ? '공개로 변경' : '숨김으로 변경'}
-                            </Button>
-                            <Button
-                              variant="default"
-                              size="sm"
-                              onClick={() => router.push(`/admin/review-management/list/${review.reviewId}`)}
-                              className="bg-gray-800 hover:bg-gray-700"
-                            >
-                              상세보기
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
+            <div className="space-y-4">
+              {reviews?.map((review) => (
+                <div key={review.reviewId} className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm border border-gray-100 transition">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="font-semibold text-lg text-gray-800 truncate max-w-xs" title={review.productName}>{review.productName || '상품명 없음'}</span>
+                      <Badge variant={review.isHidden ? "secondary" : "default"} className={`ml-2 ${review.isHidden ? 'bg-red-100 text-red-800 border border-red-300' : 'bg-green-100 text-green-800 border border-green-300'}`}>{review.isHidden ? '숨김' : '공개'}</Badge>
                     </div>
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
+                      <span><User className="inline w-4 h-4 mr-1 text-gray-400" />{review.customerName}</span>
+                      <span><Store className="inline w-4 h-4 mr-1 text-gray-400" />판매자: {review.sellerName}</span>
+                      <span><Calendar className="inline w-4 h-4 mr-1 text-gray-400" />{new Date(review.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="text-gray-700 text-sm truncate max-w-2xl" title={review.contentSummary || review.content}>{review.contentSummary || review.content || '내용 없음'}</div>
                   </div>
-                ))}
-                
-                {(!reviews || reviews.length === 0) && !loading && (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <h3 className="text-lg font-medium text-gray-500 mb-2">조회된 리뷰가 없습니다</h3>
-                    <p className="text-gray-400">검색 조건을 변경해보세요.</p>
+                  <div className="flex flex-col items-end gap-2 min-w-[120px]">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleToggleVisibility(review.reviewId, review.isHidden)}
+                      className="flex items-center gap-1"
+                    >
+                      {review.isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                      {review.isHidden ? '공개로 변경' : '숨김으로 변경'}
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => router.push(`/admin/review-management/list/${review.reviewId}`)}
+                      className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit"
+                    >
+                      상세보기
+                    </Button>
                   </div>
-                )}
-              </div>
-            </ScrollArea>
+                </div>
+              ))}
+              {(!reviews || reviews.length === 0) && !loading && (
+                <div className="text-center py-12">
+                  <MessageSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-medium text-gray-500 mb-2">조회된 리뷰가 없습니다</h3>
+                  <p className="text-gray-400">검색 조건을 변경해보세요.</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
         {/* 페이징 */}
         {totalPages > 1 && (
-          <div className="mt-6 flex justify-center">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fetchReviews(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="flex items-center gap-1"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                이전
-              </Button>
-              
-              <div className="flex items-center gap-1">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                  if (page > totalPages) return null;
-                  
-                  return (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => fetchReviews(page)}
-                      className="w-10 h-10"
-                    >
-                      {page}
-                    </Button>
-                  );
-                })}
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fetchReviews(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="flex items-center gap-1"
-              >
-                다음
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
+          <div className="mt-8 flex justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => fetchReviews(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              <ChevronLeft className="w-4 h-4" /> 이전
+            </Button>
+            <span className="px-3 py-1 text-gray-700 font-semibold">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              onClick={() => fetchReviews(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50"
+            >
+              다음 <ChevronRight className="w-4 h-4" />
+            </Button>
           </div>
         )}
       </div>

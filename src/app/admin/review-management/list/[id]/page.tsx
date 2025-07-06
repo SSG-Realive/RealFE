@@ -96,7 +96,7 @@ export default function ReviewDetailPage() {
           <h3 className="text-2xl font-bold text-gray-800 mb-4">오류가 발생했습니다</h3>
           <p className="text-gray-600 text-lg mb-8">{error}</p>
           <div className="flex gap-4 justify-center">
-            <Button onClick={() => fetchReviewDetail()} className="bg-gray-800 hover:bg-gray-700">
+            <Button onClick={() => fetchReviewDetail()} className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit">
               <RefreshCw className="w-4 h-4 mr-2" />
               다시 시도
             </Button>
@@ -119,7 +119,7 @@ export default function ReviewDetailPage() {
           </div>
           <h3 className="text-2xl font-bold text-gray-800 mb-4">리뷰를 찾을 수 없습니다</h3>
           <p className="text-gray-600 text-lg mb-8">요청하신 리뷰 정보가 존재하지 않습니다.</p>
-          <Button onClick={() => router.back()} className="bg-gray-800 hover:bg-gray-700">
+          <Button onClick={() => router.back()} className="bg-gray-800 w-full !hover:bg-gray-800 !hover:shadow-none !hover:text-inherit">
             <ArrowLeft className="w-4 h-4 mr-2" />
             목록으로 돌아가기
           </Button>
@@ -170,7 +170,7 @@ export default function ReviewDetailPage() {
           {/* 메인 콘텐츠 */}
           <div className="lg:col-span-2 space-y-6">
             {/* 리뷰 정보 카드 */}
-            <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
@@ -280,7 +280,7 @@ export default function ReviewDetailPage() {
             </Card>
 
             {/* 리뷰 내용 카드 */}
-            <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
@@ -301,7 +301,7 @@ export default function ReviewDetailPage() {
           <div className="space-y-6">
             {/* 상품 이미지 카드 */}
             {review.productImage && (
-              <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
                 <CardHeader>
                   <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
                     <Package className="w-4 h-4" />
@@ -323,7 +323,7 @@ export default function ReviewDetailPage() {
             
 
             {/* 액션 카드 */}
-            <Card className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
               <CardHeader>
                 <CardTitle className="text-lg font-bold text-gray-800">
                   액션

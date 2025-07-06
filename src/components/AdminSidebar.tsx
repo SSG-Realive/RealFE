@@ -148,10 +148,12 @@ export default function AdminSidebar() {
             </Link>
           </li>
           <li className="my-2">
-            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold" style={getLinkStyle('/admin/review-management')}>
-              <Link href="/admin/review-management" className="flex-1 no-underline text-inherit">
+            <div className="flex items-center px-4 py-3 rounded hover:bg-teal-600 transition-colors text-lg font-semibold cursor-pointer" style={getLinkStyle('/admin/review-management')}
+              onClick={() => setReviewOpen(v => !v)}
+            >
+              <span className="flex-1 no-underline text-inherit select-none">
                 고객 피드백
-              </Link>
+              </span>
               <button
                 aria-label="리뷰 하위 메뉴 열기"
                 onClick={(e) => { e.stopPropagation(); e.preventDefault(); setReviewOpen(v => !v); }}

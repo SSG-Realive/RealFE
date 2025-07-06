@@ -13,28 +13,33 @@ export default function ProductImage({
                                          alt,
                                          className = '',
                                      }: ProductImageProps) {
-    const fallback1 = '/images/placeholder.jpg';      // 1차 fallback
-    const fallback2 = '/images/placeholder.png';          // 2차 fallback
+    const fallback1 = '/images/placeholder.jpg';
+    const fallback2 = '/images/placeholder.png';
 
     const [currentSrc, setCurrentSrc] = useState(src || fallback1);
     const [errorCount, setErrorCount] = useState(0);
 
     const handleError = () => {
         if (errorCount === 0) {
-            setCurrentSrc(fallback1); // 1차 실패 → fallback1
+            setCurrentSrc(fallback1);
             setErrorCount(1);
         } else if (errorCount === 1) {
-            setCurrentSrc(fallback2); // 2차 실패 → fallback2
+            setCurrentSrc(fallback2);
             setErrorCount(2);
         }
     };
 
     return (
-        <img
-            src={currentSrc}
-            alt={alt}
-            onError={handleError}
-            className={`object-cover rounded-lg ${className}`}
-        />
+        <div className={`w-full h-full overflow-hidden flex items-center justify-center bg-white ${className}`}>
+            <img
+                src={currentSrc}
+                alt={alt}
+                onError={handleError}
+                loading="lazy"
+                className="w-full h-full object-cover"
+                decoding="async"
+                sizes="(max-width: 768px) 50vw, 25vw" // 모바일에서는 50%, PC에서는 25%
+            />
+        </div>
     );
 }

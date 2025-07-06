@@ -17,6 +17,11 @@ export default function ReviewQnaPage() {
   const [answeredFilter, setAnsweredFilter] = useState<string>("");
   const [selectedQna, setSelectedQna] = useState<AdminReviewQna | null>(null);
   const [answerText, setAnswerText] = useState("");
+  const [statistics, setStatistics] = useState<{ totalCount: number; answeredCount: number; unansweredCount: number }>({
+    totalCount: 0,
+    answeredCount: 0,
+    unansweredCount: 0
+  });
   const {show} = useGlobalDialog();
 
   // Q&A 목록 조회
@@ -34,9 +39,24 @@ export default function ReviewQnaPage() {
       };
 
       const response = await getAdminReviewQnaList(params);
-      setQnas(response.content);
+      // camelCase로 매핑 (any로 캐스팅하여 snake_case 접근)
+      setQnas((response.content as any[]).map(qna => ({
+        ...qna,
+        isAnswered: qna.isAnswered ?? qna.is_answered,
+        answeredAt: qna.answeredAt ?? qna.answered_at,
+        createdAt: qna.createdAt ?? qna.created_at,
+      })));
       setTotalPages(response.totalPages);
       setCurrentPage(page);
+      
+      // 통계 계산
+      const answeredCount = (response.content as any[]).filter(qna => (qna.isAnswered ?? qna.is_answered)).length;
+      const unansweredCount = (response.content as any[]).filter(qna => !(qna.isAnswered ?? qna.is_answered)).length;
+      setStatistics({
+        totalCount: response.content.length,
+        answeredCount,
+        unansweredCount
+      });
     } catch (err: any) {
       console.error('Q&A 목록 조회 실패:', err);
       setError(err.message || 'Q&A 목록을 불러오는데 실패했습니다.');
@@ -163,6 +183,22 @@ export default function ReviewQnaPage() {
           </button>
         </div>
 
+        {/* 상단 통계 영역 개선 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div className="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+            <div className="text-2xl font-bold text-purple-700">{statistics?.totalCount ?? 0}</div>
+            <div className="text-sm text-gray-500 mt-1">총 문의</div>
+          </div>
+          <div className="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+            <div className="text-2xl font-bold text-green-700">{statistics?.answeredCount ?? 0}</div>
+            <div className="text-sm text-gray-500 mt-1">답변완료</div>
+          </div>
+          <div className="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+            <div className="text-2xl font-bold text-red-700">{statistics?.unansweredCount ?? 0}</div>
+            <div className="text-sm text-gray-500 mt-1">미답변</div>
+          </div>
+        </div>
+
         {/* Q&A 테이블 */}
         <div className="overflow-x-auto w-full">
           <table className="min-w-[900px] w-full border text-sm">
@@ -179,7 +215,7 @@ export default function ReviewQnaPage() {
             </thead>
             <tbody>
                 {qnas?.map(qna => (
-                  <tr key={qna.id} className="hover:bg-gray-50">
+                  <tr key={qna.id} className="hover:bg-blue-50 transition rounded-xl shadow-sm">
                     <td className="whitespace-nowrap px-2 py-2 text-xs">{qna.productName}</td>
                     <td className="whitespace-nowrap px-2 py-2 text-xs max-w-xs truncate" title={qna.title}>
                       {qna.title}
@@ -191,29 +227,27 @@ export default function ReviewQnaPage() {
                     <td className={`whitespace-nowrap px-2 py-2 text-center ${getStatusStyle(qna.status)}`}>
                       {getStatusText(qna.status)}
                     </td>
-                    <td className="whitespace-nowrap px-2 py-2 text-center">
-                      <span className={qna.isAnswered ? 'text-green-600' : 'text-red-600'}>
-                        {qna.isAnswered ? '답변완료' : '미답변'}
-                      </span>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${qna.isAnswered ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`}>{qna.isAnswered ? "답변완료" : "미답변"}</span>
                     </td>
                     <td className="whitespace-nowrap px-2 py-2 text-center">
-                    <button 
+                      <button 
                         className="text-blue-600 underline hover:text-blue-800" 
                         onClick={() => {
                           console.log('Q&A 상세 버튼 클릭:', qna.id);
                           try {
-                            router.push(`/admin/review-management/qna/${qna.id}`);
+                            router.push(`/admin/review-management/seller-qna/${qna.id}`);
                           } catch (error) {
                             console.error('라우터 에러:', error);
-                            window.location.href = `/admin/review-management/qna/${qna.id}`;
+                            window.location.href = `/admin/review-management/seller-qna/${qna.id}`;
                           }
                         }}
-                    >
+                      >
                         상세
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -261,7 +295,7 @@ export default function ReviewQnaPage() {
               <button
                 className="text-blue-600 underline"
                 onClick={() => {
-                  router.push(`/admin/review-management/qna/${qna.id}`);
+                  router.push(`/admin/review-management/seller-qna/${qna.id}`);
                 }}
               >상세</button>
             </div>

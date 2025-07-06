@@ -12,7 +12,7 @@ const pathTitleMap: { path: string; title: string }[] = [
   { path: '/admin/auction-management/register', title: '경매 등록' },
   { path: '/admin/review-management/list', title: '리뷰 목록' },
   { path: '/admin/review-management/reported', title: '리뷰 신고 관리' },
-  { path: '/admin/review-management/qna', title: 'Q&A 관리' },
+  { path: '/admin/review-management/seller-qna', title: 'Q&A 관리' },
   { path: '/admin/customers', title: '회원' },
   { path: '/admin/auction-management', title: '경매' },
   { path: '/admin/review-management', title: '리뷰' },

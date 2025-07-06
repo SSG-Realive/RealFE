@@ -4,15 +4,14 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
-import { getAdminReviewList, getAdminReviewReportList, getAdminReviewQnaList } from "@/service/admin/reviewService";
-import { AdminReview, AdminReviewReport, AdminReviewQna, ReviewReportStatus } from "@/types/admin/review";
+import { getAdminReviewList, getAdminReviewQnaList } from "@/service/admin/reviewService";
+import { AdminReview, AdminReviewQna } from "@/types/admin/review";
 import { useAdminAuthStore } from "@/store/admin/useAdminAuthStore";
 
 export default function ReviewManagementPage() {
   const router = useRouter();
   const { accessToken } = useAdminAuthStore();
   const [reviews, setReviews] = useState<AdminReview[]>([]);
-  const [reports, setReports] = useState<AdminReviewReport[]>([]);
   const [qnas, setQnas] = useState<AdminReviewQna[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,14 +29,6 @@ export default function ReviewManagementPage() {
         sort: 'createdAt,desc',
       });
 
-      // 신고 목록 (최신 5개)
-      const reportResponse = await getAdminReviewReportList({
-        page: 0,
-        size: 5,
-        status: 'PENDING',
-        sort: 'createdAt,desc'
-      });
-
       // Q&A 목록 (최신 5개)
       const qnaResponse = await getAdminReviewQnaList({
         page: 0,
@@ -45,7 +36,6 @@ export default function ReviewManagementPage() {
       });
 
       setReviews(reviewResponse.content);
-      setReports(reportResponse.content);
       setQnas(qnaResponse.content);
     } catch (err: any) {
       console.error('데이터 조회 실패:', err);
@@ -77,18 +67,6 @@ export default function ReviewManagementPage() {
     return isHidden ? '숨김' : '공개';
   };
 
-  const getReportStatusText = (status: ReviewReportStatus) => {
-    switch (status) {
-      case 'PENDING': return '접수됨';
-      case 'UNDER_REVIEW': return '검토 중';
-      case 'RESOLVED_KEPT': return '리뷰 유지';
-      case 'RESOLVED_HIDDEN': return '리뷰 숨김';
-      case 'RESOLVED_REJECTED': return '신고 기각';
-      case 'REPORTER_ACCOUNT_INACTIVE': return '신고자 계정 비활성';
-      default: return status;
-    }
-  };
-
   const getQnaStatusText = (isAnswered: boolean) => {
     return isAnswered ? '답변완료' : '미답변';
   };
@@ -96,18 +74,6 @@ export default function ReviewManagementPage() {
   // 상태별 스타일
   const getReviewStatusStyle = (isHidden: boolean) => {
     return isHidden ? 'text-gray-600' : 'text-green-600';
-  };
-
-  const getReportStatusStyle = (status: ReviewReportStatus) => {
-    switch (status) {
-      case 'PENDING': return 'text-yellow-600';
-      case 'UNDER_REVIEW': return 'text-blue-600';
-      case 'RESOLVED_KEPT': return 'text-green-600';
-      case 'RESOLVED_HIDDEN': return 'text-red-600';
-      case 'RESOLVED_REJECTED': return 'text-gray-600';
-      case 'REPORTER_ACCOUNT_INACTIVE': return 'text-red-800';
-      default: return '';
-    }
   };
 
   const getQnaStatusStyle = (isAnswered: boolean) => {
@@ -173,42 +139,12 @@ export default function ReviewManagementPage() {
           </table>
         </div>
 
-        {/* 리뷰 신고 관리 요약 */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-gray-800">리뷰 신고 관리</h2>
-            <Link href="/admin/review-management/reported" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
-              전체보기 →
-            </Link>
-          </div>
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th scope="col" className="px-4 py-2">작성자</th>
-                <th scope="col" className="px-4 py-2">사유</th>
-                <th scope="col" className="px-4 py-2">상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reports?.slice(0, 5).map(report => (
-                <tr key={report.reportId} onClick={() => router.push(`/admin/review-management/reported/${report.reportId}`)} className="bg-white border-b hover:bg-gray-50 cursor-pointer">
-                  <td className="px-4 py-2">{report.reporterName}</td>
-                  <td className="px-4 py-2 truncate" title={report.reason}>{report.reason}</td>
-                  <td className={`px-4 py-2 font-semibold ${getReportStatusStyle(report.status)}`}>
-                    {getReportStatusText(report.status)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
         {/* Q&A 관리 요약 */}
         <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold text-gray-800">Q&A 관리</h2>
-            <Link href="/admin/review-management/qna" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
-              전체보기 →
+            <Link href="/admin/review-management/seller-qna" className="text-sm font-semibold text-blue-600 hover:text-blue-800">
+              Q&A 관리 전체보기 →
             </Link>
           </div>
           <table className="w-full text-sm text-left">
@@ -244,14 +180,7 @@ export default function ReviewManagementPage() {
               <div className="text-2xl font-bold">{reviews.length}</div>
             </CardContent>
           </Card>
-          <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">신고된 리뷰</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{reports.length}</div>
-            </CardContent>
-          </Card>
+
           <Card className="rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">미답변 Q&A</CardTitle>

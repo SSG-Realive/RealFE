@@ -65,8 +65,8 @@ export const processAdminReviewReport = async (reportId: number, request: AdminR
 
 // 리뷰 Q&A 목록 조회
 export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): Promise<AdminReviewQnaListResponse> => {
-  console.log('Q&A 목록 API 호출:', '/admin/qna/customer', params);
-  const response = await adminApi.get('/admin/qna/customer', { 
+  console.log('Q&A 목록 API 호출:', '/admin/seller-qna', params);
+  const response = await adminApi.get('/admin/seller-qna', { 
     params,
     paramsSerializer,
   });
@@ -76,25 +76,25 @@ export const getAdminReviewQnaList = async (params: AdminReviewQnaListRequest): 
 
 // 리뷰 Q&A 상세 조회
 export const getAdminReviewQna = async (qnaId: number): Promise<AdminReviewQnaDetail> => {
-  console.log('Q&A 상세 API 호출:', `/admin/qna/customer/${qnaId}`);
-  const response = await adminApi.get(`/admin/qna/customer/${qnaId}`);
+  console.log('Q&A 상세 API 호출:', `/admin/seller-qna/${qnaId}`);
+  const response = await adminApi.get(`/admin/seller-qna/${qnaId}`);
   console.log('Q&A 상세 API 응답:', response.data);
   return response.data.data || response.data;
 };
 
 // 리뷰 Q&A 답변 등록
 export const answerAdminReviewQna = async (qnaId: number, request: AdminReviewQnaAnswerRequest): Promise<void> => {
-  console.log('Q&A 답변 등록 API 호출:', `/admin/qna/customer/${qnaId}`, request);
-  const response = await adminApi.patch(`/admin/qna/customer/${qnaId}`, request);
+  console.log('Q&A 답변 등록 API 호출:', `/admin/seller-qna/${qnaId}/answer`, request);
+  const response = await adminApi.post(`/admin/seller-qna/${qnaId}/answer`, request);
   console.log('Q&A 답변 등록 API 응답:', response.data);
 };
 
 // Q&A 삭제
 export const deleteAdminReviewQna = async (qnaId: number): Promise<void> => {
-  await adminApi.delete(`/admin/qna/customer/${qnaId}`);
+  await adminApi.delete(`/admin/seller-qna/${qnaId}`);
 };
 
 // 리뷰 Q&A 상태 변경
 export const updateAdminReviewQnaStatus = async (qnaId: number, isHidden: boolean): Promise<void> => {
-  await adminApi.patch(`/admin/qna/customer/${qnaId}`, { isHidden });
+  await adminApi.patch(`/admin/seller-qna/${qnaId}`, { isHidden });
 }; 

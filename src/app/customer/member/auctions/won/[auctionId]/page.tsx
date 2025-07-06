@@ -16,6 +16,8 @@ interface AuctionWinnerDetail {
   bidTime: string;
   paymentDue: string;
   adminProduct: AdminProductDTO;
+  paid?: boolean;
+  paymentStatus?: string;
 }
 
 const useCountdown = (targetDate?: string | null) => {
@@ -79,8 +81,12 @@ export default function WonAuctionDetailPage() {
     if (!auctionId || !isAuthenticated) return;
     customerApi
         .get<AuctionWinnerDetail>(`/customer/auctions/${auctionId}/winner-detail`)
-        .then((res) => setData(res.data))
+        .then((res) => {
+          console.log('API 응답:', res.data);
+          setData(res.data);
+        })
         .catch((err) => {
+          console.error('API 오류:', err);
           const msg = err.response?.data?.message || '데이터를 불러오지 못했습니다.';
           setError(msg);
         });
@@ -131,25 +137,33 @@ export default function WonAuctionDetailPage() {
                   </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">결제 마감까지</span>
-                    {isExpired ? (
+                    <span className="text-gray-600">결제 상태</span>
+                    {data.paid ? (
+                        <span className="font-light text-green-600">결제 완료</span>
+                    ) : isExpired ? (
                         <span className="font-light text-gray-500">마감되었습니다</span>
                     ) : (
                         <span className="font-light text-red-500 animate-pulse">
-                      {days}일 {hours}시간 {minutes}분 남음
+                      결제 마감까지 {days}일 {hours}시간 {minutes}분 남음
                     </span>
                     )}
                   </div>
                 </div>
 
                 <div className="mt-auto pt-6">
-                  <button
-                      onClick={handlePay}
-                      disabled={isExpired}
-                      className="w-full py-3 bg-black text-white rounded-none text-sm font-medium hover:bg-neutral-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    {isExpired ? '결제 기간 만료' : '결제하기'}
-                  </button>
+                  {data.paid ? (
+                    <div className="w-full py-3 bg-green-600 text-white rounded-none text-sm font-medium text-center">
+                      결제 완료
+                    </div>
+                  ) : (
+                    <button
+                        onClick={handlePay}
+                        disabled={isExpired}
+                        className="w-full py-3 bg-black text-white rounded-none text-sm font-medium hover:bg-neutral-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {isExpired ? '결제 기간 만료' : '결제하기'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

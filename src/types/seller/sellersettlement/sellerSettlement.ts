@@ -9,6 +9,19 @@ export interface SellerSettlementResponse {
     processedAt: string;
 }
 
+// 페이지 응답 타입 추가
+export interface PageResponse<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
+    first: boolean;
+    last: boolean;
+    numberOfElements: number;
+    empty: boolean;
+}
+
 // 정산 상세 정보를 위한 새로운 타입들
 export interface PayoutLogDetailResponse {
     payoutInfo: PayoutLogInfo;

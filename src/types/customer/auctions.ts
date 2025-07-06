@@ -1,4 +1,5 @@
 //types/customer/auctions.ts
+import type { AdminProduct } from './adminProduct';
 
 export interface Auction {
   id: number;
@@ -9,11 +10,9 @@ export interface Auction {
   endTime: string;
   status: string;
   createdAt?: string;
-  adminProduct: {
-    productName: string | null;
-    imageUrl?: string | null;
-  } | null;
+  adminProduct: AdminProduct | null;
 }
+
 
 export interface ApiResponse<T> {
   status: number;

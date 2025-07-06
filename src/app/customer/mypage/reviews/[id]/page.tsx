@@ -88,21 +88,23 @@ export default function ReviewDetailPage() {
                     </div>
 
                     {/* 본문 */}
-                    <p className="text-gray-800 whitespace-pre-line mb-6 border border-gray-200 rounded-none px-6 py-5 leading-relaxed text-base bg-white">
+                    <p
+                        className="text-gray-800 whitespace-pre-line mb-6 border border-gray-200 rounded-mdpx-6 py-6 leading-relaxed text-base bg-white min-h-[250px]"
+                    >
                         {review.content}
                     </p>
 
                     {/* 버튼 */}
-                    <div className="flex justify-end gap-3 mt-auto">
+                    <div className="flex gap-2 mt-auto">
                         <button
                             onClick={() => router.push(`/customer/mypage/reviews/${id}/edit`)}
-                            className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-600"
+                            className="w-1/2 px-4 py-2 bg-black text-white rounded hover:bg-neutral-800"
                         >
                             수정
                         </button>
                         <button
                             onClick={handleDelete}
-                            className="px-4 py-2 bg-rose-900 text-white rounded hover:bg-red-600"
+                            className="w-1/2 px-4 py-2 bg-black text-white rounded hover:bg-neutral-800"
                         >
                             삭제
                         </button>

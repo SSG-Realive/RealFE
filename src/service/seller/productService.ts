@@ -76,8 +76,8 @@ export async function getMyProducts(searchParams: Record<string, any> = {}): Pro
     console.log('- 입력 파라미터:', searchParams);
     console.log('- 생성된 쿼리:', query);
     console.log('- 최종 URL:', `/seller/products?${query}`);
-    
-    const res = await sellerApi.get(`/seller/products?${query}`);
+
+  const res = await sellerApi.get(`/seller/products?${query}`);
     const data = res.data;
     
     console.log('📦 API 응답 디버깅:');

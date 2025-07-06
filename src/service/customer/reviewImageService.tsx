@@ -1,5 +1,7 @@
 import apiClient from '@/lib/apiClient';
 
+// 이미지 업로드 - 파일 여러 개 개별 업로드
+// reviewImageService.ts
 export async function uploadReviewImages(
   files: File[] | null | undefined,
   reviewId?: number
@@ -21,6 +23,7 @@ export async function uploadReviewImages(
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
+      // 응답 구조가 { url: string }일 경우
       const uploadedUrl = res.data.url ?? res.data;
       urls.push(uploadedUrl);
     } catch (error) {
@@ -31,6 +34,8 @@ export async function uploadReviewImages(
   return urls;
 }
 
+
+// 이미지 삭제 - 서버 API에 맞게 URL 또는 ID로 삭제 요청
 export async function deleteReviewImage(imageUrl: string): Promise<void> {
   await apiClient.delete('/customer/reviews/images/delete', {
     params: { imageUrl },

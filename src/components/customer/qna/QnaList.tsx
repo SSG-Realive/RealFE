@@ -18,7 +18,7 @@ export default function QnaList({ qnas, initialDisplayCount = 3 }: QnaListProps)
         <div className="space-y-4">
             {displayedQnas.length > 0 ? (
                 displayedQnas.map((qna) => (
-                    <div key={qna.id} className="border p-4 rounded-md shadow-sm bg-white">
+                    <div key={qna.id} className="p-4 bg-white rounded-md shadow-sm">
                         <div className="flex justify-between items-start mb-2">
                             <h3 className="font-medium text-base text-gray-900 break-words pr-4">{qna.title}</h3>
                             <span className="text-xs text-gray-500 flex-shrink-0">{new Date(qna.createdAt).toLocaleDateString()}</span>

@@ -1,7 +1,19 @@
 // 경매 관련 타입 정의
-export interface AuctionResponseDTO {
-    name: any;
+export interface AdminProduct {
   id: number;
+  productId: number;
+  productName: string;
+  productDescription: string;
+  purchasePrice: number;
+  purchasedFromSellerId: number | null;
+  purchasedAt: string;
+  auctioned: boolean;
+  imageThumbnailUrl: string;
+  imageUrls: string[];
+}
+export interface AuctionResponseDTO {
+  id: number;
+  name: any;
   startPrice: number;
   currentPrice: number;
   startTime: string;
@@ -10,17 +22,7 @@ export interface AuctionResponseDTO {
   statusText?: string;
   createdAt: string;
   updatedAt: string;
-  adminProduct: {
-    id: number;
-    productId: number;
-    productName: string;
-    productDescription: string;
-    purchasePrice: number;
-    purchasedFromSellerId: number | null;
-    purchasedAt: string;
-    auctioned: boolean;
-    imageThumbnailUrl: string;
-  };
+  adminProduct: AdminProduct;
 }
 
 export interface AuctionCreateRequestDTO {
@@ -32,15 +34,8 @@ export interface AuctionCreateRequestDTO {
 
 export interface AuctionUpdateRequestDTO {
   id: number;
-  name: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  startPrice: number;
-  buyNowPrice?: number;
-  category: string;
-  sellerId: number;
-  productId: number;
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface AuctionCancelResponseDTO {
@@ -53,12 +48,10 @@ export interface AuctionCancelResponseDTO {
 export interface BidResponseDTO {
   id: number;
   auctionId: number;
-  auctionName: string;
   customerId: number;
   customerName: string;
-  bidAmount: number;
+  bidPrice: number;
   bidTime: string;
-  isWinning: boolean;
 }
 
 export interface PageResponse<T> {

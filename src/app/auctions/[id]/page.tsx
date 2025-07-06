@@ -1,7 +1,7 @@
 'use client';
 
 /* ──────────── imports ──────────── */
-import { useState, useEffect, FormEvent, useCallback } from 'react';
+import { useState, useEffect, FormEvent, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 
 import {
@@ -38,6 +38,7 @@ export default function AuctionDetailPage() {
   const [error,         setError]         = useState<string | null>(null);
   const [bidError,      setBidError]      = useState<string | null>(null);
   const [isLeading,     setIsLeading]     = useState(false);
+  const [mainImage,     setMainImage]     = useState<string>('');
 
   /* 다이얼로그 & confirm */
   const { show, open, message, handleClose } = useGlobalDialog();
@@ -69,15 +70,19 @@ export default function AuctionDetailPage() {
       setAuction(auctionDetails);
       setBids(bidsRes.content);
       setTickSize(tickSizeRes);
+      setMainImage(
+          auctionDetails.adminProduct?.imageThumbnailUrl ||
+          auctionDetails.adminProduct?.imageUrls?.[0] ||
+          '/images/placeholder.png'
+      );
 
       const filtered = othersRes.content.filter((a) => a.id !== auctionId);
       setOtherAuctions(filtered);
 
-      /* 최고 입찰자인지 계산 */
       if (bidsRes.content.length) {
         const topBid = bidsRes.content.reduce(
-          (max, cur) => (cur.bidPrice > max.bidPrice ? cur : max),
-          bidsRes.content[0],
+            (max, cur) => (cur.bidPrice > max.bidPrice ? cur : max),
+            bidsRes.content[0],
         );
         setIsLeading(topBid.customerId === myId);
       } else {
@@ -94,6 +99,12 @@ export default function AuctionDetailPage() {
   useEffect(() => {
     if (accessToken) fetchData();
   }, [accessToken, fetchData]);
+
+  const imageList = useMemo(() => {
+    const images = auction?.adminProduct?.imageUrls ?? [];
+    const thumbnail = auction?.adminProduct?.imageThumbnailUrl;
+    return thumbnail ? [thumbnail, ...images] : images;
+  }, [auction]);
 
   if (!accessToken) return null;
 
@@ -113,7 +124,7 @@ export default function AuctionDetailPage() {
   else if (!isStepOK)         helperText = `${tickSize?.toLocaleString()}원 단위로 입력`;
 
   const btnDisabled =
-    auction?.status !== 'PROCEEDING' || isLoading || isLeading || !amountValid;
+      auction?.status !== 'PROCEEDING' || isLoading || isLeading || !amountValid;
 
   /* -------------------------------------------------- */
   /* 입찰 제출 */
@@ -162,16 +173,37 @@ export default function AuctionDetailPage() {
 
         <div className="container mx-auto p-4 md:p-6 text-sm">
           {/* ---------- 상단 ---------- */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className="max-w-6xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 이미지 */}
             <div>
-              <div className="bg-gray-100 overflow-hidden aspect-[4/3] max-h-[400px]">
+              <div className="w-full aspect-square bg-white overflow-hidden shadow-sm">
                 <img
-                    src={auction.adminProduct?.imageUrl || '/images/placeholder.png'}
+                    src={mainImage}
                     alt={auction.adminProduct?.productName || '상품 이미지'}
                     className="w-full h-full object-contain"
                 />
               </div>
+              {imageList.length > 0 && (
+                  <div className="mt-4">
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                      {imageList.map((url, idx) => (
+                          <button
+                              key={idx}
+                              onClick={() => setMainImage(url)}
+                              className={`flex-shrink-0 w-20 h-20 overflow-hidden border transition-all duration-200 ${
+                                  mainImage === url ? 'border-gray-400' : 'border-transparent'
+                              }`}
+                          >
+                            <img
+                                src={url}
+                                alt={`서브 이미지 ${idx + 1}`}
+                                className="w-full h-full object-cover"
+                            />
+                          </button>
+                      ))}
+                    </div>
+                  </div>
+              )}
             </div>
 
             {/* 정보 + 입찰 */}
@@ -227,7 +259,7 @@ export default function AuctionDetailPage() {
               <div className="mt-6">
                 <h3 className="text-base font-light mb-1">입찰 내역</h3>
                 <ul className="space-y-2 max-h-60 overflow-y-auto mt-2">
-                {bids.length ? (
+                  {bids.length ? (
                       bids.map((b) => (
                           <li
                               key={b.id}

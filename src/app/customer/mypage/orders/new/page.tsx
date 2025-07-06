@@ -161,7 +161,6 @@ export default function NewOrderPage() {
 
       <div className="min-h-screen bg-white pb-24 lg:pb-0">
         <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-          <h1 className="text-xl lg:text-3xl font-light mb-6">주문·결제</h1>
           <div className="space-y-6">
             {/* ── 배송지 ── */}
             <section className="rounded-lg bg-white p-6 shadow-sm">

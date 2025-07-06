@@ -34,7 +34,7 @@ function BidCard({
   return (
     <div
       onClick={() => router.push(`/auctions/${bid.auctionId}`)}
-      className="flex gap-4 p-4 border rounded-lg hover:shadow transition
+      className="flex gap-4 p-4 rounded-lg hover:shadow transition
                  cursor-pointer"
     >
       {/* 썸네일 */}
@@ -135,8 +135,6 @@ export default function MyBidCardsPage() {
       <GlobalDialog open={open} message={message} onClose={handleClose} />
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-light mb-6">나의 입찰 현황</h1>
-
         {/* 카드 그리드 */}
         {cards.length === 0 && !loading ? (
           <p className="text-gray-600">참여한 경매가 없습니다.</p>
@@ -156,8 +154,8 @@ export default function MyBidCardsPage() {
         {/* 하단 마퀴 슬라이더 */}
         {publicAuctions.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-lg font-light mb-3">
-              함께 진행 중인 다른 경매
+            <h2 className="text-sm font-light text-gray-400 mb-3">
+              놓치면 아쉬운 다른 경매들도 있어요
             </h2>
             <AuctionCard auctions={publicAuctions} />
           </section>

@@ -17,7 +17,7 @@ import ClientSellerDetails from './ClientSellerDetails';
 import ImageWithFallback from '@/components/common/imageWithFallback';
 import { getTrafficLightText } from '@/types/admin/review';
 
-export const dynamic = "force-dynamic"; 
+export const dynamic = "force-dynamic";
 
 const getRatingColor = (rating: number): string => {
     if (rating >= 66.1) return 'bg-green-500';
@@ -34,7 +34,7 @@ interface SellerDetailPageProps {
 export default async function SellerDetailPage({ params }: SellerDetailPageProps) {
     const { id } = await params;
     const productId = parseInt(id, 10);
-    
+
     if (isNaN(productId)) {
         return (
             <div className="flex justify-center items-center h-screen text-red-500 text-xl font-light">
@@ -102,8 +102,8 @@ function SmallTrafficLightCard({ rating, title, count }: { rating: number; title
         />
       </svg>
       <div className="flex flex-col text-center sm:text-center">
-        <div className="text-xs sm:text-sm font-semibold text-gray-700">{title}</div>
-        <div className="text-sm sm:text-base font-semibold text-gray-900">
+        <div className="text-xs sm:text-sm font-light text-gray-700">{title}</div>
+        <div className="text-sm sm:text-base font-light text-gray-900">
           {isNoReview ? '평가 없음' : getTrafficLightText(rating)}
         </div>
         <div className="text-[9px] sm:text-xs text-gray-500 mt-1">리뷰 {count ?? 0}건</div>
@@ -135,21 +135,21 @@ function SmallTrafficLightCard({ rating, title, count }: { rating: number; title
               </div>
 
               <div>
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{seller.name}</h1>
+                <h1 className="text-xl font-light text-gray-800 mb-2">{seller.name}</h1>
                 <div className="text-sm text-gray-600 mb-1">
-                  <span className="font-medium text-gray-700">연락처:</span> {seller.contactNumber || '정보 없음'}
+                  <span className="font-light text-gray-700">연락처:</span> {seller.contactNumber || '정보 없음'}
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
-                  <span className="font-medium text-gray-700">사업자 번호:</span> {seller.businessNumber || '정보 없음'}
+                  <span className="font-light text-gray-700">사업자 번호:</span> {seller.businessNumber || '정보 없음'}
                 </div>
                 <div className="text-sm text-gray-600 mb-1">
-                  <span className="font-medium text-gray-700">가입일:</span>{' '}
+                  <span className="font-light text-gray-700">가입일:</span>{' '}
                   {seller.createdAt
                     ? new Date(seller.createdAt).toLocaleDateString('ko-KR')
                     : '정보 없음'}
                 </div>
                 <div className="text-sm text-gray-600 mt-1">
-                  <span className="font-medium text-gray-700">총 리뷰 수:</span> {seller.totalReviews}
+                  <span className="font-light text-gray-700">총 리뷰 수:</span> {seller.totalReviews}
                 </div>
               </div>
             </div>

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Filter, Package, DollarSign, Calendar, Eye, TrendingUp } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/apiClient';
 import OwnedProductDetailModal from '@/components/admin/OwnedProductDetailModal';
 
@@ -155,15 +154,6 @@ export default function AdminOwnedProductsPage() {
     fetchProducts();
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'ACTIVE': return 'bg-green-500 text-white';
-      case 'INACTIVE': return 'bg-red-500 text-white';
-      case 'SOLD_OUT': return 'bg-gray-500 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
-
   const getAuctionStatusColor = (isAuctioned: boolean | undefined) => {
     return isAuctioned 
       ? 'bg-blue-500 text-white' 
@@ -300,7 +290,7 @@ export default function AdminOwnedProductsPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-400 focus:border-transparent"
               >
                 <option value="all">전체</option>
-                <option value="true">경매 등록</option>
+                <option value="true">등록</option>
                 <option value="false">미등록</option>
               </select>
             </div>
@@ -369,7 +359,7 @@ export default function AdminOwnedProductsPage() {
                   )}
                   <div className="absolute top-3 right-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${getAuctionStatusColor(product.isAuctioned)}`}>
-                      {product.isAuctioned === true ? '경매 등록' : '미등록'}
+                      {product.isAuctioned === true ? '등록' : '미등록'}
                     </span>
                   </div>
                 </div>

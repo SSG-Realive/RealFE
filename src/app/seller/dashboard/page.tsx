@@ -162,6 +162,14 @@ export default function SellerDashboardPage() {
     }
 
     fetchDashboardData();
+
+    // 30초마다 대시보드 데이터 자동 갱신
+    const intervalId = setInterval(() => {
+      fetchDashboardData();
+    }, 30000);
+
+    // 컴포넌트 언마운트 시 인터벌 정리
+    return () => clearInterval(intervalId);
   }, [checking]);
 
   // 최근 6개월 yearMonth 배열 생성
@@ -360,6 +368,7 @@ export default function SellerDashboardPage() {
               count={dashboard?.totalReviews ?? 0}
               className="h-full w-full text-2xl"
               onClick={() => router.push('/seller/reviews')}
+              onRefresh={handleRefresh}
             />
           </div>
           {/* 우측: 나머지 카드들 */}

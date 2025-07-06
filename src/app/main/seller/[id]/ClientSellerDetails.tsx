@@ -163,9 +163,9 @@ export default function ClientSellerDetails({
 
     return (
         <>
-            <div className="mb-12 p-6 bg-blue-50 rounded-2xl shadow-lg border border-blue-100">
-            <h2 className="text-2xl font-semibold text-blue-900 mb-6 border-b border-blue-200 pb-2">
-                🗣️ 판매자 리뷰
+            <div className="mb-12 p-6 bg-black-50 rounded-2xl shadow-lg border border-blue-100">
+            <h2 className="text-sm font-light text-blue-900 mb-6 border-b border-blue-200 pb-2">
+                판매자 리뷰
             </h2>
 
             {reviews.length === 0 && !loadingReviews ? (
@@ -240,7 +240,7 @@ export default function ClientSellerDetails({
             <div className="text-center mt-8">
                 <button
                 onClick={loadMoreReviews}
-                className="px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
+                className="px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-light shadow-sm"
                 >
                 리뷰 더보기
                 </button>
@@ -258,8 +258,8 @@ export default function ClientSellerDetails({
 
         {/* 상품 영역 */}
         <div className="mb-12 p-6 bg-white rounded-2xl shadow-lg border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b border-gray-300 pb-2">
-            🛒 판매자 상품 목록
+            <h2 className="text-sm font-light text-gray-800 mb-6 border-b border-gray-300 pb-2">
+            상품 목록
             </h2>
 
             {products.length === 0 && !loadingProducts ? (
@@ -285,7 +285,7 @@ export default function ClientSellerDetails({
                     />
 
                     <div className="p-2 sm:p-4 bg-gray-50 flex-grow flex flex-col justify-between gap-0.5 sm:gap-1">
-                    <h3 className="text-xs sm:text-base font-medium line-clamp-2 text-gray-800">
+                    <h3 className="text-xs sm:text-base font-light line-clamp-2 text-gray-800">
                         {product.name}
                     </h3>
                     <p className="text-xs sm:text-base text-gray-700">{product.price?.toLocaleString()}원</p>

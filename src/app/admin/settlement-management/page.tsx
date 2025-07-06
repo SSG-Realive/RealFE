@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,7 +63,7 @@ export default function SettlementManagementPage() {
   }, [router]);
 
   // 정산 목록 및 통계 데이터 로드
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -92,12 +92,12 @@ export default function SettlementManagementPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, pageSize, sellerFilter, periodStartFilter, periodEndFilter]);
 
   // 필터 변경 시 데이터 다시 로드
   useEffect(() => {
     loadData();
-  }, [currentPage, sellerFilter, periodStartFilter, periodEndFilter]);
+  }, [loadData]);
 
   // 필터 초기화
   const resetFilters = () => {

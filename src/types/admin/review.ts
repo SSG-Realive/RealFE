@@ -26,6 +26,7 @@ export interface AdminReview {
   createdAt: string;
   updatedAt: string;
   reportCount?: number;
+  imageUrls?: string[];
 }
 
 export interface AdminReviewReport {

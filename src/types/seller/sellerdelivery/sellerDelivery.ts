@@ -1,4 +1,5 @@
-import { DeliveryStatus } from "./sellerOrder";
+import { DeliveryStatus } from "../sellerorder/sellerOrder";
+
 
 export interface OrderDeliveryDetail {
     orderId: number;

@@ -126,10 +126,10 @@ const AdminLoginPage = () => {
             title={modalTitle}
             message={modalMessage}
             type={modalType}
-            hideButton={modalType === 'success'}
+            // hideButton={modalType === 'success'}
         />
       </div>
-  );
+  ); 
 };
 
 export default AdminLoginPage;

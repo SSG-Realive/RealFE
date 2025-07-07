@@ -38,8 +38,9 @@ export default function BidHistoryPage() {
   }
 
   const filteredBids = bids.filter(bid => 
-    bid.customerName.includes(search) || 
-    bid.auctionName.includes(search)
+    bid.customerName.includes(search) 
+    // || 
+    // bid.auctionName.includes(search)
   );
 
   if (loading) {
@@ -88,11 +89,11 @@ export default function BidHistoryPage() {
         <tbody>
           {filteredBids.map((bid) => (
             <tr key={bid.id}>
-              <td className="border px-2 py-1">{bid.auctionName}</td>
+              {/* <td className="border px-2 py-1">{bid.auctionName}</td> */}
               <td className="border px-2 py-1">{bid.customerName}</td>
-              <td className="border px-2 py-1">{bid.bidAmount.toLocaleString()}원</td>
+              <td className="border px-2 py-1">{bid.bidPrice.toLocaleString()}원</td>
               <td className="border px-2 py-1">{new Date(bid.bidTime).toLocaleString()}</td>
-              <td className="border px-2 py-1">{bid.isWinning ? '낙찰' : '-'}</td>
+              {/* <td className="border px-2 py-1">{bid.isWinning ? '낙찰' : '-'}</td> */}
               <td className="border px-2 py-1">
                 <button 
                   onClick={() => router.push(`/admin/auction-management/bid/${bid.id}`)}

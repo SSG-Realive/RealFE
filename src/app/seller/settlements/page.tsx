@@ -170,40 +170,45 @@ export default function SellerSettlementPage() {
 
     // 전체 정산 내역 조회 (페이징 지원)
     const fetchAll = async (page: number = 0) => {
-        try {
-            setLoading(true);
-            console.log('📊 정산 내역 조회 시작:', { page, usePagination });
-            
-            let res; // <-- 여기서 미리 선언
-            if (usePagination) {
-                // 페이징 조회
-                res = await getSellerSettlementListWithPaging(page, pageSize);
-                console.log('📊 페이징 정산 데이터:', res);
-                setSettlements((res as PageResponse<SellerSettlementResponse>).content || []);
-                setTotalPages((res as PageResponse<SellerSettlementResponse>).totalPages);
-                setTotalElements((res as PageResponse<SellerSettlementResponse>).totalElements);
-                setCurrentPage((res as PageResponse<SellerSettlementResponse>).number);
-            } else {
-                // 전체 조회
-                res = await getSellerSettlementList();
-                console.log('📊 전체 정산 데이터:', res);
-                setSettlements(res as SellerSettlementResponse[] || []);
-                setTotalPages(0);
-                setTotalElements((res as SellerSettlementResponse[])?.length || 0);
-                setCurrentPage(0);
-            }
-            
-            // 하루별로 그룹핑
-            await createDailyPayoutsOptimized(usePagination ? (res as PageResponse<SellerSettlementResponse>).content || [] : res as SellerSettlementResponse[] || []);
-            setSummary(null);
-            setError(null);
-        } catch (err) {
-            console.error('정산 목록 조회 실패:', err);
-            setError('정산 데이터를 불러오는 데 실패했습니다.');
-        } finally {
-            setLoading(false);
+    try {
+        setLoading(true);
+        console.log('📊 정산 내역 조회 시작:', { page, usePagination });
+
+        let res: SellerSettlementResponse[] | PageResponse<SellerSettlementResponse>;
+
+        if (usePagination) {
+        res = await getSellerSettlementListWithPaging(page, pageSize);
+        console.log('📊 페이징 정산 데이터:', res);
+
+        setSettlements(res.content || []);
+        setTotalPages(res.totalPages);
+        setTotalElements(res.totalElements);
+        setCurrentPage(res.number);
+
+        await createDailyPayoutsOptimized(res.content || []);
+        } else {
+        res = await getSellerSettlementList();
+        console.log('📊 전체 정산 데이터:', res);
+
+        setSettlements(res || []);
+        setTotalPages(0);
+        setTotalElements(res.length);
+        setCurrentPage(0);
+
+        await createDailyPayoutsOptimized(res);
         }
+
+        setSummary(null);
+        setError(null);
+    } catch (err) {
+        console.error('정산 목록 조회 실패:', err);
+        setError('정산 데이터를 불러오는 데 실패했습니다.');
+    } finally {
+        setLoading(false);
+    }
     };
+
+
 
     // 기간별 필터링
     const fetchFilteredByPeriod = async (from: string, to: string) => {

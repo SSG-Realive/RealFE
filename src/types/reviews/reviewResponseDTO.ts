@@ -5,7 +5,7 @@ export interface ReviewResponseDTO {
     customerId: number;
     sellerId: number;
     productId: number;
-    productName: string;
+    // productName: string;
     rating: number;
     content: string;
     imageUrls: string[];

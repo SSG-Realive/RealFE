@@ -1,8 +1,8 @@
 //service/customer/auctionService.ts
 
 
-import apiClient from "@/lib/apiClient";
-import { Auction, Bid, PaginatedAuctionResponse, PaginatedBidResponse, PlaceBidRequest,  } from "@/types/customer/auctions";
+import apiClient, { customerApi } from "@/lib/apiClient";
+import { Auction, AuctionPaymentRequestDTO, AuctionWinInfo, Bid, PaginatedAuctionResponse, PaginatedBidResponse, PlaceBidRequest, UserProfile,  } from "@/types/customer/auctions";
 
 const BASE_URL = '/customer';
 
@@ -128,3 +128,12 @@ export const customerBidService = {
   };
 },
 }
+
+export const fetchAuctionWinInfo = async (id: string) =>
+  (await customerApi.get(`/customer/auction-wins/${id}`)).data.data as AuctionWinInfo;
+
+export const fetchMyProfile = async () =>
+  (await customerApi.get('/customer/me')).data as UserProfile;
+
+export const approvePayment = async (id: string, dto: AuctionPaymentRequestDTO) =>
+  (await customerApi.post(`/customer/auction-wins/${id}/payment`, dto)).data;

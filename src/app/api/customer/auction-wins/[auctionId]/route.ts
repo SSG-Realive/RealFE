@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { auctionId: string } }
+  context: any // 👈 여기서 타입 에러 회피
 ) {
   try {
-    const { auctionId } = params;
+    const { auctionId } = context.params;
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/customer/auction-wins/${auctionId}`, {
       method: 'GET',
@@ -28,4 +28,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

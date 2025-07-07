@@ -117,9 +117,10 @@ export default function ChatBotWidget() {
                                             : 'bg-gray-200 text-black rounded-bl-none'
                                     }`}
                                     style={{ maxWidth: '80%' }}
-                                >
-                                    {msg.text}
-                                </div>
+                                    dangerouslySetInnerHTML={{
+                                        __html: msg.text.replace(/\n/g, '<br />'),
+                                    }}
+                                />
                             </div>
                         ))}
                     </div>

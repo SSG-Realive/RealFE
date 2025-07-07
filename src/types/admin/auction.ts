@@ -11,6 +11,7 @@ export interface AdminProduct {
   imageThumbnailUrl: string;
   imageUrls: string[];
 }
+
 export interface AuctionResponseDTO {
   id: number;
   name: any;
@@ -45,6 +46,7 @@ export interface AuctionCancelResponseDTO {
   reason?: string;
 }
 
+// 입찰 관련 타입 정의
 export interface BidResponseDTO {
   id: number;
   auctionId: number;
@@ -52,6 +54,20 @@ export interface BidResponseDTO {
   customerName: string;
   bidPrice: number;
   bidTime: string;
+}
+
+export interface BidRequestDTO {
+  auctionId: number;
+  bidPrice: number;
+}
+
+export interface BidHistoryDTO {
+  bidId: number;
+  customerId: number;
+  customerName: string;
+  bidPrice: number;
+  bidTime: string;
+  bidStatus: string;
 }
 
 export interface PageResponse<T> {

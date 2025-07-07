@@ -1,6 +1,7 @@
 //types/customer/auctions.ts
 import type { AdminProduct } from './adminProduct';
 
+
 export interface Auction {
   id: number;
   productId: number;
@@ -87,4 +88,23 @@ export interface WonAuctionState {
   error: string | null;
   fetchWonAuctions: () => Promise<void>;
   reset: () => void;
+}
+
+export interface AuctionWinInfo {
+  auctionId: number;
+  productName: string;
+  productImageUrl: string | null;
+  winningBidPrice: number;
+  isPaid: boolean;
+}
+export interface UserProfile {
+  receiverName: string;
+  phone: string;
+  deliveryAddress: string;
+  email?: string;
+}
+export interface AuctionPaymentRequestDTO {
+  auctionId: number;
+  paymentKey: string;
+  amount: number;
 }

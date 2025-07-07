@@ -28,4 +28,8 @@ export async function POST(
     console.error('경매 결제 처리 오류:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : '결제 처리에 실패했습니다.' },
+      { status: 500 }
+    );
+  }
+}
  

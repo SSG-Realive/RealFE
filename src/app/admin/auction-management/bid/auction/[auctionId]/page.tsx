@@ -76,8 +76,8 @@ export default function AuctionBidHistoryPage() {
         <div className="mb-6 p-4 bg-gray-100 rounded">
           <h2 className="text-xl font-bold mb-2">{auction.name}</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>상품명: {auction.productName}</div>
-            <div>판매자: {auction.sellerName}</div>
+            <div>상품명: {auction.adminProduct.productName}</div>
+            {/* <div>판매자: {auction.sellerName}</div> */}
             <div>시작가: {auction.startPrice.toLocaleString()}원</div>
             <div>현재가: {auction.currentPrice ? `${auction.currentPrice.toLocaleString()}원` : '-'}</div>
             <div>상태: {auction.status === 'ACTIVE' ? '진행중' : auction.status === 'ENDED' ? '종료' : '취소됨'}</div>
@@ -108,10 +108,10 @@ export default function AuctionBidHistoryPage() {
           {filteredBids.map((bid) => (
             <tr key={bid.id}>
               <td className="border px-2 py-1">{bid.customerName}</td>
-              <td className="border px-2 py-1">{bid.bidAmount.toLocaleString()}원</td>
+              <td className="border px-2 py-1">{bid.bidPrice.toLocaleString()}원</td>
               <td className="border px-2 py-1">{new Date(bid.bidTime).toLocaleString()}</td>
               <td className="border px-2 py-1">
-                {bid.isWinning ? (
+                {'isWinning' in bid && bid.isWinning ? (
                   <span className="text-green-600 font-bold">낙찰</span>
                 ) : (
                   '-'

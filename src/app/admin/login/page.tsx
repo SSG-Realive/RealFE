@@ -34,15 +34,7 @@ const AdminLoginPage = () => {
         localStorage.setItem('adminToken', data.accessToken);
         // 2. zustand 스토어에도 저장
         useAdminAuthStore.getState().setTokens(data.accessToken, data.refreshToken);
-
-        setModalType('success');
-        setModalTitle('로그인 성공');
-        setModalMessage('관리자 페이지로 이동합니다.');
-        setShowModal(true);
-        setTimeout(() => {
-          setShowModal(false);
-          router.push('/admin/dashboard?loginSuccess=true');
-        }, 1200);
+        router.push('/admin/dashboard?loginSuccess=true');
       } else {
         setModalType('error');
         setModalTitle('로그인 실패');
@@ -126,10 +118,10 @@ const AdminLoginPage = () => {
             title={modalTitle}
             message={modalMessage}
             type={modalType}
-            hideButton={modalType === 'success'}
+            // hideButton={modalType === 'success'}
         />
       </div>
-  );
+  ); 
 };
 
 export default AdminLoginPage;

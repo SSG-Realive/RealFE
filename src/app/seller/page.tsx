@@ -9,7 +9,7 @@ export default function SellerIndexPage() {
   const router = useRouter();
   
   useEffect(() => {
-    const token = useSellerAuthStore.getState().token;
+    const token = useSellerAuthStore.getState().accessToken;
 
     if (token) {
       router.replace('/seller/dashboard');

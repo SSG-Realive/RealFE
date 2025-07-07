@@ -368,7 +368,7 @@ export default function SellerDashboardPage() {
               count={dashboard?.totalReviews ?? 0}
               className="h-full w-full text-2xl"
               onClick={() => router.push('/seller/reviews')}
-              onRefresh={handleRefresh}
+              // onRefresh={handleRefresh}
             />
           </div>
           {/* 우측: 나머지 카드들 */}

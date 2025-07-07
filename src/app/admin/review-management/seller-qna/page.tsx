@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminReviewQnaList, answerAdminReviewQna } from "@/service/admin/reviewService";
+import { getSellerQnaStatistics } from "@/service/admin/adminQnaService";
 import { AdminReviewQna, AdminReviewQnaListRequest } from "@/types/admin/review";
 import { useGlobalDialog } from "@/app/context/dialogContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,21 @@ export default function ReviewQnaPage() {
     updatedAt: qna.updatedAt ?? qna.updated_at,
   });
 
+  // 통계 조회
+  const fetchStatistics = async () => {
+    try {
+      const stats = await getSellerQnaStatistics();
+      setStatistics({
+        totalCount: stats.totalCount,
+        answeredCount: stats.answeredCount,
+        unansweredCount: stats.unansweredCount
+      });
+    } catch (err: any) {
+      console.error('통계 조회 실패:', err);
+      // 통계 조회 실패 시 기본값 유지
+    }
+  };
+
   // Q&A 목록 조회
   const fetchQnas = async (page: number = 1) => {
     try {
@@ -65,14 +81,8 @@ export default function ReviewQnaPage() {
       setCurrentPage(page);
       setTotalElements(response.totalElements ?? 0);
       
-      // 통계 계산
-      const answeredCount = (response as any).answeredCount ?? mappedQnas.filter(qna => qna.isAnswered).length;
-      const unansweredCount = (response as any).unansweredCount ?? mappedQnas.filter(qna => !qna.isAnswered).length;
-      setStatistics({
-        totalCount: response.totalElements ?? 0,
-        answeredCount,
-        unansweredCount
-      });
+      // 통계는 별도로 조회 (전체 통계)
+      await fetchStatistics();
     } catch (err: any) {
       console.error('Q&A 목록 조회 실패:', err);
       setError(err.message || 'Q&A 목록을 불러오는데 실패했습니다.');
@@ -103,7 +113,7 @@ export default function ReviewQnaPage() {
       show('답변이 등록되었습니다.');
       setSelectedQna(null);
       setAnswerText("");
-      fetchQnas(currentPage); // 목록 새로고침
+      fetchQnas(currentPage); // 목록 새로고침 (통계도 함께 업데이트됨)
     } catch (err: any) {
       console.error('답변 등록 실패:', err);
       show(err.message || '답변 등록에 실패했습니다.');
@@ -266,13 +276,21 @@ export default function ReviewQnaPage() {
                     <div className="text-gray-700 text-sm truncate max-w-2xl" title={qna.content}>{qna.content}</div>
                   </div>
                   <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
-                    >
-                      답변하기
-                    </Button>
+                    {!qna.isAnswered ? (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+                      >
+                        답변하기
+                      </Button>
+                    ) : (
+                      <div className="text-center">
+                        <div className="text-green-600 text-sm font-medium">답변완료</div>
+                        <div className="text-xs text-gray-500">처리됨</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

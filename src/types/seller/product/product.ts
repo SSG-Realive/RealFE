@@ -42,3 +42,4 @@ export interface ProductListDTO {
     stock: number;
     isWished: boolean;
 }
+

@@ -1,11 +1,8 @@
-// 챗봇이 모든 service를 사용 가능하도록 설정하기위한 파일
-
+// 중복 제거 + alias 처리한 버전
 export * from './categoryService'
 export * from './productService'
 export * from './customer/productService'
-export * from './customer/customerService'
 export * from './customer/cartService'
-export * from './customer/auctionService'
 export * from './customer/logoutService'
 export * from './customer/publicAuctionService'
 export * from './customer/reviewService'
@@ -13,6 +10,11 @@ export * from './customer/wishlistService'
 export * from './customer/wonAuctionService'
 export * from './customer/customerQnaService'
 export * from './customer/reviewImageService'
+
+// 중복된 fetchMyProfile 충돌 해결
+export { fetchMyProfile as fetchCustomerProfile } from './customer/customerService';
+export { fetchMyProfile as fetchAuctionProfile } from './customer/auctionService';
+
 export * from './order/orderService'
 export * from './order/tossPaymentService'
 export * from './seller/adminInquiryService'

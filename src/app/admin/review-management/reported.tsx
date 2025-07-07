@@ -168,15 +168,15 @@ export default function ReviewReportedPage() {
         </thead>
         <tbody>
             {reports?.map(report => (
-              <tr key={report.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{report.review.productName}</td>
-                <td className="px-4 py-2 border">{report.review.customerName}</td>
+              <tr key={report.reportId} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border">{report.productName}</td>
+                <td className="px-4 py-2 border">{report.customerName}</td>
                 <td className="px-4 py-2 border">{report.reporterName}</td>
                 <td className="px-4 py-2 border max-w-xs truncate" title={report.reason}>
                   {report.reason}
                 </td>
                 <td className="px-4 py-2 border">
-                  {new Date(report.createdAt).toLocaleDateString()}
+                  {new Date(report.reportedAt).toLocaleDateString()}
                 </td>
                 <td className={`px-4 py-2 border text-center ${getStatusStyle(report.status)}`}>
                   {getStatusText(report.status)}
@@ -187,7 +187,7 @@ export default function ReviewReportedPage() {
                       <Button 
                         variant="default"
                         size="sm"
-                        onClick={() => handleProcessReport(report.id, 'UNDER_REVIEW')}
+                        onClick={() => handleProcessReport(report.reportId, 'UNDER_REVIEW')}
                       >
                         검토 시작
                       </Button>
@@ -198,21 +198,21 @@ export default function ReviewReportedPage() {
                       <Button 
                         variant="success"
                         size="sm"
-                        onClick={() => handleProcessReport(report.id, 'RESOLVED_KEPT')}
+                        onClick={() => handleProcessReport(report.reportId, 'RESOLVED_KEPT')}
                       >
                         리뷰 유지
                       </Button>
                       <Button 
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleProcessReport(report.id, 'RESOLVED_HIDDEN')}
+                        onClick={() => handleProcessReport(report.reportId, 'RESOLVED_HIDDEN')}
                       >
                         리뷰 숨김
                       </Button>
                       <Button 
                         variant="outline"
                         size="sm"
-                        onClick={() => handleProcessReport(report.id, 'RESOLVED_REJECTED')}
+                        onClick={() => handleProcessReport(report.reportId, 'RESOLVED_REJECTED')}
                       >
                         신고 기각
                       </Button>

@@ -50,7 +50,7 @@ export default function AuctionPage() {
             {TAB_LIST.map((tab) => (
                 <button
                     key={tab.key}
-                    onClick={() => setActiveTab(tab.key as any)}
+                    onClick={() => setActiveTab(tab.key as 'live' | 'popular' | 'ending' | 'scheduled')}
                     className={`pb-2 px-2 text-sm font-medium ${
                         activeTab === tab.key
                             ? 'border-b-2 border-black text-black'

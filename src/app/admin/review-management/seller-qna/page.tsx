@@ -111,9 +111,21 @@ export default function ReviewQnaPage() {
     try {
       await answerAdminReviewQna(selectedQna.id, { answer: answerText });
       show('답변이 등록되었습니다.');
+      
+      // 즉시 목록 상태 업데이트
+      setQnas(prevQnas => 
+        prevQnas.map(qna => 
+          qna.id === selectedQna.id 
+            ? { ...qna, isAnswered: true, answer: answerText }
+            : qna
+        )
+      );
+      
       setSelectedQna(null);
       setAnswerText("");
-      fetchQnas(currentPage); // 목록 새로고침 (통계도 함께 업데이트됨)
+      
+      // 통계 업데이트
+      await fetchStatistics();
     } catch (err: any) {
       console.error('답변 등록 실패:', err);
       show(err.message || '답변 등록에 실패했습니다.');
@@ -276,20 +288,18 @@ export default function ReviewQnaPage() {
                     <div className="text-gray-700 text-sm truncate max-w-2xl" title={qna.content}>{qna.content}</div>
                   </div>
                   <div className="flex flex-col items-end gap-2 min-w-[120px]">
-                    {!qna.isAnswered ? (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
-                      >
-                        답변하기
-                      </Button>
-                    ) : (
-                      <div className="text-center">
-                        <div className="text-green-600 text-sm font-medium">답변완료</div>
-                        <div className="text-xs text-gray-500">처리됨</div>
-                      </div>
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
+                      className={qna.isAnswered
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"}
+                    >
+                      {qna.isAnswered ? "상세보기" : "답변하기"}
+                    </Button>
+                    {qna.isAnswered && (
+                      <div className="text-green-600 text-xs mt-1">답변완료 처리됨</div>
                     )}
                   </div>
                 </div>

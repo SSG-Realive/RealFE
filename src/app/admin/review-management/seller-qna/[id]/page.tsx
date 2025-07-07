@@ -61,11 +61,32 @@ export default function QnaDetailPage() {
   };
 
   const handleAnswer = async () => {
-    if (!qna) return;
+    if (!qna || !answer.trim()) {
+      show("답변을 입력해주세요.");
+      return;
+    }
+    
     try {
       await answerAdminReviewQna(qnaId, { answer });
       show("답변이 등록되었습니다.");
-      fetchQnaDetail();
+      
+      // 답변 등록 후 즉시 상태 업데이트
+      if (qna) {
+        setQna({
+          ...qna,
+          answer: answer,
+          isAnswered: true,
+          answeredAt: new Date().toISOString()
+        });
+      }
+      
+      // 답변 입력 필드 초기화
+      setAnswer('');
+      
+      // 백그라운드에서 상세 정보 새로고침 (최신 데이터 확인)
+      setTimeout(() => {
+        fetchQnaDetail();
+      }, 100);
     } catch (err: any) {
       console.error("답변 등록 실패:", err);
       show(err.message || "답변 등록에 실패했습니다.");
@@ -126,10 +147,6 @@ export default function QnaDetailPage() {
           <div className="text-base text-gray-700 whitespace-pre-line">{qna.answer}</div>
         </div>
       )}
-
-      <div className="mb-4">
-        <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded !hover:bg-gray-200 !hover:shadow-none !hover:text-inherit" onClick={() => router.push('/admin/review-management/seller-qna')}>목록으로</button>
-      </div>
     </div>
   );
 } 

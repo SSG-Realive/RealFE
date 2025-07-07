@@ -97,21 +97,21 @@ export async function getSellerPublicInfoList(startDate: string, endDate: string
   return response.data; // 목록 형태일 수 있습니다. DTO가 단일 객체라면 조정 필요
 }
 
-// 특정 판매자의 공개 프로필 정보 조회 (새로 추가)
-export async function getSellerPublicInfo(productId: number): Promise<publicSellerInfoResponseDTO | null> {
+
+// sellerId 기반으로 API 요청
+export async function getSellerPublicInfoBySellerId(sellerId: number): Promise<publicSellerInfoResponseDTO | null> {
   try {
-    const response = await sellerApi.get(`/public/seller/by-product/${productId}`);
+    const response = await sellerApi.get(`/public/seller/${sellerId}`);
     return response.data;
   } catch (error: any) {
-    // 404 에러 등 특정 HTTP 상태 코드 처리
-    if (error.response && error.response.status === 404) {
-      console.warn(`판매자 ID ${productId}의 공개 정보를 찾을 수 없습니다.`);
+    if (error.response?.status === 404) {
+      console.warn(`판매자 ID ${sellerId}의 공개 정보를 찾을 수 없습니다.`);
       return null;
     }
-    console.error(`판매자 공개 정보 가져오기 오류 (ID: ${productId}):`, error);
-    throw error; // 다른 오류는 다시 던져서 상위 컴포넌트에서 처리
+    throw error;
   }
 }
+
 
 // 특정 판매자의 리뷰 조회 (수정된 함수)
 export async function getSellerReviews(

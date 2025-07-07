@@ -42,8 +42,6 @@ export default function ClientSellerDetails({
     const reviewObserverTarget = useRef<HTMLDivElement>(null);
     const productObserverTarget = useRef<HTMLDivElement>(null);
 
-    
-
     const toggleReviewExpansion = (reviewId: number) => {
         setExpandedReviews(prev => ({
             ...prev,
@@ -83,6 +81,7 @@ export default function ClientSellerDetails({
             setLoadingReviews(false);
         }
     }, [sellerId, reviewPage, loadingReviews, hasMoreReviews]);
+
 
     const loadMoreProducts = useCallback(async () => {
         if (loadingProducts || !hasMoreProducts) return;
@@ -160,6 +159,8 @@ export default function ClientSellerDetails({
             }
         };
     }, [loadMoreProducts, hasMoreProducts, loadingProducts]);
+
+
 
     return (
         <>

@@ -58,8 +58,9 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
         });
     }, [selectedSubId, categoryId, limit]);
 
+    // ✅ 슬라이더 설정: 2개씩 보여주기
     const sliderSettings = {
-        slidesToShow: 5,
+        slidesToShow: 2,
         slidesToScroll: 1,
         infinite: true,
         autoplay: true,
@@ -68,10 +69,10 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
         nextArrow: <Arrow direction="right" />,
         prevArrow: <Arrow direction="left" />,
         responsive: [
-            { breakpoint: 640, settings: { slidesToShow: 2 } },
-            { breakpoint: 768, settings: { slidesToShow: 3 } },
-            { breakpoint: 1024, settings: { slidesToShow: 4 } },
-            { breakpoint: 1280, settings: { slidesToShow: 5 } },
+            { breakpoint: 640, settings: { slidesToShow: 1 } },  // 모바일: 1개
+            { breakpoint: 768, settings: { slidesToShow: 2 } },  // 태블릿~PC: 2개
+            { breakpoint: 1024, settings: { slidesToShow: 2 } },
+            { breakpoint: 1280, settings: { slidesToShow: 2 } },
         ],
     };
 
@@ -110,7 +111,7 @@ export default function SectionWithSubCategoryButtons({ title, categoryId, limit
             {/* 🔹 상품 슬라이더 */}
             <Slider {...sliderSettings}>
                 {products.map((p) => (
-                    <div key={p.id} className="px-2">
+                    <div key={p.id} className="px-2 sm:px-3">
                         <ProductCard {...p} />
                     </div>
                 ))}

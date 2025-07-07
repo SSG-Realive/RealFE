@@ -59,8 +59,8 @@ export default function MiddleBannerCarousel({
         }
       `}</style>
 
-            <div className="w-full flex justify-center mt-12 mb-20 px-2 sm:px-4 overflow-visible">
-                <div className="w-full max-w-7xl rounded-lg overflow-hidden">
+            <div className="w-full mt-12 mb-20 overflow-visible">
+                <div className="w-full rounded-none overflow-hidden">
                     <Slider {...settings}>
                         {images.map((item, index) => (
                             <div key={index}>
@@ -80,7 +80,7 @@ export default function MiddleBannerCarousel({
                                             src={item.src}
                                             alt={`하단 배너 ${index + 1}`}
                                             fill
-                                            className="object-cover object-bottom rounded-lg cursor-pointer"
+                                            className="object-cover object-bottom rounded-none cursor-pointer"
                                             sizes="100vw"
                                             priority={index === 0}
                                         />

@@ -140,7 +140,8 @@ export default function SellerAdminQnaPage() {
 
   // 상태별 배지
   const getStatusBadge = (inquiry: AdminInquiryResponse) => {
-    if (inquiry.isAnswered) {
+    const isAnswered = inquiry.isAnswered || !!inquiry.answer || inquiry.status === 'ANSWERED';
+    if (isAnswered) {
       return (
         <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-600">
           <CheckCircle className="w-3 h-3" />
@@ -156,6 +157,17 @@ export default function SellerAdminQnaPage() {
       );
     }
   };
+
+  if (checking) {
+    return (
+      <div className="w-full max-w-full min-h-screen overflow-x-hidden bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6b7280] mx-auto mb-4"></div>
+          <p className="text-[#374151]">인증 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (checking) {
     return (

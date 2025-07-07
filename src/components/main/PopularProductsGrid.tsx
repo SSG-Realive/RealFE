@@ -18,7 +18,7 @@ export default function PopularProductsGrid() {
         autoplay: true,
         autoplaySpeed: 3000,
         speed: 500,
-        slidesToShow: 5,
+        slidesToShow: 3,
         slidesToScroll: 1,
         arrows: false,
         swipeToSlide: true,
@@ -28,11 +28,11 @@ export default function PopularProductsGrid() {
         responsive: [
             {
                 breakpoint: 1280,
-                settings: { slidesToShow: 4, slidesToScroll: 1 },
+                settings: { slidesToShow: 3, slidesToScroll: 1 },
             },
             {
                 breakpoint: 1024,
-                settings: { slidesToShow: 3, slidesToScroll: 1 },
+                settings: { slidesToShow: 2, slidesToScroll: 1 },
             },
             {
                 breakpoint: 768,
@@ -66,13 +66,16 @@ export default function PopularProductsGrid() {
 
     return (
         <section className="max-w-screen-xl mx-auto mt-6 sm:mt-10 px-4">
-        <h2 className="text-xl font-light text-gray-800 mb-6">인기 상품</h2>
+            <h2 className="text-xl font-light text-gray-800 mb-1">인기 상품</h2>
+            <p className="text-sm text-gray-500 mb-6">
+                지금 많은 분들이 관심을 가지고 있는 상품들을 만나보세요.
+            </p>
 
             {/* 로딩 완료 후에만 슬라이더 렌더링 */}
             {products && (
                 <Slider {...settings} ref={sliderRef}>
                     {products.map((product) => (
-                        <div key={product.id} className="px-2">
+                        <div key={product.id} className="px-2 h-full flex">
                             <ProductCard {...product} />
                         </div>
                     ))}

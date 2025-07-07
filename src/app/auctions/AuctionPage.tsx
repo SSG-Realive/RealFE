@@ -50,7 +50,7 @@ export default function AuctionPage() {
             {TAB_LIST.map((tab) => (
                 <button
                     key={tab.key}
-                    onClick={() => setActiveTab(tab.key as any)}
+                    onClick={() => setActiveTab(tab.key as 'live' | 'popular' | 'ending' | 'scheduled')}
                     className={`pb-2 px-2 text-sm font-medium ${
                         activeTab === tab.key
                             ? 'border-b-2 border-black text-black'
@@ -72,7 +72,11 @@ export default function AuctionPage() {
                 >
                   <div className="relative aspect-square bg-gray-100">
                     <ProductImage
-                        src={a.adminProduct?.imageUrl ?? '/default-thumbnail.png'}
+                        src={
+                            a.adminProduct?.imageThumbnailUrl ||
+                            a.adminProduct?.imageUrls?.[0] ||
+                            '/default-thumbnail.png'
+                        }
                         alt={a.adminProduct?.productName ?? '경매 상품'}
                         className="w-full h-full object-cover"
                     />

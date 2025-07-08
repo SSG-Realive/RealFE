@@ -89,7 +89,7 @@ export default function AuctionPage() {
                     <p className="text-sm text-black-500">
                       현재가 {a.currentPrice.toLocaleString()}원
                     </p>
-                    <p className="text-[11px] text-gray-400 mt-1">
+                    <p className="text-[11px] text-red-500 mt-1">
                       종료일 {new Date(a.endTime).toLocaleDateString()} {new Date(a.endTime).toLocaleTimeString()}
                     </p>
                   </div>

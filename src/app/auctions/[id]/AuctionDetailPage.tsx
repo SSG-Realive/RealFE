@@ -103,7 +103,13 @@ export default function AuctionDetailPage() {
   const imageList = useMemo(() => {
     const images = auction?.adminProduct?.imageUrls ?? [];
     const thumbnail = auction?.adminProduct?.imageThumbnailUrl;
-    return thumbnail ? [thumbnail, ...images] : images;
+
+    // 썸네일 중복 제거
+    const filteredImages = thumbnail
+        ? images.filter((url) => url !== thumbnail)
+        : images;
+
+    return thumbnail ? [thumbnail, ...filteredImages] : filteredImages;
   }, [auction]);
 
   if (!accessToken) return null;
@@ -220,7 +226,7 @@ export default function AuctionDetailPage() {
                 {tickSize && (
                     <p className="text-sm text-gray-600">입찰 단위: {tickSize.toLocaleString()}원</p>
                 )}
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-red-500 mb-4">
                   경매 종료: {new Date(auction.endTime).toLocaleString()}
                 </p>
               </div>

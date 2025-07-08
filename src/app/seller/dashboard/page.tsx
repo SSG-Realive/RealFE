@@ -7,7 +7,9 @@ import SellerLayout from '@/components/layouts/SellerLayout';
 import TrafficLightStatusCard from '@/components/seller/TrafficLightStatusCard';
 import { getDashboard, getSalesStatistics, getDailySalesTrend, getMonthlySalesTrend, getTodayStats, getCurrentMonthStats, TodayStatsDTO, CurrentMonthStatsDTO } from '@/service/seller/sellerService';
 import { getCustomerQnaList } from '@/service/seller/customerQnaService';
+import { getSellerReviewStatistics } from '@/service/seller/reviewService';
 import { SellerDashboardResponse, SellerSalesStatsDTO, DailySalesDTO, MonthlySalesDTO } from '@/types/seller/dashboard/sellerDashboardResponse';
+import { SellerReviewStatistics } from '@/types/seller/review';
 import { useEffect, useState } from 'react';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import dynamic from 'next/dynamic';
@@ -28,6 +30,7 @@ export default function SellerDashboardPage() {
   const [actualUnansweredCount, setActualUnansweredCount] = useState(0); // 실제 미답변 문의 수
   const [todayStats, setTodayStats] = useState<TodayStatsDTO | null>(null);
   const [monthStats, setMonthStats] = useState<CurrentMonthStatsDTO | null>(null);
+  const [reviewStats, setReviewStats] = useState<SellerReviewStatistics | null>(null); // 리뷰 통계 추가
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -46,9 +49,14 @@ export default function SellerDashboardPage() {
         setLoading(true);
       }
         
-        // 기본 대시보드 데이터
-        const dashboardData = await getDashboard();
+        // 기본 대시보드 데이터와 리뷰 통계를 병렬로 가져오기
+        const [dashboardData, reviewStatsData] = await Promise.all([
+          getDashboard(),
+          getSellerReviewStatistics()
+        ]);
+        
         setDashboard(dashboardData);
+        setReviewStats(reviewStatsData);
 
       // 실제 미답변 문의 수 계산을 위해 QnA 데이터 조회
       try {
@@ -366,8 +374,8 @@ export default function SellerDashboardPage() {
           <div className="flex-1 min-w-[320px] max-w-[400px] flex items-stretch">
             <TrafficLightStatusCard
               title="판매자 등급"
-              rating={dashboard?.averageRating ?? 0}
-              count={dashboard?.totalReviews ?? 0}
+              rating={reviewStats?.averageRating ?? 0}
+              count={reviewStats?.totalReviews ?? 0}
               className="h-full w-full text-2xl"
               onClick={() => router.push('/seller/reviews')}
               // onRefresh={handleRefresh}

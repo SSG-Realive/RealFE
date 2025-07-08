@@ -27,7 +27,6 @@ export default function BidDetailPage() {
   const [auction, setAuction] = useState<AuctionResponseDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [maxBidPrice, setMaxBidPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (bidId) {
@@ -60,15 +59,7 @@ export default function BidDetailPage() {
         console.error('경매 정보 조회 실패:', auctionErr);
       }
 
-      // 해당 경매의 모든 입찰 내역을 불러와 최고가 계산
-      try {
-        const auctionBidsRes = await adminBidService.getBidsByAuction(foundBid.auctionId, 0, 1000);
-        const bids = auctionBidsRes.content || [];
-        const maxPrice = bids.length > 0 ? Math.max(...bids.map(b => b.bidPrice)) : null;
-        setMaxBidPrice(maxPrice);
-      } catch (bidsErr) {
-        setMaxBidPrice(null);
-      }
+
 
     } catch (err: any) {
       console.error('입찰 상세 정보 조회 실패:', err);
@@ -182,11 +173,11 @@ export default function BidDetailPage() {
                     {bid.bidPrice ? bid.bidPrice.toLocaleString() : 'N/A'}원
                   </span>
                 </div>
-                {maxBidPrice !== null && (
+                {auction && (
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">현재가</span>
                     <span className="text-2xl font-bold text-blue-600">
-                      {maxBidPrice.toLocaleString()}원
+                      {auction.currentPrice ? auction.currentPrice.toLocaleString() : 'N/A'}원
                     </span>
                   </div>
                 )}
@@ -233,7 +224,7 @@ export default function BidDetailPage() {
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">현재가</span>
                       <span className="font-semibold text-blue-600">
-                        {maxBidPrice !== null ? maxBidPrice.toLocaleString() : 'N/A'}원
+                        {auction.currentPrice ? auction.currentPrice.toLocaleString() : 'N/A'}원
                       </span>
                     </div>
                     

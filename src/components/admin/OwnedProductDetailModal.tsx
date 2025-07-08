@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import apiClient from '@/lib/apiClient';
+import { useGlobalDialog } from "@/app/context/dialogContext";
 
 interface OwnedProduct {
   id: number;
@@ -37,6 +38,7 @@ export default function OwnedProductDetailModal({
   onClose, 
   onAuctionCreated 
 }: OwnedProductDetailModalProps) {
+  const { show } = useGlobalDialog();
   const [startPrice, setStartPrice] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [startHour, setStartHour] = useState<string>("12");
@@ -65,22 +67,22 @@ export default function OwnedProductDetailModal({
 
   const handleCreateAuction = async () => {
     if (!product.purchasePrice) {
-      alert("매입 가격 정보가 없습니다.");
+      await show("매입 가격 정보가 없습니다.");
       return;
     }
 
     const numericStartPrice = Number(startPrice.replace(/,/g, ''));
     
     if (numericStartPrice <= 0 || isNaN(numericStartPrice)) {
-      alert("유효한 시작 가격을 입력해주세요.");
+      await show("유효한 시작 가격을 입력해주세요.");
       return;
     }
     if (!startDate) {
-      alert("경매 시작 날짜를 입력해주세요.");
+      await show("경매 시작 날짜를 입력해주세요.");
       return;
     }
     if (!endDate) {
-      alert("경매 종료 날짜를 입력해주세요.");
+      await show("경매 종료 날짜를 입력해주세요.");
       return;
     }
 
@@ -107,17 +109,17 @@ export default function OwnedProductDetailModal({
     console.log('백엔드로 보낼 종료 시간:', endTime);
     
     if (startDateTime <= now) {
-      alert("시작 시간은 현재 시간 이후여야 합니다.");
+      await show("시작 시간은 현재 시간 이후여야 합니다.");
       return;
     }
     
     if (endDateTime <= now) {
-      alert("종료 시간은 현재 시간 이후여야 합니다.");
+      await show("종료 시간은 현재 시간 이후여야 합니다.");
       return;
     }
     
     if (startDateTime >= endDateTime) {
-      alert("종료 시간은 시작 시간보다 늦어야 합니다.");
+      await show("종료 시간은 시작 시간보다 늦어야 합니다.");
       return;
     }
 
@@ -142,7 +144,7 @@ export default function OwnedProductDetailModal({
       });
 
       console.log('경매 등록 성공:', response.data);
-      alert("경매가 성공적으로 등록되었습니다.");
+      await show("경매가 성공적으로 등록되었습니다.");
       
       if (onAuctionCreated) {
         onAuctionCreated();
@@ -151,7 +153,7 @@ export default function OwnedProductDetailModal({
     } catch (error: any) {
       console.error("경매 등록 중 오류:", error);
       const errorMessage = error.response?.data?.message || "경매 등록 중 오류가 발생했습니다.";
-      alert(errorMessage);
+      await show(errorMessage);
     } finally {
       setIsCreatingAuction(false);
     }

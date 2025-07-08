@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminReviewQnaList, answerAdminReviewQna } from "@/service/admin/reviewService";
+import { getSellerQnaStatistics } from "@/service/admin/adminQnaService";
 import { AdminReviewQna, AdminReviewQnaListRequest } from "@/types/admin/review";
 import { useGlobalDialog } from "@/app/context/dialogContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +20,6 @@ export default function ReviewQnaPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [answeredFilter, setAnsweredFilter] = useState<string>("all");
   const [selectedQna, setSelectedQna] = useState<AdminReviewQna | null>(null);
   const [answerText, setAnswerText] = useState("");
@@ -40,6 +40,21 @@ export default function ReviewQnaPage() {
     updatedAt: qna.updatedAt ?? qna.updated_at,
   });
 
+  // 통계 조회
+  const fetchStatistics = async () => {
+    try {
+      const stats = await getSellerQnaStatistics();
+      setStatistics({
+        totalCount: stats.totalCount,
+        answeredCount: stats.answeredCount,
+        unansweredCount: stats.unansweredCount
+      });
+    } catch (err: any) {
+      console.error('통계 조회 실패:', err);
+      // 통계 조회 실패 시 기본값 유지
+    }
+  };
+
   // Q&A 목록 조회
   const fetchQnas = async (page: number = 1) => {
     try {
@@ -50,9 +65,13 @@ export default function ReviewQnaPage() {
         page: page - 1, // 백엔드는 0-based pagination
         size: 10,
         search: search || undefined,
-        status: statusFilter === "all" ? undefined : statusFilter,
         isAnswered: answeredFilter === "all" ? undefined : answeredFilter === "true" ? true : answeredFilter === "false" ? false : undefined
       };
+
+      // 디버깅용 로그 추가
+      console.log('Q&A 목록 조회 파라미터:', params);
+      console.log('검색어:', search);
+      console.log('답변 상태 필터:', answeredFilter);
 
       const response = await getAdminReviewQnaList(params);
       // camelCase로 일괄 변환
@@ -62,14 +81,8 @@ export default function ReviewQnaPage() {
       setCurrentPage(page);
       setTotalElements(response.totalElements ?? 0);
       
-      // 통계 계산
-      const answeredCount = (response as any).answeredCount ?? mappedQnas.filter(qna => qna.isAnswered).length;
-      const unansweredCount = (response as any).unansweredCount ?? mappedQnas.filter(qna => !qna.isAnswered).length;
-      setStatistics({
-        totalCount: response.totalElements ?? 0,
-        answeredCount,
-        unansweredCount
-      });
+      // 통계는 별도로 조회 (전체 통계)
+      await fetchStatistics();
     } catch (err: any) {
       console.error('Q&A 목록 조회 실패:', err);
       setError(err.message || 'Q&A 목록을 불러오는데 실패했습니다.');
@@ -98,9 +111,21 @@ export default function ReviewQnaPage() {
     try {
       await answerAdminReviewQna(selectedQna.id, { answer: answerText });
       show('답변이 등록되었습니다.');
+      
+      // 즉시 목록 상태 업데이트
+      setQnas(prevQnas => 
+        prevQnas.map(qna => 
+          qna.id === selectedQna.id 
+            ? { ...qna, isAnswered: true, answer: answerText }
+            : qna
+        )
+      );
+      
       setSelectedQna(null);
       setAnswerText("");
-      fetchQnas(currentPage); // 목록 새로고침
+      
+      // 통계 업데이트
+      await fetchStatistics();
     } catch (err: any) {
       console.error('답변 등록 실패:', err);
       show(err.message || '답변 등록에 실패했습니다.');
@@ -211,7 +236,7 @@ export default function ReviewQnaPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
@@ -223,17 +248,6 @@ export default function ReviewQnaPage() {
                   className="pl-10"
                 />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="전체 상태" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">전체 상태</SelectItem>
-                  <SelectItem value="PENDING">대기중</SelectItem>
-                  <SelectItem value="ANSWERED">답변완료</SelectItem>
-                  <SelectItem value="HIDDEN">숨김</SelectItem>
-                </SelectContent>
-              </Select>
               <Select value={answeredFilter} onValueChange={setAnsweredFilter}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="전체 답변상태" />
@@ -244,7 +258,7 @@ export default function ReviewQnaPage() {
                   <SelectItem value="true">답변완료</SelectItem>
                 </SelectContent>
               </Select>
-              <Button onClick={handleSearch} className="bg-gray-800 hover:bg-gray-700 col-span-1 md:col-span-3 mt-2">검색</Button>
+              <Button onClick={handleSearch} className="bg-gray-800 hover:bg-gray-700 col-span-1 md:col-span-2 mt-2">검색</Button>
             </div>
           </CardContent>
         </Card>
@@ -278,12 +292,61 @@ export default function ReviewQnaPage() {
                       variant="default"
                       size="sm"
                       onClick={() => router.push(`/admin/review-management/seller-qna/${qna.id}`)}
+                      className={qna.isAnswered
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-blue-600 hover:bg-blue-700 text-white"}
                     >
-                      답변하기
+                      {qna.isAnswered ? "상세보기" : "답변하기"}
                     </Button>
+                    {qna.isAnswered && (
+                      <div className="text-green-600 text-xs mt-1">답변완료 처리됨</div>
+                    )}
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* 페이징 UI */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center space-x-2 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => fetchQnas(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="flex items-center space-x-1"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  이전
+                </Button>
+                
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "default" : "outline"}
+                      onClick={() => fetchQnas(page)}
+                      className="w-8 h-8"
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => fetchQnas(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="flex items-center space-x-1"
+                >
+                  다음
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
+
+            {/* 페이지 정보 표시 */}
+            <div className="text-center text-sm text-gray-500 mt-4">
+              총 {totalElements}개의 문의 중 {(currentPage - 1) * 10 + 1} - {Math.min(currentPage * 10, totalElements)}번째 문의를 보여주고 있습니다.
             </div>
           </CardContent>
         </Card>

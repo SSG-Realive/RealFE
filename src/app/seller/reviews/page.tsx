@@ -116,13 +116,14 @@ export default function SellerReviewPage() {
         }
     };
 
-    // WebSocket 또는 주기적 갱신 설정
+    // 페이지 활성화 시 데이터 새로고침
     useEffect(() => {
-        // 1분마다 데이터 새로고침
-        const intervalId = setInterval(refreshData, 60000);
-        
-        // 컴포넌트 언마운트 시 정리
-        return () => clearInterval(intervalId);
+        const handleFocus = () => {
+            refreshData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
     // 신호등 색상 반환 (대시보드와 동일한 규칙)

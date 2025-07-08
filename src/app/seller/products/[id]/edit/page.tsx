@@ -8,11 +8,13 @@ import { ProductDetail } from '@/types/seller/product/product';
 import useSellerAuthGuard from '@/hooks/useSellerAuthGuard';
 import SellerLayout from '@/components/layouts/SellerLayout';
 import { Package, Tag, DollarSign, Layers, Ruler, Image, Video, Save, AlertCircle } from 'lucide-react';
+import { useGlobalDialog } from '@/app/context/dialogContext';
 
 export default function ProductEditPage() {
     const checking = useSellerAuthGuard();
     const router = useRouter();
     const params = useParams();
+    const { show } = useGlobalDialog();
     const productId = params?.id as string;
 
     const [form, setForm] = useState<ProductDetail | null>(null);
@@ -80,7 +82,7 @@ export default function ProductEditPage() {
         if (!form) return;
 
         if (!form.categoryId || form.categoryId === 0) {
-            alert('카테고리를 선택해주세요.');
+            await show('카테고리를 선택해주세요.');
             return;
         }
 
@@ -110,7 +112,7 @@ export default function ProductEditPage() {
 
         try {
             await updateProduct(Number(productId), formData);
-            alert('상품이 수정되었습니다.');
+            await show('상품이 수정되었습니다.');
             router.push('/seller/products');
         } catch (err: any) {
             let errorMessage = '상품 수정 중 오류가 발생했습니다.';
@@ -130,7 +132,7 @@ export default function ProductEditPage() {
             }
             
             setError(errorMessage);
-            alert(`수정 실패: ${errorMessage}`);
+            await show(`수정 실패: ${errorMessage}`);
         }
     };
 

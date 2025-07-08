@@ -12,7 +12,9 @@ import ClientSellerDetails from './ClientSellerDetails';
 import ImageWithFallback from '@/components/common/imageWithFallback';
 import { getTrafficLightText } from '@/types/admin/review';
 
+
 export const dynamic = "force-dynamic";
+
 
 const getRatingColor = (rating: number): string => {
   if (rating >= 66.1) return 'bg-green-500';
@@ -20,15 +22,10 @@ const getRatingColor = (rating: number): string => {
   return 'bg-red-500';
 };
 
-interface SellerDetailPageProps {
-  params: {
-    id: string;
-  };
-}
+type ParamsType = { id: string };
 
-export default async function SellerDetailPage({ params }: SellerDetailPageProps) {
-  const { id } = params; // ✅ 수정: await 제거
-  const sellerId = parseInt(id, 10);
+export default async function SellerDetailPage(props: any) {
+  const sellerId = parseInt(props.params?.id, 10);
 
   if (isNaN(sellerId)) {
     return (
@@ -39,6 +36,7 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
   }
 
   const seller = await getSellerPublicInfoBySellerId(sellerId);
+
   if (!seller) {
     return (
       <div className="flex justify-center items-center h-screen text-red-500 text-xl font-light">
@@ -46,6 +44,7 @@ export default async function SellerDetailPage({ params }: SellerDetailPageProps
       </div>
     );
   }
+
 
   const [initialReviewsResponse, initialProductsResponse] = await Promise.all([
     getSellerReviews(sellerId, 0),

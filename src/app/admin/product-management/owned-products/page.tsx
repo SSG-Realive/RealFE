@@ -14,7 +14,8 @@ interface Product {
   status: string;
   categoryName: string;
   createdAt: string;
-  thumbnailUrl?: string;
+  imageThumbnailUrl?: string;  // 백엔드 응답과 일치하도록 수정
+  imageUrls?: string[];        // 백엔드 응답과 일치하도록 수정
   purchasePrice?: number;
   purchasedAt?: string;
   isAuctioned?: boolean;
@@ -346,17 +347,25 @@ export default function AdminOwnedProductsPage() {
               <div key={product.id} className="bg-gray-50 rounded-3xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                 {/* 상품 이미지 */}
                 <div className="aspect-square bg-gray-200 relative">
-                  {product.thumbnailUrl ? (
+                  {product.imageThumbnailUrl ? (
                     <img
-                      src={product.thumbnailUrl}
+                      src={product.imageThumbnailUrl}
                       alt={product.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // 이미지 로드 실패 시 기본 박스로 대체
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Package className="w-12 h-12 text-gray-400" />
+                  ) : null}
+                  {/* 기본 이미지 박스 */}
+                  <div className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${product.imageThumbnailUrl ? 'hidden' : ''}`}>
+                    <div className="text-center">
+                      <Package className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-500 text-xs">이미지 없음</p>
                     </div>
-                  )}
+                  </div>
                   <div className="absolute top-3 right-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${getAuctionStatusColor(product.isAuctioned)}`}>
                       {product.isAuctioned === true ? '등록' : '미등록'}

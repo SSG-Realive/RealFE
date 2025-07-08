@@ -16,7 +16,8 @@ interface OwnedProduct {
   status: string;
   categoryName: string;
   createdAt: string;
-  thumbnailUrl?: string;
+  imageThumbnailUrl?: string;  // thumbnailUrl → imageThumbnailUrl로 변경
+  imageUrls?: string[];
   purchasePrice?: number;
   purchasedAt?: string;
   isAuctioned?: boolean;
@@ -229,9 +230,9 @@ export default function OwnedProductDetailModal({
             {/* 상품 이미지 섹션 */}
             <div className="space-y-4">
               <div className="aspect-square bg-gray-100 rounded-3xl overflow-hidden shadow-lg">
-                {product.thumbnailUrl ? (
+                {product.imageThumbnailUrl ? (
                   <img
-                    src={product.thumbnailUrl}
+                    src={product.imageThumbnailUrl}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />

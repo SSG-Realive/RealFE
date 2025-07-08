@@ -19,7 +19,8 @@ import {
   EyeOff,
   Package,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Image
 } from "lucide-react";
 
 export default function ReviewDetailPage() {
@@ -295,6 +296,35 @@ export default function ReviewDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* 리뷰 이미지 카드 */}
+            {review.imageUrls && review.imageUrls.length > 0 && (
+              <Card className="bg-white rounded-xl shadow-sm border border-gray-200 !shadow-sm !hover:shadow-none">
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <Image className="w-5 h-5" />
+                    첨부 이미지 ({review.imageUrls.length}개)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-4">
+                    {review.imageUrls.map((url, index) => (
+                      <div key={index} className="aspect-square rounded-xl overflow-hidden bg-gray-100">
+                        <img 
+                          src={url} 
+                          alt={`리뷰 이미지 ${index + 1}`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/images/placeholder.jpg';
+                            e.currentTarget.alt = '이미지를 불러올 수 없습니다';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* 사이드바 */}

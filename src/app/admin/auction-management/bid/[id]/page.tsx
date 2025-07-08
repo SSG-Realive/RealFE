@@ -43,7 +43,7 @@ export default function BidDetailPage() {
       // 전체 입찰 내역에서 해당 입찰 찾기
       const response = await adminBidService.getAllBids(0, 1000); // 충분한 데이터 로드
       const foundBid = response.content.find(b => b.id.toString() === bidId);
-      
+
       if (!foundBid) {
         setError('입찰 정보를 찾을 수 없습니다.');
         return;
@@ -142,7 +142,7 @@ export default function BidDetailPage() {
                   <Users className="w-8 h-8 text-white" />
                 </div>
               </div>
-              <div>
+          <div>
                 <h1 className="text-4xl font-bold text-gray-800">
                   입찰 상세 정보
                 </h1>
@@ -167,8 +167,8 @@ export default function BidDetailPage() {
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
+          </div>
+          <div>
                   <h3 className="text-lg font-semibold text-gray-800">
                     {bid.customerName || '입찰자 없음'}
                   </h3>
@@ -214,8 +214,8 @@ export default function BidDetailPage() {
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                       <Gavel className="w-8 h-8 text-gray-600" />
-                    </div>
-                    <div>
+          </div>
+          <div>
                       <h3 className="text-lg font-semibold text-gray-800">
                         {auction.adminProduct?.productName || '상품명 없음'}
                       </h3>
@@ -257,13 +257,13 @@ export default function BidDetailPage() {
                         {auction.endTime ? new Date(auction.endTime).toLocaleString() : 'N/A'}
                       </span>
                     </div>
-                  </div>
+          </div>
                 </>
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Gavel className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                   <p>경매 정보를 불러올 수 없습니다.</p>
-                </div>
+          </div>
               )}
             </CardContent>
           </Card>

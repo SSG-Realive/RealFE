@@ -17,7 +17,7 @@ export default function ChatBotWidget() {
     // 토큰 가져오기
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const raw = localStorage.getItem('auth-storage');
+            const raw = localStorage.getItem('seller-auth-storage') || localStorage.getItem('auth-storage');
             const parsed = raw ? JSON.parse(raw) : null;
             const storedToken = parsed?.state?.accessToken;
             setToken(storedToken || null);
@@ -117,9 +117,10 @@ export default function ChatBotWidget() {
                                             : 'bg-gray-200 text-black rounded-bl-none'
                                     }`}
                                     style={{ maxWidth: '80%' }}
-                                >
-                                    {msg.text}
-                                </div>
+                                    dangerouslySetInnerHTML={{
+                                        __html: msg.text.replace(/\n/g, '<br />'),
+                                    }}
+                                />
                             </div>
                         ))}
                     </div>
@@ -167,3 +168,4 @@ export default function ChatBotWidget() {
         </div>
     );
 }
+

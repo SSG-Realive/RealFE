@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import axios from 'axios';
+import { HiOutlineChatBubbleLeftRight } from 'react-icons/hi2';
 
 export default function ChatBotWidget() {
     const [open, setOpen] = useState(false);
@@ -14,17 +15,19 @@ export default function ChatBotWidget() {
 
     const pathname = usePathname();
 
-    // 토큰 가져오기
+    // ✅ 토큰 가져오기
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const raw = localStorage.getItem('seller-auth-storage') || localStorage.getItem('auth-storage');
+            const raw =
+                localStorage.getItem('seller-auth-storage') ||
+                localStorage.getItem('auth-storage');
             const parsed = raw ? JSON.parse(raw) : null;
             const storedToken = parsed?.state?.accessToken;
             setToken(storedToken || null);
         }
     }, []);
 
-    // sessionStorage에서 이전 대화 불러오기
+    // ✅ 이전 대화 불러오기
     useEffect(() => {
         const stored = sessionStorage.getItem('chat-history');
         if (stored) {
@@ -32,10 +35,26 @@ export default function ChatBotWidget() {
         }
     }, []);
 
-    // 대화 저장
+    // ✅ 대화 저장
     useEffect(() => {
         sessionStorage.setItem('chat-history', JSON.stringify(messages));
     }, [messages]);
+
+    // ✅ 챗봇 열렸을 때 인삿말 자동 추가
+    useEffect(() => {
+        if (open) {
+            const hasGreeted = messages.some(
+                (m) => m.sender === 'bot' && m.text.includes('상품 추천')
+            );
+            if (!hasGreeted) {
+                const greeting = {
+                    sender: 'bot' as const,
+                    text: `안녕하세요! 😊<br />상품 추천, 상품 조회, 기타 문의 등을 도와드릴 수 있어요.`,
+                };
+                setMessages((prev) => [...prev, greeting]);
+            }
+        }
+    }, [open]);
 
     // 숨길 경로
     const hiddenPaths = [
@@ -49,10 +68,9 @@ export default function ChatBotWidget() {
     const shouldHide = hiddenPaths.some(
         (path) => pathname === path || pathname.startsWith(`${path}/`)
     );
-
     if (shouldHide) return null;
 
-    // 전송 핸들러
+    // ✅ 메시지 전송
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         const trimmed = input.trim();
@@ -82,7 +100,7 @@ export default function ChatBotWidget() {
         } catch (err) {
             setMessages((prev) => [
                 ...prev,
-                { sender: 'bot', text: '❌ 응답 중 오류가 발생했습니다.' },
+                { sender: 'bot', text: '❌ 챗봇 응답 처리 중 오류 발생' },
             ]);
             console.error(err);
         }
@@ -90,28 +108,33 @@ export default function ChatBotWidget() {
 
     return (
         <div>
+            {/* 🟢 챗봇 열기 버튼 */}
             <button
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-4 right-4 bg-blue-600 text-white rounded-full w-14 h-14 shadow-lg z-50"
+                className="fixed bottom-4 right-4 bg-black text-white rounded-full w-14 h-14 shadow-lg z-50 flex items-center justify-center"
             >
-                💬
+                <HiOutlineChatBubbleLeftRight size={24} />
             </button>
 
+            {/* 🟢 챗봇 패널 */}
             {open && (
                 <div className="fixed bottom-20 right-4 w-80 h-96 bg-white shadow-lg rounded-xl border border-gray-300 z-50 flex flex-col">
 
-                    {/* 상단 전체 검정 배경 헤더 */}
+                    {/* 🟣 상단 헤더 */}
                     <div className="bg-black text-white px-4 py-2 rounded-t-xl flex justify-between items-center">
-                        <h2 className="text-lg font-bold">Realive</h2>
+                        <HiOutlineChatBubbleLeftRight size={24} className="text-white" />
                         <button onClick={() => setOpen(false)} className="text-white text-xl">
                             ⨉
                         </button>
                     </div>
 
-                    {/* 메시지 영역 및 입력창 */}
+                    {/* 🟣 메시지 영역 */}
                     <div className="flex-1 overflow-y-auto mb-2 space-y-2 p-4 pr-1">
                         {messages.map((msg, i) => (
-                            <div key={i} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div
+                                key={i}
+                                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
                                 <div
                                     className={`inline-block px-3 py-2 rounded-lg text-sm break-words ${
                                         msg.sender === 'user'
@@ -127,7 +150,7 @@ export default function ChatBotWidget() {
                         ))}
                     </div>
 
-                    {/* 입력창 */}
+                    {/* 🟣 입력창 */}
                     <form
                         onSubmit={sendMessage}
                         className="px-4 pb-4 mt-auto flex gap-2 items-center relative"
@@ -165,4 +188,3 @@ export default function ChatBotWidget() {
         </div>
     );
 }
-

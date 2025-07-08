@@ -27,7 +27,6 @@ export default function BidDetailPage() {
   const [auction, setAuction] = useState<AuctionResponseDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [maxBidPrice, setMaxBidPrice] = useState<number | null>(null);
 
   useEffect(() => {
     if (bidId) {
@@ -43,7 +42,7 @@ export default function BidDetailPage() {
       // 전체 입찰 내역에서 해당 입찰 찾기
       const response = await adminBidService.getAllBids(0, 1000); // 충분한 데이터 로드
       const foundBid = response.content.find(b => b.id.toString() === bidId);
-      
+
       if (!foundBid) {
         setError('입찰 정보를 찾을 수 없습니다.');
         return;
@@ -60,15 +59,7 @@ export default function BidDetailPage() {
         console.error('경매 정보 조회 실패:', auctionErr);
       }
 
-      // 해당 경매의 모든 입찰 내역을 불러와 최고가 계산
-      try {
-        const auctionBidsRes = await adminBidService.getBidsByAuction(foundBid.auctionId, 0, 1000);
-        const bids = auctionBidsRes.content || [];
-        const maxPrice = bids.length > 0 ? Math.max(...bids.map(b => b.bidPrice)) : null;
-        setMaxBidPrice(maxPrice);
-      } catch (bidsErr) {
-        setMaxBidPrice(null);
-      }
+
 
     } catch (err: any) {
       console.error('입찰 상세 정보 조회 실패:', err);
@@ -142,7 +133,7 @@ export default function BidDetailPage() {
                   <Users className="w-8 h-8 text-white" />
                 </div>
               </div>
-              <div>
+          <div>
                 <h1 className="text-4xl font-bold text-gray-800">
                   입찰 상세 정보
                 </h1>
@@ -167,8 +158,8 @@ export default function BidDetailPage() {
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                   <User className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
+          </div>
+          <div>
                   <h3 className="text-lg font-semibold text-gray-800">
                     {bid.customerName || '입찰자 없음'}
                   </h3>
@@ -182,11 +173,11 @@ export default function BidDetailPage() {
                     {bid.bidPrice ? bid.bidPrice.toLocaleString() : 'N/A'}원
                   </span>
                 </div>
-                {maxBidPrice !== null && (
+                {auction && (
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                     <span className="text-gray-600">현재가</span>
                     <span className="text-2xl font-bold text-blue-600">
-                      {maxBidPrice.toLocaleString()}원
+                      {auction.currentPrice ? auction.currentPrice.toLocaleString() : 'N/A'}원
                     </span>
                   </div>
                 )}
@@ -214,8 +205,8 @@ export default function BidDetailPage() {
                   <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
                       <Gavel className="w-8 h-8 text-gray-600" />
-                    </div>
-                    <div>
+          </div>
+          <div>
                       <h3 className="text-lg font-semibold text-gray-800">
                         {auction.adminProduct?.productName || '상품명 없음'}
                       </h3>
@@ -233,7 +224,7 @@ export default function BidDetailPage() {
                     <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <span className="text-gray-600">현재가</span>
                       <span className="font-semibold text-blue-600">
-                        {maxBidPrice !== null ? maxBidPrice.toLocaleString() : 'N/A'}원
+                        {auction.currentPrice ? auction.currentPrice.toLocaleString() : 'N/A'}원
                       </span>
                     </div>
                     
@@ -257,13 +248,13 @@ export default function BidDetailPage() {
                         {auction.endTime ? new Date(auction.endTime).toLocaleString() : 'N/A'}
                       </span>
                     </div>
-                  </div>
+          </div>
                 </>
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   <Gavel className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                   <p>경매 정보를 불러올 수 없습니다.</p>
-                </div>
+          </div>
               )}
             </CardContent>
           </Card>

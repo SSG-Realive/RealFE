@@ -48,7 +48,7 @@ export {
     getDailySalesTrend as getSellerDailySalesTrend,
     getMonthlySalesTrend as getSellerMonthlySalesTrend,
     getSellerPublicInfoList,
-    getSellerPublicInfo,
+    getSellerPublicInfoBySellerId,
     getSellerReviews,
     getSellerProducts,
 } from './seller/sellerService';

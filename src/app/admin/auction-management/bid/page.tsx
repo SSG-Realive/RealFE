@@ -104,7 +104,7 @@ export default function BidHistoryPage() {
           window.location.replace('/admin/login');
         }
       } else {
-        setError('입찰 내역을 불러오는데 실패했습니다.');
+      setError('입찰 내역을 불러오는데 실패했습니다.');
       }
     } finally {
       setLoading(false);
@@ -186,7 +186,7 @@ export default function BidHistoryPage() {
           <h3 className="text-2xl font-bold text-gray-800 mb-4">오류가 발생했습니다</h3>
           <p className="text-gray-600 text-lg mb-8">{error}</p>
           <Button onClick={selectedAuctionId ? fetchBids : fetchAllBids} className="bg-gray-800 hover:bg-gray-700">
-            다시 시도
+          다시 시도
           </Button>
         </div>
       </div>
@@ -255,11 +255,11 @@ export default function BidHistoryPage() {
                   <Input
                     type="text"
                     placeholder="입찰자명 또는 경매 ID 검색"
-                    value={search}
+          value={search}
                     onChange={e => setSearch(e.target.value)}
                     className="pl-10 w-64"
-                  />
-                </div>
+        />
+      </div>
                 
                 {/* 필터 버튼들 */}
                 <div className="flex gap-2">
@@ -312,15 +312,15 @@ export default function BidHistoryPage() {
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+        <thead>
                   <tr className="bg-gray-50 border-b">
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">경매명</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">입찰자</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">입찰금액</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">입찰시간</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
-                  </tr>
-                </thead>
+          </tr>
+        </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {sortedBids.length === 0 ? (
                     <tr>
@@ -333,7 +333,7 @@ export default function BidHistoryPage() {
                     </tr>
                   ) : (
                     sortedBids.map((bid) => (
-                      <tr key={bid.id}>
+            <tr key={bid.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
                             {getAuctionName(bid.auctionId)}
@@ -357,20 +357,20 @@ export default function BidHistoryPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Button
-                            onClick={() => router.push(`/admin/auction-management/bid/${bid.id}`)}
+                  onClick={() => router.push(`/admin/auction-management/bid/${bid.id}`)}
                             variant="ghost"
                             size="sm"
                             className="text-blue-600 hover:text-blue-800"
-                          >
+                >
                             <Eye className="w-4 h-4 mr-1" />
-                            상세보기
+                  상세보기
                           </Button>
-                        </td>
-                      </tr>
+              </td>
+            </tr>
                     ))
                   )}
-                </tbody>
-              </table>
+        </tbody>
+      </table>
             </div>
           </CardContent>
         </Card>
@@ -413,10 +413,10 @@ export default function BidHistoryPage() {
                   다음
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
-              </div>
+        </div>
             </CardContent>
           </Card>
-        )}
+      )}
       </div>
     </div>
   );

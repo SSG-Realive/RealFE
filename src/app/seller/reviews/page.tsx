@@ -36,6 +36,7 @@ export default function SellerReviewPage() {
     
     // 필터링 상태
     const [filterProductName, setFilterProductName] = useState('');
+    const [inputProductName, setInputProductName] = useState('');
     const [filterRating, setFilterRating] = useState<number | undefined>(undefined);
     const [sortBy, setSortBy] = useState<'latest' | 'oldest' | 'rating_high' | 'rating_low'>('latest');
     
@@ -115,13 +116,14 @@ export default function SellerReviewPage() {
         }
     };
 
-    // WebSocket 또는 주기적 갱신 설정
+    // 페이지 활성화 시 데이터 새로고침
     useEffect(() => {
-        // 1분마다 데이터 새로고침
-        const intervalId = setInterval(refreshData, 60000);
-        
-        // 컴포넌트 언마운트 시 정리
-        return () => clearInterval(intervalId);
+        const handleFocus = () => {
+            refreshData();
+        };
+
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
     }, []);
 
     // 신호등 색상 반환 (대시보드와 동일한 규칙)
@@ -236,8 +238,13 @@ export default function SellerReviewPage() {
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6b7280]" />
                                     <input
                                         type="text"
-                                        value={filterProductName}
-                                        onChange={(e) => setFilterProductName(e.target.value)}
+                                        value={inputProductName}
+                                        onChange={(e) => setInputProductName(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' && inputProductName.trim() !== '') {
+                                                setFilterProductName(inputProductName); // 엔터 시 검색어가 있을 때만 검색
+                                            }
+                                        }}
                                         placeholder="상품명 검색"
                                         className="w-full pl-10 pr-3 py-2 border border-[#d1d5db] rounded-md focus:ring-2 focus:ring-[#a89f91] focus:border-transparent"
                                     />

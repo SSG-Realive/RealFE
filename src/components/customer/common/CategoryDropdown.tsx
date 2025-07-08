@@ -61,7 +61,8 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
 
     return (
         <div
-            className={`overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar px-4 py-0 bg-transparent backdrop-blur-none text-sm relative mb-0 ${
+            style={{ border: 'none', boxShadow: 'none' }}
+            className={`overflow-x-auto md:overflow-visible whitespace-nowrap no-scrollbar px-4 py-0 bg-transparent border-none shadow-none rounded-none text-sm relative mb-0 ${
                 isCompact ? 'z-10' : 'z-50'
             }`}
         >

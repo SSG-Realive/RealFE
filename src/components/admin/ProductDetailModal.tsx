@@ -6,14 +6,16 @@ import { useGlobalDialog } from "@/app/context/dialogContext";
 interface Product {
   id: number;
   name: string;
+  categoryId: number;
   categoryName: string;
   price: number;
   stock: number;
-  status: string;
   createdAt: string;
-  sellerName?: string;
+  status: "상" | "중" | "하";
+  imageThumbnailUrl?: string;  // 백엔드 응답과 일치하도록 수정
+  imageUrls?: string[];        // 백엔드 응답과 일치하도록 수정
   description?: string;
-  productImages?: string[];
+  sellerName?: string;
   width?: number;
   depth?: number;
   height?: number;
@@ -153,26 +155,31 @@ export default function ProductDetailModal({
             {/* 상품 이미지 섹션 */}
             <div className="space-y-4">
               <div className="aspect-square bg-gray-100 rounded-3xl overflow-hidden shadow-lg">
-                {product.productImages && product.productImages.length > 0 ? (
+                {product.imageThumbnailUrl ? (
                   <img
-                    src={product.productImages[0]}
+                    src={product.imageThumbnailUrl}
                     alt={product.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // 이미지 로드 실패 시 기본 박스로 대체
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <div className="text-center">
-                      <Package className="w-20 h-20 mx-auto mb-4" />
-                      <p className="text-lg">이미지 없음</p>
-                    </div>
+                ) : null}
+                {/* 기본 이미지 박스 */}
+                <div className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${product.imageThumbnailUrl ? 'hidden' : ''}`}>
+                  <div className="text-center">
+                    <Package className="w-20 h-20 text-gray-400 mx-auto mb-4" />
+                    <p className="text-lg text-gray-500">이미지 없음</p>
                   </div>
-                )}
+                </div>
               </div>
               
               {/* 추가 이미지가 있다면 썸네일 표시 */}
-              {product.productImages && product.productImages.length > 1 && (
+              {product.imageUrls && product.imageUrls.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto">
-                  {product.productImages.slice(1, 5).map((image, index) => (
+                  {product.imageUrls.slice(1, 5).map((image, index) => (
                     <div key={index} className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                       <img
                         src={image}

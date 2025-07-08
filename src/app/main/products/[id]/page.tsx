@@ -173,13 +173,13 @@ export default function ProductDetailPage() {
           {/* 상품 설명 + 버튼 */}
           <div>
             <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
-            <p className="text-sm text-gray-700 mb-4 break-words whitespace-pre-wrap">
+            <p className="text-sm text-gray-700 mb-2 break-words whitespace-pre-wrap">
               {product.description}
             </p>
-            <div className="flex items-center justify-between text-base font-light mb-6">
-              <span>총 상품금액</span>
-              <span>KRW {(product.price * quantity).toLocaleString()}</span>
-            </div>
+
+            <p className="text-base text-gray-800 font-light mb-4">
+              상품 금액: KRW {product.price.toLocaleString()}
+            </p>
 
             <div className="mb-6 space-y-2 text-sm text-gray-700">
               <p><span className="font-light">상품상태:</span> {product.status}</p>
@@ -216,7 +216,7 @@ export default function ProductDetailPage() {
 
               <div className="flex items-center justify-between text-base font-light mb-6">
                 <span>총 상품금액</span>
-                <span>{(product.price * quantity).toLocaleString()}<span className="text-sm ml-1">원</span></span>
+                <span>KRW {(product.price * quantity).toLocaleString()}</span>
               </div>
 
               <div className="flex gap-3">
@@ -251,11 +251,19 @@ export default function ProductDetailPage() {
               <h2 className="text-lg font-light text-gray-600 mb-4">이런 상품은 어떠세요?</h2>
               <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
                 {related.map((item) => (
-                    <div key={item.id} onClick={() => router.push(`/main/products/${item.id}`)} className="cursor-pointer bg-white rounded-md overflow-hidden shadow-sm hover:shadow-md transition flex-shrink-0 w-44">
-                      <img src={item.imageThumbnailUrl ?? '/default-thumbnail.png'} alt={item.name} className="w-full aspect-[4/3] object-cover" />
-                      <div className="p-3">
-                        <p className="text-sm font-light truncate text-black">{item.name}</p>
-                        <p className="text-sm font-light mt-1 text-black">{item.price.toLocaleString()}원</p>
+                    <div
+                        key={item.id}
+                        onClick={() => router.push(`/main/products/${item.id}`)}
+                        className="w-32 sm:w-36 md:w-40 flex-shrink-0 bg-white rounded-md shadow hover:shadow-md transition overflow-hidden cursor-pointer"
+                    >
+                      <img
+                          src={item.imageThumbnailUrl ?? '/default-thumbnail.png'}
+                          alt={item.name}
+                          className="w-full aspect-square object-cover"
+                      />
+                      <div className="p-2">
+                        <p className="text-sm font-light truncate text-black text-center">{item.name}</p>
+                        <p className="text-sm font-light text-black mt-1 text-right">KRW {item.price.toLocaleString()}</p>
                       </div>
                     </div>
                 ))}

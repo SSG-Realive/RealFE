@@ -15,13 +15,13 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
     } = auction
 
     return (
-        <li className="shrink-0 w-80 sm:w-96 px-3">
+        <li className="shrink-0 w-64 sm:w-96 px-3">
             <Link
                 href={`/auctions/${id}`}
                 className="block rounded-2xl bg-white shadow hover:shadow-md transition"
             >
                 {/* 이미지 영역 */}
-                <div className="aspect-[4/3] bg-gray-100 rounded-none overflow-hidden">
+                <div className="aspect-[1] bg-gray-100 rounded-none overflow-hidden">
                     <img
                         src={
                             adminProduct?.imageUrls?.[0] ||
@@ -29,7 +29,7 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
                             '/images/placeholder.png'
                         }
                         alt={adminProduct?.productName || '상품'}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                     />
                 </div>
 
@@ -41,7 +41,7 @@ export function AuctionItemCard({ auction }: { auction: Auction }) {
                     <p className="text-sm font-light text-gray-800 text-center truncate">
                         시작가 <span className="ml-1">KRW {startPrice?.toLocaleString()}</span>
                     </p>
-                    <p className="text-sm font-light text-gray-800 text-center truncate">
+                    <p className="text-sm font-bold text-gray-800 text-center truncate">
                         현재가 <span className="ml-1">KRW {currentPrice?.toLocaleString()}</span>
                     </p>
                     <p className="text-sm font-light text-red-500 text-center truncate mt-0.5">

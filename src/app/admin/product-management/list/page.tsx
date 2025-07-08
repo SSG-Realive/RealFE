@@ -38,8 +38,8 @@ interface Product {
   stock: number;
   createdAt: string;
   status: "상" | "중" | "하";
-  productImage: string;
-  productImages?: string[];
+  imageThumbnailUrl?: string;  // 백엔드 응답과 일치하도록 수정
+  imageUrls?: string[];        // 백엔드 응답과 일치하도록 수정
   description?: string;
   sellerName?: string;
   width?: number;
@@ -489,17 +489,25 @@ export default function ProductManagementPage() {
                 >
                   {/* 상품 이미지 */}
                   <div className="relative h-64 overflow-hidden">
-                    {product.productImages && product.productImages.length > 0 ? (
+                    {product.imageThumbnailUrl ? (
                       <img
-                        src={product.productImages[0]}
+                        src={product.imageThumbnailUrl}
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 이미지 로드 실패 시 기본 박스로 대체
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                        <Package className="w-16 h-16 text-gray-400" />
+                    ) : null}
+                    {/* 기본 이미지 박스 */}
+                    <div className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${product.imageThumbnailUrl ? 'hidden' : ''}`}>
+                      <div className="text-center">
+                        <Package className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">이미지 없음</p>
                       </div>
-                    )}
+                    </div>
                     
                     {/* 상태 배지 */}
                     <div className="absolute top-4 right-4">

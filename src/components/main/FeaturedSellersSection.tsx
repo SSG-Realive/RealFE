@@ -98,7 +98,9 @@ export default function FeaturedSellersSection() {
                             <h3 className="text-lg font-light text-gray-700 mb-4 text-center">{seller.sellerName}</h3>
 
                             <Slider
-                                ref={(ref) => (sliderRefs.current[seller.sellerId] = ref)}
+                                ref={(ref) => {
+                                    sliderRefs.current[seller.sellerId] = ref;
+                                }}
                                 dots={false}
                                 infinite
                                 speed={500}

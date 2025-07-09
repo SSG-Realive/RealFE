@@ -161,7 +161,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setShowCategory((prev) => !prev)}
-                                className="p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                                className="p-2 rounded-md hover:bg-gray-100"
                                 aria-label="카테고리 메뉴"
                             >
                                 {showCategory ? <X size={20} /> : <Menu size={20} />}

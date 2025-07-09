@@ -6,7 +6,7 @@ import { Users, Search, UserCheck, UserX, CheckCircle, XCircle} from 'lucide-rea
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 interface Seller {
   id: number;
@@ -64,6 +64,9 @@ const AdminSellersPage: React.FC = () => {
   const [selectedSeller, setSelectedSeller] = useState<SellerDetail | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const [totalStats, setTotalStats] = useState({
     total: 0,
     active: 0,
@@ -219,10 +222,12 @@ const AdminSellersPage: React.FC = () => {
       // 승인/거절 후 전체 통계 다시 로딩
       fetchTotalStats();
       
-      alert(`${seller.name} ${approved ? '승인' : '거절'} 처리되었습니다.`);
+      setModalMessage(`${seller.name} ${approved ? '승인' : '거절'} 처리되었습니다.`);
+      setShowSuccessModal(true);
     } catch (err) {
       const error = err as ErrorResponse;
-      alert(`처리 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+      setModalMessage(`처리 실패: ${error?.response?.data?.message || error?.message || '알 수 없는 오류'}`);
+      setShowErrorModal(true);
     } finally {
       setUpdatingId(null);
     }
@@ -701,6 +706,46 @@ const AdminSellersPage: React.FC = () => {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* 성공 모달 */}
+        <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                처리 완료
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-gray-700">{modalMessage}</p>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowSuccessModal(false)} variant="default">
+                확인
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 에러 모달 */}
+        <Dialog open={showErrorModal} onOpenChange={setShowErrorModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-red-600" />
+                처리 실패
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-red-600">{modalMessage}</p>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setShowErrorModal(false)} variant="outline">
+                확인
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>

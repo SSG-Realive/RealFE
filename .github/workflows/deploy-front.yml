@@ -2,7 +2,7 @@ name: Deploy Frontend to EC2
 
 on:
   push:
-    branches: [main]  # 원하는 브랜치명 사용 가능
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -24,21 +24,23 @@ jobs:
       - name: Build Next.js
         run: npm run build
 
-      - name: Upload files to EC2
+      - name: SCP to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
-          source: ".next,public,package.json,package-lock.json,.env.production"
+          port: 22
+          source: ".next,public,package.json,package-lock.json"
           target: "/home/ec2-user/realive-front"
 
-      - name: Restart app on EC2
+      - name: SSH into EC2 and Restart PM2
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_KEY }}
+          port: 22
           script: |
             cd /home/ec2-user/realive-front
             npm install --production

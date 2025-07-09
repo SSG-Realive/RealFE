@@ -106,8 +106,6 @@ export default function ChatBotWidget() {
                 }
             );
 
-
-
             const botMsg = {
                 sender: 'bot' as const,
                 text: res.data.reply || '❌ 답변을 받을 수 없습니다.',

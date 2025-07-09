@@ -3,6 +3,7 @@ name: Deploy Frontend to EC2
 on:
   push:
     branches: [main]  # 원하는 브랜치명 사용 가능
+  workflow_dispatch:
 
 jobs:
   deploy:

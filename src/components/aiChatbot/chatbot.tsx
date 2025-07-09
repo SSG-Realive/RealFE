@@ -1,3 +1,4 @@
+// chatbot.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -70,6 +71,16 @@ export default function ChatBotWidget() {
     );
     if (shouldHide) return null;
 
+    // ✅ GPT 메시지 포맷 변환
+    const convertMessagesForGPT = (
+        msgs: { sender: 'user' | 'bot'; text: string }[]
+    ) => {
+        return msgs.map((msg) => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text.replace(/<br\s*\/?>/g, '\n'),
+        }));
+    };
+
     // ✅ 메시지 전송
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -77,18 +88,21 @@ export default function ChatBotWidget() {
         if (!trimmed || !token) return;
 
         const userMsg = { sender: 'user' as const, text: trimmed };
-        setMessages((prev) => [...prev, userMsg]);
+        const newMessages = [...messages, userMsg];
+        setMessages(newMessages);
         setInput('');
 
         try {
+            // 🔁 이전 대화 포함하여 GPT에 전달
+            const formattedMessages = convertMessagesForGPT(newMessages);
+
+            console.log('[디버깅] formattedMessages:', formattedMessages);
+
             const res = await axios.post(
                 'http://localhost:8080/api/chat',
-                { message: trimmed },
+                formattedMessages,  // 메시지 배열만 보냄
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                    withCredentials: true,
+                    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
                 }
             );
 
@@ -97,13 +111,16 @@ export default function ChatBotWidget() {
                 text: res.data.reply || '❌ 답변을 받을 수 없습니다.',
             };
             setMessages((prev) => [...prev, botMsg]);
-        } catch (err) {
+        } catch (err: any) {
+            const errorMessage =
+                err?.response?.data?.message || err.message || '알 수 없는 오류';
             setMessages((prev) => [
                 ...prev,
-                { sender: 'bot', text: '❌ 챗봇 응답 처리 중 오류 발생' },
+                { sender: 'bot', text: `❌ 오류 발생: ${errorMessage}` },
             ]);
-            console.error(err);
+            console.error('[GPT 오류]', err);
         }
+
     };
 
     return (

@@ -15,7 +15,7 @@ async function CartPaymentPage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
 
-    const cartResponse = await fetch('http://localhost:8080/api/customer/cart', {
+    const cartResponse = await fetch('https://www.realive-ssg.click/api/customer/cart', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ async function CartPaymentPage() {
 
         try {
             // 백엔드 POST API 호출
-            const paymentProcessResponse = await fetch('http://localhost:8080/api/customer/cart/payment', {
+            const paymentProcessResponse = await fetch('https://www.realive-ssg.click/api/customer/cart/payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

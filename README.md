@@ -110,10 +110,10 @@ npm install
 ### 3. 환경 변수 설정
 ```bash
 # .env.local 파일 생성
-NEXT_PUBLIC_API_URL=http://localhost:8080
+NEXT_PUBLIC_API_URL=https://www.realive-ssg.click
 NEXT_PUBLIC_TOSS_CLIENT_KEY=your_toss_client_key
-NEXT_PUBLIC_TOSS_SUCCESS_URL=http://localhost:3000/orders/success
-NEXT_PUBLIC_TOSS_FAIL_URL=http://localhost:3000/orders/fail
+NEXT_PUBLIC_TOSS_SUCCESS_URL=https://www.realive-ssg.click/orders/success
+NEXT_PUBLIC_TOSS_FAIL_URL=https://www.realive-ssg.click/orders/fail
 ```
 
 ### 4. 개발 서버 실행
@@ -128,7 +128,7 @@ npm start
 
 ### 5. 브라우저에서 확인
 ```
-http://localhost:3000
+https://www.realive-ssg.click
 ```
 
 <br><br>

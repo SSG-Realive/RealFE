@@ -7,7 +7,7 @@ import { OrderItemResponseDTO } from '@/types/orders/orderItemResponseDTO';
 import { useAuthStore } from '@/store/customer/authStore';
 
 async function fetchOrderDetail(orderId: number, token: string): Promise<OrderResponseDTO> {
-    const url = `http://localhost:8080/api/customer/orders/${orderId}`;
+    const url = `https://www.realive-ssg.click/api/customer/orders/${orderId}`;
     const response = await fetch(url, {
         cache: 'no-store',
         redirect: 'follow',

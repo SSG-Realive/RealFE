@@ -99,8 +99,8 @@ export default function ChatBotWidget() {
             console.log('[디버깅] formattedMessages:', formattedMessages);
 
             const res = await axios.post(
-                'http://localhost:8080/api/chat',
-                formattedMessages,  // 메시지 배열만 보냄
+                'https://www.realive-ssg.click/api/chat',
+                { message: trimmed },
                 {
                     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }
                 }

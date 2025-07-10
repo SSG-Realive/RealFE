@@ -52,7 +52,7 @@ export default function AuctionDetailPage() {
   const getImageUrl = (imagePath: string): string => {
     if (!imagePath) return '/images/placeholder.png';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8080${imagePath}`;
+    return `https://www.realive-ssg.click/api${imagePath}`;
   };
 
   const getStatusColor = (status: string, startTime?: string) => {

@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://www.realive-ssg.click/:path*',
+        destination: 'https://www.realive-ssg.click/api/:path*',
       },
     ];
   },

@@ -21,10 +21,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Next.js
-        run: npm run build
+      - name: Build with production env
+        run: |
+          cp .env.production .env
+          NODE_ENV=production npm run build
 
-      - name: SCP to EC2
+      - name: SCP build to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -43,5 +45,6 @@ jobs:
           port: 22
           script: |
             cd /home/ec2-user/realive-front
+            cp .env.production .env
             npm install --production
             pm2 restart realive-front || pm2 start "npm run start" --name realive-front

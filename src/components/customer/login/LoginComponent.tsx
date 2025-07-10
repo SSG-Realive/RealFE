@@ -39,7 +39,7 @@ export default function LoginForm() {
     };
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_UR || 'http://localhost:8080/api';
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_UR || 'https://www.realive-ssg.click/api';
       const apiUrl = `${apiBaseUrl}/public/auth/login`;
 
       const res = await fetch(apiUrl, {

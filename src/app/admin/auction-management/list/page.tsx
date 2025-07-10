@@ -118,7 +118,7 @@ function AuctionListPage() {
   const getImageUrl = (imagePath: string): string => {
     if (!imagePath) return '/images/placeholder.png';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8080${imagePath}`;
+    return `https://www.realive-ssg.click${imagePath}`;
   };
 
   const handlePageChange = (page: number) => {

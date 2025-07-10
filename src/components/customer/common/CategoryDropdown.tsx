@@ -29,7 +29,7 @@ export default function CategoryDropdown({ onCategorySelect, isCompact }: Props)
 
     useEffect(() => {
         axios
-            .get<Category[]>('http://localhost:8080/api/seller/categories')
+            .get<Category[]>('https://www.realive-ssg.click/api/seller/categories')
             .then((res) => {
                 const all = res.data;
                 const parents = all.filter((c) => c.parentId === null);

@@ -63,7 +63,7 @@ function ReviewPage() {
       };
 
       axios
-        .get('http://localhost:8080/api/customer/reviews/check-exists', {
+        .get('https://www.realive-ssg.click/api/customer/reviews/check-exists', {
           params: { orderId: parsedOrderId, sellerId: parsedSellerId },
           headers,
           withCredentials: true,
@@ -97,7 +97,7 @@ function ReviewPage() {
       const formData = new FormData();
       formData.append('file', file);
       try {
-        const res = await axios.post('http://localhost:8080/api/customer/reviews/images/upload', formData, {
+        const res = await axios.post('https://www.realive-ssg.click/api/customer/reviews/images/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             ...(accessToken && { Authorization: `Bearer ${accessToken}` }),

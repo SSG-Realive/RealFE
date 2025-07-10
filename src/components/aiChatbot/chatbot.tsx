@@ -64,7 +64,7 @@ export default function ChatBotWidget() {
 
         try {
             const res = await axios.post(
-                'http://localhost:8080/api/chat',
+                'https://www.realive-ssg.click/api/chat',
                 { message: trimmed },
                 {
                     headers: {

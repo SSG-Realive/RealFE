@@ -97,6 +97,15 @@ export default function CustomerHomePage() {
         return current.name;
     };
 
+    const getRootCategoryId = (id: number | null): number | null => {
+        if (id === null || !categoryMap[id]) return null;
+        let current = categoryMap[id];
+        while (current.parentId && categoryMap[current.parentId]) {
+            current = categoryMap[current.parentId];
+        }
+        return current.id;
+    };
+
     const getSiblingCategories = (): Category[] => {
         if (!categoryId || !categoryMap[categoryId]) return categories.filter((c) => c.parentId === null);
         const current = categoryMap[categoryId];
@@ -109,8 +118,16 @@ export default function CustomerHomePage() {
             {isMainDefaultView && <div className="mb-0 sm:mb-2"><ExtraBanner /></div>}
 
             {/* ✅ 주간 경매 */}
-            {!categoryId && (
-                <section className="w-full mt-32 mb-4 sm:mt-6 sm:mb-8">
+            {isMainDefaultView && (
+                <section className="w-full mt-12 mb-4 sm:mt-6 sm:mb-8">
+                    <div className="max-w-screen-xl mx-auto px-4">
+                        <h2 className="text-lg sm:text-xl font-light mb-2 text-gray-900">주간 경매</h2>
+                        <p className="text-sm text-gray-500 mb-6">
+                            이번 주에만 만나볼 수 있는 한정 경매 상품을 확인해보세요.
+                        </p>
+                    </div>
+
+
                     {auctionLoading ? (
                         <p className="px-4">로딩 중...</p>
                     ) : auctionError ? (
@@ -123,7 +140,10 @@ export default function CustomerHomePage() {
                 </section>
             )}
 
-            <PopularProductsGrid />
+            {categoryMap && Object.keys(categoryMap).length > 0 && (
+                <PopularProductsGrid categoryId={getRootCategoryId(categoryId)} />
+            )}
+
             {isMainDefaultView && <BannerCarousel />}
             {isMainDefaultView && <div className="my-4 sm:my-8 md:my-12"><FeaturedSellersSection /></div>}
             {isMainDefaultView && <MiddleBannerCarousel />}

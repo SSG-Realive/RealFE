@@ -39,10 +39,13 @@ interface Product {
   stock: number;
   createdAt: string;
   status: "상" | "중" | "하";
-  productImage: string;
-  productImages?: string[];
+  imageThumbnailUrl?: string;  // 백엔드 응답과 일치하도록 수정
+  imageUrls?: string[];        // 백엔드 응답과 일치하도록 수정
   description?: string;
   sellerName?: string;
+  width?: number;
+  depth?: number;
+  height?: number;
 }
 
 interface Category {
@@ -501,17 +504,25 @@ export default function ProductManagementPage() {
               <div key={product.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 {/* 상품 이미지 */}
                 <div className="aspect-square bg-gray-100 relative">
-                  {product.productImages && product.productImages.length > 0 ? (
+                  {product.imageThumbnailUrl ? (
                     <img
-                      src={product.productImages[0]}
+                      src={product.imageThumbnailUrl}
                       alt={product.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // 이미지 로드 실패 시 기본 박스로 대체
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <Package className="w-12 h-12" />
+                  ) : null}
+                  {/* 기본 이미지 박스 */}
+                  <div className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center ${product.imageThumbnailUrl ? 'hidden' : ''}`}>
+                    <div className="text-center">
+                      <Package className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-500 text-xs">이미지 없음</p>
                     </div>
-                  )}
+                  </div>
                   
                   {/* 상태 배지 */}
                   <div className="absolute top-2 right-2">

@@ -92,7 +92,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                         <div className="flex items-center gap-2 shrink-0">
                             <button
                                 onClick={() => setShowCategory((prev) => !prev)}
-                                className="p-2 rounded-md border border-gray-300 hover:bg-gray-100"
+                                className="p-2 rounded-md hover:bg-gray-100"
                                 aria-label="카테고리 메뉴"
                             >
                                 {showCategory ? <X size={20} /> : <Menu size={20} />}
@@ -101,7 +101,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                 <Image
                                     src="/images/logo.png"
                                     alt="Realive 로고"
-                                    width={120}
+                                    width={60}
                                     height={30}
                                     className="object-contain"
                                     priority
@@ -170,7 +170,7 @@ export default function Navbar({ onSearch, onCategorySelect }: NavbarProps) {
                                 <Image
                                     src="/images/logo.png"
                                     alt="Realive 로고"
-                                    width={120}
+                                    width={60}
                                     height={30}
                                     className="object-contain"
                                     priority

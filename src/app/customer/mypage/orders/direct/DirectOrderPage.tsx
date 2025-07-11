@@ -340,13 +340,19 @@ const handleAddressChange = useCallback((fullAddress: string) => {
             {/* 1. 주문 상품 정보 */}
             <section className="order-section">
                 <h2>주문 상품</h2>
-                <div className="product-summary-card">
-                    <img src={productInfo.imageUrl || '/images/placeholder.png'} alt={productInfo.productName} />
-                    <div className="product-details">
-                        <p className="product-name">{productInfo.productName}</p>
-                        <p className="product-quantity">수량: {productInfo.quantity}개</p>
+                <div className="product-summary-card flex items-start gap-4">
+                    <img
+                        src={productInfo.imageUrl || '/images/placeholder.png'}
+                        alt={productInfo.productName}
+                        className="w-24 h-24 object-cover"
+                    />
+                    <div className="flex flex-col justify-between">
+                        <p className="product-name text-sm text-gray-800">{productInfo.productName}</p>
+                        <p className="product-quantity text-sm text-gray-600">수량: {productInfo.quantity}개</p>
+                        <p className="product-price text-sm text-black mt-1">
+                            {(productInfo.price * productInfo.quantity).toLocaleString()}원
+                        </p>
                     </div>
-                    <p className="product-price">{(productInfo.price * productInfo.quantity).toLocaleString()}원</p>
                 </div>
             </section>
 
